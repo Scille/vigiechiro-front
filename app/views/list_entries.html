@@ -1,0 +1,10 @@
+<div ng-repeat="entry in entries" class="well">
+    <img class="center-block" ng-src="{{entry.picture}}" style="display:block"/>
+    <br>
+    <div class="text-center">{{entry.comment}}</div>
+</div>
+
+<div ng-show="entries.length == 0" class="text-center">
+	<h3><i>No entries</i></h3>
+	<a href='#/post'>you should post something...</a>
+</div>

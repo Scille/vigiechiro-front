@@ -1,0 +1,27 @@
+<div class="container" ng-hide="is_logged === true">
+  <div class="header">
+    <h3>Login with your favorite service</h3>
+  </div>
+  <p>
+    <button class="btn btn-default" ng-href="{{api_domain}}/login/google" onclick="popup(this.getAttribute('href'))">
+      <span>Login with Google</span>
+      <img src="/images/google.ico"/>
+    </button>
+  </p>
+  <p>
+    <a class="auhomatic btn btn-default" ng-href="{{api_domain}}/login/github" onclick="popup(this.getAttribute('href'))">
+      <span>Login with Github</span>
+      <img src="/images/github.ico"/>
+    </a>
+  </p>
+</div>
+<script>
+  function popup(url) {
+    event.preventDefault();
+    var width = 640;
+    var height = 480;
+    var top = (screen.height / 2) - (height / 2)
+    var left = (screen.width / 2) - (width / 2)
+    window.open(url, '', 'width='+width+',height='+height+',top='+top+',left='+left);
+  }
+</script>
