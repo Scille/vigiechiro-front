@@ -45,7 +45,7 @@ describe 'Service: session', ->
   test_user_id = "123456789"
   test_authorization_header = "Basic QzhZMVZNRUtIT0lUM0YxR1U5SEkxNkZOTkhCN1FGS0o6"
 
-  beforeEach module 'vigiechiroApp'
+  beforeEach module 'xin_session'
 
   # load the service's module
   beforeEach module ($provide)->

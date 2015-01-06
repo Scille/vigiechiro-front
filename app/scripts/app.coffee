@@ -18,7 +18,8 @@ angular
     'ngResource',
     'restangular',
     'http-auth-interceptor',
-    'flow'
+    'flow',
+    'xin'
   ])
   .constant 'RESOURCES',
     API_DOMAIN: 'http://api.lvh.me:8080'
@@ -42,10 +43,10 @@ angular
   .config ($routeProvider) ->
     $routeProvider
       .when '/',
-        templateUrl: 'views/list_entries.html'
+        templateUrl: 'scripts/views/list_entries/list_entries.html'
         controller: 'ListEntriesCtrl'
       .when '/post',
-        templateUrl: 'views/new_entry.html'
+        templateUrl: 'scripts/views/new_entry/new_entry.html'
         controller: 'NewEntryCtrl'
       .when '/404',
         templateUrl: '404.html'
@@ -53,7 +54,7 @@ angular
         redirectTo: '/404'
   .directive 'loginDirective', ->
     restrict: 'E'
-    templateUrl: 'views/login.html'
+    templateUrl: 'scripts/xin/login_drt/login.html'
     controller: 'LoginCtrl'
   .directive 'contentDirective', (session) ->
     restrict: 'E'
@@ -69,4 +70,4 @@ angular
   .directive 'userStatus', ->
     restrict: 'E'
     controller: 'UserStatusCtrl'
-    templateUrl: 'views/user_status.html'
+    templateUrl: 'scripts/xin/user_status_drt/user_status.html'

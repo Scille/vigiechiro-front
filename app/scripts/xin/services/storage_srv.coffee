@@ -1,6 +1,6 @@
 'use strict'
 
-angular.module('vigiechiroApp')
+angular.module('xin_storage', [])
   .factory 'storage', ->
     class Storage
       # localStorage uses native code, must wrap the calls...

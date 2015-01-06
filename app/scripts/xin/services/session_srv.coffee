@@ -1,6 +1,6 @@
 'use strict'
 
-angular.module('vigiechiroApp')
+angular.module('xin_session', [])
   .factory 'session', ($rootScope, authService, storage) ->
     get_authorization_header = ->
       token = get_element('token')

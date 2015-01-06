@@ -26,7 +26,7 @@ module.exports = (config) ->
       'bower_components/restangular/dist/restangular.js'
       'bower_components/flow.js/dist/flow.js'
       'bower_components/ng-flow/dist/ng-flow.js'
-      'app/scripts/**/*.coffee'
+      'app/**/*.coffee'
       'test/mock/**/*.coffee'
       'test/spec/**/*.coffee'
     ],
