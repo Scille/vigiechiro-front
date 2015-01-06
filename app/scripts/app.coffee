@@ -2,7 +2,7 @@
 
 
 angular.module('settings', [])
-  .constant 'RESOURCES',
+  .constant 'SETTINGS',
     API_DOMAIN: 'http://api.lvh.me:8080'
     FRONT_DOMAIN: 'http://www.lvh.me:9000'
 
@@ -33,8 +33,8 @@ angular
     'xin_user_status',
     'listUtilisateurs'
   ])
-  .run (Backend, RESOURCES, session) ->
-    Backend.setBaseUrl(RESOURCES.API_DOMAIN)
+  .run (Backend, SETTINGS, session) ->
+    Backend.setBaseUrl(SETTINGS.API_DOMAIN)
   .config ($routeProvider) ->
     $routeProvider
       .when '/',
