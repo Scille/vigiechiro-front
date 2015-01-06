@@ -1,0 +1,7 @@
+<div ng-repeat="utilisateur in utilisateurs" >
+    <div class="text-center">{{ utilisateur.prenom }} {{ utilisateur.nom }}</div>
+</div>
+
+<div ng-show="utilisateurs.length == 0" class="text-center">
+	<h3><i>Pas d'utilisateurs</i></h3>
+</div>

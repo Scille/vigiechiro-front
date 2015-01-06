@@ -22,7 +22,8 @@ angular
     'xin_session',
     'xin_geolocation',
     'xin_login',
-    'xin_user_status'
+    'xin_user_status',
+    'listUtilisateurs'
   ])
   .constant 'RESOURCES',
     API_DOMAIN: 'http://api.lvh.me:8080'
@@ -51,6 +52,9 @@ angular
       .when '/post',
         templateUrl: 'scripts/views/new_entry/new_entry.html'
         controller: 'NewEntryCtrl'
+      .when '/utilisateurs',
+        templateUrl: 'scripts/views/list_utilisateurs/list_utilisateurs.html'
+        controller: 'ListUtilisateursCtrl'
       .when '/404',
         templateUrl: '404.html'
       .otherwise
