@@ -1,6 +1,6 @@
 'use strict'
 
-angular.module('xin_session', [])
+angular.module('xin_session', ['http-auth-interceptor', 'xin_storage'])
   .factory 'session', ($rootScope, authService, storage) ->
     get_authorization_header = ->
       token = get_element('token')

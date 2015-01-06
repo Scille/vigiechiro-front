@@ -37,7 +37,7 @@ describe 'Controller: NewEntryCtrl', ->
 
   scope = {}
   Restangular = new RestangularMock()
-  Geolocation = new GeolocationMock()
+  geolocation = new GeolocationMock()
 
   # Initialize the controller and a mock scope
   beforeEach inject ($controller, $rootScope) ->
@@ -45,7 +45,7 @@ describe 'Controller: NewEntryCtrl', ->
     $controller 'NewEntryCtrl',
       $scope: scope
       Restangular: Restangular
-      Geolocation: Geolocation
+      geolocation: geolocation
 
   it 'Test entry form submit & reset', ->
     scope.entry.comment = 'test'
@@ -56,7 +56,7 @@ describe 'Controller: NewEntryCtrl', ->
     expect(Restangular.all('entries').post).toHaveBeenCalledWith
       picture: 'picture data'
       comment: 'test'
-      date: Geolocation._utc_date
+      date: geolocation._utc_date
       location:
         type: 'Point'
-        coordinates: [Geolocation._longitude, Geolocation._latitude]
+        coordinates: [geolocation._longitude, geolocation._latitude]

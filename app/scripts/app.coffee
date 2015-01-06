@@ -19,7 +19,10 @@ angular
     'restangular',
     'http-auth-interceptor',
     'flow',
-    'xin'
+    'xin_session',
+    'xin_geolocation',
+    'xin_login',
+    'xin_user_status'
   ])
   .constant 'RESOURCES',
     API_DOMAIN: 'http://api.lvh.me:8080'

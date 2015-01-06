@@ -8,9 +8,9 @@
  # Controller of the xin
 ###
 angular.module('xin_user_status', ['restangular', 'xin_session'])
-  .controller 'UserStatusCtrl', ($scope, Restangular, xin_session) ->
+  .controller 'UserStatusCtrl', ($scope, Restangular, session) ->
     update_user = ->
-      user_id = xin_session.get_user_id()
+      user_id = session.get_user_id()
       $scope.user = {}
       if user_id
         Restangular.one('users', user_id).get().then (user) ->
@@ -20,4 +20,4 @@ angular.module('xin_user_status', ['restangular', 'xin_session'])
       update_user()
     $scope.logout = ->
       Restangular.one('logout').post().then ->
-        xin_session.logout()
+        session.logout()
