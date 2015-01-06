@@ -1,5 +1,12 @@
 'use strict'
 
+
+angular.module('settings', [])
+  .constant 'RESOURCES',
+    API_DOMAIN: 'http://api.lvh.me:8080'
+    FRONT_DOMAIN: 'http://www.lvh.me:9000'
+
+
 ###*
  # @ngdoc overview
  # @name vigiechiroApp
@@ -16,34 +23,18 @@ angular
     'ngSanitize',
     'ngTouch',
     'ngResource',
-    'restangular',
     'http-auth-interceptor',
     'flow',
+    'settings',
     'xin_session',
     'xin_geolocation',
     'xin_login',
+    'xin_backend',
     'xin_user_status',
     'listUtilisateurs'
   ])
-  .constant 'RESOURCES',
-    API_DOMAIN: 'http://api.lvh.me:8080'
-    FRONT_DOMAIN: 'http://www.lvh.me:9000'
-  .run (Restangular, RESOURCES, session) ->
-    Restangular.setBaseUrl(RESOURCES.API_DOMAIN)
-      .setDefaultHeaders
-        Authorization: session.get_authorization_header
-      .setRestangularFields
-        id: "_id"
-        etag: "_etag"
-      .addResponseInterceptor (data, operation, what, url, response, deferred) ->
-        if operation == "getList"
-          extractedData = data._items
-          extractedData._meta = data._meta
-          extractedData._links = data._links
-          extractedData.self = data.self
-        else
-          extractedData = data
-        return extractedData
+  .run (Backend, RESOURCES, session) ->
+    Backend.setBaseUrl(RESOURCES.API_DOMAIN)
   .config ($routeProvider) ->
     $routeProvider
       .when '/',

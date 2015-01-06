@@ -1,6 +1,6 @@
 'use strict'
 
-class RestangularMock
+class BackendMock
   constructor: -> @_spies = {}
   one: jasmine.createSpy()
   all: (resource) ->
@@ -36,7 +36,7 @@ describe 'Controller: NewEntryCtrl', ->
   beforeEach module 'vigiechiroApp'
 
   scope = {}
-  Restangular = new RestangularMock()
+  Backend = new BackendMock()
   geolocation = new GeolocationMock()
 
   # Initialize the controller and a mock scope
@@ -44,7 +44,7 @@ describe 'Controller: NewEntryCtrl', ->
     scope = $rootScope.$new()
     $controller 'NewEntryCtrl',
       $scope: scope
-      Restangular: Restangular
+      Backend: Backend
       geolocation: geolocation
 
   it 'Test entry form submit & reset', ->
@@ -52,8 +52,8 @@ describe 'Controller: NewEntryCtrl', ->
     scope.entry.picture = 'picture data'
     scope.sendEntry()
     expect(scope.entry).toEqual {picture: null}
-    expect(Restangular.all('entries').post.calls.count()).toEqual(1)
-    expect(Restangular.all('entries').post).toHaveBeenCalledWith
+    expect(Backend.all('entries').post.calls.count()).toEqual(1)
+    expect(Backend.all('entries').post).toHaveBeenCalledWith
       picture: 'picture data'
       comment: 'test'
       date: geolocation._utc_date

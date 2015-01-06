@@ -50,7 +50,7 @@ angular.module('vigiechiroApp')
           load_and_resize(file)
         else
           elem.hide()
-  .controller 'NewEntryCtrl', ($scope, Restangular, geolocation) ->
+  .controller 'NewEntryCtrl', ($scope, Backend, geolocation) ->
     $scope.input_file = null
     $scope.fileAdded = ($file) ->
       $scope.input_file = $file.file
@@ -64,4 +64,4 @@ angular.module('vigiechiroApp')
       geolocation.getCurrentPosition (location) ->
         $scope.input_file = null
         entry.location = {'type': 'Point', 'coordinates': [location.coords.longitude, location.coords.latitude]}
-        Restangular.all('entries').post(entry)
+        Backend.all('entries').post(entry)

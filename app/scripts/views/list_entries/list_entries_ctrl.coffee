@@ -8,7 +8,7 @@
  # Controller of the vigiechiroApp
 ###
 angular.module('vigiechiroApp')
-  .controller 'ListEntriesCtrl', ($scope, Restangular) ->
+  .controller 'ListEntriesCtrl', ($scope, Backend) ->
     $scope.entries = []
-    Restangular.all('entries').getList({sort:'-_created'}).then (entries) ->
+    Backend.all('entries').getList({sort:'-_created'}).then (entries) ->
       $scope.entries = entries

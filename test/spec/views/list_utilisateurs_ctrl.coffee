@@ -3,22 +3,22 @@
 describe 'Controller: ListUtilisateursCtrl', ->
 
   # load the controller's module
-  beforeEach module 'restangular'
+  beforeEach module 'xin_backend'
   beforeEach module 'listUtilisateurs'
 
-  scope = {}
-  Restangular = undefined
+  scope = undefined
+  Backend = undefined
   httpBackend = undefined
 
   # Initialize the controller and a mock scope
-  beforeEach inject ($controller, $rootScope, _Restangular_, _$httpBackend_) ->
-    Restangular = _Restangular_
+  beforeEach inject ($controller, $rootScope, _Backend_, _$httpBackend_) ->
+    Backend = _Backend_
     httpBackend = _$httpBackend_
-    spyOn(Restangular, 'all').and.callThrough()
+    spyOn(Backend, 'all').and.callThrough()
     scope = $rootScope.$new()
     $controller 'ListUtilisateursCtrl',
       $scope: scope
-      Restangular: Restangular
+      Backend: Backend
 
   it 'Test entry form submit & reset', ->
     mockToReturn = [
@@ -42,5 +42,5 @@ describe 'Controller: ListUtilisateursCtrl', ->
     httpBackend.expectGET('/utilisateurs').respond(mockToReturn)
     expect(scope.utilisateurs).toEqual([])
     httpBackend.flush()
-    expect(Restangular.all).toHaveBeenCalledWith('utilisateurs')
+    expect(Backend.all).toHaveBeenCalledWith('utilisateurs')
     expect(scope.utilisateurs).toEqual(mockToReturn)
