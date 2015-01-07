@@ -31,7 +31,8 @@ angular
     'xin_login',
     'xin_backend',
     'xin_user_status',
-    'listUtilisateurs'
+    'listUtilisateurs',
+    'showUtilisateur'
   ])
   .run (Backend, SETTINGS, session) ->
     Backend.setBaseUrl(SETTINGS.API_DOMAIN)
@@ -46,6 +47,9 @@ angular
       .when '/utilisateurs',
         templateUrl: 'scripts/views/list_utilisateurs/list_utilisateurs.html'
         controller: 'ListUtilisateursCtrl'
+      .when '/utilisateurs/:id',
+        templateUrl: 'scripts/views/show_utilisateur/show_utilisateur.html'
+        controller: 'ShowUtilisateurCtrl'
       .when '/404',
         templateUrl: '404.html'
       .otherwise

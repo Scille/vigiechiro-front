@@ -1,10 +1,10 @@
 'use strict'
 
-###
+###*
  # @ngdoc function
- # @name vigiechiroApp.controller:MainCtrl
+ # @name vigiechiroApp.controller:ListUtilisateursCtrl
  # @description
- # # MainCtrl
+ # # ListUtilisateursCtrl
  # Controller of the vigiechiroApp
 ###
 angular.module('listUtilisateurs', ['xin_backend'])
@@ -12,4 +12,3 @@ angular.module('listUtilisateurs', ['xin_backend'])
     $scope.utilisateurs = []
     Backend.all('utilisateurs').getList().then (utilisateurs) ->
       $scope.utilisateurs = utilisateurs.plain()
-      console.log($scope.utilisateurs)

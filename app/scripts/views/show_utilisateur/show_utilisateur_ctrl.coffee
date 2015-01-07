@@ -1,14 +1,14 @@
 'use strict'
 
-###
+###*
  # @ngdoc function
  # @name vigiechiroApp.controller:ShowUtilisateurCtrl
  # @description
- # # MainCtrl
+ # # ShowUtilisateurCtrl
  # Controller of the vigiechiroApp
 ###
 angular.module('showUtilisateur', ['xin_backend'])
-  .controller 'showUtilisateurCtrl', ($scope, Backend) ->
+  .controller 'ShowUtilisateurCtrl', ($stateParams, $scope, Backend) ->
     $scope.utilisateur = {}
-    Backend.all('utilisateurs').get().then (utilisateurs) ->
-      $scope.utilisateur = utilisateur
+    Backend.one('utilisateurs', $stateParams.id).get().then (utilisateur) ->
+      $scope.utilisateur = utilisateur.plain()
