@@ -1,5 +1,5 @@
 <div ng-repeat="utilisateur in utilisateurs" >
-    <div class="text-center">{{ utilisateur.prenom }} {{ utilisateur.nom }}</div>
+    <div class="text-center"><a href='{{ utilisateur.id }}'>{{ utilisateur.prenom }} {{ utilisateur.nom }}</a></div>
 </div>
 
 <div ng-show="utilisateurs.length == 0" class="text-center">
