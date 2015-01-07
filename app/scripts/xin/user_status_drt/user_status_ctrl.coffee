@@ -13,7 +13,7 @@ angular.module('xin_user_status', ['xin_backend', 'xin_session'])
       user_id = session.get_user_id()
       $scope.user = {}
       if user_id
-        Backend.one('users', user_id).get().then (user) ->
+        Backend.one('utilisateurs', user_id).get().then (user) ->
           $scope.user = user
     update_user()
     $scope.$on 'event:auth-loginConfirmed', ->

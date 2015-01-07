@@ -12,3 +12,4 @@ angular.module('listUtilisateurs', ['xin_backend'])
     $scope.utilisateurs = []
     Backend.all('utilisateurs').getList().then (utilisateurs) ->
       $scope.utilisateurs = utilisateurs.plain()
+      console.log($scope.utilisateurs)
