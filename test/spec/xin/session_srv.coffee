@@ -46,6 +46,7 @@ describe 'Service: session', ->
   test_authorization_header = "Basic QzhZMVZNRUtIT0lUM0YxR1U5SEkxNkZOTkhCN1FGS0o6"
 
   beforeEach module 'xin_session'
+  beforeEach module 'xin_session_tools'
 
   # load the service's module
   beforeEach module ($provide)->
@@ -59,20 +60,20 @@ describe 'Service: session', ->
     $rootScope = _$rootScope_
     spyOn($rootScope, '$broadcast')
 
-  it 'Test basic login', inject (session) ->
+  it 'Test basic login', inject (session, SessionTools) ->
     session.login(test_user_id, test_token)
     expect(authService.loginConfirmed).toHaveBeenCalled()
     expect(session.get_token()).toEqual(test_token)
     expect(session.get_user_id()).toEqual(test_user_id)
-    expect(session.get_authorization_header()).toEqual(test_authorization_header)
+    expect(SessionTools.get_authorization_header()).toEqual(test_authorization_header)
 
-  it 'Test basic logout', inject (session) ->
+  it 'Test basic logout', inject (session, SessionTools) ->
     session.logout()
     expect($rootScope.$broadcast).toHaveBeenCalledWith('event:auth-loginRequired')
     $rootScope.$broadcast.calls.reset()
     expect(session.get_token()).toBe(null)
     expect(session.get_user_id()).toBe(null)
-    expect(session.get_authorization_header()).toBe(null)
+    expect(SessionTools.get_authorization_header()).toBe(null)
     expect($rootScope.$broadcast.calls.allArgs()).toEqual(['event:auth-loginRequired'] for _ in [1..3])
 
   describe 'Test login & logout from another tab', ->
