@@ -21,3 +21,7 @@ angular.module('xin_user_status', ['xin_backend', 'xin_session'])
     $scope.logout = ->
       Backend.one('logout').post().then ->
         session.logout()
+  .directive 'userStatus', ->
+    restrict: 'E'
+    controller: 'UserStatusCtrl'
+    templateUrl: 'scripts/xin/user_status_drt/user_status.html'

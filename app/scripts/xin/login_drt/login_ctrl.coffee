@@ -21,3 +21,7 @@ angular.module('xin_login', ['xin_session', 'appSettings'])
     if route_params.token?
       session.login(route_params.id, route_params.token)
       window.close()
+  .directive 'loginDirective', ->
+    restrict: 'E'
+    templateUrl: 'scripts/xin/login_drt/login.html'
+    controller: 'LoginCtrl'
