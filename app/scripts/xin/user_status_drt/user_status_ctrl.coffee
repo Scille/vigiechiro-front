@@ -7,20 +7,17 @@
  # # UserStatusCtrl
  # Controller of the xin
 ###
-angular.module('xin_user_status', ['xin_backend', 'xin_session'])
-  .controller 'UserStatusCtrl', ($scope, Backend, session) ->
+angular.module('xin_user_status', ['xin_session'])
+  .controller 'UserStatusCtrl', ($scope, session) ->
+    $scope.user = {}
     update_user = ->
-      user_id = session.get_user_id()
-      $scope.user = {}
-      if user_id
-        Backend.one('utilisateurs', user_id).get().then (user) ->
-          $scope.user = user
+      session.get_user_status (user_status) ->
+        $scope.user = user_status
     update_user()
     $scope.$on 'event:auth-loginConfirmed', ->
       update_user()
     $scope.logout = ->
-      Backend.one('logout').post().then ->
-        session.logout()
+      session.logout()
   .directive 'userStatus', ->
     restrict: 'E'
     controller: 'UserStatusCtrl'

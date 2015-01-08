@@ -1,10 +1,10 @@
 'use strict'
 
-angular.module('xin_backend', ['restangular', 'xin_session'])
-  .factory 'Backend', (Restangular, session) ->
+angular.module('xin_backend', ['restangular', 'xin_session_tools'])
+  .factory 'Backend', (Restangular, SessionTools) ->
     Restangular.withConfig (RestangularConfigurer) ->
         RestangularConfigurer.setDefaultHeaders
-            Authorization: session.get_authorization_header
+            Authorization: SessionTools.get_authorization_header
           .setRestangularFields
             id: "_id"
             etag: "_etag"
