@@ -26,12 +26,11 @@ angular
     'http-auth-interceptor',
     'flow',
     'appSettings',
-    'xin_session',
-    'xin_geolocation',
     'xin_login',
-    'xin_backend',
     'xin_user_status',
     'xin_content',
+    'xin_session',
+    'xin_backend',
     'listUtilisateurs',
     'showUtilisateur'
   ])
