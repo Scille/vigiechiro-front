@@ -1,7 +1,7 @@
 'use strict'
 
 
-angular.module('settings', [])
+angular.module('appSettings', [])
   .constant 'SETTINGS',
     API_DOMAIN: 'http://api.lvh.me:8080'
     FRONT_DOMAIN: 'http://www.lvh.me:9000'
@@ -25,7 +25,7 @@ angular
     'ngResource',
     'http-auth-interceptor',
     'flow',
-    'settings',
+    'appSettings',
     'xin_session',
     'xin_geolocation',
     'xin_login',
@@ -39,11 +39,7 @@ angular
   .config ($routeProvider) ->
     $routeProvider
       .when '/',
-        templateUrl: 'scripts/views/list_entries/list_entries.html'
-        controller: 'ListEntriesCtrl'
-      .when '/post',
-        templateUrl: 'scripts/views/new_entry/new_entry.html'
-        controller: 'NewEntryCtrl'
+        templateUrl: 'scripts/views/welcome/welcome.html'
       .when '/utilisateurs',
         templateUrl: 'scripts/views/list_utilisateurs/list_utilisateurs.html'
         controller: 'ListUtilisateursCtrl'

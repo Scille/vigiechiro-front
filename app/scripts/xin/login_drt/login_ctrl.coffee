@@ -7,7 +7,7 @@
  # # LoginCtrl
  # Controller of the xin
 ###
-angular.module('xin_login', ['xin_session', 'settings'])
+angular.module('xin_login', ['xin_session', 'appSettings'])
   .controller 'LoginCtrl', ($scope, $route, session, SETTINGS) ->
     $scope.api_domain = SETTINGS.API_DOMAIN
     # Display/hide login dialogue depending on session logged state
