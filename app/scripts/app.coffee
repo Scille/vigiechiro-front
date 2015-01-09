@@ -26,7 +26,6 @@ angular
     'xin_session',
     'xin_backend',
     'xin_listResource',
-    'listUtilisateurs',
     'showUtilisateur',
     'listTaxons',
     'showTaxon'

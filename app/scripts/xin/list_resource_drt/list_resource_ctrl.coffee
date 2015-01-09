@@ -2,7 +2,7 @@
 
 angular.module('xin_listResource', ['ngRoute', 'angularUtils.directives.dirPagination'])
   .config (paginationTemplateProvider) ->
-    paginationTemplateProvider.setPath('scripts/xin/list_drt/dirPagination.tpl.html')
+    paginationTemplateProvider.setPath('scripts/xin/list_resource_drt/dirPagination.tpl.html')
   .controller 'ListResourceCtrl', ($scope, $routeParams, resourceBackend) ->
     resourceName = resourceBackend.route
     $scope[resourceName] = []

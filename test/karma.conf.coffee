@@ -26,6 +26,7 @@ module.exports = (config) ->
       'bower_components/restangular/dist/restangular.js'
       'bower_components/flow.js/dist/flow.js'
       'bower_components/ng-flow/dist/ng-flow.js'
+      'bower_components/angular-utils-pagination/dirPagination.js'
       'app/**/*.coffee'
       'test/mock/**/*.coffee'
       'test/spec/**/*.coffee'
