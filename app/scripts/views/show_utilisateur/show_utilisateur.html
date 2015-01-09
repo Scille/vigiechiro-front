@@ -1,25 +1,37 @@
 <div class="text-center">
-    {{ utilisateur.prenom }}
-    <br>
-    {{ utilisateur.nom }}
-    <br>
-    {{ utilisateur.emai}}
-    <br>
-    {{ utilisateur.pseudo }}
-    <br>
-    {{ utilisateur.telephone }}
-    <br>
-    {{ utilisateur.adresse }}
-    <br>
-    {{ utilisateur.commentaire }}
-    <br>
-    {{ utilisateur.organisation }}
-    <br>
-    {{ utilisateur.professionnel }}
-    <br>
-    {{ utilisateur.donnees_publiques }}
-    <br>
-    {{ utilisateur.role }}
-    <br>
-    {{ utilisateur.tags }}
+    <form class="simple-form" novalidate name="userForm" ng-submit="userForm.$valid && saveUser()">
+        Prénom :  <input type="text" name="prenom" ng-model="utilisateur.prenom" value="{{ utilisateur.prenom }}">
+        <br>
+        Nom : <input type="text" name="nom" ng-model="utilisateur.nom" value="{{ utilisateur.nom }}">
+        <br>
+        Email : <input type="text" name="email" ng-model="utilisateur.email" value="{{ utilisateur.email }}" required>
+        <br>
+        Pseudo : <input type="text" name="pseudo" ng-model="utilisateur.pseudo" value="{{ utilisateur.pseudo }}" required>
+        <br>
+        Téléphone : <input type="text" name="telephone" ng-model="utilisateur.telephone" value="{{ utilisateur.telephone }}">
+        <br>
+        Adresse : <input type="text" name="adresse" ng-model="utilisateur.adresse" value="{{ utilisateur.adresse }}">
+        <br>
+        Commentaire : <input type="text"name="commentaire" ng-model="utilisateur.commentaire" value="{{ utilisateur.commentaire }}">
+        <br>
+        Organisation : <input type="text"name="organisation" ng-model="utilisateur.organisation" value="{{ utilisateur.organisation }}">
+        <br>
+        Professionnel : 
+        <input  type="radio" ng-model="professionnel" value="true" ng-checked="utilisateur.professionnel == true">Oui
+        <input  type="radio" ng-model="professionnel" value="false" ng-checked="utilisateur.professionnel == false || utilisateur.professionnel == null"> Non
+        <br>
+        Données publiques :  
+        <input  type="radio" ng-model="donnees_publiques" value="true" ng-checked="utilisateur.donnees_publiques == true || utilisateur.donnees_publiques == null">Oui
+        <input  type="radio" ng-model="donnees_publiques" value="false" ng-checked="utilisateur.donnees_publiques == false"> Non
+        <br>
+        Rôle : <select ng-model="utilisateur.role">
+            <option id="">Administrateur</option>
+            <option id="">Validateur</option>
+            <option id="">Observateur</option>
+        </select>
+        <br>
+        Tags : <input type="text" name="tags" ng-model="utilisateur.tags" value="{{ utilisateur.tags }}">
+        <br><br>
+        <input type="submit" value="Sauvegarder" ng-disabled="userForm.$pristine">
+    </form>
 </div>

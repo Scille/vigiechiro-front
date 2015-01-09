@@ -37,7 +37,7 @@ angular
       .when '/utilisateurs',
         templateUrl: 'scripts/views/list_utilisateurs/list_utilisateurs.html'
         controller: 'ListUtilisateursCtrl'
-      .when '/utilisateurs/:id',
+      .when '/utilisateurs/:userId',
         templateUrl: 'scripts/views/show_utilisateur/show_utilisateur.html'
         controller: 'ShowUtilisateurCtrl'
       .when '/404',

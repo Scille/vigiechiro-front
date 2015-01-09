@@ -1,6 +1,6 @@
 <div ng-if="!loading">
     <div ng-repeat="utilisateur in utilisateurs" >
-        <div class="text-center"><a href='{{ utilisateur._id }}'>{{ utilisateur.pseudo }}</a></div>
+        <div class="text-center"><a href='#/utilisateurs/{{ utilisateur._id }}'>{{ utilisateur.pseudo }}</a></div>
     </div>
 
     <div ng-show="utilisateurs.length == 0" class="text-center">

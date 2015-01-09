@@ -6,7 +6,7 @@ describe 'Controller: ShowUtilisateurCtrl', ->
   beforeEach module 'xin_backend'
   beforeEach module 'showUtilisateur'
 
-  stateParams = { id: '54949c201d41c868777dd6d4' }
+  routeParams = {userId: '54949c201d41c868777dd6d4'}
   scope = undefined
   Backend = undefined
   httpBackend = undefined
@@ -18,11 +18,10 @@ describe 'Controller: ShowUtilisateurCtrl', ->
     spyOn(Backend, 'one').and.callThrough()
     scope = $rootScope.$new()
     $controller 'ShowUtilisateurCtrl',
-      $stateParams: stateParams
+      $routeParams: routeParams
       $scope: scope
-      Backend: Backend
-
-  it 'Test entry form submit & reset', ->
+      Backend: Backend#
+  it 'Test show utilisateur', ->
     mockToReturn =
       'nom': 'Doe'
       'prenom': 'John'
@@ -41,3 +40,43 @@ describe 'Controller: ShowUtilisateurCtrl', ->
     expect(Backend.one).toHaveBeenCalledWith('utilisateurs', '54949c201d41c868777dd6d4')
     delete mockToReturn._etag
     expect(scope.utilisateur).toEqual(mockToReturn)
+
+  it 'Test save utilisateur', ->
+    mockToReturn =
+      'pseudo': 'n00b'
+      'email': 'john.doe@gmail.com'
+      '_etag': 'f47127f2392bfc4f0bd6aae28835e8763c98b737'
+      '_id': '54949c201d41c868777dd6d4'
+      'role': 'Observateur'
+      '_links':
+        'self':
+          'title': 'utilisateur'
+          'href': 'utilisateurs/54949c201d41c868777dd6d4'
+    scope.userForm =
+      '$dirty': false
+      '$setPristine': ->
+      'prenom': {'$dirty': true}
+      'nom': {'$dirty': false}
+      'email': {'$dirty': true}
+      'pseudo': {'$dirty': false}
+      'telephone': {'$dirty': false}
+      'adresse': {'$dirty': false}
+      'commentaire': {'$dirty': false}
+      'organisation': {'$dirty': false}
+    httpBackend.expectGET('/utilisateurs/54949c201d41c868777dd6d4').respond(mockToReturn)
+    expect(scope.utilisateur).toEqual({})
+    httpBackend.flush()
+    expect(Backend.one).toHaveBeenCalledWith('utilisateurs', '54949c201d41c868777dd6d4')
+    spyOn(scope.userForm, '$dirty').and.returnValue(true)
+    spyOn(scope.userForm, '$setPristine')
+    delete mockToReturn._etag
+    expect(scope.utilisateur).toEqual(mockToReturn)
+    scope.utilisateur.email = 'john.irondick@gmail.com'
+    scope.utilisateur.prenom = 'John'
+    scope.saveUser()
+    httpBackend.expectPATCH(
+      '/utilisateurs/54949c201d41c868777dd6d4'
+        'email': 'john.irondick@gmail.com'
+        'prenom': 'John'
+    ).respond(201)
+    httpBackend.flush()
