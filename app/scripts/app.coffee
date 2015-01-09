@@ -28,7 +28,7 @@ angular
     'listUtilisateurs',
     'showUtilisateur'
   ])
-  .run (Backend, SETTINGS, session) ->
+  .run (Backend, SETTINGS) ->
     Backend.setBaseUrl(SETTINGS.API_DOMAIN)
   .config ($routeProvider) ->
     $routeProvider
@@ -40,6 +40,12 @@ angular
       .when '/utilisateurs/:userId',
         templateUrl: 'scripts/views/show_utilisateur/show_utilisateur.html'
         controller: 'ShowUtilisateurCtrl'
+      .when '/profil',
+        templateUrl: 'scripts/views/show_utilisateur/show_utilisateur.html'
+        controller: 'ShowUtilisateurCtrl'
+        resolve: {$routeParams: (session) -> return {'userId': session.get_user_id()}}
+      .when '/403',
+        templateUrl: '403.html'
       .when '/404',
         templateUrl: '404.html'
       .otherwise
