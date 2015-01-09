@@ -1,0 +1,32 @@
+<div class="text-center">
+    <form class="simple-form" novalidate name="taxonForm"
+          ng-submit="saveTaxon()">
+        Libellé long :  <input type="text" name="libelle_long" ng-model="taxon.libelle_long"
+                         value="{{ taxon.libelle_long }}"
+                         ng-disabled="false" required>
+        <br>
+        Libellé court : <input type="text" name="libelle_court" ng-model="taxon.libelle_court"
+                               value="{{ taxon.libelle_court }}" ng-disabled="false">
+        <br>
+        Description : <textarea name="description" ng-model="taxon.description"
+                                ng-disabled="false" required>{{ taxon.description }}</textarea>
+<!--        <br>
+        Parents : <input type="text" name="parents" ng-model="taxon.parents" value="{{ taxon.parents }}"
+                        ng-disabled="false" required>
+        <br>
+        Liens : <input type="text" name="liens" ng-model="taxon.liens"
+                           value="{{ taxon.liens }}"
+                           ng-disabled="false">
+        <br>
+        Tags : <input type="text" name="tags" ng-model="taxon.tags"
+                         value="{{ taxon.tags }}"
+                         ng-disabled="false">
+        <br>
+        photos : <input type="text"name="photos" ng-model="taxon.photos"
+                              value="{{ taxon.photos }}"
+                              ng-disabled="true">-->
+        <br>
+        <br>
+        <input type="submit" value="Sauvegarder" ng-disabled="taxonForm.$pristine">
+    </form>
+</div>
