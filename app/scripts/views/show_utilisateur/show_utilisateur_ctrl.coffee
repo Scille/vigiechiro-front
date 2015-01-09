@@ -14,7 +14,6 @@ angular.module('showUtilisateur', ['ngRoute', 'xin_backend'])
     Backend.one('utilisateurs', $routeParams.userId).get().then (utilisateur) ->
       user = utilisateur
       $scope.utilisateur = utilisateur.plain()
-#      $scope.utilisateur._etag = utilisateur._etag
     $scope.saveUser = ->
       if not user
         return

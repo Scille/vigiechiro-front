@@ -26,7 +26,9 @@ angular
     'xin_session',
     'xin_backend',
     'listUtilisateurs',
-    'showUtilisateur'
+    'showUtilisateur',
+    'listTaxons',
+    'showTaxon'
   ])
   .run (Backend, SETTINGS) ->
     Backend.setBaseUrl(SETTINGS.API_DOMAIN)
@@ -44,6 +46,15 @@ angular
         templateUrl: 'scripts/views/show_utilisateur/show_utilisateur.html'
         controller: 'ShowUtilisateurCtrl'
         resolve: {$routeParams: (session) -> return {'userId': session.get_user_id()}}
+      .when '/taxons',
+        templateUrl: 'scripts/views/list_taxons/list_taxons.html'
+        controller: 'ListTaxonsCtrl'
+      .when '/taxons/nouveau-taxon',
+        templateUrl: 'scripts/views/list_taxons/list_taxons.html'
+        controller: 'ListTaxonsCtrl'
+      .when '/taxons/:taxonId',
+        templateUrl: 'scripts/views/show_taxon/show_taxon.html'
+        controller: 'ShowTaxonCtrl'
       .when '/403',
         templateUrl: '403.html'
       .when '/404',
