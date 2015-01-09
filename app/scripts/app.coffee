@@ -25,6 +25,7 @@ angular
     'xin_content',
     'xin_session',
     'xin_backend',
+    'xin_listResource',
     'listUtilisateurs',
     'showUtilisateur',
     'listTaxons',
@@ -37,8 +38,9 @@ angular
       .when '/',
         templateUrl: 'scripts/views/welcome/welcome.html'
       .when '/utilisateurs',
-        templateUrl: 'scripts/views/list_utilisateurs/list_utilisateurs.html'
-        controller: 'ListUtilisateursCtrl'
+        templateUrl: 'scripts/views/list_utilisateurs.html'
+        controller: 'ListResourceCtrl'
+        resolve: {resourceBackend: (Backend) -> Backend.all('utilisateurs')}
       .when '/utilisateurs/:userId',
         templateUrl: 'scripts/views/show_utilisateur/show_utilisateur.html'
         controller: 'ShowUtilisateurCtrl'
