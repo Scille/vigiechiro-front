@@ -27,7 +27,6 @@ angular
     'xin_backend',
     'xin_listResource',
     'showUtilisateur',
-    'listTaxons',
     'showTaxon'
   ])
   .run (Backend, SETTINGS) ->
@@ -48,8 +47,9 @@ angular
         controller: 'ShowUtilisateurCtrl'
         resolve: {$routeParams: (session) -> return {'userId': session.get_user_id()}}
       .when '/taxons',
-        templateUrl: 'scripts/views/list_taxons/list_taxons.html'
-        controller: 'ListTaxonsCtrl'
+        templateUrl: 'scripts/views/list_taxons.html'
+        controller: 'ListResourceCtrl'
+        resolve: {resourceBackend: (Backend) -> Backend.all('taxons')}
       .when '/taxons/nouveau-taxon',
         templateUrl: 'scripts/views/show_taxon/show_taxon.html'
         controller: 'ShowTaxonCtrl'
