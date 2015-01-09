@@ -1,5 +1,6 @@
 'use strict'
 
+
 angular.module('xin_backend', ['ngRoute', 'restangular', 'xin_session_tools'])
   .factory 'Backend', ($location, Restangular, SessionTools) ->
     Restangular.withConfig (RestangularConfigurer) ->

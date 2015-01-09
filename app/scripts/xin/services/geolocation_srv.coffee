@@ -1,5 +1,6 @@
 'use strict'
 
+
 angular.module('xin_geolocation', [])
   .factory 'geolocation', ->
     if navigator.geolocation

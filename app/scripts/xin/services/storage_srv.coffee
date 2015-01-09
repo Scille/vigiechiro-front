@@ -1,5 +1,6 @@
 'use strict'
 
+
 angular.module('xin_storage', [])
   .factory 'storage', ->
     class Storage

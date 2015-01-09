@@ -1,5 +1,6 @@
 'use strict'
 
+
 ###*
  # @ngdoc function
  # @name xin.controller:UserStatusCtrl
