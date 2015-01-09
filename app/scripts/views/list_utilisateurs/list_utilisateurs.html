@@ -1,7 +1,13 @@
-<div ng-repeat="utilisateur in utilisateurs" >
-    <div class="text-center"><a href='{{ utilisateur._id }}'>{{ utilisateur.pseudo }}</a></div>
+<div ng-if="!loading">
+    <div ng-repeat="utilisateur in utilisateurs" >
+        <div class="text-center"><a href='{{ utilisateur._id }}'>{{ utilisateur.pseudo }}</a></div>
+    </div>
+
+    <div ng-show="utilisateurs.length == 0" class="text-center">
+        <h3><i>Pas d'utilisateurs</i></h3>
+    </div>
 </div>
 
-<div ng-show="utilisateurs.length == 0" class="text-center">
-	<h3><i>Pas d'utilisateurs</i></h3>
+<div ng-if="loading">
+    <center>Changement de la liste des utilisateurs...</center>
 </div>
