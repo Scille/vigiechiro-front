@@ -50,11 +50,13 @@ angular
         templateUrl: 'scripts/views/list_taxons/list_taxons.html'
         controller: 'ListTaxonsCtrl'
       .when '/taxons/nouveau-taxon',
-        templateUrl: 'scripts/views/list_taxons/list_taxons.html'
-        controller: 'ListTaxonsCtrl'
+        templateUrl: 'scripts/views/show_taxon/show_taxon.html'
+        controller: 'ShowTaxonCtrl'
+        resolve: {action: -> 'createNew'}
       .when '/taxons/:taxonId',
         templateUrl: 'scripts/views/show_taxon/show_taxon.html'
         controller: 'ShowTaxonCtrl'
+        resolve: {action: -> 'edit'}
       .when '/403',
         templateUrl: '403.html'
       .when '/404',
