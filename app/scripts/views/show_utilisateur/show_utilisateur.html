@@ -1,33 +1,48 @@
 <div class="text-center">
     <form class="simple-form" novalidate name="userForm" ng-submit="userForm.$valid && saveUser()">
-        Prénom :  <input type="text" name="prenom" ng-model="utilisateur.prenom" value="{{ utilisateur.prenom }}">
+        Prénom :  <input type="text" name="prenom" ng-model="utilisateur.prenom"
+                         value="{{ utilisateur.prenom }}"
+                         ng-disabled="user.role != 'Administrateur' && user._id != utilisateur._id">
         <br>
-        Nom : <input type="text" name="nom" ng-model="utilisateur.nom" value="{{ utilisateur.nom }}">
+        Nom : <input type="text" name="nom" ng-model="utilisateur.nom" value="{{ utilisateur.nom }}"
+                     ng-disabled="user.role != 'Administrateur' && user._id != utilisateur._id">
         <br>
-        Email : <input type="text" name="email" ng-model="utilisateur.email" value="{{ utilisateur.email }}" required>
+        Email : <input type="text" name="email" ng-model="utilisateur.email" value="{{ utilisateur.email }}"
+                       ng-disabled="user.role != 'Administrateur' && user._id != utilisateur._id" required>
         <br>
-        Pseudo : <input type="text" name="pseudo" ng-model="utilisateur.pseudo" value="{{ utilisateur.pseudo }}" required>
+        Pseudo : <input type="text" name="pseudo" ng-model="utilisateur.pseudo" value="{{ utilisateur.pseudo }}"
+                        ng-disabled="user.role != 'Administrateur' && user._id != utilisateur._id" required>
         <br>
-        Téléphone : <input type="text" name="telephone" ng-model="utilisateur.telephone" value="{{ utilisateur.telephone }}">
+        Téléphone : <input type="text" name="telephone" ng-model="utilisateur.telephone"
+                           value="{{ utilisateur.telephone }}"
+                           ng-disabled="user.role != 'Administrateur' && user._id != utilisateur._id">
         <br>
-        Adresse : <input type="text" name="adresse" ng-model="utilisateur.adresse" value="{{ utilisateur.adresse }}">
+        Adresse : <input type="text" name="adresse" ng-model="utilisateur.adresse"
+                         value="{{ utilisateur.adresse }}"
+                         ng-disabled="user.role != 'Administrateur' && user._id != utilisateur._id">
         <br>
-        Commentaire : <input type="text"name="commentaire" ng-model="utilisateur.commentaire" value="{{ utilisateur.commentaire }}">
+        Commentaire : <input type="text"name="commentaire" ng-model="utilisateur.commentaire"
+                             value="{{ utilisateur.commentaire }}"
+                             ng-disabled="user.role != 'Administrateur' && user._id != utilisateur._id">
         <br>
-        Organisation : <input type="text"name="organisation" ng-model="utilisateur.organisation" value="{{ utilisateur.organisation }}">
+        Organisation : <input type="text"name="organisation" ng-model="utilisateur.organisation"
+                              value="{{ utilisateur.organisation }}"
+                              ng-disabled="user.role != 'Administrateur' && user._id != utilisateur._id">
         <br>
         Professionnel : 
-        <input  type="radio" ng-model="professionnel" value="true" ng-checked="utilisateur.professionnel == true">Oui
-        <input  type="radio" ng-model="professionnel" value="false" ng-checked="utilisateur.professionnel == false || utilisateur.professionnel == null"> Non
+        <input type="radio" ng-model="professionnel" value="true" ng-checked="utilisateur.professionnel == true">Oui
+        <input type="radio" ng-model="professionnel" value="false"
+               ng-checked="utilisateur.professionnel == false || utilisateur.professionnel == null"> Non
         <br>
         Données publiques :  
-        <input  type="radio" ng-model="donnees_publiques" value="true" ng-checked="utilisateur.donnees_publiques == true || utilisateur.donnees_publiques == null">Oui
-        <input  type="radio" ng-model="donnees_publiques" value="false" ng-checked="utilisateur.donnees_publiques == false"> Non
+        <input type="radio" ng-model="donnees_publiques" value="true"
+               ng-checked="utilisateur.donnees_publiques == true || utilisateur.donnees_publiques == null">Oui
+        <input type="radio" ng-model="donnees_publiques" value="false" ng-checked="utilisateur.donnees_publiques == false"> Non
         <br>
-        Rôle : <select ng-model="utilisateur.role">
-            <option id="">Administrateur</option>
-            <option id="">Validateur</option>
-            <option id="">Observateur</option>
+        Rôle : <select ng-model="utilisateur.role" ng-disabled="user.role != 'Administrateur'">
+            <option>Administrateur</option>
+            <option>Validateur</option>
+            <option>Observateur</option>
         </select>
         <br>
         Tags : <input type="text" name="tags" ng-model="utilisateur.tags" value="{{ utilisateur.tags }}">
