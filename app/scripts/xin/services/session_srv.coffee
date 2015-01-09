@@ -33,12 +33,13 @@ angular.module('xin_session', ['http-auth-interceptor', 'xin_storage', 'xin_sess
           $rootScope.$broadcast 'event:auth-loginRequired'
     class Session
       @login: (user_id, token) ->
-        storage.setItem 'auth-session', JSON.stringify
+        storage.setItem('auth-session', JSON.stringify
           user_id: user_id
           token: token
+        )
       @logout: ->
         Backend.one('logout').post().then ->
-          storage.removeItem 'auth-session'
+          storage.removeItem('auth-session')
       @get_user_id: -> SessionTools.get_element('user_id')
       @get_token: -> SessionTools.get_element('token')
       @get_user_status: (callback) =>
