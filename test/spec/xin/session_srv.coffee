@@ -84,13 +84,6 @@ describe 'Service: session', ->
     expect(session.getUserId()).toBe(undefined)
     expect(SessionTools.getAuthorizationHeader()).toBe(undefined)
 
-  it 'Test getUserStatus', inject (session, SessionTools) ->
-    userStatus = undefined
-    session.getUserStatus (user) ->
-      userStatus = user
-    $rootScope.$digest() # Trigger promises
-    expect(userStatus).toBe(undefined)
-
   describe 'Test login & logout from another tab', ->
 
     beforeEach inject ($rootScope) ->

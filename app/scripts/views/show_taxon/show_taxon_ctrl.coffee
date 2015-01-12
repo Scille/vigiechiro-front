@@ -19,39 +19,26 @@ angular.module('showTaxon', ['ngRoute', 'xin_backend'])
       if not $scope.taxonForm.$valid
         return
       if action == 'edit'
-        if not orig_taxon
+        # Modify an existing taxon
+        if not orig_taxon or not $scope.taxonForm.$dirty
           return
-        modif_taxon = {}
-        if not $scope.taxonForm.$dirty
-          return
-        if $scope.taxonForm.libelle_long.$dirty
-          modif_taxon.libelle_long = $scope.taxon.libelle_long
-        if $scope.taxonForm.libelle_court.$dirty
-          modif_taxon.libelle_court = $scope.taxon.libelle_court
-        if $scope.taxonForm.description.$dirty
-          modif_taxon.description = $scope.taxon.description
-#      if $scope.taxonForm.parents.$dirty
-#        modif_taxon.parents = $scope.taxon.parents
-#      if $scope.taxonForm.liens.$dirty
-#        modif_taxon.liens = $scope.taxon.liens
-#      if $scope.taxonForm.tags.$dirty
-#        modif_taxon.tags = $scope.taxon.tags
-#      if $scope.taxonForm.photos.$dirty
-#        modif_taxon.photos = $scope.taxon.photos
-        orig_taxon.patch(modif_taxon).then(
+        payload = {}
+        # Retrieve the modified fields from the form
+        for key, value of $scope.taxonForm
+          if key.charAt(0) != '$' and value.$dirty
+            payload[key] = $scope.taxon[key]
+        console.log(payload)
+        orig_taxon.patch(payload).then(
+          -> $scope.taxonForm.$setPristine()
           ->
-            $scope.taxonForm.$setPristine()
-          ->
-            return
         )
-        return
-      taxon =
-        'libelle_long': $scope.taxonForm.libelle_long.$modelValue
-        'libelle_court': $scope.taxonForm.libelle_court.$modelValue
-        'description': $scope.taxonForm.description.$modelValue
-      Backend.all('taxons').post(taxon).then(
-        ->
-          window.location = '#/taxons'
-        ->
-          return
+      else
+        # Post a new taxon
+        taxon =
+          'libelle_long': $scope.taxonForm.libelle_long.$modelValue
+          'libelle_court': $scope.taxonForm.libelle_court.$modelValue
+          'description': $scope.taxonForm.description.$modelValue
+        Backend.all('taxons').post(taxon).then(
+          -> window.location = '#/taxons'
+          ->
         )

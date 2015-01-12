@@ -7,7 +7,6 @@ angular.module('xin_listResource', ['ngRoute', 'angularUtils.directives.dirPagin
   .controller 'ListResourceCtrl', ($scope, $routeParams, resourceBackend) ->
     resourceName = resourceBackend.route
     $scope[resourceName] = []
-    # $scope.items = []
     $scope.totalItems = 0
     $scope.itemsPerPage = 25
 

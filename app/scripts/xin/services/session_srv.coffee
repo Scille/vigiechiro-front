@@ -26,12 +26,14 @@ angular.module('xin_session_tools', ['xin_storage'])
 angular.module('xin_session', ['http-auth-interceptor', 'xin_storage', 'xin_session_tools', 'xin_backend'])
   .factory 'session', ($rootScope, Backend, SessionTools, authService, storage) ->
     # Register a listener to launch login/logout event on storage alteration
+    loginConfirmed = ->
+      authService.loginConfirmed(null, SessionTools.authUpdater)
     storage.addEventListener (e) ->
       if e.key == 'auth-session'
         if e.newValue?
-          authService.loginConfirmed(null, SessionTools.authUpdater)
+          loginConfirmed()
         else
-          $rootScope.$broadcast 'event:auth-loginRequired'
+          $rootScope.$broadcast('event:auth-loginRequired')
     class Session
       @login: (token) ->
         Backend.setCustomToken(token)
@@ -45,8 +47,3 @@ angular.module('xin_session', ['http-auth-interceptor', 'xin_storage', 'xin_sess
       @getUserId: -> SessionTools.getElement('_id')
       @getToken: -> SessionTools.getElement('token')
       @getProfile: SessionTools.getProfile
-      @getUserStatus: (callback) =>
-        user_id = @getUserId()
-        if user_id
-          Backend.one('utilisateurs', user_id).get().then (user) ->
-            callback(user)

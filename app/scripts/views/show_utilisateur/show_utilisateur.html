@@ -2,42 +2,46 @@
     <form class="simple-form" novalidate name="userForm" ng-submit="userForm.$valid && saveUser()">
         Prénom :  <input type="text" name="prenom" ng-model="utilisateur.prenom"
                          value="{{ utilisateur.prenom }}"
-                         ng-disabled="user.role != 'Administrateur' && user._id != utilisateur._id">
+                         ng-disabled="readOnly">
         <br>
         Nom : <input type="text" name="nom" ng-model="utilisateur.nom" value="{{ utilisateur.nom }}"
-                     ng-disabled="user.role != 'Administrateur' && user._id != utilisateur._id">
+                     ng-disabled="readOnly">
         <br>
         Email : <input type="text" name="email" ng-model="utilisateur.email" value="{{ utilisateur.email }}"
-                       ng-disabled="user.role != 'Administrateur' && user._id != utilisateur._id" required>
+                       ng-disabled="readOnly" required>
         <br>
         Pseudo : <input type="text" name="pseudo" ng-model="utilisateur.pseudo" value="{{ utilisateur.pseudo }}"
-                        ng-disabled="user.role != 'Administrateur' && user._id != utilisateur._id" required>
+                        ng-disabled="readOnly" required>
         <br>
         Téléphone : <input type="text" name="telephone" ng-model="utilisateur.telephone"
                            value="{{ utilisateur.telephone }}"
-                           ng-disabled="user.role != 'Administrateur' && user._id != utilisateur._id">
+                           ng-disabled="readOnly">
         <br>
         Adresse : <input type="text" name="adresse" ng-model="utilisateur.adresse"
                          value="{{ utilisateur.adresse }}"
-                         ng-disabled="user.role != 'Administrateur' && user._id != utilisateur._id">
+                         ng-disabled="readOnly">
         <br>
         Commentaire : <input type="text"name="commentaire" ng-model="utilisateur.commentaire"
                              value="{{ utilisateur.commentaire }}"
-                             ng-disabled="user.role != 'Administrateur' && user._id != utilisateur._id">
+                             ng-disabled="readOnly">
         <br>
         Organisation : <input type="text"name="organisation" ng-model="utilisateur.organisation"
                               value="{{ utilisateur.organisation }}"
-                              ng-disabled="user.role != 'Administrateur' && user._id != utilisateur._id">
+                              ng-disabled="readOnly">
         <br>
         Professionnel : 
-        <input type="radio" ng-model="professionnel" value="true" ng-checked="utilisateur.professionnel == true">Oui
-        <input type="radio" ng-model="professionnel" value="false"
-               ng-checked="utilisateur.professionnel == false || utilisateur.professionnel == null"> Non
+        <input type="radio" ng-model="utilisateur.professionnel" ng-value="true"
+            ng-checked="utilisateur.professionnel" ng-disabled="readOnly">Oui
+        <input type="radio" ng-model="utilisateur.professionnel" ng-value="false"
+            ng-checked="!utilisateur.professionnel" ng-disabled="readOnly"> Non
         <br>
-        Données publiques :  
-        <input type="radio" ng-model="donnees_publiques" value="true"
-               ng-checked="utilisateur.donnees_publiques == true || utilisateur.donnees_publiques == null">Oui
-        <input type="radio" ng-model="donnees_publiques" value="false" ng-checked="utilisateur.donnees_publiques == false"> Non
+        Données publiques :
+        <input type="radio" ng-model="utilisateur.donnees_publiques" ng-value="true"
+               ng-checked="utilisateur.donnees_publiques == true || utilisateur.donnees_publiques == null"
+               ng-disabled="readOnly">Oui
+        <input type="radio" ng-model="utilisateur.donnees_publiques" ng-value="false"
+               ng-checked="utilisateur.donnees_publiques == false"
+               ng-disabled="readOnly"> Non
         <br>
         Rôle : <select ng-model="utilisateur.role" ng-disabled="user.role != 'Administrateur'">
             <option>Administrateur</option>
