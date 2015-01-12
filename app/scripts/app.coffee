@@ -27,7 +27,8 @@ angular
     'xin_backend',
     'xin_listResource',
     'showUtilisateur',
-    'showTaxon'
+    'showTaxon',
+    'showProtocole'
   ])
   .run (Backend, SETTINGS) ->
     Backend.setBaseUrl(SETTINGS.API_DOMAIN)
@@ -57,6 +58,18 @@ angular
       .when '/taxons/:taxonId',
         templateUrl: 'scripts/views/show_taxon/show_taxon.html'
         controller: 'ShowTaxonCtrl'
+        resolve: {action: -> 'edit'}
+      .when '/protocoles',
+        templateUrl: 'scripts/views/list_protocoles.html'
+        controller: 'ListResourceCtrl'
+        resolve: {resourceBackend: (Backend) -> Backend.all('protocoles')}
+      .when '/protocoles/nouveau-protocole',
+        templateUrl: 'scripts/views/show_protocle/show_protocole.html'
+        controller: 'ShowTaxonCtrl'
+        resolve: {action: -> 'createNew'}
+      .when '/protocoles/:protocoleId',
+        templateUrl: 'scripts/views/show_protocole/show_protocole.html'
+        controller: 'ShowProtocoleCtrl'
         resolve: {action: -> 'edit'}
       .when '/403',
         templateUrl: '403.html'
