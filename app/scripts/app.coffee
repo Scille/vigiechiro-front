@@ -45,7 +45,7 @@ angular
       .when '/profil',
         templateUrl: 'scripts/views/show_utilisateur/show_utilisateur.html'
         controller: 'ShowUtilisateurCtrl'
-        resolve: {$routeParams: (session) -> return {'userId': session.get_user_id()}}
+        resolve: {$routeParams: (session) -> return {'userId': session.getUserId()}}
       .when '/taxons',
         templateUrl: 'scripts/views/list_taxons.html'
         controller: 'ListResourceCtrl'

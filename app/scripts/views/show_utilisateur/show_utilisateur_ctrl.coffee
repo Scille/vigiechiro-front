@@ -8,15 +8,18 @@
  # # ShowUtilisateurCtrl
  # Controller of the vigiechiroApp
 ###
-angular.module('showUtilisateur', ['ngRoute', 'xin_backend'])
-  .controller 'ShowUtilisateurCtrl', ($routeParams, $scope, Backend) ->
+angular.module('showUtilisateur', ['ngRoute', 'xin_session', 'xin_backend'])
+  .controller 'ShowUtilisateurCtrl', ($scope, $routeParams, Backend, session) ->
     $scope.utilisateur = {}
-    user = undefined
+    userResource = undefined
     Backend.one('utilisateurs', $routeParams.userId).get().then (utilisateur) ->
-      user = utilisateur
+      userResource = utilisateur
       $scope.utilisateur = utilisateur.plain()
+      profile = session.getProfile()
+      $scope.readOnly = (profile.role != 'Administrateur' and
+                         profile._id != utilisateur._id)
     $scope.saveUser = ->
-      if not user
+      if not userResource
         return
       modif_utilisateur = {}
       if not $scope.userForm.$dirty
@@ -38,9 +41,7 @@ angular.module('showUtilisateur', ['ngRoute', 'xin_backend'])
         modif_utilisateur.commentaire = $scope.utilisateur.commentaire
       if $scope.userForm.organisation.$dirty
         modif_utilisateur.organisation = $scope.utilisateur.organisation
-      user.patch(modif_utilisateur).then(
+      userResource.patch(modif_utilisateur).then(
+        -> $scope.userForm.$setPristine()
         ->
-          $scope.userForm.$setPristine()
-        ->
-          return
       )

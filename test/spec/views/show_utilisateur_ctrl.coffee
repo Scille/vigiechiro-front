@@ -13,14 +13,19 @@ describe 'Controller: ShowUtilisateurCtrl', ->
 
   # Initialize the controller and a mock scope
   beforeEach inject ($controller, $rootScope, _Backend_, _$httpBackend_) ->
+
     Backend = _Backend_
     httpBackend = _$httpBackend_
     spyOn(Backend, 'one').and.callThrough()
     scope = $rootScope.$new()
+    session =
+      getProfile: -> utilisateurs_builder('utilisateurs/moi')
     $controller 'ShowUtilisateurCtrl',
       $routeParams: routeParams
       $scope: scope
-      Backend: Backend#
+      Backend: Backend
+      session: session
+
   it 'Test show utilisateur', ->
     mockToReturn =
       'nom': 'Doe'

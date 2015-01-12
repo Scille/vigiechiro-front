@@ -5,22 +5,23 @@ angular.module('xin_session_tools', ['xin_storage'])
   .factory 'SessionTools', ($rootScope, storage) ->
     class SessionTools
       @authUpdater: (config) =>
-        config.headers.Authorization = @get_authorization_header()
+        config.headers.Authorization = @getAuthorizationHeader()
         return config
-      @get_authorization_header: =>
-        token = @get_element('token')
+      @buildAuthorizationHeader: (token) ->
+        "Basic " + btoa("#{token}:")
+      @getAuthorizationHeader: =>
+        token = @getElement('token')
         if token?
-          "Basic " + btoa("#{token}:")
+          return @buildAuthorizationHeader(token)
         else
-          null
-      @get_element: (key) ->
+          return undefined
+      @getProfile: ->
         auth_session = storage.getItem('auth-session')
         if auth_session?
-          auth_session = JSON.parse(auth_session)
-          return auth_session[key]
-        else
-          $rootScope.$broadcast 'event:auth-loginRequired'
-          return null
+          return JSON.parse(auth_session)
+      @getElement: (key) =>
+        profil = @getProfile()
+        return profil?[key]
 
 angular.module('xin_session', ['http-auth-interceptor', 'xin_storage', 'xin_session_tools', 'xin_backend'])
   .factory 'session', ($rootScope, Backend, SessionTools, authService, storage) ->
@@ -29,21 +30,23 @@ angular.module('xin_session', ['http-auth-interceptor', 'xin_storage', 'xin_sess
       if e.key == 'auth-session'
         if e.newValue?
           authService.loginConfirmed(null, SessionTools.authUpdater)
-        else if e.oldValue?
+        else
           $rootScope.$broadcast 'event:auth-loginRequired'
     class Session
-      @login: (user_id, token) ->
-        storage.setItem('auth-session', JSON.stringify
-          user_id: user_id
-          token: token
-        )
+      @login: (token) ->
+        Backend.setCustomToken(token)
+        Backend.one('utilisateurs', 'moi').get().then (user) ->
+          user.token = token
+          storage.setItem('auth-session', JSON.stringify(user))
+          Backend.resetCustomToken()
       @logout: ->
         Backend.one('logout').post().then ->
           storage.removeItem('auth-session')
-      @get_user_id: -> SessionTools.get_element('user_id')
-      @get_token: -> SessionTools.get_element('token')
-      @get_user_status: (callback) =>
-        user_id = @get_user_id()
+      @getUserId: -> SessionTools.getElement('_id')
+      @getToken: -> SessionTools.getElement('token')
+      @getProfile: SessionTools.getProfile
+      @getUserStatus: (callback) =>
+        user_id = @getUserId()
         if user_id
           Backend.one('utilisateurs', user_id).get().then (user) ->
             callback(user)

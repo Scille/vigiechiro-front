@@ -5,7 +5,7 @@ angular.module('xin_content', ['xin_session'])
   .directive 'contentDirective', (session) ->
     restrict: 'E'
     link: (scope, elem, attrs) ->
-      if session.get_user_id()?
+      if session.getUserId()?
         elem.show()
       else
         elem.hide()

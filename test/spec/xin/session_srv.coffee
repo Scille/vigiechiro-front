@@ -2,9 +2,8 @@
 
 
 class AuthServiceMock
-  constructor: ->
-  loginConfirmed: jasmine.createSpy()
-  loginCancelled: jasmine.createSpy()
+  loginConfirmed: jasmine.createSpy('loginConfirmed')
+  loginCancelled: jasmine.createSpy('loginCancelled')
 
 
 class StorageMock
@@ -41,6 +40,7 @@ describe 'Service: session', ->
   $rootScope = null
   authService = null
   storage = null
+  Backend = null
   test_token = "C8Y1VMEKHOIT3F1GU9HI16FNNHB7QFKJ"
   test_user_id = "123456789"
   test_authorization_header = "Basic QzhZMVZNRUtIT0lUM0YxR1U5SEkxNkZOTkhCN1FGS0o6"
@@ -52,63 +52,81 @@ describe 'Service: session', ->
   beforeEach module ($provide)->
     authService = new AuthServiceMock()
     storage = new StorageMock()
+    Backend = new BackendMock()
     $provide.value('authService', authService)
     $provide.value('storage', storage)
+    $provide.value('Backend', Backend)
     return null
 
-  beforeEach inject (_$rootScope_) ->
+  beforeEach inject (_$rootScope_, $q) ->
+    Backend._q = $q
     $rootScope = _$rootScope_
     spyOn($rootScope, '$broadcast')
 
   it 'Test basic login', inject (session, SessionTools) ->
-    session.login(test_user_id, test_token)
+    Backend._builders['utilisateurs'] = (href) ->
+      user = utilisateurs_builder(href)
+      user._id = test_user_id
+      return user
+    session.login(test_token)
+    $rootScope.$digest() # Trigger promises
     expect(authService.loginConfirmed).toHaveBeenCalled()
-    expect(session.get_token()).toEqual(test_token)
-    expect(session.get_user_id()).toEqual(test_user_id)
-    expect(SessionTools.get_authorization_header()).toEqual(test_authorization_header)
+    expect(session.getToken()).toEqual(test_token)
+    expect(session.getUserId()).toEqual(test_user_id)
+    expect(SessionTools.getAuthorizationHeader()).toEqual(test_authorization_header)
 
   it 'Test basic logout', inject (session, SessionTools) ->
     session.logout()
+    $rootScope.$digest() # Trigger promises
     expect($rootScope.$broadcast).toHaveBeenCalledWith('event:auth-loginRequired')
     $rootScope.$broadcast.calls.reset()
-    expect(session.get_token()).toBe(null)
-    expect(session.get_user_id()).toBe(null)
-    expect(SessionTools.get_authorization_header()).toBe(null)
-    expect($rootScope.$broadcast.calls.allArgs()).toEqual(['event:auth-loginRequired'] for _ in [1..3])
+    expect(session.getToken()).toBe(undefined)
+    expect(session.getUserId()).toBe(undefined)
+    expect(SessionTools.getAuthorizationHeader()).toBe(undefined)
+
+  it 'Test getUserStatus', inject (session, SessionTools) ->
+    userStatus = undefined
+    session.getUserStatus (user) ->
+      userStatus = user
+    $rootScope.$digest() # Trigger promises
+    expect(userStatus).toBe(undefined)
 
   describe 'Test login & logout from another tab', ->
 
     beforeEach inject ($rootScope) ->
-      storage.setItem 'auth-session', JSON.stringify
-        user_id: test_user_id
-        token: test_token
+      user = utilisateurs_builder('/utilisateurs/moi')
+      user._id = test_user_id
+      user.token = test_token
+      storage.setItem('auth-session', JSON.stringify(user))
 
     it 'Test successful login', inject (session) ->
       expect(authService.loginConfirmed).toHaveBeenCalled()
-      expect(session.get_user_id()).toEqual(test_user_id)
-      expect(session.get_token()).toEqual(test_token)
+      expect(session.getUserId()).toEqual(test_user_id)
+      expect(session.getToken()).toEqual(test_token)
 
     it 'Test logout', inject (session, $rootScope) ->
       storage.removeItem('auth-session')
       expect($rootScope.$broadcast).toHaveBeenCalledWith('event:auth-loginRequired')
-      expect(session.get_user_id()).toBe(null)
-      expect(session.get_token()).toBe(null)
+      expect(session.getUserId()).toBe(undefined)
+      expect(session.getToken()).toBe(undefined)
 
     it 'Test updating token', inject (session, $rootScope) ->
       new_token = "RFQNHVDZAN8LHD5F1C7AJSNMYN0UXU90"
-      storage.setItem 'auth-session', JSON.stringify
-        user_id: test_user_id
-        token: new_token
-      expect(session.get_user_id()).toEqual(test_user_id)
-      expect(session.get_token()).toEqual(new_token)
+      user = utilisateurs_builder('/utilisateurs/moi')
+      user._id = test_user_id
+      user.token = new_token
+      storage.setItem('auth-session', JSON.stringify(user))
+      expect(session.getUserId()).toEqual(test_user_id)
+      expect(session.getToken()).toEqual(new_token)
       expect(authService.loginConfirmed).toHaveBeenCalled()
 
     it 'Test changing user', inject (session, $rootScope) ->
       new_user_id = 7777777
       new_token = "RFQNHVDZAN8LHD5F1C7AJSNMYN0UXU90"
-      storage.setItem 'auth-session', JSON.stringify
-        user_id: new_user_id
-        token: new_token
-      expect(session.get_user_id()).toEqual(new_user_id)
-      expect(session.get_token()).toEqual(new_token)
+      user = utilisateurs_builder('/utilisateurs/moi')
+      user._id = new_user_id
+      user.token = new_token
+      storage.setItem('auth-session', JSON.stringify(user))
+      expect(session.getUserId()).toEqual(new_user_id)
+      expect(session.getToken()).toEqual(new_token)
       expect(authService.loginConfirmed).toHaveBeenCalled()
