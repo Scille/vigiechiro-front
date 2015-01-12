@@ -8,9 +8,10 @@
  # # ShowtaxonCtrl
  # Controller of the vigiechiroApp
 ###
-angular.module('showTaxon', ['ngRoute', 'xin_backend'])
+angular.module('showTaxon', ['ngRoute', 'ngSanitize', 'textAngular', 'xin_backend'])
   .controller 'ShowTaxonCtrl', ($routeParams, $scope, Backend, action) ->
     $scope.taxon = {}
+    $scope.editMode = true # TODO : add display mode in addition to edit mode
     orig_taxon = undefined
     Backend.one('taxons', $routeParams.taxonId).get().then (taxon) ->
       orig_taxon = taxon
@@ -27,6 +28,8 @@ angular.module('showTaxon', ['ngRoute', 'xin_backend'])
         for key, value of $scope.taxonForm
           if key.charAt(0) != '$' and value.$dirty
             payload[key] = $scope.taxon[key]
+        # Special handle for description
+        payload.description = $scope.taxon.description
         console.log(payload)
         orig_taxon.patch(payload).then(
           -> $scope.taxonForm.$setPristine()

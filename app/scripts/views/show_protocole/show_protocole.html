@@ -5,8 +5,7 @@
                          value="{{ protocole.titre }}"
                          ng-disabled="false" required>
         <br>
-        Description : <textarea name="description" ng-model="protocole.description"
-                                ng-disabled="false">{{ protocole.description }}</textarea>
+        <text-angular name="description" ng-model="protocole.description"></text-angular>
 <!--        <br>
         Parent : <input type="text" name="parent" ng-model="protocole.parent" value="{{ protocole.parent }}"
                         ng-disabled="false">-->

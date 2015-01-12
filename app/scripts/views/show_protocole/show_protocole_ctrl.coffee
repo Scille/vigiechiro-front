@@ -8,7 +8,7 @@
  # # ShowProtocoleCtrl
  # Controller of the vigiechiroApp
 ###
-angular.module('showProtocole', ['ngRoute', 'xin_backend'])
+angular.module('showProtocole', ['ngRoute', 'textAngular', 'xin_backend'])
   .controller 'ShowProtocoleCtrl', ($routeParams, $scope, Backend, action) ->
     $scope.protocole = {}
     orig_protocole = undefined

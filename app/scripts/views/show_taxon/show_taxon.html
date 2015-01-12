@@ -8,8 +8,8 @@
         Libellé court : <input type="text" name="libelle_court" ng-model="taxon.libelle_court"
                                value="{{ taxon.libelle_court }}" ng-disabled="false">
         <br>
-        Description : <textarea name="description" ng-model="taxon.description"
-                                ng-disabled="false" required>{{ taxon.description }}</textarea>
+        <text-angular ng-if="editMode" ng-model="taxon.description"></text-angular>
+        <div ng-if="!editMode" ng-bind-html="taxon.description"></div>
 <!--        <br>
         Parents : <input type="text" name="parents" ng-model="taxon.parents" value="{{ taxon.parents }}"
                         ng-disabled="false" required>
