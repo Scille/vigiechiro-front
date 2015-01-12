@@ -1,32 +1,52 @@
 <div class="text-center">
-    <form class="simple-form" novalidate name="taxonForm"
-          ng-submit="saveTaxon()">
-        Libellé long :  <input type="text" name="libelle_long" ng-model="taxon.libelle_long"
-                         value="{{ taxon.libelle_long }}"
+    <form class="simple-form" novalidate name="protocoleForm"
+          ng-submit="saveProtocole()">
+        Titre :  <input type="text" name="titre" ng-model="protocole.titre"
+                         value="{{ protocole.titre }}"
                          ng-disabled="false" required>
         <br>
-        Libellé court : <input type="text" name="libelle_court" ng-model="taxon.libelle_court"
-                               value="{{ taxon.libelle_court }}" ng-disabled="false">
-        <br>
-        Description : <textarea name="description" ng-model="taxon.description"
-                                ng-disabled="false" required>{{ taxon.description }}</textarea>
+        Description : <textarea name="description" ng-model="protocole.description"
+                                ng-disabled="false">{{ protocole.description }}</textarea>
 <!--        <br>
-        Parents : <input type="text" name="parents" ng-model="taxon.parents" value="{{ taxon.parents }}"
-                        ng-disabled="false" required>
+        Parent : <input type="text" name="parent" ng-model="protocole.parent" value="{{ protocole.parent }}"
+                        ng-disabled="false">-->
         <br>
-        Liens : <input type="text" name="liens" ng-model="taxon.liens"
-                           value="{{ taxon.liens }}"
-                           ng-disabled="false">
-        <br>
-        Tags : <input type="text" name="tags" ng-model="taxon.tags"
-                         value="{{ taxon.tags }}"
-                         ng-disabled="false">
-        <br>
-        photos : <input type="text"name="photos" ng-model="taxon.photos"
-                              value="{{ taxon.photos }}"
+        Macro protocole :
+        <input type="radio" name="macro_protocole" ng-model="protocole.macro_protocole" value="true"
+               ng-checked="protocole.macro_protocole == true">Oui
+        <input type="radio" name="macro_protocole" ng-model="protocole.macro_protocole" value="false"
+               ng-checked="protocole.macro_protocole == false || protocole.macro_protocole == null"> Non
+<!--        <br>
+        Tags : <input type="text" name="tags" ng-model="protocole.tags"
+                         value="{{ protocole.tags }}"
+                         ng-disabled="false">-->
+<!--        <br>
+        Fichiers : <input type="text" name="fichiers" ng-model="protocole.fichiers"
+                              value="{{ protocole.fichiers }}"
                               ng-disabled="true">-->
         <br>
+        Type de site :
+        <input type="radio" name="type_site" ng-model="protocole.type_site" value="LINEAIRE"
+               ng-checked="protocole.type_site == true || protocole.type_site == null">Linéaire
+        <input type="radio" name="type_site" ng-model="protocole.type_site" value="POLYGONE"
+               ng-checked="protocole.type_site == false"> Polygone
         <br>
-        <input type="submit" value="Sauvegarder" ng-disabled="taxonForm.$pristine">
+        Taxon :
+        <select name="taxon" ng-model="protocole.taxon">
+          <option ng-repeat="taxon in taxons" value="{{ taxon._id }}">{{ taxon.libelle_court }}</option>
+        </select>
+<!--        <br>
+        Configuration de la participation :-->
+        <br>
+        Algorithme de tirage du site :
+        <input type="radio" name="algo_tirage_site" ng-model="protocole.algo_tirage_site" value="CARRE"
+               ng-checked="protocole.algo_tirage_site == 'CARRE' || protocole.algo_tirage_site == null">Carré
+        <input type="radio" name="algo_tirage_site" ng-model="protocole.algo_tirage_site" value="ROUTIER"
+               ng-checked="protocole.algo_tirage_site == 'ROUTIER'">Routier
+        <input type="radio" name="algo_tirage_site" ng-model="protocole.algo_tirage_site" value="POINT_FIXE"
+               ng-checked="protocole.algo_tirage_site == 'POINT_FIXE'"> Point fixe
+        <br>
+        <br>
+        <input type="submit" value="Sauvegarder" ng-disabled="protocoleForm.$pristine">
     </form>
 </div>

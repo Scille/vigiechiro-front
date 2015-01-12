@@ -64,8 +64,8 @@ angular
         controller: 'ListResourceCtrl'
         resolve: {resourceBackend: (Backend) -> Backend.all('protocoles')}
       .when '/protocoles/nouveau-protocole',
-        templateUrl: 'scripts/views/show_protocle/show_protocole.html'
-        controller: 'ShowTaxonCtrl'
+        templateUrl: 'scripts/views/show_protocole/show_protocole.html'
+        controller: 'ShowProtocoleCtrl'
         resolve: {action: -> 'createNew'}
       .when '/protocoles/:protocoleId',
         templateUrl: 'scripts/views/show_protocole/show_protocole.html'

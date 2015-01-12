@@ -3,55 +3,65 @@
 
 ###*
  # @ngdoc function
- # @name vigiechiroApp.controller:ShowtaxonCtrl
+ # @name vigiechiroApp.controller:ShowProtocoleCtrl
  # @description
- # # ShowtaxonCtrl
+ # # ShowProtocoleCtrl
  # Controller of the vigiechiroApp
 ###
-angular.module('showTaxon', ['ngRoute', 'xin_backend'])
-  .controller 'ShowTaxonCtrl', ($routeParams, $scope, Backend, action) ->
-    $scope.taxon = {}
-    orig_taxon = undefined
-    Backend.one('taxons', $routeParams.taxonId).get().then (taxon) ->
-      orig_taxon = taxon
-      $scope.taxon = taxon.plain()
-    $scope.saveTaxon = ->
-      if not $scope.taxonForm.$valid
+angular.module('showProtocole', ['ngRoute', 'xin_backend'])
+  .controller 'ShowProtocoleCtrl', ($routeParams, $scope, Backend, action) ->
+    $scope.protocole = {}
+    orig_protocole = undefined
+    Backend.one('protocoles', $routeParams.protocoleId).get().then (protocole) ->
+      orig_protocole = protocole
+      $scope.protocole = protocole.plain()
+      Backend.all('taxons').getList().then (taxons) ->
+        $scope.taxons = taxons.plain()
+    $scope.saveProtocole = ->
+      if not $scope.protocoleForm.$valid
         return
       if action == 'edit'
-        if not orig_taxon
+        if not orig_protocole
           return
-        modif_taxon = {}
-        if not $scope.taxonForm.$dirty
+        modif_protocole = {}
+        if not $scope.protocoleForm.$dirty
           return
-        if $scope.taxonForm.libelle_long.$dirty
-          modif_taxon.libelle_long = $scope.taxon.libelle_long
-        if $scope.taxonForm.libelle_court.$dirty
-          modif_taxon.libelle_court = $scope.taxon.libelle_court
-        if $scope.taxonForm.description.$dirty
-          modif_taxon.description = $scope.taxon.description
-#      if $scope.taxonForm.parents.$dirty
-#        modif_taxon.parents = $scope.taxon.parents
-#      if $scope.taxonForm.liens.$dirty
-#        modif_taxon.liens = $scope.taxon.liens
-#      if $scope.taxonForm.tags.$dirty
-#        modif_taxon.tags = $scope.taxon.tags
-#      if $scope.taxonForm.photos.$dirty
-#        modif_taxon.photos = $scope.taxon.photos
-        orig_taxon.patch(modif_taxon).then(
+        if $scope.protocoleForm.titre.$dirty
+          modif_protocole.titre = $scope.protocole.titre
+        if $scope.protocoleForm.description.$dirty
+          modif_protocole.description = $scope.protocole.description
+#        if $scope.protocoleForm.parent.$dirty
+#          modif_protocole.parent = $scope.protocole.parent
+        if $scope.protocoleForm.macro_protocole.$dirty
+          modif_protocole.macro_protocole = $scope.protocole.macro_protocole
+#        if $scope.protocoleForm.tags.$dirty
+#          modif_protocole.tags = $scope.protocole.tags
+#        if $scope.protocoleForm.fichiers.$dirty
+#          modif_protocole.photos = $scope.protocole.fichiers
+        if $scope.protocoleForm.type_site.$dirty
+          modif_protocole.type_site = $scope.protocole.type_site
+#        if $scope.protocoleForm.taxon.$dirty
+#          modif_protocole.taxon = $scope.protocole.taxon
+        if $scope.protocoleForm.configuration_participation.$dirty
+          modif_protocole.configuration_participation = $scope.protocole.configuration_participation
+        if $scope.protocoleForm.algo_tirage_site.$dirty
+          modif_protocole.algo_tirage_site = $scope.protocole.algo_tirage_site
+        orig_protocole.patch(modif_protocole).then(
           ->
-            $scope.taxonForm.$setPristine()
+            $scope.protocoleForm.$setPristine()
           ->
             return
         )
         return
-      taxon =
-        'libelle_long': $scope.taxonForm.libelle_long.$modelValue
-        'libelle_court': $scope.taxonForm.libelle_court.$modelValue
-        'description': $scope.taxonForm.description.$modelValue
-      Backend.all('taxons').post(taxon).then(
+      protocole =
+        'titre': $scope.protocoleForm.titre.$modelValue
+        'description': $scope.protocoleForm.description.$modelValue
+        'macro_protocole': $scope.protocoleForm.macro_protocole.$modelValue
+        'type_site': $scope.protocoleForm.type_site.$modelValue
+        'algo_tirage_site': $scope.protocoleForm.algo_tirage_site.$modelValue
+      Backend.all('protocoles').post(protocole).then(
         ->
-          window.location = '#/taxons'
+          window.location = '#/protocoles'
         ->
           return
         )
