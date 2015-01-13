@@ -40,8 +40,8 @@ angular.module('showProtocole', ['ngRoute', 'textAngular', 'xin_backend'])
 #          modif_protocole.photos = $scope.protocole.fichiers
         if $scope.protocoleForm.type_site.$dirty
           modif_protocole.type_site = $scope.protocole.type_site
-#        if $scope.protocoleForm.taxon.$dirty
-#          modif_protocole.taxon = $scope.protocole.taxon
+        if $scope.protocoleForm.taxon.$dirty
+          modif_protocole.taxon = $scope.protocole.taxon
         if $scope.protocoleForm.configuration_participation.$dirty
           modif_protocole.configuration_participation = $scope.protocole.configuration_participation
         if $scope.protocoleForm.algo_tirage_site.$dirty
@@ -58,6 +58,7 @@ angular.module('showProtocole', ['ngRoute', 'textAngular', 'xin_backend'])
         'description': $scope.protocoleForm.description.$modelValue
         'macro_protocole': $scope.protocoleForm.macro_protocole.$modelValue
         'type_site': $scope.protocoleForm.type_site.$modelValue
+        'taxon': $scope.protocoleForm.taxon.$modelValue
         'algo_tirage_site': $scope.protocoleForm.algo_tirage_site.$modelValue
       Backend.all('protocoles').post(protocole).then(
         ->
