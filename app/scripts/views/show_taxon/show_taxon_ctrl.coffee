@@ -40,7 +40,7 @@ angular.module('showTaxon', ['ngRoute', 'ngSanitize', 'textAngular', 'xin_backen
         taxon =
           'libelle_long': $scope.taxonForm.libelle_long.$modelValue
           'libelle_court': $scope.taxonForm.libelle_court.$modelValue
-          'description': $scope.taxonForm.description.$modelValue
+          'description': $scope.taxon.description
         Backend.all('taxons').post(taxon).then(
           -> window.location = '#/taxons'
           ->
