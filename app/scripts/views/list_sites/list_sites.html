@@ -1,6 +1,10 @@
 <div ng-if="!loading">
     <div ng-repeat="site in sites" >
-        <div class="text-center"><a href='#/sites/{{ site._id }}'>{{ site.titre }}</a></div>
+        <div class="text-center"><a href='#/sites/{{ site._id }}'>
+            {{ site.protocole }} : {{ site.commentaire }}
+        </a></div>
+
+        <div id="map-canvas-{{ $index }}"></div>
     </div>
 
     <div ng-show="sites.length == 0" class="text-center">

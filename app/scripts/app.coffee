@@ -28,8 +28,10 @@ angular
     'xin_listResource',
     'showUtilisateur',
     'showTaxon',
-    'showProtocole',
-    'showSite'
+    'displayProtocole',
+    'editProtocole',
+    'listSites',
+    'viewSite'
   ])
   .run (Backend, SETTINGS) ->
     Backend.setBaseUrl(SETTINGS.API_DOMAIN)
@@ -65,25 +67,25 @@ angular
         controller: 'ListResourceCtrl'
         resolve: {resourceBackend: (Backend) -> Backend.all('protocoles')}
       .when '/protocoles/nouveau-protocole',
-        templateUrl: 'scripts/views/show_protocole/show_protocole.html'
-        controller: 'ShowProtocoleCtrl'
+        templateUrl: 'scripts/views/protocole/edit_protocole/edit_protocole.html'
+        controller: 'EditProtocoleCtrl'
         resolve: {action: -> 'createNew'}
       .when '/protocoles/:protocoleId',
-        templateUrl: 'scripts/views/show_protocole/show_protocole.html'
-        controller: 'ShowProtocoleCtrl'
+        templateUrl: 'scripts/views/protocole/display_protocole/display_protocole.html'
+        controller: 'DisplayProtocoleCtrl'
+      .when '/protocoles/:protocoleId/edit',
+        templateUrl: 'scripts/views/protocole/edit_protocole/edit_protocole.html'
+        controller: 'EditProtocoleCtrl'
         resolve: {action: -> 'edit'}
       .when '/sites',
-        templateUrl: 'scripts/views/list_sites.html'
-        controller: 'ListResourceCtrl'
-        resolve: {resourceBackend: (Backend) -> Backend.all('sites')}
+        templateUrl: 'scripts/views/list_sites/list_sites.html'
+        controller: 'ListSitesCtrl'
       .when '/sites/nouveau-site',
-        templateUrl: 'scripts/views/show_site/show_site.html'
-        controller: 'ShowSiteCtrl'
-        resolve: {action: -> 'createNew'}
+        templateUrl: 'scripts/views/view_site/view_site.html'
+        controller: 'CreateSiteCtrl'
       .when '/sites/:siteId',
-        templateUrl: 'scripts/views/show_site/show_site.html'
+        templateUrl: 'scripts/views/view_site/view_site.html'
         controller: 'ShowSiteCtrl'
-        resolve: {action: -> 'edit'}
       .when '/403',
         templateUrl: '403.html'
       .when '/404',
