@@ -25,6 +25,7 @@ angular
     'xin_content',
     'xin_session',
     'xin_backend',
+    'xin_google_maps',
     'xin_listResource',
     'showUtilisateur',
     'showTaxon',
