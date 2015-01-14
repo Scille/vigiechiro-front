@@ -28,7 +28,8 @@ angular
     'xin_listResource',
     'showUtilisateur',
     'showTaxon',
-    'showProtocole'
+    'showProtocole',
+    'showSite'
   ])
   .run (Backend, SETTINGS) ->
     Backend.setBaseUrl(SETTINGS.API_DOMAIN)
@@ -70,6 +71,18 @@ angular
       .when '/protocoles/:protocoleId',
         templateUrl: 'scripts/views/show_protocole/show_protocole.html'
         controller: 'ShowProtocoleCtrl'
+        resolve: {action: -> 'edit'}
+      .when '/sites',
+        templateUrl: 'scripts/views/list_sites.html'
+        controller: 'ListResourceCtrl'
+        resolve: {resourceBackend: (Backend) -> Backend.all('sites')}
+      .when '/sites/nouveau-site',
+        templateUrl: 'scripts/views/show_site/show_site.html'
+        controller: 'ShowSiteCtrl'
+        resolve: {action: -> 'createNew'}
+      .when '/sites/:siteId',
+        templateUrl: 'scripts/views/show_site/show_site.html'
+        controller: 'ShowSiteCtrl'
         resolve: {action: -> 'edit'}
       .when '/403',
         templateUrl: '403.html'

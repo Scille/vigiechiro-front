@@ -77,3 +77,9 @@ body {
     border-bottom: 0;
   }
 }
+
+#map-canvas {
+  height: 400px;
+  margin: 0px;
+  padding: 0px;
+}
