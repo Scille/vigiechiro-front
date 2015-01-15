@@ -78,7 +78,7 @@ body {
   }
 }
 
-#map-canvas {
+.g-maps {
   height: 400px;
   margin: 0px;
   padding: 0px;
