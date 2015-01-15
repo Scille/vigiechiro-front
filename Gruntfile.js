@@ -372,13 +372,28 @@ module.exports = function (grunt) {
 
     // Test settings
     karma: {
+      options: {
+        configFile: 'test/unit/karma.conf.coffee'
+      },
       unit: {
-        configFile: 'test/karma.conf.coffee',
-        singleRun: true,
+        singleRun: true
       },
       server: {
-        configFile: 'test/karma.conf.coffee',
-        singleRun: false,
+        singleRun: false
+      }
+    },
+
+    // E2e test settings
+    protractor: {
+      options: {
+        configFile: 'test/e2e/protractor.conf.coffee'
+      },
+      e2e: {
+        configFile: 'test/e2e/protractor.conf.coffee',
+        singleRun: true
+      },
+      server: {
+        singleRun: true
       }
     }
   });
@@ -410,6 +425,22 @@ module.exports = function (grunt) {
     'autoprefixer',
     'connect:test',
     'karma:unit'
+  ]);
+
+  grunt.registerTask('test-e2e', [
+    'clean:server',
+    'concurrent:test',
+    'autoprefixer',
+    'connect:test',
+    'protractor:e2e'
+  ]);
+
+  grunt.registerTask('test-e2e-server', [
+    'clean:server',
+    'concurrent:test',
+    'autoprefixer',
+    'connect:test',
+    'protractor:server'
   ]);
 
   grunt.registerTask('test-server', [

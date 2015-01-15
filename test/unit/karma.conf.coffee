@@ -6,7 +6,7 @@
 module.exports = (config) ->
   config.set
     # base path, that will be used to resolve files and exclude
-    basePath: '../'
+    basePath: '../..'
 
     # testing framework to use (jasmine/mocha/qunit/...)
     frameworks: ['jasmine']
@@ -28,8 +28,8 @@ module.exports = (config) ->
       'bower_components/ng-flow/dist/ng-flow.js'
       'bower_components/angular-utils-pagination/dirPagination.js'
       'app/**/*.coffee'
-      'test/mock/**/*.coffee'
-      'test/spec/**/*.coffee'
+      'test/unit/mock/**/*.coffee'
+      'test/unit/spec/**/*.coffee'
     ],
 
     # list of files / patterns to exclude

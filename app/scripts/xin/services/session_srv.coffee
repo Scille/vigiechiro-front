@@ -44,6 +44,7 @@ angular.module('xin_session', ['http-auth-interceptor', 'xin_storage', 'xin_sess
       @logout: ->
         Backend.one('logout').post().then ->
           storage.removeItem('auth-session')
+      @forceLogout: -> storage.removeItem('auth-session')
       @getUserId: -> SessionTools.getElement('_id')
       @getToken: -> SessionTools.getElement('token')
       @getProfile: SessionTools.getProfile

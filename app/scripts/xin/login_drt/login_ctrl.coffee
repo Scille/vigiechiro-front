@@ -15,6 +15,7 @@ angular.module('xin_login', ['ngRoute', 'xin_session', 'appSettings'])
     # Display/hide login dialogue depending on session logged state
     $scope.isLogged = session.getUserId()?
     $scope.$on 'event:auth-loginRequired', ->
+      session.forceLogout()
       $scope.isLogged = false
       $scope.$apply()
     $scope.$on 'event:auth-loginConfirmed', ->
