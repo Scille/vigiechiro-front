@@ -47,3 +47,6 @@ angular.module('xin_session', ['http-auth-interceptor', 'xin_storage', 'xin_sess
       @getUserId: -> SessionTools.getElement('_id')
       @getToken: -> SessionTools.getElement('token')
       @getProfile: SessionTools.getProfile
+      @refreshProfile: () ->
+        Backend.one('utilisateurs', 'moi').get().then (user) ->
+          storage.setItem('auth-session', JSON.stringify(user))

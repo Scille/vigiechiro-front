@@ -39,9 +39,14 @@
          ng-checked="protocole.algo_tirage_site == 'POINT_FIXE'"> Point fixe
   <br>
   <br>
-  <input type="button" value="Editer" ng-click="editProtocole()">
+  <input type="button" value="Editer" ng-click="editProtocole()"
+         ng-show="user.role = 'Administrateur'">
+  <button value="inscription" ng-click="inscription()"
+          ng-show="! inscrit && ! protocole.macro_protocole">
+    S'inscrire
+  </button>
 </div>
 
-<list-sites-directive protocole-id="{{ protocole._id }}"></list-sites-directive>
+<list-sites-directive protocole-id="{{ protocole._id }}" ng-show="inscrit"></list-sites-directive>
 
-<view-site-directive protocole-id="{{ protocole._id }}"></view-site-directive>
+<view-site-directive protocole-id="{{ protocole._id }}" ng-show="inscrit"></view-site-directive>

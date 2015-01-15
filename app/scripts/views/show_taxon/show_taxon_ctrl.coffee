@@ -30,7 +30,6 @@ angular.module('showTaxon', ['ngRoute', 'ngSanitize', 'textAngular', 'xin_backen
             payload[key] = $scope.taxon[key]
         # Special handle for description
         payload.description = $scope.taxon.description
-        console.log(payload)
         orig_taxon.patch(payload).then(
           -> $scope.taxonForm.$setPristine()
           ->

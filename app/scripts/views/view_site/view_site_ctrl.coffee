@@ -47,7 +47,7 @@ angular.module('viewSite', ['ngRoute', 'textAngular', 'xin_backend'])
         #'commentaire': $scope.siteForm.commentaire.$modelValue
       Backend.all('sites').post(site).then(
         ->
-#          window.location = '#/sites'
+          window.location.reload()
         ->
           return
       )

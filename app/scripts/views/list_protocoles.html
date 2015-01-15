@@ -6,13 +6,13 @@
     <div ng-show="protocoles.length == 0" class="text-center">
         <h3><i>Pas de protocoles</i></h3>
     </div>
-
-    <div class="text-center" ng-show="user.role == 'Administrateur'">
-      <a href="#/protocoles/nouveau-protocole">Nouveau protocole</a>
-    </div>
 </div>
 
 <div ng-if="loading">
     <center><img src="images/spinner.gif"></img></center>
     <center>Changement de la liste des protocoles...</center>
+</div>
+
+<div class="text-center" ng-show="user.role == 'Administrateur'">
+  <a href="#/protocoles/nouveau-protocole">Nouveau protocole</a>
 </div>

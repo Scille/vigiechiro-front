@@ -21,31 +21,13 @@ angular.module('editProtocole', ['ngRoute', 'textAngular', 'xin_backend'])
       if not $scope.protocoleForm.$valid
         return
       if action == 'edit'
-        if not orig_protocole
+        if not orig_protocole or not $scope.protocoleForm.$dirty
           return
         modif_protocole = {}
-        if not $scope.protocoleForm.$dirty
-          return
-        if $scope.protocoleForm.titre.$dirty
-          modif_protocole.titre = $scope.protocole.titre
-        if $scope.protocoleForm.description.$dirty
-          modif_protocole.description = $scope.protocole.description
-#        if $scope.protocoleForm.parent.$dirty
-#          modif_protocole.parent = $scope.protocole.parent
-        if $scope.protocoleForm.macro_protocole.$dirty
-          modif_protocole.macro_protocole = $scope.protocole.macro_protocole
-#        if $scope.protocoleForm.tags.$dirty
-#          modif_protocole.tags = $scope.protocole.tags
-#        if $scope.protocoleForm.fichiers.$dirty
-#          modif_protocole.photos = $scope.protocole.fichiers
-        if $scope.protocoleForm.type_site.$dirty
-          modif_protocole.type_site = $scope.protocole.type_site
-        if $scope.protocoleForm.taxon.$dirty
-          modif_protocole.taxon = $scope.protocole.taxon
-        if $scope.protocoleForm.configuration_participation.$dirty
-          modif_protocole.configuration_participation = $scope.protocole.configuration_participation
-        if $scope.protocoleForm.algo_tirage_site.$dirty
-          modif_protocole.algo_tirage_site = $scope.protocole.algo_tirage_site
+        # Retrieve the modified fields from the form
+        for key, value of $scope.protocoleForm
+          if key.charAt(0) != '$' and value.$dirty
+            modif_protocole[key] = $scope.protocole[key]
         orig_protocole.patch(modif_protocole).then(
           ->
             $scope.protocoleForm.$setPristine()

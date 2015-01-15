@@ -4,8 +4,8 @@
  # args
  ## @div : element html (div) dans laquelle la map sera instanciée
 ###
-angular.module('xin_google_maps', ['xin_storage'])
-  .factory 'GoogleMaps', ($rootScope, storage) ->
+angular.module('xin_google_maps', [])
+  .factory 'GoogleMaps', ($rootScope) ->
     class GoogleMaps
       constructor: (@div) ->
         @mapOptions =
@@ -20,8 +20,7 @@ angular.module('xin_google_maps', ['xin_storage'])
             drawingModes: [
               google.maps.drawing.OverlayType.MARKER,
               google.maps.drawing.OverlayType.POLYGON,
-              google.maps.drawing.OverlayType.POLYLINE,
-              google.maps.drawing.OverlayType.RECTANGLE
+              google.maps.drawing.OverlayType.POLYLINE
             ]
           markerOptions:
             draggable: true
@@ -53,23 +52,24 @@ angular.module('xin_google_maps', ['xin_storage'])
           if shape.type == google.maps.drawing.OverlayType.MARKER
             topush = new google.maps.Marker(
               position: new google.maps.LatLng(shape.lat, shape.lng)
-              map: @_map
             )
-#    if shape.type == google.maps.drawing.OverlayType.POLYGON
-#      topush = new google.maps.Polygon(
-#        paths: shape.paths
-#      )
-#      topush.setMap(scope.map);
-#    if shape.type == google.maps.drawing.OverlayType.POLYLINE
-#      topush = new google.maps.Polyline(
-#        path: shape.path
-#      )
-#      topush.setMap(scope.map)
-#    if shape.type == google.maps.drawing.OverlayType.RECTANGLE
-#      topush = new google.maps.Rectangle(
-#        map: scope.map
-#        bounds: shape.bounds
-#      )
+          if shape.type == google.maps.drawing.OverlayType.POLYGON
+            paths = []
+            for latlng in shape.path
+              paths.push(new google.maps.LatLng(latlng.lat, latlng.lng))
+            topush = new google.maps.Polygon(
+              paths: paths
+            )
+          if shape.type == google.maps.drawing.OverlayType.POLYLINE
+            path = []
+            if not shape.path
+              continue
+            for latlng in shape.path
+              path.push(new google.maps.LatLng(latlng.lat, latlng.lng))
+            topush = new google.maps.Polyline(
+              path: path
+            )
+          topush.setMap(@_map)
           @_overlay.push(topush)
 
       saveMap: () ->
@@ -78,20 +78,21 @@ angular.module('xin_google_maps', ['xin_storage'])
           shapetosave = {}
           if shape.type == google.maps.drawing.OverlayType.MARKER
             shapetosave =
-              type: google.maps.drawing.OverlayType.MARKER
               lat: shape.getPosition().lat()
               lng: shape.getPosition().lng()
-          if shape.type == google.maps.drawing.OverlayType.POLYGON
+          if shape.type in [
+            google.maps.drawing.OverlayType.POLYGON,
+            google.maps.drawing.OverlayType.POLYLINE
+          ]
+            vertices = shape.getPath()
+            latlngs = []
+            for i in [1..vertices.getLength()]
+              xy = vertices.getAt(i-1)
+              lat = xy.lat()
+              lng = xy.lng()
+              latlngs.push({'lat': lat, 'lng': lng})
             shapetosave =
-              type: google.maps.drawing.OverlayType.POLYGON
-              paths: shape.getPaths()
-          if shape.type == google.maps.drawing.OverlayType.POLYLINE
-            shapetosave =
-              type: google.maps.drawing.OverlayType.POLYLINE
-              path: shape.getPath()
-          if shape.type == google.maps.drawing.OverlayType.RECTANGLE
-            shapetosave =
-              type: google.maps.drawing.OverlayType.RECTANGLE
-              bounds: shape.getBounds()
+              path: latlngs
+          shapetosave.type = shape.type
           toSave.push(shapetosave)
         shapesToJson = angular.toJson(toSave, false)
