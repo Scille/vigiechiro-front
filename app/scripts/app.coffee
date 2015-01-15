@@ -31,6 +31,7 @@ angular
     'showTaxon',
     'displayProtocole',
     'editProtocole',
+    'inscriptionsProtocoles',
     'listSites',
     'viewSite'
   ])
@@ -67,6 +68,9 @@ angular
         templateUrl: 'scripts/views/list_protocoles.html'
         controller: 'ListResourceCtrl'
         resolve: {resourceBackend: (Backend) -> Backend.all('protocoles')}
+      .when '/protocoles/validations',
+        templateUrl: 'scripts/views/protocole/inscriptions_protocoles/inscriptions_protocoles.html'
+        controller: 'ListInscriptionsProtocolesCtrl'
       .when '/protocoles/nouveau-protocole',
         templateUrl: 'scripts/views/protocole/edit_protocole/edit_protocole.html'
         controller: 'EditProtocoleCtrl'

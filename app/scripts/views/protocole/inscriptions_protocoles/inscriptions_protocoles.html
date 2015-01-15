@@ -1,0 +1,16 @@
+<div ng-if="!loading">
+    <div dir-paginate="inscription in inscriptions | itemsPerPage: 20" total-items="totalResults">
+        <div class="text-center"><a href='#/protocoles/'></a> s'est inscrit
+        au protocole <a href="#/protocoles/"></a>le ....</div>
+    </div>
+
+    <div ng-show="inscriptions.length == 0" class="text-center">
+        <h3><i>Aucune inscription à valider</i></h3>
+    </div>
+    <dir-pagination-controls on-page-change="pageChanged(newPageNumber)"></dir-pagination-controls>
+</div>
+
+<div ng-if="loading">
+    <center><img src="images/spinner.gif"></img></center>
+    <center>Changement de la liste des inscriptions...</center>
+</div>

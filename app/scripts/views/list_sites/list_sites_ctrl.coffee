@@ -1,5 +1,15 @@
 'use strict'
 
+getList = (scope, filter) ->
+  scope.backend.all('sites').getList(filter).then (sites) ->
+    scope.sites = sites.plain()
+    scope.loading = false
+    setTimeout( ->
+      for key, site of scope.sites
+        scope.googles_maps[key] = new scope.GoogleMaps(angular.element('#map-canvas-'+key)[0])
+        scope.googles_maps[key].loadMap(site.commentaire)
+    , 1000)
+
 ###*
  # @ngdoc function
  # @name vigiechiroApp.controller:ListSitesCtrl
@@ -13,6 +23,8 @@ angular.module('listSites', ['ngRoute', 'textAngular', 'xin_backend'])
     $scope.loading = true
     $scope.googles_maps = []
     $scope.GoogleMaps = GoogleMaps
+    getList($scope, {})
+
   .directive 'listSitesDirective', ->
     restrict: 'E'
     templateUrl: 'scripts/views/list_sites/list_sites.html'
@@ -21,12 +33,6 @@ angular.module('listSites', ['ngRoute', 'textAngular', 'xin_backend'])
       attrs.$observe('protocoleId', (value) ->
         if value
           scope.protocoleId = value
-          scope.backend.all('sites').getList({where: {protocole: scope.protocoleId}}).then (sites) ->
-            scope.sites = sites.plain()
-            scope.loading = false
-            setTimeout( ->
-              for key, site of scope.sites
-                scope.googles_maps[key] = new scope.GoogleMaps(angular.element('#map-canvas-'+key)[0])
-                scope.googles_maps[key].loadMap(site.commentaire)
-            , 1000)
+          filter = {where: {protocole: scope.protocoleId}}
+          getList(scope, filter)
       )

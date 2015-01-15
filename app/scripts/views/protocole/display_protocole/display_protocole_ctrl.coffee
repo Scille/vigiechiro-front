@@ -1,6 +1,5 @@
 'use strict'
 
-
 ###*
  # @ngdoc function
  # @name vigiechiroApp.controller:ShowProtocoleCtrl
@@ -15,7 +14,7 @@ angular.module('displayProtocole', ['ngRoute', 'textAngular', 'xin_backend', 'li
     orig_protocole = undefined
     Backend.one('protocoles', $routeParams.protocoleId).get().then (protocole) ->
       $scope.protocole = protocole.plain()
-      if $scope.protocole._id of session.getProfile().protocoles
+      if session.getProfile().protocoles and $scope.protocole._id of session.getProfile().protocoles
         $scope.inscrit = true
       Backend.one('taxons', $scope.protocole.taxon).get().then (taxon) ->
         $scope.taxon = taxon.plain()
@@ -23,8 +22,9 @@ angular.module('displayProtocole', ['ngRoute', 'textAngular', 'xin_backend', 'li
       window.location = '#/protocoles/'+$routeParams.protocoleId+'/edit'
     $scope.inscription = ->
       Backend.one('utilisateurs', 'moi').get().then (user) ->
-        utilisateur = { protocoles: {}}
-        utilisateur.protocoles[$scope.protocole._id] = {}
+        utilisateur = {}
+        utilisateur.protocoles = user.protocoles
+        utilisateur.protocoles.push({ protocole: $scope.protocole._id })
         user.patch(utilisateur).then (
           ->
             console.log 'OK'
