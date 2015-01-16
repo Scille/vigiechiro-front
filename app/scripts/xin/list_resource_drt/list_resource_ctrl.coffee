@@ -1,11 +1,11 @@
 'use strict'
 
 
-angular.module('xin_listResource', ['ngRoute', 'angularUtils.directives.dirPagination'])
+angular.module('xin_listResource', ['ngRoute', 'angularUtils.directives.dirPagination', 'xin_session'])
   .config (paginationTemplateProvider) ->
     paginationTemplateProvider.setPath('scripts/xin/list_resource_drt/dirPagination.tpl.html')
-  .controller 'ListResourceCtrl', ($scope, $routeParams, resourceBackend, Backend) ->
-    Backend.one("utilisateurs", 'moi').get().then (user) ->
+  .controller 'ListResourceCtrl', ($scope, $routeParams, resourceBackend, session) ->
+    session.getUserPromise().then (user) ->
       $scope.user = user
     resourceName = resourceBackend.route
     $scope[resourceName] = []
