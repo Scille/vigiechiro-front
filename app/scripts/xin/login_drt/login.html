@@ -1,34 +1,23 @@
-<div class="container" ng-hide="isLogged === true">
+<div class="container">
   <div class="header">
     <h3>Login with your favorite service</h3>
   </div>
   <p>
-    <a class="btn btn-default" ng-href="{{api_domain}}/login/google">
+    <a class="btn btn-default btn-login" ng-href="{{api_domain}}/login/google">
       <img src="/images/google.png"/>
       <span>Login with Google</span>
     </a>
   </p>
   <p>
-    <a class="btn btn-default" ng-href="{{api_domain}}/login/github">
+    <a class="btn btn-default btn-login" ng-href="{{api_domain}}/login/github">
       <img src="/images/github.png"/>
       <span>Login with Github</span>
     </a>
   </p>
   <p>
-    <a class="btn btn-default" ng-href="{{api_domain}}/login/facebook">
+    <a class="btn btn-default btn-login" ng-href="{{api_domain}}/login/facebook">
       <img src="/images/facebook.png"/>
       <span>Login with Facebook</span>
     </a>
   </p>
 </div>
-<script>
-  // Usage : <... onclick="popup(this.getAttribute('href'))">
-  function popup(url) {
-    event.preventDefault();
-    var width = 640;
-    var height = 480;
-    var top = (screen.height / 2) - (height / 2);
-    var left = (screen.width / 2) - (width / 2);
-    window.open(url, '', 'width='+width+',height='+height+',top='+top+',left='+left);
-  }
-</script>

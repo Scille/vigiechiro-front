@@ -11,9 +11,8 @@
 angular.module('xin_user_status', ['xin_session'])
   .controller 'UserStatusCtrl', ($scope, session) ->
     $scope.user = {}
-    $scope.user = session.getProfile()
-    $scope.$on 'event:auth-loginConfirmed', ->
-      $scope.user = session.getProfile()
+    session.getUserPromise().then (user) ->
+      $scope.user = user
     $scope.logout = ->
       session.logout()
   .directive 'userStatus', ->

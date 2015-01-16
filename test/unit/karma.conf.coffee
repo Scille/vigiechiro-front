@@ -21,7 +21,6 @@ module.exports = (config) ->
       'bower_components/angular-route/angular-route.js'
       'bower_components/angular-sanitize/angular-sanitize.js'
       'bower_components/angular-touch/angular-touch.js'
-      'bower_components/angular-http-auth/src/http-auth-interceptor.js'
       'bower_components/lodash/dist/lodash.compat.js'
       'bower_components/restangular/dist/restangular.js'
       'bower_components/flow.js/dist/flow.js'

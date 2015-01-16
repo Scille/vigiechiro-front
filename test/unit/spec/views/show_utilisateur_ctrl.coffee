@@ -12,14 +12,17 @@ describe 'Controller: ShowUtilisateurCtrl', ->
   httpBackend = undefined
 
   # Initialize the controller and a mock scope
-  beforeEach inject ($controller, $rootScope, _Backend_, _$httpBackend_) ->
+  beforeEach inject ($q, $controller, $rootScope, _Backend_, _$httpBackend_) ->
 
     Backend = _Backend_
     httpBackend = _$httpBackend_
     spyOn(Backend, 'one').and.callThrough()
     scope = $rootScope.$new()
     session =
-      getProfile: -> utilisateurs_builder('utilisateurs/moi')
+      getUserPromise: ->
+        deferred = $q.defer()
+        deferred.resolve(utilisateurs_builder('utilisateurs/moi'))
+        return deferred.promise
     $controller 'ShowUtilisateurCtrl',
       $routeParams: routeParams
       $scope: scope

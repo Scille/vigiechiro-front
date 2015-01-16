@@ -17,7 +17,6 @@ angular
     'ngSanitize',
     'ngTouch',
     'ngResource',
-    'http-auth-interceptor',
     'flow',
     'appSettings',
     'xin_login',
@@ -51,7 +50,7 @@ angular
       .when '/profil',
         templateUrl: 'scripts/views/show_utilisateur/show_utilisateur.html'
         controller: 'ShowUtilisateurCtrl'
-        resolve: {$routeParams: (session) -> return {'userId': session.getUserId()}}
+        resolve: {$routeParams: (session) -> return {'userId': 'moi'}}
       .when '/taxons',
         templateUrl: 'scripts/views/list_taxons.html'
         controller: 'ListResourceCtrl'

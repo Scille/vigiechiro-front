@@ -1,50 +1,55 @@
 "use strict"
 
-describe 'E2e login', ->
+# by is a keyword in coffescript, must rename it
+_by_ = `by`
+
+check_logout_state = ->
   content = $("content-directive")
-  loginGoogle = element(by.buttonText("Login with Google"))
+  # Find back login button and make sure it is visible
+  expect(browser.executeScript('localStorage.getItem("auth-session");')).toBe(null)
+  buttonsLogin = $$('.btn-login')
+  expect(buttonsLogin.count()).toBeGreaterThan(0)
+  buttonLogin = buttonsLogin.get(0)
+  expect(buttonLogin.isDisplayed()).toBe(true)
+  # On the other hand, content page should be hidden
+  expect(content.isDisplayed()).toBe(false)
 
-#   console.log(browser.getCurrentUrl)
 
-  # beforeEach module 'appSettings'
-
-  # beforeEach inject (SETTINGS) ->
-  #   console.log(SETTINGS.FRONT_DOMAIN)
-
-#   var firstNumber = element(by.model('first'));
-#   var secondNumber = element(by.model('second'));
-#   var goButton = element(by.id('gobutton'));
-#   var latestResult = element(by.binding('latest'));
+describe 'E2e login', ->
 
   beforeEach ->
-    console.log(protractor)
     browser.get('http://localhost:9001')
-    # browser.get('http://juliemr.github.io/protractor-demo/');
 
   it 'Test title', ->
     expect(browser.getTitle()).toEqual('Vigiechiro')
 
-
   it 'Test login page', ->
-    # expect(browser.getTitle()).toEqual('Vigiechiro')
-    expect(content.isDisplayed()).toBe(false)
-    expect(loginGoogle.isDisplayed()).toBe(true)
+    check_logout_state()
+    # Now process to login
+    browser.waitForAngular()
+    element.all(_by_.css('.btn-login')).get(0).click().then ->
+    # buttonLogin.click().then ->
+      # Login should be complete, retrieve the element and check their visibility
+      buttonsLogin = $('.btn-login')
+      element.all(_by_.css('.btn-login')).each (element) ->
+        expect(element.isDisplayed()).toBe(false)
+      content = $("content-directive")
+      expect(content.isDisplayed()).toBe(true)
 
-#   it('should add one and two', function() {
-#     firstNumber.sendKeys(1);
-#     secondNumber.sendKeys(2);
 
-#     goButton.click();
+describe 'E2e test once logged', ->
 
-#     expect(latestResult.getText()).toEqual('3');
-#   });
+  beforeEach ->
+    browser.get('http://localhost:9001')
+    element.all(_by_.css('.btn-login')).get(0).click()
 
-#   it('should add four and six', function() {
-#     firstNumber.sendKeys(4);
-#     secondNumber.sendKeys(6);
+  it 'Test get user profile', ->
+    browser.debugger()
+    userStatus = element('user-status')
+    expect(userStatus.getText()).toEqual('John Doe')
+    userStatus.element('a').click().then ->
 
-#     goButton.click();
 
-#     expect(latestResult.getText()).toEqual('10');
-#   });
-# });
+  it 'Test logout', ->
+    element(_by_.buttonText('Logout')).click().then ->
+      check_logout_state()

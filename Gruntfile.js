@@ -393,7 +393,7 @@ module.exports = function (grunt) {
         singleRun: true
       },
       server: {
-        singleRun: true
+        singleRun: false
       }
     }
   });

@@ -18,9 +18,9 @@ angular.module('showUtilisateur', ['ngRoute', 'xin_session', 'xin_backend'])
       userResource = utilisateur
       $scope.utilisateur = utilisateur.plain()
       origin_role = $scope.utilisateur.role
-      profile = session.getProfile()
-      $scope.readOnly = (profile.role != 'Administrateur' and
-                         profile._id != utilisateur._id)
+      session.getUserPromise().then (user) ->
+        $scope.readOnly = (user.role != 'Administrateur' and
+                           user._id != utilisateur._id)
     $scope.saveUser = ->
       if not userResource or not $scope.userForm.$dirty
         console.log("Pas de modification")

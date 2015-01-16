@@ -24,7 +24,11 @@ angular.module('xin_backend', ['ngRoute', 'restangular', 'xin_session_tools'])
             extractedData = data
           return extractedData
         .setErrorInterceptor (response, deferred, responseHandler) ->
-          if response.status == 404
+          if response.status == 401
+            # User is not login, notify the session about this
+            SessionTools.logRequestError()
+            return true
+          else if response.status == 404
             $location.path('/404')
           else if response.status == 403
             $location.path('/403')
@@ -36,5 +40,4 @@ angular.module('xin_backend', ['ngRoute', 'restangular', 'xin_session_tools'])
       customToken = token
     backendConfig.resetCustomToken = (token=undefined) ->
       customToken = undefined
-
     return backendConfig
