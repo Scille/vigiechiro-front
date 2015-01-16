@@ -95,7 +95,6 @@ describe 'Outdated token', ->
   $httpBackend = null
   storage = null
   test_token = "C8Y1VMEKHOIT3F1GU9HI16FNNHB7QFKJ"
-  test_user_id = "123456789"
   test_authorization_header = "Basic QzhZMVZNRUtIT0lUM0YxR1U5SEkxNkZOTkhCN1FGS0o6"
 
   beforeEach module 'xin_session'
