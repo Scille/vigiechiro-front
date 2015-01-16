@@ -26,15 +26,15 @@ describe 'E2e login', ->
   it 'Test login page', ->
     check_logout_state()
     # Now process to login
-    browser.waitForAngular()
-    element.all(_by_.css('.btn-login')).get(0).click().then ->
-    # buttonLogin.click().then ->
-      # Login should be complete, retrieve the element and check their visibility
-      buttonsLogin = $('.btn-login')
-      element.all(_by_.css('.btn-login')).each (element) ->
-        expect(element.isDisplayed()).toBe(false)
-      content = $("content-directive")
-      expect(content.isDisplayed()).toBe(true)
+    browser.waitForAngular().then ->
+      element.all(_by_.css('.btn-login')).get(0).click().then ->
+      # buttonLogin.click().then ->
+        # Login should be complete, retrieve the element and check their visibility
+        buttonsLogin = $('.btn-login')
+        element.all(_by_.css('.btn-login')).each (element) ->
+          expect(element.isDisplayed()).toBe(false)
+        content = $("content-directive")
+        expect(content.isDisplayed()).toBe(true)
 
 
 login = (callback) ->
