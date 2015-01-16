@@ -9,8 +9,8 @@
                 {{ inscription.protocole_titre }}
             </a>
             le {{ inscription.protocole_updated }}
-            <button ng-click="valider('{{ inscription.utilisateur_id}}','{{ inscription.protocole_id }}')">Valider</button>
-            <button ng-click="refuser('{{ inscription.utilisateur_id}}','{{ inscription.protocole_id }}')">Refuser</button>
+            <button ng-click="validate(inscription.utilisateur_id, inscription.protocole_id)">Valider</button>
+            <button ng-click="refuse(inscription.utilisateur_id, inscription.protocole_id)">Refuser</button>
         </div>
     </div>
 
