@@ -1,7 +1,17 @@
 <div ng-if="!loading">
     <div dir-paginate="inscription in inscriptions | itemsPerPage: 20" total-items="totalResults">
-        <div class="text-center"><a href='#/protocoles/'></a> s'est inscrit
-        au protocole <a href="#/protocoles/"></a>le ....</div>
+        <div class="text-center">
+            <a href='#/utilisateurs/{{ inscription.utilisateur_id}}'>
+                {{ inscription.utilisateur_pseudo }}
+            </a>
+            s'est inscrit au protocole
+            <a href="#/protocoles/{{ inscription.protocole_id }}">
+                {{ inscription.protocole_titre }}
+            </a>
+            le {{ inscription.protocole_updated }}
+            <button ng-click="valider('{{ inscription.utilisateur_id}}','{{ inscription.protocole_id }}')">Valider</button>
+            <button ng-click="refuser('{{ inscription.utilisateur_id}}','{{ inscription.protocole_id }}')">Refuser</button>
+        </div>
     </div>
 
     <div ng-show="inscriptions.length == 0" class="text-center">

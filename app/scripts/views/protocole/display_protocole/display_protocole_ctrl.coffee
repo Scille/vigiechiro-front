@@ -14,24 +14,22 @@ angular.module('displayProtocole', ['ngRoute', 'textAngular', 'xin_backend', 'li
     orig_protocole = undefined
     Backend.one('protocoles', $routeParams.protocoleId).get().then (protocole) ->
       $scope.protocole = protocole.plain()
-      if session.getProfile().protocoles and $scope.protocole._id of session.getProfile().protocoles
-        $scope.inscrit = true
+      Backend.one('utilisateurs', 'moi').get().then (user) ->
+        if user.protocoles
+          for protocole in user.protocoles
+            if protocole.protocole == $scope.protocole._id
+              $scope.inscrit = true
+              break
       Backend.one('taxons', $scope.protocole.taxon).get().then (taxon) ->
         $scope.taxon = taxon.plain()
     $scope.editProtocole = ->
       window.location = '#/protocoles/'+$routeParams.protocoleId+'/edit'
     $scope.inscription = ->
-      Backend.one('utilisateurs', 'moi').get().then (user) ->
-        utilisateur = {}
-        utilisateur.protocoles = user.protocoles
-        utilisateur.protocoles.push({ protocole: $scope.protocole._id })
-        user.patch(utilisateur).then (
-          ->
-            console.log 'OK'
-            session.refreshProfile()
-            window.location.reload()
-          (response) ->
-            console.log("error", response)
-            session.refreshProfile()
-            window.location.reload()
-        )
+      Backend.one('protocoles', $scope.protocole._id+"/action/join").post().then (
+        ->
+          console.log 'OK'
+          window.location.reload()
+        (response) ->
+          console.log("error", response)
+          window.location.reload()
+      )

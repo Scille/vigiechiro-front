@@ -4,7 +4,9 @@
 angular.module('xin_listResource', ['ngRoute', 'angularUtils.directives.dirPagination'])
   .config (paginationTemplateProvider) ->
     paginationTemplateProvider.setPath('scripts/xin/list_resource_drt/dirPagination.tpl.html')
-  .controller 'ListResourceCtrl', ($scope, $routeParams, resourceBackend) ->
+  .controller 'ListResourceCtrl', ($scope, $routeParams, resourceBackend, Backend) ->
+    Backend.one("utilisateurs", 'moi').get().then (user) ->
+      $scope.user = user
     resourceName = resourceBackend.route
     $scope[resourceName] = []
     $scope.totalItems = 0
