@@ -3,8 +3,9 @@
         <div class="text-center"><a href='#/sites/{{ site._id }}'>
             {{ site.protocole }} : {{ site.commentaire }}
         </a></div>
+        <input type="button" ng-value="display" ng-click="display = ! display" ng-init="display = false">
 
-        <div id="map-canvas-{{ $index }}" class="g-maps"></div>
+        <div id="map-canvas-{{ $index }}" class="g-maps" ng-show="display"></div>
     </div>
 
     <div ng-show="sites.length == 0" class="text-center">

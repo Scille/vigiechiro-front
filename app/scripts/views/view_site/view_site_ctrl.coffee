@@ -8,6 +8,7 @@
  # Controller of the vigiechiroApp
 ###
 angular.module('viewSite', ['ngRoute', 'textAngular', 'xin_backend'])
+
   .controller 'ShowSiteCtrl', ($routeParams, $scope, Backend, GoogleMaps) ->
     orig_site = undefined
     google_maps = new GoogleMaps(angular.element('#map-canvas')[0])
@@ -15,6 +16,7 @@ angular.module('viewSite', ['ngRoute', 'textAngular', 'xin_backend'])
       orig_site = site
       $scope.site = site.plain()
       google_maps.loadMap($scope.site.commentaire)
+
     $scope.saveSite = ->
       if not $scope.siteForm.$valid
         return
@@ -31,6 +33,13 @@ angular.module('viewSite', ['ngRoute', 'textAngular', 'xin_backend'])
         ->
           return
       )
+
+    $scope.verrouiller = ->
+      orig_site.patch({ verrouille: true }).then (
+        -> console.log("Verrou ok")
+        -> console.log('echec verrou')
+      )
+
   .controller 'CreateSiteCtrl', ($routeParams, $scope, Backend, GoogleMaps) ->
     orig_site = undefined
     google_maps = new GoogleMaps(angular.element('#map-canvas')[0])
@@ -38,6 +47,7 @@ angular.module('viewSite', ['ngRoute', 'textAngular', 'xin_backend'])
       orig_site = site
       $scope.site = site.plain()
       google_maps.loadMap($scope.site.commentaire)
+
     $scope.saveSite = ->
       if not $scope.siteForm.$valid
         return
@@ -51,6 +61,7 @@ angular.module('viewSite', ['ngRoute', 'textAngular', 'xin_backend'])
         ->
           return
       )
+
   .directive 'viewSiteDirective', ->
     restrict: 'E'
     templateUrl: 'scripts/views/view_site/view_site.html'

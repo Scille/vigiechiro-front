@@ -33,10 +33,26 @@ angular.module('inscriptionsProtocoles', ['ngRoute', 'textAngular', 'xin_backend
 
     $scope.valider = (utilisateur_id, protocole_id) ->
       Backend.one('utilisateurs', utilisateur_id).get().then (utilisateur) ->
-        path = {}
-        utilisateur.path().then ( -> )
-        console.log("Valider")
+        patch = {}
+        patch.protocoles = utilisateur.protocoles
+        for protocole in patch.protocoles
+          if protocole.protocole == protocole_id
+            protocole.valide = true
+            utilisateur.patch(patch).then (
+              -> console.log 'Patch OK'
+              -> console.log 'Erreur patch'
+            )
+            return
 
     $scope.refuser = (utilisateur_id, protocole_id) ->
       Backend.one('utilisateurs', utilisateur_id).get().then (utilisateur) ->
-        console.log("Refuser")
+        patch = {}
+        patch.protocoles = utilisateur.protocoles
+        for index, protocole in patch.protocoles
+          if protocole.protocole == protocole_id
+            patch.protocoles.splice(index, 1)
+            utilisateur.patch(patch).then (
+              -> console.log 'Patch OK'
+              -> console.log 'Erreur patch'
+            )
+            return

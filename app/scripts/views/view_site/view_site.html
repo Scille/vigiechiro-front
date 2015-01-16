@@ -21,5 +21,6 @@
                          ng-disabled="false">
         <br>
         <input type="submit" value="Sauvegarder" ng-disabled="protocoleForm.$pristine">
+        <button ngIf="user.role == 'Administrateur'" ng-click="verrouiller()">Verrouiller</button>
     </form>
 </div>
