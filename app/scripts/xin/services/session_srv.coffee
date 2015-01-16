@@ -34,8 +34,8 @@ angular.module('xin_session', ['xin_storage', 'xin_backend'])
 
 
 angular.module('xin_session_tools', ['xin_storage'])
-  .factory 'SessionTools', ($window, storage) ->
-    class SessionTools
+  .factory 'sessionTools', ($window, storage) ->
+    class sessionTools
       @buildAuthorizationHeader: (token) ->
         "Basic " + btoa("#{token}:")
       @getAuthorizationHeader: =>

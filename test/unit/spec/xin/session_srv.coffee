@@ -14,17 +14,17 @@ class StorageMock
   removeItem: (key) ->
     delete @_storage[key]
   clear: -> @_storage = {}
-  addEventListener: ->
+  _eventListener: undefined
+  addEventListener: (@_eventListener) ->
 
 
 describe 'Service: session', ->
 
   $rootScope = null
-  authService = null
+  $httpBackend = null
   storage = null
   Backend = null
   test_token = "C8Y1VMEKHOIT3F1GU9HI16FNNHB7QFKJ"
-  test_user_id = "123456789"
   test_authorization_header = "Basic QzhZMVZNRUtIT0lUM0YxR1U5SEkxNkZOTkhCN1FGS0o6"
 
   beforeEach module 'xin_session'
@@ -38,82 +38,86 @@ describe 'Service: session', ->
     $provide.value('Backend', Backend)
     return null
 
-  beforeEach inject (_$rootScope_, $q) ->
+  beforeEach inject (_$rootScope_, _$httpBackend_, $q) ->
     Backend._q = $q
     $rootScope = _$rootScope_
+    $httpBackend = _$httpBackend_
 
-  it 'Test basic login', inject ($window, session, SessionTools) ->
+  it 'Test trigger login', inject ($window, session, sessionTools) ->
     spyOn($window.location, 'reload').and.callThrough()
     session.login(test_token)
+    expect($window.location.reload).toHaveBeenCalled()
+    expect(sessionTools.getAuthorizationHeader()).toEqual(test_authorization_header)
+
+  it 'Test login from another tab', inject ($window, storage, session, sessionTools) ->
+    spyOn($window.location, 'reload').and.callThrough()
+    storage.setItem('auth-session-token', test_token)
+    # Send a fake event to simulate the other tab
+    storage._eventListener(
+      "key": 'auth-session-token'
+      "oldValue": null
+      "newValue": test_token
+    )
     $rootScope.$digest() # Trigger promises
     expect($window.location.reload).toHaveBeenCalled()
-    expect(SessionTools.getAuthorizationHeader()).toEqual(test_authorization_header)
+    expect(sessionTools.getAuthorizationHeader()).toEqual(test_authorization_header)
 
-  # it 'Test token loading', inject () ->
+  describe 'Once logged in', ->
+
+    beforeEach inject (session) ->
+      session.login(test_token)
+
+    it 'Test logout', inject ($window, session, sessionTools) ->
+      spyOn($window.location, 'reload').and.callThrough()
+      $httpBackend.expectPOST('/logout').respond(200)
+      session.logout()
+      $rootScope.$digest() # Trigger promises
+      expect($window.location.reload).toHaveBeenCalled()
+      expect(sessionTools.getAuthorizationHeader()).toBeUndefined()
+
+    it 'Test logout from another tab', inject ($window, session, sessionTools) ->
+      spyOn($window.location, 'reload').and.callThrough()
+      storage.removeItem('auth-session-token')
+      # Send a fake event to simulate the other tab
+      storage._eventListener(
+        "key": 'auth-session-token'
+        "oldValue": test_token
+        "newValue": null
+      )
+      $rootScope.$digest() # Trigger promises
+      expect($window.location.reload).toHaveBeenCalled()
+      expect(sessionTools.getAuthorizationHeader()).toBeUndefined()
 
 
-    # Backend._builders['utilisateurs'] = (href) ->
-    #   user = utilisateurs_builder(href)
-    #   user._id = test_user_id
-    #   return user
-    # user = undefined
-    # session.getUserPromise().then(
-    #   (_user_) ->
-    #     console.log(user)
-    #     user = _user_
-    #   (e) ->
-    #     console.log('error')
-    #     console.log(e)
-    # )
-    # expect(user).toEqual({'touille': 1})
-    # expect(session.getToken()).toEqual(test_token)
-    # expect(session.getUserId()).toEqual(test_user_id)
+describe 'Outdated token', ->
 
-  # it 'Test basic logout', inject (session, SessionTools) ->
-  #   session.logout()
-  #   $rootScope.$digest() # Trigger promises
-  #   expect($rootScope.$broadcast).toHaveBeenCalledWith('event:auth-loginRequired')
-  #   $rootScope.$broadcast.calls.reset()
-  #   # expect(session.getToken()).toBe(undefined)
-  #   expect(session.getUserId()).toBe(undefined)
-  #   expect(SessionTools.getAuthorizationHeader()).toBe(undefined)
+  $rootScope = null
+  $httpBackend = null
+  storage = null
+  test_token = "C8Y1VMEKHOIT3F1GU9HI16FNNHB7QFKJ"
+  test_user_id = "123456789"
+  test_authorization_header = "Basic QzhZMVZNRUtIT0lUM0YxR1U5SEkxNkZOTkhCN1FGS0o6"
 
-  # describe 'Test login & logout from another tab', ->
+  beforeEach module 'xin_session'
+  beforeEach module 'xin_session_tools'
 
-  #   beforeEach inject ($rootScope) ->
-  #     user = utilisateurs_builder('/utilisateurs/moi')
-  #     user._id = test_user_id
-  #     user.token = test_token
-  #     storage.setItem('auth-session', JSON.stringify(user))
+  beforeEach module ($provide)->
+    storage = new StorageMock()
+    $provide.value('storage', storage)
+    return null
 
-  #   it 'Test successful login', inject (session) ->
-  #     expect(authService.loginConfirmed).toHaveBeenCalled()
-  #     expect(session.getUserId()).toEqual(test_user_id)
-  #     # expect(session.getToken()).toEqual(test_token)
+  beforeEach inject (_$rootScope_, _$httpBackend_, session) ->
+    $rootScope = _$rootScope_
+    $httpBackend = _$httpBackend_
+    session.login(test_token)
 
-  #   it 'Test logout', inject (session, $rootScope) ->
-  #     storage.removeItem('auth-session')
-  #     expect($rootScope.$broadcast).toHaveBeenCalledWith('event:auth-loginRequired')
-  #     expect(session.getUserId()).toBe(undefined)
-  #     # expect(session.getToken()).toBe(undefined)
-
-  #   it 'Test updating token', inject (session, $rootScope) ->
-  #     new_token = "RFQNHVDZAN8LHD5F1C7AJSNMYN0UXU90"
-  #     user = utilisateurs_builder('/utilisateurs/moi')
-  #     user._id = test_user_id
-  #     user.token = new_token
-  #     storage.setItem('auth-session', JSON.stringify(user))
-  #     expect(session.getUserId()).toEqual(test_user_id)
-  #     # expect(session.getToken()).toEqual(new_token)
-  #     expect(authService.loginConfirmed).toHaveBeenCalled()
-
-  #   it 'Test changing user', inject (session, $rootScope) ->
-  #     new_user_id = 7777777
-  #     new_token = "RFQNHVDZAN8LHD5F1C7AJSNMYN0UXU90"
-  #     user = utilisateurs_builder('/utilisateurs/moi')
-  #     user._id = new_user_id
-  #     user.token = new_token
-  #     storage.setItem('auth-session', JSON.stringify(user))
-  #     expect(session.getUserId()).toEqual(new_user_id)
-  #     # expect(session.getToken()).toEqual(new_token)
-  #     expect(authService.loginConfirmed).toHaveBeenCalled()
+  it 'Test outdated token', inject ($rootScope, Backend) ->
+    $httpBackend.expectGET('/utilisateurs/123456789').respond(401, {})
+    result = undefined
+    Backend.one('utilisateurs', '123456789').get().then(
+      -> result = 'Bad success'
+      -> result = 'True error'
+    )
+    $httpBackend.flush();
+    $rootScope.$digest() # Trigger promises
+    expect(result).toEqual('True error')

@@ -2,15 +2,15 @@
 
 
 angular.module('xin_backend', ['ngRoute', 'restangular', 'xin_session_tools'])
-  .factory 'Backend', ($location, Restangular, SessionTools) ->
+  .factory 'Backend', ($location, Restangular, sessionTools) ->
     customToken = undefined
     backendConfig = Restangular.withConfig (RestangularConfigurer) ->
       RestangularConfigurer.setDefaultHeaders
           Authorization: ->
             if customToken?
-              return SessionTools.buildAuthorizationHeader(customToken)
+              return sessionTools.buildAuthorizationHeader(customToken)
             else
-              return SessionTools.getAuthorizationHeader()
+              return sessionTools.getAuthorizationHeader()
         .setRestangularFields
           id: "_id"
           etag: "_etag"
@@ -26,7 +26,7 @@ angular.module('xin_backend', ['ngRoute', 'restangular', 'xin_session_tools'])
         .setErrorInterceptor (response, deferred, responseHandler) ->
           if response.status == 401
             # User is not login, notify the session about this
-            SessionTools.logRequestError()
+            sessionTools.logRequestError()
             return true
           else if response.status == 404
             $location.path('/404')
