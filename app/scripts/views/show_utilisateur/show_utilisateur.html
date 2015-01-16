@@ -51,6 +51,6 @@
         <br>
         Tags : <input type="text" name="tags" ng-model="utilisateur.tags" value="{{ utilisateur.tags }}">
         <br><br>
-        <input type="submit" value="Sauvegarder" ng-disabled="userForm.$pristine">
+        <input type="submit" value="Sauvegarder" ng-hide="userForm.$pristine">
     </form>
 </div>

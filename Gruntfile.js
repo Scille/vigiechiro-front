@@ -385,15 +385,9 @@ module.exports = function (grunt) {
 
     // E2e test settings
     protractor: {
-      options: {
-        configFile: 'test/e2e/protractor.conf.coffee'
-      },
       e2e: {
         configFile: 'test/e2e/protractor.conf.coffee',
         singleRun: true
-      },
-      server: {
-        singleRun: false
       }
     }
   });
@@ -433,14 +427,6 @@ module.exports = function (grunt) {
     'autoprefixer',
     'connect:test',
     'protractor:e2e'
-  ]);
-
-  grunt.registerTask('test-e2e-server', [
-    'clean:server',
-    'concurrent:test',
-    'autoprefixer',
-    'connect:test',
-    'protractor:server'
   ]);
 
   grunt.registerTask('test-server', [
