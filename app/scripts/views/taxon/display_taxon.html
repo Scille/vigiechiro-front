@@ -1,0 +1,7 @@
+<div class="text-center">
+  <h1 ng-bind="taxon.libelle_long"></h1>
+  <h3>(<text ng-bind="taxon.libelle_court"/>)</h3>
+  <br>
+  <div ng-bind-html="taxon.description">
+</div>
+<a class="button" ng-show="isAdmin" ng-href="#/taxons/{{taxonId}}/edition">Éditer</a>

@@ -27,12 +27,12 @@ angular
     'xin_google_maps',
     'xin_listResource',
     'showUtilisateur',
-    'showTaxon',
     'displayProtocole',
     'editProtocole',
     'inscriptionsProtocoles',
     'listSites',
-    'viewSite'
+    'viewSite',
+    'taxonView'
   ])
   .run (Backend, SETTINGS) ->
     Backend.setBaseUrl(SETTINGS.API_DOMAIN)
@@ -51,18 +51,6 @@ angular
         templateUrl: 'scripts/views/show_utilisateur/show_utilisateur.html'
         controller: 'ShowUtilisateurCtrl'
         resolve: {$routeParams: (session) -> return {'userId': 'moi'}}
-      .when '/taxons',
-        templateUrl: 'scripts/views/list_taxons.html'
-        controller: 'ListResourceCtrl'
-        resolve: {resourceBackend: (Backend) -> Backend.all('taxons')}
-      .when '/taxons/nouveau-taxon',
-        templateUrl: 'scripts/views/show_taxon/show_taxon.html'
-        controller: 'ShowTaxonCtrl'
-        resolve: {action: -> 'createNew'}
-      .when '/taxons/:taxonId',
-        templateUrl: 'scripts/views/show_taxon/show_taxon.html'
-        controller: 'ShowTaxonCtrl'
-        resolve: {action: -> 'edit'}
       .when '/protocoles',
         templateUrl: 'scripts/views/list_protocoles.html'
         controller: 'ListResourceCtrl'
