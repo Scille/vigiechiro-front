@@ -61,16 +61,11 @@ describe 'Test manual login', ->
         # Make sure the user is logged as John Doe
         expect(name).toBe('John Doe')
         # Now manually change token
-        browser.get("#{baseUrl}?token=#{observateurToken}").then ->
-          # Wait for the login to complete
-          browser.wait( ->
-            # Refresh can occure during login, thus we must look for
-            # content-directive each time we evalute the test
-            $('content-directive').isDisplayed()
-          ).then ->
-            # Check the user has changed
-            element(`by`.binding("user.pseudo")).getText().then (name) ->
-              expect(name).toBe('Observateur Name')
+        browser.get("#{baseUrl}?token=#{observateurToken}")
+        browser.sleep(1000).then ->
+          # Wait for the login to complete and make sure the user has changed
+          element(`by`.binding("user.pseudo")).getText().then (name) ->
+            expect(name).toBe('Observateur Name')
 
   it 'Test token invalidation relog', ->
     # Manual login
@@ -86,9 +81,12 @@ describe 'Test manual login', ->
               expect(name).toBe('Observateur Name')
 
   it 'Test logout', ->
-   element.all(`by`.css('.btn-login')).get(0).click().then ->
-    element(`by`.buttonText('Logout')).click().then ->
-      check_logout_state()
+   $$('.btn-login').get(0).click().then ->
+    expect($('.user-status').isDisplayed()).toBe(true)
+    $('.user-status').click().then ->
+      expect($('.button-logout').isDisplayed()).toBe(true)
+      $('.button-logout').click().then ->
+        check_logout_state()
 
 
 describe 'Test once logged', ->
@@ -115,18 +113,20 @@ describe 'Test once logged', ->
     userStatus = $('user-status')
     userStatus.element(`by`.binding("user.pseudo")).getText().then (name) ->
       expect(name).toBe('Observateur Name')
-    userStatus.element(`by`.css('a')).click().then ->
-      browser.waitForAngular().then ->
-        element(`by`.model('utilisateur.email')).getAttribute('value').then (email) ->
-          expect(email).toBe('observateur@facebook.com')
-        element(`by`.model('utilisateur.pseudo')).getAttribute('value').then (pseudo) ->
-          expect(pseudo).toBe('Observateur Name')
-        element(`by`.model('utilisateur.prenom')).clear().sendKeys('John')
-        element(`by`.model('utilisateur.nom')).clear().sendKeys('Doe')
-        element(`by`.css('input[type="submit"]')).click().then ->
-          # Reload page to make sure submit has worked
-          element(`by`.css('user-status')).element(`by`.css('a')).click().then ->
-            element(`by`.model('utilisateur.prenom')).getAttribute('value').then (email) ->
-              expect(email).toBe('John')
-            element(`by`.model('utilisateur.nom')).getAttribute('value').then (pseudo) ->
-              expect(pseudo).toBe('Doe')
+    $('.user-status').click().then ->
+      expect($('.button-profile').isDisplayed()).toBe(true)
+      $('.button-profile').click().then ->
+        browser.waitForAngular().then ->
+          element(`by`.model('utilisateur.email')).getAttribute('value').then (email) ->
+            expect(email).toBe('observateur@facebook.com')
+          element(`by`.model('utilisateur.pseudo')).getAttribute('value').then (pseudo) ->
+            expect(pseudo).toBe('Observateur Name')
+          element(`by`.model('utilisateur.prenom')).clear().sendKeys('John')
+          element(`by`.model('utilisateur.nom')).clear().sendKeys('Doe')
+          element(`by`.css('input[type="submit"]')).click().then ->
+            # Reload page to make sure submit has worked
+            browser.setLocation('profil').then ->
+              element(`by`.model('utilisateur.prenom')).getAttribute('value').then (email) ->
+                expect(email).toBe('John')
+              element(`by`.model('utilisateur.nom')).getAttribute('value').then (pseudo) ->
+                expect(pseudo).toBe('Doe')

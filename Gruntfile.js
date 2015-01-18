@@ -21,6 +21,8 @@ module.exports = function (grunt) {
     dist: 'dist'
   };
 
+  grunt.loadNpmTasks('grunt-protractor-runner');
+
   // Define the configuration for all the tasks
   grunt.initConfig({
 
@@ -38,7 +40,7 @@ module.exports = function (grunt) {
         tasks: ['newer:coffee:dist']
       },
       coffeeTest: {
-        files: ['test/spec/**/*.{coffee,litcoffee,coffee.md}'],
+        files: ['test/**/*.{coffee,litcoffee,coffee.md}'],
         tasks: ['newer:coffee:test', 'karma']
       },
       styles: {
@@ -385,10 +387,13 @@ module.exports = function (grunt) {
 
     // E2e test settings
     protractor: {
-      e2e: {
+      options: {
         configFile: 'test/e2e/protractor.conf.coffee',
-        singleRun: true
-      }
+        keepalive: true,
+        noColor: false,
+        args: {}
+      },
+      all: {}
     }
   });
 
@@ -422,11 +427,8 @@ module.exports = function (grunt) {
   ]);
 
   grunt.registerTask('test-e2e', [
-    'clean:server',
     'concurrent:test',
-    'autoprefixer',
-    'connect:test',
-    'protractor:e2e'
+    'protractor:all'
   ]);
 
   grunt.registerTask('test-server', [

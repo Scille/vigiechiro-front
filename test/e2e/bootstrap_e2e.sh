@@ -74,14 +74,3 @@ fi
 # Reset the bdd
 echo "Setting the bdd..."
 mongorestore -d vigiechiro e2e_vigiechiro_db --drop
-
-# Launch the tests !
-echo "Starting tests"
-protractor protractor.conf.coffee
-RESULT=$?
-
-# Finally kill the child process and return to orginal dir before leaving
-pkill -P $$
-cd $OLD_DIR
-
-exit $RESULT
