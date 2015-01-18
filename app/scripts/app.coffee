@@ -25,11 +25,10 @@ angular
     'xin_session',
     'xin_backend',
     'xin_google_maps',
-    'listSites',
-    'viewSite',
     'utilisateurViews',
     'taxonViews',
-    'protocoleViews'
+    'protocoleViews',
+    'siteViews'
   ])
   .run (Backend, SETTINGS) ->
     Backend.setBaseUrl(SETTINGS.API_DOMAIN)
@@ -41,15 +40,6 @@ angular
         templateUrl: 'scripts/views/utilisateur/show_utilisateur.html'
         controller: 'ShowUtilisateurCtrl'
         resolve: {$routeParams: (session) -> return {'userId': 'moi'}}
-      .when '/sites',
-        templateUrl: 'scripts/views/list_sites/list_sites.html'
-        controller: 'ListSitesCtrl'
-      .when '/sites/nouveau-site',
-        templateUrl: 'scripts/views/view_site/view_site.html'
-        controller: 'CreateSiteCtrl'
-      .when '/sites/:siteId',
-        templateUrl: 'scripts/views/view_site/view_site.html'
-        controller: 'ShowSiteCtrl'
       .when '/403',
         templateUrl: '403.html'
       .when '/404',

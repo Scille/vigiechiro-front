@@ -17,6 +17,7 @@ angular.module('taxonViews', ['ngRoute', 'ngSanitize', 'textAngular', 'xin_listR
       .when '/taxons/:taxonId/edition',
         templateUrl: 'scripts/views/taxon/edit_taxon.html'
         controller: 'EditTaxonCtrl'
+
   .controller 'CreateTaxonCtrl', ($scope, Backend) ->
     $scope.taxon = {}
     $scope.submitted = false
@@ -32,6 +33,7 @@ angular.module('taxonViews', ['ngRoute', 'ngSanitize', 'textAngular', 'xin_listR
         -> window.location = '#/taxons'
         ->
       )
+
   .controller 'DisplayTaxonCtrl', ($routeParams, $scope, session, Backend) ->
     $scope.taxon = {}
     $scope.taxonId = $routeParams.taxonId
@@ -40,6 +42,7 @@ angular.module('taxonViews', ['ngRoute', 'ngSanitize', 'textAngular', 'xin_listR
       $scope.isAdmin = user.role == 'Administrateur'
     Backend.one('taxons', $routeParams.taxonId).get().then (taxon) ->
       $scope.taxon = taxon.plain()
+
   .controller 'EditTaxonCtrl', ($route, $routeParams, $scope, Backend) ->
     $scope.submitted = false
     $scope.taxon = {}

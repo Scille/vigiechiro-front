@@ -11,8 +11,7 @@ make_payload = ($scope) ->
     'algo_tirage_site': $scope.protocole.algo_tirage_site
 
 
-angular.module('protocoleViews', ['ngRoute', 'xin_listResource', 'textAngular', 'xin_backend', 'xin_session'
-  'listSites', 'viewSite'])
+angular.module('protocoleViews', ['ngRoute', 'xin_listResource', 'textAngular', 'xin_backend', 'xin_session', 'siteViews'])
   .config ($routeProvider) ->
     $routeProvider
       .when '/protocoles',
