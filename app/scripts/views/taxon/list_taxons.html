@@ -1,10 +1,15 @@
 <div ng-if="!loading">
-    <div ng-if="taxons.length != 0" class="text-center panel panel-info">
-        <div class="panel-heading panel-title"><b>Liste des taxons</b></div>
-            <div ng-repeat="taxon in taxons" >
-                <div class="text-center well well-sm"><a href='#/taxons/{{ taxon._id }}'>{{ taxon.libelle_long }}</a></div>
-            </div>
-        </div>
+    <div class="page-header">
+        <h4>Taxons</h4>
+    </div>
+    <div ng-if="taxons.length != 0">
+        <ul class="list-group">
+            <li class="list-group-item" ng-repeat="taxon in taxons">
+                <a class="btn" ng-href='#/taxons/{{ taxon._id }}'>
+                    {{ taxon.libelle_long }}
+                </a>
+            </li>
+        </ul>
     </div>
 
     <div ng-show="taxons.length == 0" class="text-center">

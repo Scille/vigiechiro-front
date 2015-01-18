@@ -1,5 +1,7 @@
-<div class="panel panel-warning">
-    <div class="panel-heading"><h4>Profil de l'utilisateur {{ utilisateur.pseudo }}</h4></div>
+<div class="container">
+    <div class="page-header">
+        <h4><b>{{ utilisateur.pseudo }}</b></h4>
+    </div>
 
     <form class="simple-form" novalidate name="userForm" ng-submit="userForm.$valid && saveUser()">
 

@@ -1,4 +1,7 @@
-<div class="group">
-    <a href="#/profil"><span><b>{{user.pseudo}}</b></span></a>
-    <button type="button" class="btn btn-default" ng-click="logout()">Logout</button>
+<div class="dropdown">
+  <a class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false"><b>{{user.pseudo}} </b><span class="caret"></span></a>
+  <ul class="dropdown-menu" role="menu">
+    <li><a href="#/profil">Profil</a></li>
+    <li><a ng-click="logout()">Déconnexion</a></li>
+  </ul>
 </div>

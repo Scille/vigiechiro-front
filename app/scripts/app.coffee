@@ -77,9 +77,11 @@ angular
         templateUrl: '404.html'
       .otherwise
         redirectTo: '/404'
-
-  .controller 'MenuCtrl', ($scope, $location, $route) ->
-    $scope.activePath = null
-    $scope.$on('$routeChangeSuccess', ->
+  .directive 'navbarDirective', ($location, session)->
+    restrict: 'E'
+    templateUrl: 'navbar.html'
+    link: ($scope, elem, attrs) ->
       $scope.activePath = $location.path()
-    )
+      $scope.isAdmin = false
+      session.getUserPromise().then (user) ->
+        $scope.isAdmin = user.role == 'Administrateur'

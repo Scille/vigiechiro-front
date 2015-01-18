@@ -1,7 +1,10 @@
 <div class="text-center">
-  <h1 ng-bind="taxon.libelle_long"></h1>
-  <h3>(<text ng-bind="taxon.libelle_court"/>)</h3>
-  <br>
-  <div ng-bind-html="taxon.description">
+  <div class="page-header text-center">
+    <h1 ng-bind="taxon.libelle_long"></h1>
+    <h3>(<text ng-bind="taxon.libelle_court"/>)</h3>
+  </div>
 </div>
-<a name="edit-taxon" class="button" ng-show="isAdmin" ng-href="#/taxons/{{taxonId}}/edition">Éditer</a>
+<div class="panel panel-body">
+  <span ng-bind-html="taxon.description"/>
+</div>
+<a name="edit-taxon" class="btn btn-primary" ng-show="isAdmin" ng-href="#/taxons/{{taxonId}}/edition">Éditer</a>
