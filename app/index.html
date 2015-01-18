@@ -19,6 +19,7 @@
     <link rel="stylesheet" href="styles/main.css">
     <!-- endbuild -->
   </head>
+
   <body ng-app="vigiechiroApp" class="auth-application waiting-for-angular">
     <!--[if lt IE 7]>
       <p class="browsehappy">You are using an <strong>outdated</strong> browser. Please <a href="http://browsehappy.com/">upgrade your browser</a> to improve your experience.</p>
@@ -27,32 +28,30 @@
     <login-directive></login-directive>
     <content-directive class="content">
       <div class="container">
+
         <!-- Navigation bar -->
         <nav class="navbar navbar-default" role="navigation">
           <div class="container-fluid">
             <!-- Brand and toggle get grouped for better mobile display -->
             <div class="navbar-header">
               <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#bs-vigiechiro-navbar-collapse-1">
-                <span class="sr-only">Toggle navigation</span>
-                <span class="icon-bar"></span>
-                <span class="icon-bar"></span>
-                <span class="icon-bar"></span>
               </button>
               <a class="navbar-brand" href="#/">Vigiechiro</a>
             </div>
             <!-- Collect the nav links, forms, and other content for toggling -->
             <div class="collapse navbar-collapse" id="bs-vigiechiro-navbar-collapse-1">
-              <ul class="nav navbar-nav">
-                <li class="active"><a href="#/utilisateurs">Utilisateurs<span class="sr-only">(current)</span></a></li>
-                <li class="active"><a href="#/taxons">Taxons<span class="sr-only">(current)</span></a></li>
-                <li class="active"><a href="#/protocoles">Gestion des protocoles et des sites<span class="sr-only">(current)</span></a></li>
+              <ul class="nav navbar-nav" ng-controller="MenuCtrl">
+                <li ng-class="{ active: activePath=='/utilisateurs' }"><a href="#/utilisateurs">Utilisateurs</a></li>
+                <li ng-class="{ active: activePath=='/taxons' }"><a href="#/taxons">Taxons</a></li>
+                <li ng-class="{ active: activePath=='/protocoles' }"><a href="#/protocoles">Gestion des protocoles et des sites</a></li>
               </ul>
               <ul class="nav navbar-nav navbar-right">
-                <li><user-status></user-status></li>
+                <li style="margin-top: 8px;"><user-status></user-status></li>
               </ul>
             </div><!-- /.navbar-collapse -->
           </div><!-- /.container-fluid -->
         </nav>
+
         <!-- Application content -->
         <div ng-view=""></div>
         <div class="footer">

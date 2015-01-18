@@ -1,6 +1,10 @@
 <div ng-if="!loading">
-    <div ng-repeat="protocole in protocoles" >
-        <div class="text-center"><a href='#/protocoles/{{ protocole._id }}'>{{ protocole.titre }}</a></div>
+    <div ng-if="protocoles.length != 0" class="text-center panel panel-info">
+        <div class="panel-heading panel-title"><b>Liste des protocoles</b></div>
+            <div ng-repeat="protocole in protocoles" >
+                <div class="text-center well well-sm"><a href='#/protocoles/{{ protocole._id }}'>{{ protocole.titre }}</a></div>
+            </div>
+        </div>
     </div>
 
     <div ng-show="protocoles.length == 0" class="text-center">
@@ -14,5 +18,5 @@
 </div>
 
 <div class="text-center" ng-show="user.role == 'Administrateur'">
-  <a href="#/protocoles/nouveau-protocole">Nouveau protocole</a>
+  <a class="btn btn-default" href="#/protocoles/nouveau-protocole">Nouveau protocole</a>
 </div>

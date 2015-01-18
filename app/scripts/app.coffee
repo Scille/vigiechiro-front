@@ -84,3 +84,9 @@ angular
         templateUrl: '404.html'
       .otherwise
         redirectTo: '/404'
+
+  .controller 'MenuCtrl', ($scope, $location, $route) ->
+    $scope.activePath = null
+    $scope.$on('$routeChangeSuccess', ->
+      $scope.activePath = $location.path()
+    )

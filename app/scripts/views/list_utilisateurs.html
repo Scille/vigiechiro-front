@@ -1,9 +1,12 @@
 <div ng-if="!loading">
-    <div dir-paginate="utilisateur in utilisateurs | itemsPerPage: 20" total-items="totalResults">
-        <div class="text-center"><a href='#/utilisateurs/{{ utilisateur._id }}'>{{ utilisateur.pseudo }}</a></div>
+    <div ng-if="utilisateurs.length != 0" class="text-center panel panel-info">
+        <div class="panel-heading panel-title"><b>Liste des utilisateurs</b></div>
+        <div dir-paginate="utilisateur in utilisateurs | itemsPerPage: 20" total-items="totalResults">
+            <div class="text-center well well-sm"><a href='#/utilisateurs/{{ utilisateur._id }}'>{{ utilisateur.pseudo }}</a></div>
+        </div>
     </div>
 
-    <div ng-show="utilisateurs.length == 0" class="text-center">
+    <div ng-if="utilisateurs.length == 0" class="text-center">
         <h3><i>Pas d'utilisateurs</i></h3>
     </div>
     <dir-pagination-controls on-page-change="pageChanged(newPageNumber)"></dir-pagination-controls>
