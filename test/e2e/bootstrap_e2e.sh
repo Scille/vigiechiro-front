@@ -53,8 +53,8 @@ echo 'GET /' | nc www.lvh.me 9000
 if [ "$?" -ne 0 ]
 then
     echo "Starting frontend"
-    cd ../.. && 1>frontend.log grunt serve:dist 2>&1 &
-    cd - && sleep 5
+    1>frontend.log grunt serve:dist 2>&1 &
+    sleep 5
 else
     echo "Frontend already running"
 fi
