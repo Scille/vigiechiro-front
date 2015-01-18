@@ -61,6 +61,7 @@ describe 'Controller: ShowUtilisateurCtrl', ->
           'title': 'utilisateur'
           'href': 'utilisateurs/54949c201d41c868777dd6d4'
     scope.userForm =
+      '$valid': true
       '$dirty': false
       '$setPristine': ->
       'prenom': {'$dirty': true}
