@@ -8,7 +8,16 @@
  # # ShowUtilisateurCtrl
  # Controller of the vigiechiroApp
 ###
-angular.module('showUtilisateur', ['ngRoute', 'xin_session', 'xin_backend'])
+angular.module('utilisateurViews', ['ngRoute', 'xin_session', 'xin_backend'])
+  .config ($routeProvider) ->
+    $routeProvider
+      .when '/utilisateurs',
+        templateUrl: 'scripts/views/utilisateur/list_utilisateurs.html'
+        controller: 'ListResourceCtrl'
+        resolve: {resourceBackend: (Backend) -> Backend.all('utilisateurs')}
+      .when '/utilisateurs/:utilisateurId',
+        templateUrl: 'scripts/views/utilisateur/show_utilisateur.html'
+        controller: 'ShowUtilisateurCtrl'
   .controller 'ShowUtilisateurCtrl', ($scope, $routeParams, Backend, session) ->
     $scope.utilisateur = {}
     $scope.readOnly = false

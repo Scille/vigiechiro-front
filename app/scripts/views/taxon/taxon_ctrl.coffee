@@ -1,7 +1,7 @@
 'use strict'
 
 
-angular.module('taxonView', ['ngRoute', 'ngSanitize', 'textAngular', 'xin_backend', 'xin_session'])
+angular.module('taxonViews', ['ngRoute', 'ngSanitize', 'textAngular', 'xin_backend', 'xin_session'])
   .config ($routeProvider) ->
     $routeProvider
       .when '/taxons',
@@ -38,11 +38,15 @@ angular.module('taxonView', ['ngRoute', 'ngSanitize', 'textAngular', 'xin_backen
       $scope.isAdmin = user.role == 'Administrateur'
     Backend.one('taxons', $routeParams.taxonId).get().then (taxon) ->
       $scope.taxon = taxon.plain()
-  .controller 'EditTaxonCtrl', ($routeParams, $scope, Backend) ->
+  .controller 'EditTaxonCtrl', ($route, $routeParams, $scope, Backend) ->
     $scope.taxon = {}
     taxonResource = undefined
     $scope.taxonId = $routeParams.taxonId
-    Backend.one('taxons', $routeParams.taxonId).get().then (taxon) ->
+    # Force the cache control to get back the last version on the serveur
+    Backend.one('taxons', $routeParams.taxonId).get(
+      {}
+      {'Cache-Control': 'no-cache'}
+    ).then (taxon) ->
       taxonResource = taxon
       $scope.taxon = taxon.plain()
     $scope.saveTaxon = ->
@@ -57,8 +61,9 @@ angular.module('taxonView', ['ngRoute', 'ngSanitize', 'textAngular', 'xin_backen
           payload[key] = $scope.taxon[key]
       # Special handle for description
       payload.description = $scope.taxon.description
-      # Finally patch the resource
+      # Finally refresh the page (needed for cache reasons)
       taxonResource.patch(payload).then(
-        -> $scope.taxonForm.$setPristine()
+        -> $route.reload();
+        # -> $scope.taxonForm.$setPristine()
         ->
       )

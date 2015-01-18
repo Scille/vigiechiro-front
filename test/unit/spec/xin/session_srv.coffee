@@ -17,6 +17,8 @@ class StorageMock
   _eventListener: undefined
   addEventListener: (@_eventListener) ->
 
+test_token = "C8Y1VMEKHOIT3F1GU9HI16FNNHB7QFKJ"
+test_authorization_header = "Basic QzhZMVZNRUtIT0lUM0YxR1U5SEkxNkZOTkhCN1FGS0o6"
 
 describe 'Service: session', ->
 
@@ -24,8 +26,6 @@ describe 'Service: session', ->
   $httpBackend = null
   storage = null
   Backend = null
-  test_token = "C8Y1VMEKHOIT3F1GU9HI16FNNHB7QFKJ"
-  test_authorization_header = "Basic QzhZMVZNRUtIT0lUM0YxR1U5SEkxNkZOTkhCN1FGS0o6"
 
   beforeEach module 'xin_session'
   beforeEach module 'xin_session_tools'
@@ -94,8 +94,6 @@ describe 'Outdated token', ->
   $rootScope = null
   $httpBackend = null
   storage = null
-  test_token = "C8Y1VMEKHOIT3F1GU9HI16FNNHB7QFKJ"
-  test_authorization_header = "Basic QzhZMVZNRUtIT0lUM0YxR1U5SEkxNkZOTkhCN1FGS0o6"
 
   beforeEach module 'xin_session'
   beforeEach module 'xin_session_tools'

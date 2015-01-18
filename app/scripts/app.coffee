@@ -26,29 +26,22 @@ angular
     'xin_backend',
     'xin_google_maps',
     'xin_listResource',
-    'showUtilisateur',
     'displayProtocole',
     'editProtocole',
     'inscriptionsProtocoles',
     'listSites',
     'viewSite',
-    'taxonView'
+    'utilisateurViews',
+    'taxonViews'
   ])
   .run (Backend, SETTINGS) ->
     Backend.setBaseUrl(SETTINGS.API_DOMAIN)
-  .config ($routeProvider) ->
+  .config ($routeProvider, RestangularProvider) ->
     $routeProvider
       .when '/',
         templateUrl: 'scripts/views/welcome/welcome.html'
-      .when '/utilisateurs',
-        templateUrl: 'scripts/views/list_utilisateurs.html'
-        controller: 'ListResourceCtrl'
-        resolve: {resourceBackend: (Backend) -> Backend.all('utilisateurs')}
-      .when '/utilisateurs/:userId',
-        templateUrl: 'scripts/views/show_utilisateur/show_utilisateur.html'
-        controller: 'ShowUtilisateurCtrl'
       .when '/profil',
-        templateUrl: 'scripts/views/show_utilisateur/show_utilisateur.html'
+        templateUrl: 'scripts/views/utilisateur/show_utilisateur.html'
         controller: 'ShowUtilisateurCtrl'
         resolve: {$routeParams: (session) -> return {'userId': 'moi'}}
       .when '/protocoles',

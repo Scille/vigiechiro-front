@@ -4,7 +4,7 @@ describe 'Controller: ShowUtilisateurCtrl', ->
 
   # load the controller's module
   beforeEach module 'xin_backend'
-  beforeEach module 'showUtilisateur'
+  beforeEach module 'utilisateurViews'
 
   routeParams = {userId: '54949c201d41c868777dd6d4'}
   scope = undefined

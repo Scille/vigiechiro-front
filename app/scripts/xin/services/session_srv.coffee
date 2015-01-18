@@ -11,7 +11,11 @@ angular.module('xin_session', ['xin_storage', 'xin_backend'])
     # Get back the user from the backend
     token = storage.getItem('auth-session-token')
     if token?
-      userPromise = Backend.one('utilisateurs', 'moi').get()
+      # Force the cache to really get current user
+      userPromise = Backend.one('utilisateurs', 'moi').get(
+        {},
+        {'Cache-Control': 'no-cache'}
+      )
     else
       # If the user is not logged, no need to call the backend
       deferred = $q.defer()
@@ -22,8 +26,6 @@ angular.module('xin_session', ['xin_storage', 'xin_backend'])
       @getUserPromise = => @_userPromise
       @login: (token) ->
         storage.setItem('auth-session-token', token)
-        # Remove token in params to avoid infinite loop
-        $location.search('token', null)
         $window.location.reload()
       @logout: ->
         postLogout = (e)->
@@ -46,10 +48,10 @@ angular.module('xin_session_tools', ['xin_storage'])
           return undefined
       @logRequestError: ->
         # A 401 error happened, this is normal if the user is not currently
-        # logged in (i.e. no token is set), otherwise it means the current
-        # token is no longer valid (thus we have to force the user to
-        # login again)
-        token = storage.getItem('auth-session-token')
-        if token?
+        # logged in (i.e. no auth-session-token is set), otherwise it means the
+        # current auth-session-token is no longer valid (thus we have to force
+        # the user to login again)
+        authSession = storage.getItem('auth-session-token')
+        if authSession?
           storage.removeItem('auth-session-token')
           $window.location.reload()
