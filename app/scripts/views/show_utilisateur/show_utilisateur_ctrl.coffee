@@ -12,6 +12,7 @@ angular.module('showUtilisateur', ['ngRoute', 'xin_session', 'xin_backend'])
   .controller 'ShowUtilisateurCtrl', ($scope, $routeParams, Backend, session) ->
     $scope.utilisateur = {}
     $scope.readOnly = false
+    $scope.isAdmin = false
     userResource = undefined
     origin_role = undefined
     Backend.one('utilisateurs', $routeParams.userId).get().then (utilisateur) ->
@@ -19,7 +20,8 @@ angular.module('showUtilisateur', ['ngRoute', 'xin_session', 'xin_backend'])
       $scope.utilisateur = utilisateur.plain()
       origin_role = $scope.utilisateur.role
       session.getUserPromise().then (user) ->
-        $scope.readOnly = (user.role != 'Administrateur' and
+        $scope.isAdmin = user.role == 'Administrateur'
+        $scope.readOnly = (not $scope.isAdmin and
                            user._id != utilisateur._id)
     $scope.saveUser = ->
       if not userResource or not $scope.userForm.$dirty
