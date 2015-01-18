@@ -43,50 +43,50 @@ describe 'Test manual login', ->
   it 'Test title', ->
     expect(browser.getTitle()).toEqual('Vigiechiro')
 
-  # it 'Test login page', ->
-  #   check_logout_state()
-  #   # Now process to login
-  #   element.all(`by`.css('.btn-login')).get(0).click().then ->
-  #     # Login should be complete, retrieve the element and check their visibility
-  #     buttonsLogin = $('.btn-login')
-  #     element.all(`by`.css('.btn-login')).each (element) ->
-  #       expect(element.isDisplayed()).toBe(false)
-  #     content = $("content-directive")
-  #     expect(content.isDisplayed()).toBe(true)
+  it 'Test login page', ->
+    check_logout_state()
+    # Now process to login
+    element.all(`by`.css('.btn-login')).get(0).click().then ->
+      # Login should be complete, retrieve the element and check their visibility
+      buttonsLogin = $('.btn-login')
+      element.all(`by`.css('.btn-login')).each (element) ->
+        expect(element.isDisplayed()).toBe(false)
+      content = $("content-directive")
+      expect(content.isDisplayed()).toBe(true)
 
-  # it 'Test redirection relog', ->
-  #   # Manual login
-  #   element.all(`by`.css('.btn-login')).get(0).click().then ->
-  #     element(`by`.binding("user.pseudo")).getText().then (name) ->
-  #       # Make sure the user is logged as John Doe
-  #       expect(name).toBe('John Doe')
-  #       # Now manually change token
-  #       browser.get("#{baseUrl}?token=#{observateurToken}")
-  #       browser.sleep(1000).then ->
-  #         # Wait for the login to complete and make sure the user has changed
-  #         element(`by`.binding("user.pseudo")).getText().then (name) ->
-  #           expect(name).toBe('Observateur Name')
+  it 'Test redirection relog', ->
+    # Manual login
+    element.all(`by`.css('.btn-login')).get(0).click().then ->
+      element(`by`.binding("user.pseudo")).getText().then (name) ->
+        # Make sure the user is logged as John Doe
+        expect(name).toBe('John Doe')
+        # Now manually change token
+        browser.get("#{baseUrl}?token=#{observateurToken}")
+        browser.sleep(1000).then ->
+          # Wait for the login to complete and make sure the user has changed
+          element(`by`.binding("user.pseudo")).getText().then (name) ->
+            expect(name).toBe('Observateur Name')
 
-  # it 'Test token invalidation relog', ->
-  #   # Manual login
-  #   element.all(`by`.css('.btn-login')).get(0).click().then ->
-  #     element(`by`.binding("user.pseudo")).getText().then (name) ->
-  #       # Make sure the user is logged as John Doe
-  #       expect(name).toBe('John Doe')
-  #       # Now manually change token
-  #       browser.executeScript("window.localStorage.setItem('auth-session-token', '#{observateurToken}')").then ->
-  #         browser.refresh().then ->
-  #           # Check the user has changed
-  #           element(`by`.binding("user.pseudo")).getText().then (name) ->
-  #             expect(name).toBe('Observateur Name')
+  it 'Test token invalidation relog', ->
+    # Manual login
+    element.all(`by`.css('.btn-login')).get(0).click().then ->
+      element(`by`.binding("user.pseudo")).getText().then (name) ->
+        # Make sure the user is logged as John Doe
+        expect(name).toBe('John Doe')
+        # Now manually change token
+        browser.executeScript("window.localStorage.setItem('auth-session-token', '#{observateurToken}')").then ->
+          browser.refresh().then ->
+            # Check the user has changed
+            element(`by`.binding("user.pseudo")).getText().then (name) ->
+              expect(name).toBe('Observateur Name')
 
-  # it 'Test logout', ->
-  #  $$('.btn-login').get(0).click().then ->
-  #   expect($('.user-status').isDisplayed()).toBe(true)
-  #   $('.user-status').click().then ->
-  #     expect($('.button-logout').isDisplayed()).toBe(true)
-  #     $('.button-logout').click().then ->
-  #       check_logout_state()
+  it 'Test logout', ->
+   $$('.btn-login').get(0).click().then ->
+    expect($('.user-status').isDisplayed()).toBe(true)
+    $('.user-status').click().then ->
+      expect($('.button-logout').isDisplayed()).toBe(true)
+      $('.button-logout').click().then ->
+        check_logout_state()
 
 
 describe 'Test once logged', ->
@@ -97,37 +97,37 @@ describe 'Test once logged', ->
   afterEach ->
     browser.executeScript("window.localStorage.clear()")
 
-  # it 'Test token login', ->
-  #   buttonsLogin = $('.btn-login')
-  #   $$('.btn-login').each (element) ->
-  #     expect(element.isDisplayed()).toBe(false)
-  #   content = $("content-directive")
-  #   expect(content.isDisplayed()).toBe(true)
-  #   browser.executeScript('return localStorage.getItem("auth-session-token")').then (token) ->
-  #     expect(token).toBe(observateurToken)
-  #   userStatus = $('user-status')
-  #   userStatus.element(`by`.binding("user.pseudo")).getText().then (name) ->
-  #     expect(name).toBe('Observateur Name')
+  it 'Test token login', ->
+    buttonsLogin = $('.btn-login')
+    $$('.btn-login').each (element) ->
+      expect(element.isDisplayed()).toBe(false)
+    content = $("content-directive")
+    expect(content.isDisplayed()).toBe(true)
+    browser.executeScript('return localStorage.getItem("auth-session-token")').then (token) ->
+      expect(token).toBe(observateurToken)
+    userStatus = $('user-status')
+    userStatus.element(`by`.binding("user.pseudo")).getText().then (name) ->
+      expect(name).toBe('Observateur Name')
 
-  # it 'Test get user profile', ->
-  #   userStatus = $('user-status')
-  #   userStatus.element(`by`.binding("user.pseudo")).getText().then (name) ->
-  #     expect(name).toBe('Observateur Name')
-  #   $('.user-status').click().then ->
-  #     expect($('.button-profile').isDisplayed()).toBe(true)
-  #     $('.button-profile').click().then ->
-  #       browser.waitForAngular().then ->
-  #         element(`by`.model('utilisateur.email')).getAttribute('value').then (email) ->
-  #           expect(email).toBe('observateur@facebook.com')
-  #         element(`by`.model('utilisateur.pseudo')).getAttribute('value').then (pseudo) ->
-  #           expect(pseudo).toBe('Observateur Name')
-  #         element(`by`.model('utilisateur.prenom')).clear().sendKeys('John')
-  #         element(`by`.model('utilisateur.nom')).clear().sendKeys('Doe')
-  #         expect($('.save-user').isDisplayed()).toBe(true)
-  #         $('.save-user').click().then ->
-  #           # Reload page to make sure submit has worked
-  #           browser.setLocation('profil').then ->
-  #             element(`by`.model('utilisateur.prenom')).getAttribute('value').then (email) ->
-  #               expect(email).toBe('John')
-  #             element(`by`.model('utilisateur.nom')).getAttribute('value').then (pseudo) ->
-  #               expect(pseudo).toBe('Doe')
+  it 'Test get user profile', ->
+    userStatus = $('user-status')
+    userStatus.element(`by`.binding("user.pseudo")).getText().then (name) ->
+      expect(name).toBe('Observateur Name')
+    $('.user-status').click().then ->
+      expect($('.button-profile').isDisplayed()).toBe(true)
+      $('.button-profile').click().then ->
+        browser.waitForAngular().then ->
+          element(`by`.model('utilisateur.email')).getAttribute('value').then (email) ->
+            expect(email).toBe('observateur@facebook.com')
+          element(`by`.model('utilisateur.pseudo')).getAttribute('value').then (pseudo) ->
+            expect(pseudo).toBe('Observateur Name')
+          element(`by`.model('utilisateur.prenom')).clear().sendKeys('John')
+          element(`by`.model('utilisateur.nom')).clear().sendKeys('Doe')
+          expect($('.save-user').isDisplayed()).toBe(true)
+          $('.save-user').click().then ->
+            # Reload page to make sure submit has worked
+            browser.setLocation('profil').then ->
+              element(`by`.model('utilisateur.prenom')).getAttribute('value').then (email) ->
+                expect(email).toBe('John')
+              element(`by`.model('utilisateur.nom')).getAttribute('value').then (pseudo) ->
+                expect(pseudo).toBe('Doe')
