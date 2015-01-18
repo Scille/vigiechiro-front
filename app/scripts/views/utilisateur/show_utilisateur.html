@@ -1,9 +1,9 @@
 <div class="container">
     <div class="page-header">
-        <h4><b>{{ utilisateur.pseudo }}</b></h4>
+        <h3>{{utilisateur.pseudo}}</h3>
     </div>
 
-    <form class="simple-form" novalidate name="userForm" ng-submit="userForm.$valid && saveUser()">
+    <form class="simple-form" novalidate name="userForm" ng-submit="saveUser()">
 
         <div class="input-group form-group" ng-show="isAdmin">
             <span class="input-group-addon">Rôle</span>
@@ -20,6 +20,9 @@
             <input type="text" class="form-control" id="pseudo" name="pseudo"
                    ng-model="utilisateur.pseudo" ng-disabled="readOnly" required>
         </div>
+        <span ng-show="submitted && userForm.pseudo.$error.required"
+              class="help-block">Champ requis</span>
+
 
         <div class="form-group input-group">
             <label class="input-group-addon" for="prenom">Prénom</label>
@@ -38,6 +41,8 @@
             <input type="text" class="form-control" id="email" name="email"
                    ng-model="utilisateur.email" ng-disabled="readOnly" required>
         </div>
+        <span ng-show="submitted && userForm.email.$error.required"
+              class="help-block">Champ requis</span>
 
         <div class="input-group form-group">
             <label class="input-group-addon" for="telephone">Téléphone</label>

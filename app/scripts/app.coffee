@@ -25,14 +25,11 @@ angular
     'xin_session',
     'xin_backend',
     'xin_google_maps',
-    'xin_listResource',
-    'displayProtocole',
-    'editProtocole',
-    'inscriptionsProtocoles',
     'listSites',
     'viewSite',
     'utilisateurViews',
-    'taxonViews'
+    'taxonViews',
+    'protocoleViews'
   ])
   .run (Backend, SETTINGS) ->
     Backend.setBaseUrl(SETTINGS.API_DOMAIN)
@@ -44,24 +41,6 @@ angular
         templateUrl: 'scripts/views/utilisateur/show_utilisateur.html'
         controller: 'ShowUtilisateurCtrl'
         resolve: {$routeParams: (session) -> return {'userId': 'moi'}}
-      .when '/protocoles',
-        templateUrl: 'scripts/views/list_protocoles.html'
-        controller: 'ListResourceCtrl'
-        resolve: {resourceBackend: (Backend) -> Backend.all('protocoles')}
-      .when '/protocoles/validations',
-        templateUrl: 'scripts/views/protocole/inscriptions_protocoles/inscriptions_protocoles.html'
-        controller: 'ListInscriptionsProtocolesCtrl'
-      .when '/protocoles/nouveau-protocole',
-        templateUrl: 'scripts/views/protocole/edit_protocole/edit_protocole.html'
-        controller: 'EditProtocoleCtrl'
-        resolve: {action: -> 'createNew'}
-      .when '/protocoles/:protocoleId',
-        templateUrl: 'scripts/views/protocole/display_protocole/display_protocole.html'
-        controller: 'DisplayProtocoleCtrl'
-      .when '/protocoles/:protocoleId/edit',
-        templateUrl: 'scripts/views/protocole/edit_protocole/edit_protocole.html'
-        controller: 'EditProtocoleCtrl'
-        resolve: {action: -> 'edit'}
       .when '/sites',
         templateUrl: 'scripts/views/list_sites/list_sites.html'
         controller: 'ListSitesCtrl'

@@ -1,7 +1,7 @@
 'use strict'
 
 
-angular.module('taxonViews', ['ngRoute', 'ngSanitize', 'textAngular', 'xin_backend', 'xin_session'])
+angular.module('taxonViews', ['ngRoute', 'ngSanitize', 'textAngular', 'xin_listResource', 'xin_backend', 'xin_session'])
   .config ($routeProvider) ->
     $routeProvider
       .when '/taxons',
@@ -19,7 +19,9 @@ angular.module('taxonViews', ['ngRoute', 'ngSanitize', 'textAngular', 'xin_backe
         controller: 'EditTaxonCtrl'
   .controller 'CreateTaxonCtrl', ($scope, Backend) ->
     $scope.taxon = {}
+    $scope.submitted = false
     $scope.saveTaxon = ->
+      $scope.submitted = true
       if not $scope.taxonForm.$valid or not $scope.taxonForm.$dirty
         return
       payload =
@@ -39,6 +41,7 @@ angular.module('taxonViews', ['ngRoute', 'ngSanitize', 'textAngular', 'xin_backe
     Backend.one('taxons', $routeParams.taxonId).get().then (taxon) ->
       $scope.taxon = taxon.plain()
   .controller 'EditTaxonCtrl', ($route, $routeParams, $scope, Backend) ->
+    $scope.submitted = false
     $scope.taxon = {}
     taxonResource = undefined
     $scope.taxonId = $routeParams.taxonId
@@ -50,6 +53,7 @@ angular.module('taxonViews', ['ngRoute', 'ngSanitize', 'textAngular', 'xin_backe
       taxonResource = taxon
       $scope.taxon = taxon.plain()
     $scope.saveTaxon = ->
+      $scope.submitted = true
       if (not $scope.taxonForm.$valid or
           not $scope.taxonForm.$dirty or
           not taxonResource?)

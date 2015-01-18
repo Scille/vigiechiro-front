@@ -1,0 +1,24 @@
+<div class="container">
+
+  <div class="text-center">
+    <div class="page-header text-center">
+      <h1>{{protocole.titre}}</h1>
+    </div>
+  </div>
+
+  <div class="panel panel-body">
+    <span ng-bind-html="protocole.description"></span>
+  </div>
+
+  <button name="register-protocole" ng-click="registerProtocole()"
+          ng-show="! userRegistered && ! protocole.macro_protocole"
+          class="btn btn-primary">
+    S'inscrire
+  </button>
+  <a name="edit-protocole" class="btn btn-primary" ng-show="isAdmin"
+     ng-href="#/protocoles/{{protocoleId}}/edition">Éditer</a>
+
+  <list-sites-directive protocole-id="{{ protocole._id }}" ng-show="userRegistered"></list-sites-directive>
+  <view-site-directive protocole-id="{{ protocole._id }}" ng-show="userRegistered"></view-site-directive>
+
+</div>

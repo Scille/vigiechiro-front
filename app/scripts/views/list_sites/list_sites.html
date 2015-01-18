@@ -1,23 +1,25 @@
-<div ng-if="!loading">
-    <div ng-repeat="site in sites" >
-        <div class="text-center"><a href='#/sites/{{ site._id }}'>
-            {{ site.protocole }} : {{ site.commentaire }}
-        </a></div>
-        <input type="button" ng-value="display" ng-click="display = ! display" ng-init="display = false">
+<div class="container">
+    <div ng-if="!loading">
+        <div ng-repeat="site in sites" >
+            <div class="text-center"><a href='#/sites/{{ site._id }}'>
+                {{ site.protocole }} : {{ site.commentaire }}
+            </a></div>
+            <input type="button" ng-value="display" ng-click="display = ! display" ng-init="display = false">
 
-        <div id="map-canvas-{{ $index }}" class="g-maps" ng-show="display"></div>
+            <div id="map-canvas-{{ $index }}" class="g-maps" ng-show="display"></div>
+        </div>
+
+        <div ng-show="sites.length == 0" class="text-center">
+            <h3><i>Pas de sites</i></h3>
+        </div>
+
+        <div class="text-center" ng-show="user.role == 'Administrateur'">
+          <a href="#/sites/nouveau-site">Nouveau site</a>
+        </div>
     </div>
 
-    <div ng-show="sites.length == 0" class="text-center">
-        <h3><i>Pas de sites</i></h3>
+    <div ng-if="loading">
+        <center><img src="images/spinner.gif"></img></center>
+        <center>Changement de la liste des sites...</center>
     </div>
-
-    <div class="text-center" ng-show="user.role == 'Administrateur'">
-      <a href="#/sites/nouveau-site">Nouveau site</a>
-    </div>
-</div>
-
-<div ng-if="loading">
-    <center><img src="images/spinner.gif"></img></center>
-    <center>Changement de la liste des sites...</center>
 </div>
