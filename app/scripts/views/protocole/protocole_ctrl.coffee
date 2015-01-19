@@ -11,7 +11,8 @@ make_payload = ($scope) ->
     'algo_tirage_site': $scope.protocole.algo_tirage_site
 
 
-angular.module('protocoleViews', ['ngRoute', 'xin_listResource', 'textAngular', 'xin_backend', 'xin_session', 'siteViews'])
+angular.module('protocoleViews', ['ngRoute', 'textAngular', 'xin_listResource',
+                                  'xin_backend', 'xin_session', 'siteViews'])
   .config ($routeProvider) ->
     $routeProvider
       .when '/protocoles',
@@ -36,7 +37,7 @@ angular.module('protocoleViews', ['ngRoute', 'xin_listResource', 'textAngular', 
     $scope.userRegistered = true
     Backend.one('protocoles', $routeParams.protocoleId).get().then (protocole) ->
       $scope.protocole = protocole.plain()
-      Backend.one('utilisateurs', 'moi').get().then (user) ->
+      session.getUserPromise().then (user) ->
         userRegistered = false
         for protocole in user.protocoles or []
           if protocole.protocole == $scope.protocole._id
@@ -46,7 +47,6 @@ angular.module('protocoleViews', ['ngRoute', 'xin_listResource', 'textAngular', 
       Backend.one('taxons', $scope.protocole.taxon).get().then (taxon) ->
         $scope.taxon = taxon.plain()
     $scope.registerProtocole = ->
-      console.log('register', $routeParams.protocoleId)
       Backend.one('protocoles', $scope.protocole._id+"/action/join").post().then(
         -> $route.reload()
         (error) -> console.log("error", error)

@@ -27,8 +27,7 @@ angular
     'xin_google_maps',
     'utilisateurViews',
     'taxonViews',
-    'protocoleViews',
-    'siteViews'
+    'protocoleViews'
   ])
   .run (Backend, SETTINGS) ->
     Backend.setBaseUrl(SETTINGS.API_DOMAIN)
