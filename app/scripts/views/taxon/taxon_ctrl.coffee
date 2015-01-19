@@ -71,6 +71,5 @@ angular.module('taxonViews', ['ngRoute', 'ngSanitize', 'textAngular', 'xin_listR
       # Finally refresh the page (needed for cache reasons)
       taxonResource.patch(payload).then(
         -> $route.reload();
-        # -> $scope.taxonForm.$setPristine()
         ->
       )
