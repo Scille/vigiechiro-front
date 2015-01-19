@@ -105,12 +105,12 @@ describe 'Test once logged', ->
     expect(content.isDisplayed()).toBe(true)
     browser.executeScript('return localStorage.getItem("auth-session-token")').then (token) ->
       expect(token).toBe(observateurToken)
-    userStatus = $('user-status')
+    userStatus = $('.user-status')
     userStatus.element(`by`.binding("user.pseudo")).getText().then (name) ->
       expect(name).toBe('Observateur Name')
 
   it 'Test get user profile', ->
-    userStatus = $('user-status')
+    userStatus = $('.user-status')
     userStatus.element(`by`.binding("user.pseudo")).getText().then (name) ->
       expect(name).toBe('Observateur Name')
     $('.user-status').click().then ->

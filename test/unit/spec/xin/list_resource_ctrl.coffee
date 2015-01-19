@@ -13,7 +13,6 @@ describe 'Controller: ListResourceCtrl', ->
   # Initialize the controller and a mock scope
   beforeEach inject ($controller, $rootScope, _$httpBackend_, $q) ->
     httpBackend = _$httpBackend_
-    # resourceBackend = new BackendResourceMock('utilisateurs', $q)
     resourceBackend = new BackendResourceMock('utilisateurs', utilisateurs_builder, $q)
     spyOn(resourceBackend, 'getList').and.callThrough()
     scope = $rootScope.$new()

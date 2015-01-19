@@ -5,9 +5,9 @@
 
     <form class="simple-form" novalidate name="userForm" ng-submit="saveUser()">
 
-        <div class="input-group form-group" ng-show="isAdmin">
+        <div class="input-group form-group">
             <span class="input-group-addon">Rôle</span>
-                <select class="form-control" ng-model="utilisateur.role" ng-disabled="user.role != 'Administrateur'">
+                <select class="form-control" ng-model="utilisateur.role" ng-disabled="!isAdmin">
                     <option>Administrateur</option>
                     <option>Validateur</option>
                     <option>Observateur</option>

@@ -27,8 +27,15 @@
         </li>
       </ul>
       <ul class="nav navbar-nav navbar-right">
-        <li>
-          <user-status></user-status>
+        <li class="dropdown">
+            <a class="user-status dropdown-toggle" data-toggle="dropdown"
+               role="button" aria-expanded="false">
+               <b>{{user.pseudo}} </b><span class="caret"></span>
+            </a>
+            <ul class="dropdown-menu" role="menu">
+              <li><a class="button-profile" href="#/profil">Profil</a></li>
+              <li><a class="button-logout" ng-click="logout()">Déconnexion</a></li>
+            </ul>
         </li>
       </ul>
     </div><!-- /.navbar-collapse -->

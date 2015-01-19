@@ -38,8 +38,8 @@ angular.module('taxonViews', ['ngRoute', 'ngSanitize', 'textAngular', 'xin_listR
     $scope.taxon = {}
     $scope.taxonId = $routeParams.taxonId
     $scope.isAdmin = false
-    session.getUserPromise().then (user) ->
-      $scope.isAdmin = user.role == 'Administrateur'
+    session.getIsAdminPromise().then (isAdmin) ->
+      $scope.isAdmin = isAdmin
     Backend.one('taxons', $routeParams.taxonId).get().then (taxon) ->
       $scope.taxon = taxon.plain()
 

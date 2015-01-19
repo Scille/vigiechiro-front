@@ -20,7 +20,6 @@ angular
     'flow',
     'appSettings',
     'xin_login',
-    'xin_user_status',
     'xin_content',
     'xin_session',
     'xin_backend',
@@ -45,11 +44,16 @@ angular
         templateUrl: '404.html'
       .otherwise
         redirectTo: '/404'
-  .directive 'navbarDirective', ($location, session)->
+  .directive 'navbarDirective', (session)->
     restrict: 'E'
     templateUrl: 'navbar.html'
+    scope: {}
     link: ($scope, elem, attrs) ->
-      $scope.activePath = $location.path()
       $scope.isAdmin = false
+      $scope.user = {}
+      session.getIsAdminPromise().then (isAdmin) ->
+        $scope.isAdmin = isAdmin
       session.getUserPromise().then (user) ->
-        $scope.isAdmin = user.role == 'Administrateur'
+        $scope.user = user
+      $scope.logout = ->
+        session.logout()
