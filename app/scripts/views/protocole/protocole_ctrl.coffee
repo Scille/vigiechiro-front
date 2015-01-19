@@ -48,7 +48,9 @@ angular.module('protocoleViews', ['ngRoute', 'textAngular', 'xin_listResource',
         $scope.taxon = taxon.plain()
     $scope.registerProtocole = ->
       Backend.one('protocoles', $scope.protocole._id+"/action/join").post().then(
-        -> $route.reload()
+        ->
+          session.refreshPromise()
+          $route.reload()
         (error) -> console.log("error", error)
       )
 

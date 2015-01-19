@@ -8,21 +8,22 @@ angular.module('xin_session', ['xin_storage', 'xin_backend'])
     storage.addEventListener (e) ->
       if e.key == 'auth-session-token'
         $window.location.reload()
-    # Get back the user from the backend
-    token = storage.getItem('auth-session-token')
-    if token?
-      # Force the cache to really get current user
-      userPromise = Backend.one('utilisateurs', 'moi').get(
-        {},
-        {'Cache-Control': 'no-cache'}
-      )
-    else
-      # If the user is not logged, no need to call the backend
-      deferred = $q.defer()
-      deferred.reject()
-      userPromise = deferred.promise
     class Session
-      @_userPromise = userPromise
+      @_userPromise = undefined
+      @refreshPromise = =>
+        # Get back the user from the backend
+        token = storage.getItem('auth-session-token')
+        if token?
+          # Force the cache to really get current user
+          @_userPromise = Backend.one('utilisateurs', 'moi').get(
+            {},
+            {'Cache-Control': 'no-cache'}
+          )
+        else
+          # If the user is not logged, no need to call the backend
+          deferred = $q.defer()
+          deferred.reject()
+          @_userPromise = deferred.promise
       @getUserPromise = => @_userPromise
       @getIsAdminPromise = =>
         deferred = $q.defer()
@@ -40,7 +41,8 @@ angular.module('xin_session', ['xin_storage', 'xin_backend'])
           $window.location.reload()
         # Error or success on backend logout, we delete the session token
         Backend.one('logout').post().then(postLogout, postLogout)
-
+    Session.refreshPromise()
+    return Session
 
 angular.module('xin_session_tools', ['xin_storage'])
   .factory 'sessionTools', ($window, storage) ->
