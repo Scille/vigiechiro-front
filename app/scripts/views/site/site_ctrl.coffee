@@ -34,6 +34,7 @@ angular.module('siteViews', ['ngRoute', 'textAngular', 'xin_backend'])
     # Wait for the collapse to be opened before load the google map
     drawCallback = (event) ->
       $scope.siteForm.$pristine = false
+      $scope.siteForm.$dirty = true
       $scope.$apply()
     $scope.openCollapse = (collapseTarget) ->
       if not mapLoaded
@@ -85,6 +86,7 @@ angular.module('siteViews', ['ngRoute', 'textAngular', 'xin_backend'])
     $scope.site = {}
     drawCallback = (event) ->
       $scope.siteForm.$pristine = false
+      $scope.siteForm.$dirty = true
       $scope.$apply()
     # Wait for the collapse to be opened before load the google map
     $scope.openCollapse = (collapseTarget) ->
