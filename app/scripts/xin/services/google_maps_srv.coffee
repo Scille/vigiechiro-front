@@ -54,14 +54,14 @@ angular.module('xin_google_maps', [])
             topush = new google.maps.Marker(
               position: new google.maps.LatLng(shape.lat, shape.lng)
             )
-          if shape.type == google.maps.drawing.OverlayType.POLYGON
+          else if shape.type == google.maps.drawing.OverlayType.POLYGON
             paths = []
             for latlng in shape.path
               paths.push(new google.maps.LatLng(latlng.lat, latlng.lng))
             topush = new google.maps.Polygon(
               paths: paths
             )
-          if shape.type == google.maps.drawing.OverlayType.POLYLINE
+          else if shape.type == google.maps.drawing.OverlayType.POLYLINE
             path = []
             if not shape.path
               continue
@@ -70,10 +70,15 @@ angular.module('xin_google_maps', [])
             topush = new google.maps.Polyline(
               path: path
             )
+          else
+            console.log('Error: Bad map shape', shape)
+            continue
+          # TODO : Find why we need this fix...
+          topush.type = shape.type
           topush.setMap(@_map)
           @_overlay.push(topush)
 
-      saveMap: () ->
+      saveMap: ->
         toSave = []
         for shape in @_overlay
           shapetosave = {}
