@@ -11,6 +11,7 @@ angular.module('xin_backend', ['ngRoute', 'restangular', 'xin_session_tools'])
               return sessionTools.buildAuthorizationHeader(customToken)
             else
               return sessionTools.getAuthorizationHeader()
+          'Cache-Control': -> 'no-cache'
         .setRestangularFields
           id: "_id"
           etag: "_etag"

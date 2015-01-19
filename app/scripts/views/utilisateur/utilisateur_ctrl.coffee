@@ -18,6 +18,7 @@ angular.module('utilisateurViews', ['ngRoute', 'xin_listResource', 'xin_session'
       .when '/utilisateurs/:userId',
         templateUrl: 'scripts/views/utilisateur/show_utilisateur.html'
         controller: 'ShowUtilisateurCtrl'
+
   .controller 'ShowUtilisateurCtrl', ($scope, $routeParams, Backend, session) ->
     $scope.submitted = false
     $scope.utilisateur = {}

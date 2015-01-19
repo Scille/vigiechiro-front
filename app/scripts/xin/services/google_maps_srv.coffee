@@ -7,7 +7,7 @@
 angular.module('xin_google_maps', [])
   .factory 'GoogleMaps', ($rootScope) ->
     class GoogleMaps
-      constructor: (@div) ->
+      constructor: (@div, eventCallback) ->
         @mapOptions =
           # Paris
           center: new google.maps.LatLng(48.8588589, 2.3470599)
@@ -41,6 +41,7 @@ angular.module('xin_google_maps', [])
           new_overlay = event.overlay
           new_overlay.type = event.type
           overlay.push(new_overlay)
+          eventCallback?(event)
         )
 
       loadMap: (shapesInJson) ->
@@ -95,4 +96,4 @@ angular.module('xin_google_maps', [])
               path: latlngs
           shapetosave.type = shape.type
           toSave.push(shapetosave)
-        shapesToJson = angular.toJson(toSave, false)
+        return angular.toJson(toSave, false)

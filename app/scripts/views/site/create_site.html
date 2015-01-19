@@ -1,22 +1,22 @@
 <div class="panel panel-default">
   <div class="panel-heading" role="tab" id="headingOne">
       <h4 class="panel-title">
-          <a data-toggle="collapse" data-target="#show-site-collapse-{{site._id}}"
-             aria-expanded="false" aria-controls="show-site-collapse-{{site._id}}"
-             ng-click="openCollapse('#show-site-collapse-' + site._id)">
-          {{title}}</a>
+          <a data-toggle="collapse" data-target="#create-site-collapse"
+             aria-expanded="false" aria-controls="create-site-collapse"
+             ng-click="openCollapse('#create-site-collapse')">
+          Nouveau site</a>
       </h4>
   </div>
 
-  <div class="collapse {{collapsed === undefined ? 'in' : ''}}" id="show-site-collapse-{{site._id}}">
+  <div class="collapse" id="create-site-collapse">
     <div class="panel-body">
 
       <form class="simple-form" novalidate name="siteForm" ng-submit="saveSite()">
         <div class="form-group">
           <div class="g-maps"></div>
           </div>
-<!--           <span ng-show="submitted && (!site.coordonnee.lattitude || !site.coordonnee.lattitude)"
-                class="help-block">Au moins un point est requis</span> -->
+          <span ng-show="submitted && (!site.coordonnee || !site.coordonnee.lattitude || !site.coordonnee.lattitude)"
+                class="help-block">Au moins un point est requis</span>
 
           <div class="form-group">
               <textarea rows="3" class="form-control" name="commentaire"
@@ -35,8 +35,7 @@
           <div class="form-group">
               <input class="save-user btn btn-primary" type="submit" value="Sauvegarder" ng-hide="siteForm.$pristine">
           </div>
-        </form>
-
+      </form>
     </div>
   </div>
 </div>

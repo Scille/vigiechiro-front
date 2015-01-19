@@ -6,13 +6,9 @@
             </div>
             <ul class="list-group">
                 <li class="list-group-item" ng-repeat="site in sites">
-                    <a class="btn" ng-href='#/sites/{{ site._id }}'>
-                        {{ site._id }}
-                    </a>
+                    <show-site-directive title="Site {{$index + 1}}" site="site"></show-site-directive>
                 </li>
             </ul>
-        </div>
-
         <div ng-show="taxons.length == 0" class="text-center">
             <h3><i>Vous n'avez pas de sites pour le moment</i></h3>
         </div>
@@ -24,26 +20,4 @@
         <center>Changement de la liste des Sites...</center>
     </div>
 </div>
-
-<div class="container">
-    <div ng-if="!loading">
-        <div ng-repeat="site in sites" >
-            <div class="text-center"><a href='#/sites/{{ site._id }}'>
-                {{ site.protocole }} : {{ site.commentaire }}
-            </a></div>
-            <input type="button" ng-value="display" ng-click="display = ! display" ng-init="display = false">
-
-            <div id="map-canvas-{{ $index }}" class="g-maps" ng-show="display"></div>
-        </div>
-
-        <div ng-show="sites.length == 0" class="text-center">
-            <h3><i>Pas de sites</i></h3>
-        </div>
-
-    </div>
-
-    <div ng-if="loading">
-        <center><img src="images/spinner.gif"></img></center>
-        <center>Changement de la liste des sites...</center>
-    </div>
-</div>
+ 

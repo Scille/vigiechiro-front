@@ -24,6 +24,13 @@ angular.module('xin_session', ['xin_storage', 'xin_backend'])
     class Session
       @_userPromise = userPromise
       @getUserPromise = => @_userPromise
+      @getIsAdminPromise = =>
+        deferred = $q.defer()
+        @_userPromise.then(
+          (user) -> deferred.resolve(user.role == 'Administrateur')
+          -> deferred.resolve(false)
+        )
+        return deferred.promise
       @login: (token) ->
         storage.setItem('auth-session-token', token)
         $window.location.reload()

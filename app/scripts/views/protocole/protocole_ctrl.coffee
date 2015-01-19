@@ -46,9 +46,10 @@ angular.module('protocoleViews', ['ngRoute', 'xin_listResource', 'textAngular', 
       Backend.one('taxons', $scope.protocole.taxon).get().then (taxon) ->
         $scope.taxon = taxon.plain()
     $scope.registerProtocole = ->
-      Backend.one('protocoles', $scope.protocole._id+"/action/join").post().then (
+      console.log('register', $routeParams.protocoleId)
+      Backend.one('protocoles', $scope.protocole._id+"/action/join").post().then(
         -> $route.reload()
-        (response) -> console.log("error", response)
+        (error) -> console.log("error", error)
       )
 
   .controller 'EditProtocoleCtrl', ($route, $routeParams, $scope, Backend) ->
