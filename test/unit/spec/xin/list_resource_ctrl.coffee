@@ -30,7 +30,6 @@ describe 'Controller: ListResourceCtrl', ->
     expect(scope.loading).toBe(false)
     expect(scope.utilisateurs.length).toEqual(10)
     expect(scope.utilisateurs).toEqual(items)
-    expect(scope.currentPage).toEqual(1)
     expect(scope.totalItems).toEqual(10)
 
   it 'Test pagination', ->

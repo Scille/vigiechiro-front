@@ -4,3 +4,11 @@ vigiechiro-front
 ================
 
 Partie frontend du projet vigie chiro du Muséum national d'histoire naturelle
+
+Activer l'indexation text sur tous les champs des taxons
+-------------------------
+url de la doc : http://docs.mongodb.org/manual/tutorial/create-text-index-on-multiple-fields/
+db.taxons.ensureIndex(
+  { "$**": "text" },
+  { name: "TaxonsTextIndex" }
+)
