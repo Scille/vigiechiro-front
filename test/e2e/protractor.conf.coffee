@@ -2,7 +2,11 @@
 
 exports.config =
   seleniumAddress: 'http://localhost:4444/wd/hub',
-  specs: ['spec/*']
+  specs: [
+    'spec/login.coffee'
+    'spec/taxon.coffee'
+    'spec/utilisateur.coffee'
+  ]
   capabilities:
     'browserName': 'chrome'
   jasmineNodeOpts:

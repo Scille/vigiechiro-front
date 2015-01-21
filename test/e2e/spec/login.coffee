@@ -69,6 +69,17 @@ describe 'Test manual login', ->
             element(`by`.binding("user.pseudo")).getText().then (name) ->
               expect(name).toBe('Observateur Name')
 
+  it 'Test logout', ->
+    # Manual login
+    browser.ignoreSynchronization = true
+    element.all(`by`.css('.btn-login')).get(0).click().then ->
+      browser.ignoreSynchronization = false
+      expect($('.user-status').isDisplayed()).toBe(true)
+      $('.user-status').click().then ->
+        expect($('.button-logout').isDisplayed()).toBe(true)
+        $('.button-logout').click().then ->
+          check_logout_state()
+
 
 describe 'Test once logged', ->
 
@@ -89,10 +100,3 @@ describe 'Test once logged', ->
     userStatus = $('.user-status')
     userStatus.element(`by`.binding("user.pseudo")).getText().then (name) ->
       expect(name).toBe('Observateur Name')
-
-  it 'Test logout', ->
-    expect($('.user-status').isDisplayed()).toBe(true)
-    $('.user-status').click().then ->
-      expect($('.button-logout').isDisplayed()).toBe(true)
-      $('.button-logout').click().then ->
-        check_logout_state()
