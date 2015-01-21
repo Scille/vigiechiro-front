@@ -20,28 +20,34 @@
     <!-- endbuild -->
   </head>
 
-  <body ng-app="vigiechiroApp" class="waiting-for-angular">
+  <body>
     <!--[if lt IE 7]>
       <p class="browsehappy">You are using an <strong>outdated</strong> browser. Please <a href="http://browsehappy.com/">upgrade your browser</a> to improve your experience.</p>
     <![endif]-->
-    <!-- Login and content page displayed according to current login state -->
-    <login-directive></login-directive>
-    <content-directive class="content">
-      <!-- Navigation bar -->
-      <navbar-directive></navbar-directive>
-      <!-- Application content -->
-      <div class="container">
-        <div ng-view=""></div>
-      </div>
-      <div class="clearfix"></div>
-      <br/>
-      <footer class="footer">
+    <div class="waiting-for-angular container">
+      <img src="images/spinner.gif" class="img-responsive center-block" alt="Responsive image">
+    </div>
+    <!-- <div> -->
+    <div ng-app="vigiechiroApp">
+      <!-- Login and content page displayed according to current login state -->
+      <login-directive></login-directive>
+      <content-directive class="content">
+        <!-- Navigation bar -->
+        <navbar-directive></navbar-directive>
+        <!-- Application content -->
         <div class="container">
-          <a href="http://scille.eu" target="_blank">
-            <img src="images/logo-scille.png" width="20">&nbsp;Scille</a> vigiechiro demo
+          <div ng-view=""></div>
         </div>
-      </footer>
-    </content-directive>
+        <div class="clearfix"></div>
+        <br/>
+        <footer class="footer">
+          <div class="container">
+            <a href="http://scille.eu" target="_blank">
+              <img src="images/logo-scille.png" width="20">&nbsp;Scille</a> vigiechiro demo
+          </div>
+        </footer>
+      </content-directive>
+    </div>
 
     <!-- Google Analytics: change UA-XXXXX-X to be your site's ID -->
      <script>
