@@ -8,10 +8,10 @@ angular.module('xin_google_maps', [])
   .factory 'GoogleMaps', ($rootScope) ->
     class GoogleMaps
       constructor: (@div, eventCallback) ->
+        # France
         @mapOptions =
-          # Paris
-          center: new google.maps.LatLng(48.8588589, 2.3470599)
-          zoom: 8
+          center: new google.maps.LatLng(46.71109, 1.7191036)
+          zoom: 6
         @_map = new google.maps.Map(@div, @mapOptions)
         @drawingManager = new google.maps.drawing.DrawingManager(
           drawingControl: true
@@ -35,6 +35,14 @@ angular.module('xin_google_maps', [])
             editable: true
         )
         @drawingManager.setMap(@_map)
+        # user Geoloc html5
+        if navigator.geolocation
+          navigator.geolocation.getCurrentPosition((position) =>
+            pos = new google.maps.LatLng(position.coords.latitude, position.coords.longitude)
+            @_map.setCenter(pos)
+            @_map.setZoom(9)
+          )
+
         @_overlay = []
         overlay = @_overlay
         google.maps.event.addListener(@drawingManager, 'overlaycomplete', (event) ->
