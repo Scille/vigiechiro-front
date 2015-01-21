@@ -46,7 +46,9 @@ describe 'Test manual login', ->
   it 'Test login page', ->
     check_logout_state()
     # Now process to login
+    browser.ignoreSynchronization = true
     element.all(`by`.css('.btn-login')).get(0).click().then ->
+      browser.ignoreSynchronization = false
       # Login should be complete, retrieve the element and check their visibility
       buttonsLogin = $('.btn-login')
       element.all(`by`.css('.btn-login')).each (element) ->
@@ -56,7 +58,9 @@ describe 'Test manual login', ->
 
   it 'Test redirection relog', ->
     # Manual login
+    browser.ignoreSynchronization = true
     element.all(`by`.css('.btn-login')).get(0).click().then ->
+      browser.ignoreSynchronization = false
       element(`by`.binding("user.pseudo")).getText().then (name) ->
         # Make sure the user is logged as John Doe
         expect(name).toBe('John Doe')
@@ -69,7 +73,9 @@ describe 'Test manual login', ->
 
   it 'Test token invalidation relog', ->
     # Manual login
+    browser.ignoreSynchronization = true
     element.all(`by`.css('.btn-login')).get(0).click().then ->
+      browser.ignoreSynchronization = false
       element(`by`.binding("user.pseudo")).getText().then (name) ->
         # Make sure the user is logged as John Doe
         expect(name).toBe('John Doe')
