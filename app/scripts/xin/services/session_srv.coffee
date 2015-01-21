@@ -34,7 +34,14 @@ angular.module('xin_session', ['xin_storage', 'xin_backend'])
         return deferred.promise
       @login: (token) ->
         storage.setItem('auth-session-token', token)
-        $window.location.reload()
+        # TODO : Find a cleaner fix
+        # Under firefox, `$window.location.reload()` do to a page reload while
+        # keeping the token params, leading to an infinite reload loop...
+        url = '/#' + $location.path() + '?'
+        for key, value in $location.search()
+          if key != 'token'
+            url += "#{value}&"
+        $window.location.href = url
       @logout: ->
         postLogout = (e)->
           storage.removeItem('auth-session-token')
