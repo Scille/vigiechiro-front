@@ -2,10 +2,6 @@
   "name": "vigiechiroapp",
   "version": "0.0.0",
   "dependencies": {
-    "imagemin-gifsicle": "^4.0.0",
-    "imagemin-jpegtran": "^4.0.0",
-    "imagemin-optipng": "^4.0.0",
-    "imagemin-pngquant": "^4.0.0"
   },
   "devDependencies": {
     "grunt": "^0.4.1",
@@ -38,7 +34,11 @@
     "karma": "~0.12.24",
     "karma-jasmine": "~0.2.2",
     "karma-phantomjs-launcher": "~0.1.4",
-    "grunt-protractor-runner": "~1.1.4"
+    "grunt-protractor-runner": "~1.1.4",
+    "imagemin-gifsicle": "^4.0.0",
+    "imagemin-jpegtran": "^4.0.0",
+    "imagemin-optipng": "^4.0.0",
+    "imagemin-pngquant": "^4.0.0"
   },
   "engines": {
     "node": ">=0.10.0"

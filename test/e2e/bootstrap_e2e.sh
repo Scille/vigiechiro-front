@@ -40,7 +40,7 @@ OLD_DIR=`pwd`
 cd $BASEDIR
 
 # Make sure the backend is running
-1>/dev/null 2>&1 echo 'GET /' | nc api.lvh.me 8080
+1>/dev/null 2>&1 echo 'GET /' | nc localhost 8080
 if [ "$?" -ne 0 ]
 then
     run_backend
@@ -49,7 +49,7 @@ else
 fi
 
 # Same thing for the frontend
-echo 'GET /' | nc www.lvh.me 9000
+echo 'GET /' | nc localhost 9000
 if [ "$?" -ne 0 ]
 then
     echo "Starting frontend"

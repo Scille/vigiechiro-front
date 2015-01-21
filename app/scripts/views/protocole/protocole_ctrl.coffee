@@ -102,19 +102,20 @@ angular.module('protocoleViews', ['ngRoute', 'textAngular', 'xin_listResource',
   .controller 'ValidationsProtocoleCtrl', ($routeParams, $scope, $filter, Backend) ->
     $scope.loading = true
     $scope.inscriptions = []
+    where = JSON.stringify(
+      protocoles:
+        $elemMatch:
+          valide:
+            $ne: true
+    )
     queryParams = {
-#      where:
-#        "protocoles": 
-#          "$elemMatch":
-#            "valide":
-#              "ne": true
+      where: where
      # projection:
      #   "protocoles": 1
      #   "pseudo": 1
       embedded: { "protocoles.protocole": 1 }
     }
     Backend.all('utilisateurs').getList(queryParams).then (utilisateurs) ->
-#      console.log(utilisateurs)
       utilisateurs = utilisateurs.plain()
       for utilisateur in utilisateurs
         if not utilisateur.protocoles?
