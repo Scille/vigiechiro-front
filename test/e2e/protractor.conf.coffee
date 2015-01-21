@@ -5,3 +5,8 @@ exports.config =
   specs: ['spec/*']
   capabilities:
     'browserName': 'chrome'
+  jasmineNodeOpts:
+    showColors: true,
+    defaultTimeoutInterval: 30000,
+    isVerbose : true,
+    includeStackTrace : true

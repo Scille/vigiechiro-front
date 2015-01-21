@@ -1,30 +1,12 @@
 "use strict"
 
-
-baseUrl = 'http://localhost:9000/#/'
-observateurToken = "26GLD0MWB2ISABOQN2F5K1JNKVZNLOOT"
-adminToken = "SQIWJ0GLDKI2001GA03M9P5QYMY7SV8M"
-validateurToken = "HKTG700ROM0TFNHFQZX0IQK53DU6ZY4W"
-
-login = (userRole) ->
-  if userRole == 'Administrateur'
-    token = adminToken
-  else if userRole == 'Validateur'
-    token = validateurToken
-  else
-    token = observateurToken
-  pageReady = false
-  browser.get(baseUrl).then ->
-    browser.executeScript("window.localStorage.setItem('auth-session-token', '#{token}')").then ->
-      browser.refresh().then ->
-        pageReady = true
-  browser.wait -> pageReady
+helper = require('../helper')
 
 
 describe 'Test taxon for observateur', ->
 
   beforeEach ->
-    login()
+    helper.login()
 
   afterEach ->
     browser.executeScript("window.localStorage.clear()")
@@ -41,10 +23,11 @@ describe 'Test taxon for observateur', ->
         element(`by`.binding('taxon.libelle_long')).getText().then (value) ->
           expect(value).toBe('Chauves-souris')
 
+
 describe 'Test taxon for adminstrateur', ->
 
   beforeEach ->
-    login('Administrateur')
+    helper.login('Administrateur')
 
   afterEach ->
     browser.executeScript("window.localStorage.clear()")

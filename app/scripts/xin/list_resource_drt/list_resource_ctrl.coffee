@@ -35,9 +35,6 @@ angular.module('xin_listResource', ['ngRoute', 'angularUtils.directives.dirPagin
     $scope.pageChanged = (newPage) ->
       $scope.currentPage = newPage
       $scope.loading = true
-      # Update the url's params
-      $location.search('items', $scope.itemsPerPage)
-      $location.search('page', newPage)
       # Query & load the results
       params =
         page: newPage
@@ -45,5 +42,8 @@ angular.module('xin_listResource', ['ngRoute', 'angularUtils.directives.dirPagin
       resourceBackend.getList(params).then (items) ->
         $scope[resourceName] = items.plain()
         $scope.totalItems = items._meta.total
+        # Finally update the url's params and disable loading spinner
+        $location.search('items', $scope.itemsPerPage)
+        $location.search('page', newPage)
         $scope.loading = false
     $scope.pageChanged($scope.currentPage)
