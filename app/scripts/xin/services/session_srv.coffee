@@ -42,6 +42,7 @@ angular.module('xin_session', ['xin_storage', 'xin_backend'])
           if key != 'token'
             url += "#{value}&"
         $window.location.href = url
+        $window.location.reload()
       @logout: ->
         postLogout = (e)->
           storage.removeItem('auth-session-token')
