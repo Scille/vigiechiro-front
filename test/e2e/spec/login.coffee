@@ -1,6 +1,6 @@
 "use strict"
 
-baseUrl = 'http://www.lvh.me:9000/#/'
+baseUrl = 'http:///localhost:9000/#/'
 observateurToken = "26GLD0MWB2ISABOQN2F5K1JNKVZNLOOT"
 adminToken = "SQIWJ0GLDKI2001GA03M9P5QYMY7SV8M"
 validateurToken = "HKTG700ROM0TFNHFQZX0IQK53DU6ZY4W"
