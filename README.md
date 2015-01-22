@@ -5,6 +5,18 @@ vigiechiro-front
 
 Partie frontend du projet vigie chiro du Muséum national d'histoire naturelle
 
+Netcat (nc) pour debian
+```
+sudo apt-get install netcat-openbsd
+```
+
+Tests end-to-end
+```
+sudo npm install -g protractor
+sudo webdriver-manager update
+./test/e2e/bootstrap_e2e.sh
+```
+
 Activer l'indexation text sur tous les champs des taxons
 -------------------------
 url de la doc : http://docs.mongodb.org/manual/tutorial/create-text-index-on-multiple-fields/

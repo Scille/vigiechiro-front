@@ -44,7 +44,12 @@ angular.module('siteViews', ['ngRoute', 'textAngular', 'xin_backend'])
         $timeout(
           ->
             googleMaps = new GoogleMaps(collapse.find('.g-maps')[0], drawCallback)
-            googleMaps.loadMap($scope.site.numero_grille_stoc)
+            # TODO : find a solution for center map with load without timeout
+            $timeout(
+              ->
+                googleMaps.loadMap($scope.site.localites)
+              30
+              )
           100
           )
     $scope.saveSite = ->
@@ -53,9 +58,15 @@ angular.module('siteViews', ['ngRoute', 'textAngular', 'xin_backend'])
           not $scope.siteForm.$dirty or
           not googleMaps and siteResource)
         return
-      # TODO : stop saving the map elements in the numero_grille_stoc !
+      mapDump = googleMaps.saveMap()
+      localites = []
+      for shape in mapDump
+        geometries =
+          geometries: [shape]
+        localites.push(geometries)
       payload =
-        'numero_grille_stoc': googleMaps.saveMap()
+        'protocole': $scope.protocoleId
+        'localites': localites
         'commentaire': $scope.siteForm.commentaire.$modelValue
       siteResource.patch(payload).then(
         -> $scope.siteForm.$setPristine()
@@ -104,19 +115,26 @@ angular.module('siteViews', ['ngRoute', 'textAngular', 'xin_backend'])
           not $scope.siteForm.$dirty or
           not googleMaps)
         return
-      # TODO : stop saving the map elements in the numero_grille_stoc !
+      mapDump = googleMaps.saveMap()
+      localites = []
+      for shape in mapDump
+        geometries =
+          geometries: [shape]
+        localites.push(geometries)
       payload =
         'protocole': $scope.protocoleId
-        'coordonnee':
-          'type': 'Point'
+        'localites': localites
+# TODO : use coordonnee to center the map
+#        'coordonnee':
+#          'type': 'Point'
 #          'coordinates': [mapDump[0].lng, mapDump[0].lat]
-        'numero_grille_stoc': googleMaps.saveMap()
+#        'numero_grille_stoc': 
         'commentaire': $scope.siteForm.commentaire.$modelValue
       console.log(payload)
-#      Backend.all('sites').post(payload).then(
-#        -> $route.reload()
-#        (error) -> console.log("error", error)
-#      )
+      Backend.all('sites').post(payload).then(
+        -> $route.reload()
+        (error) -> console.log("error", error)
+      )
 
   .directive 'createSiteDirective', ->
     restrict: 'E'

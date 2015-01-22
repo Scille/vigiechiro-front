@@ -47,70 +47,91 @@ angular.module('xin_google_maps', [])
         overlay = @_overlay
         google.maps.event.addListener(@drawingManager, 'overlaycomplete', (event) ->
           new_overlay = event.overlay
-          new_overlay.type = event.type
+          # Converting into mongo geoJSON type
+          if (event.type == google.maps.drawing.OverlayType.MARKER)
+            new_overlay.type = "Point"
+          else if (event.type == google.maps.drawing.OverlayType.POLYGON)
+            new_overlay.type = "Polygon"
+          else if (event.type == google.maps.drawing.OverlayType.POLYLINE)
+            new_overlay.type = "LineString"
+          else
+            return
           overlay.push(new_overlay)
           eventCallback?(event)
         )
 
-      loadMap: (shapesInJson) ->
-        if not shapesInJson
+      loadMap: (mongoShapes) ->
+        if not mongoShapes
           return
-        shapes = angular.fromJson(shapesInJson)
-        for shape in shapes
+        newCenter =
+          set: false
+          center: null
+        for mongoShape, key in mongoShapes
+          shape = mongoShape.geometries[0]
           topush = {}
-          if shape.type == google.maps.drawing.OverlayType.MARKER
+          if shape.type == "Point"
+            point = new google.maps.LatLng(shape.coordinates[0], shape.coordinates[1])
             topush = new google.maps.Marker(
-              position: new google.maps.LatLng(shape.lat, shape.lng)
+              position: point
             )
-          else if shape.type == google.maps.drawing.OverlayType.POLYGON
+            if (not newCenter.set)
+              newCenter.set = true
+              newCenter.center = point
+          else if shape.type == "Polygon"
             paths = []
-            for latlng in shape.path
-              paths.push(new google.maps.LatLng(latlng.lat, latlng.lng))
+            for latlng in shape.coordinates[0]
+              point = new google.maps.LatLng(latlng[0], latlng[1])
+              paths.push(point)
+              if (not newCenter.set)
+                newCenter.set = true
+                newCenter.center = point
             topush = new google.maps.Polygon(
               paths: paths
             )
-          else if shape.type == google.maps.drawing.OverlayType.POLYLINE
+          else if shape.type == "LineString"
             path = []
-            if not shape.path
-              continue
-            for latlng in shape.path
-              path.push(new google.maps.LatLng(latlng.lat, latlng.lng))
+            for latlng in shape.coordinates
+              point = new google.maps.LatLng(latlng[0], latlng[1])
+              path.push(point)
+              if (not newCenter.set)
+                newCenter.set = true
+                newCenter.center = point
             topush = new google.maps.Polyline(
               path: path
             )
+            if (not newCenter.set)
+              newCenter.set = true
+              newCenter.center = point
           else
             console.log('Error: Bad map shape', shape)
             continue
-          # TODO : Find why we need this fix...
           topush.type = shape.type
           topush.setMap(@_map)
           @_overlay.push(topush)
+        if (newCenter.set)
+          @_map.setCenter(newCenter.center)
+          @_map.setZoom(10)
 
       saveMap: ->
         toSave = []
         for shape in @_overlay
           shapetosave = {}
-          if shape.type == google.maps.drawing.OverlayType.MARKER
-            shapetosave =
-              type: "Point"
-              coordinates: [shape.getPosition().lat(), shape.getPosition().lng()]
-          if shape.type == google.maps.drawing.OverlayType.POLYGON
+          shapetosave.type = shape.type
+          if shape.type == "Point"
+            shapetosave.coordinates = [shape.getPosition().lat(), shape.getPosition().lng()]
+          if shape.type == "Polygon"
             vertices = shape.getPath()
             latlngs = []
             for i in [1..vertices.getLength()]
               xy = vertices.getAt(i-1)
               latlngs.push([xy.lat(), xy.lng()])
-            shapetosave =
-              type: "Polygon"
-              coordinates: [ latlngs ]
-          if shape.type == google.maps.drawing.OverlayType.POLYLINE
+            shapetosave.coordinates = [ latlngs ]
+          if shape.type == "LineString"
             vertices = shape.getPath()
             latlngs = []
             for i in [1..vertices.getLength()]
               xy = vertices.getAt(i-1)
               latlngs.push([xy.lat(), xy.lng()])
-            shapetosave =
-              type: "LineString"
-              coordinates: latlngs
+            shapetosave.coordinates = latlngs
           toSave.push(shapetosave)
         return toSave
