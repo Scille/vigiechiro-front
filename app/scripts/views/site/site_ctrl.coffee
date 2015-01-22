@@ -107,16 +107,16 @@ angular.module('siteViews', ['ngRoute', 'textAngular', 'xin_backend'])
       # TODO : stop saving the map elements in the numero_grille_stoc !
       payload =
         'protocole': $scope.protocoleId
-        # TODO : add coordonnee
-        # 'coordonnee':
-        #   'type': 'Point'
-        #   'coordinates': [mapDump[0].lng, mapDump[0].lat]
+        'coordonnee':
+          'type': 'Point'
+#          'coordinates': [mapDump[0].lng, mapDump[0].lat]
         'numero_grille_stoc': googleMaps.saveMap()
         'commentaire': $scope.siteForm.commentaire.$modelValue
-      Backend.all('sites').post(payload).then(
-        -> $route.reload()
-        (error) -> console.log("error", error)
-      )
+      console.log(payload)
+#      Backend.all('sites').post(payload).then(
+#        -> $route.reload()
+#        (error) -> console.log("error", error)
+#      )
 
   .directive 'createSiteDirective', ->
     restrict: 'E'

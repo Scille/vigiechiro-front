@@ -92,21 +92,25 @@ angular.module('xin_google_maps', [])
           shapetosave = {}
           if shape.type == google.maps.drawing.OverlayType.MARKER
             shapetosave =
-              lat: shape.getPosition().lat()
-              lng: shape.getPosition().lng()
-          if shape.type in [
-            google.maps.drawing.OverlayType.POLYGON,
-            google.maps.drawing.OverlayType.POLYLINE
-          ]
+              type: "Point"
+              coordinates: [shape.getPosition().lat(), shape.getPosition().lng()]
+          if shape.type == google.maps.drawing.OverlayType.POLYGON
             vertices = shape.getPath()
             latlngs = []
             for i in [1..vertices.getLength()]
               xy = vertices.getAt(i-1)
-              lat = xy.lat()
-              lng = xy.lng()
-              latlngs.push({'lat': lat, 'lng': lng})
+              latlngs.push([xy.lat(), xy.lng()])
             shapetosave =
-              path: latlngs
-          shapetosave.type = shape.type
+              type: "Polygon"
+              coordinates: [ latlngs ]
+          if shape.type == google.maps.drawing.OverlayType.POLYLINE
+            vertices = shape.getPath()
+            latlngs = []
+            for i in [1..vertices.getLength()]
+              xy = vertices.getAt(i-1)
+              latlngs.push([xy.lat(), xy.lng()])
+            shapetosave =
+              type: "LineString"
+              coordinates: latlngs
           toSave.push(shapetosave)
-        return angular.toJson(toSave, false)
+        return toSave
