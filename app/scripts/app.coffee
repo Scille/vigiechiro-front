@@ -26,7 +26,8 @@ angular
     'xin_google_maps',
     'utilisateurViews',
     'taxonViews',
-    'protocoleViews'
+    'protocoleViews',
+    'xin_protocoles_maps'
   ])
   .run (Backend, SETTINGS) ->
     # Disable the spinner waiting for angular

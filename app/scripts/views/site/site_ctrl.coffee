@@ -31,11 +31,12 @@ angular.module('siteViews', ['ngRoute', 'textAngular', 'xin_backend'])
       $scope.isAdmin = isAdmin
     Backend.one('sites', $scope.site._id).get().then (site) ->
       siteResource = site
-    # Wait for the collapse to be opened before load the google map
     drawCallback = (event) ->
       $scope.siteForm.$pristine = false
       $scope.siteForm.$dirty = true
       $scope.$apply()
+      true
+    # Wait for the collapse to be opened before load the google map
     $scope.openCollapse = (collapseTarget) ->
       if not mapLoaded
         mapLoaded = true
@@ -48,7 +49,7 @@ angular.module('siteViews', ['ngRoute', 'textAngular', 'xin_backend'])
             $timeout(
               ->
                 googleMaps.loadMap($scope.site.localites)
-              30
+              50
               )
           100
           )
@@ -99,6 +100,7 @@ angular.module('siteViews', ['ngRoute', 'textAngular', 'xin_backend'])
       $scope.siteForm.$pristine = false
       $scope.siteForm.$dirty = true
       $scope.$apply()
+      true
     # Wait for the collapse to be opened before load the google map
     $scope.openCollapse = (collapseTarget) ->
       if not mapLoaded
@@ -130,7 +132,6 @@ angular.module('siteViews', ['ngRoute', 'textAngular', 'xin_backend'])
 #          'coordinates': [mapDump[0].lng, mapDump[0].lat]
 #        'numero_grille_stoc': 
         'commentaire': $scope.siteForm.commentaire.$modelValue
-      console.log(payload)
       Backend.all('sites').post(payload).then(
         -> $route.reload()
         (error) -> console.log("error", error)

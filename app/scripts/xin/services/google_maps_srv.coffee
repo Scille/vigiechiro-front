@@ -8,6 +8,7 @@ angular.module('xin_google_maps', [])
   .factory 'GoogleMaps', ($rootScope) ->
     class GoogleMaps
       constructor: (@div, eventCallback) ->
+        @eventCallback = eventCallback
         # France
         @mapOptions =
           center: new google.maps.LatLng(46.71109, 1.7191036)
@@ -44,9 +45,11 @@ angular.module('xin_google_maps', [])
           )
 
         @_overlay = []
-        overlay = @_overlay
-        google.maps.event.addListener(@drawingManager, 'overlaycomplete', (event) ->
-          new_overlay = event.overlay
+        google.maps.event.addListener(@drawingManager, 'overlaycomplete', @overlayCreated)
+
+      overlayCreated: (event) =>
+        new_overlay = event.overlay
+        if @eventCallback?(event)
           # Converting into mongo geoJSON type
           if (event.type == google.maps.drawing.OverlayType.MARKER)
             new_overlay.type = "Point"
@@ -56,11 +59,11 @@ angular.module('xin_google_maps', [])
             new_overlay.type = "LineString"
           else
             return
-          overlay.push(new_overlay)
-          eventCallback?(event)
-        )
+          @_overlay.push(new_overlay)
+        else
+          event.overlay.setMap(null)
 
-      loadMap: (mongoShapes) ->
+      loadMap: (mongoShapes) =>
         if not mongoShapes
           return
         newCenter =
@@ -73,6 +76,7 @@ angular.module('xin_google_maps', [])
             point = new google.maps.LatLng(shape.coordinates[0], shape.coordinates[1])
             topush = new google.maps.Marker(
               position: point
+              draggable: true
             )
             if (not newCenter.set)
               newCenter.set = true
@@ -87,6 +91,8 @@ angular.module('xin_google_maps', [])
                 newCenter.center = point
             topush = new google.maps.Polygon(
               paths: paths
+              draggable: true
+              editable: true
             )
           else if shape.type == "LineString"
             path = []
@@ -98,6 +104,8 @@ angular.module('xin_google_maps', [])
                 newCenter.center = point
             topush = new google.maps.Polyline(
               path: path
+              draggable: true
+              editable: true
             )
             if (not newCenter.set)
               newCenter.set = true
