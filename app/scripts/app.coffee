@@ -53,9 +53,14 @@ angular
       $scope.user = {}
       session.getIsAdminPromise().then (isAdmin) ->
         $scope.isAdmin = isAdmin
-      session.getUserPromise().then (user) ->
-        $scope.user = user
-        # Disable the spinner waiting for angular
-        angular.element('.waiting-for-angular').hide()
+      session.getUserPromise().then(
+        (user) ->
+          $scope.user = user
+          # Disable the spinner waiting for angular
+          angular.element('.waiting-for-angular').hide()
+        ->
+          # Disable the spinner even after error
+          angular.element('.waiting-for-angular').hide()
+      )
       $scope.logout = ->
         session.logout()

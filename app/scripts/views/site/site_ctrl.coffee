@@ -6,7 +6,7 @@ overlayRightclickGenerator = (googleMaps) ->
 
 angular.module('siteViews', ['ngRoute', 'textAngular', 'xin_backend'])
 
-  .directive 'listSitesDirective', (Backend) ->
+  .directive 'listSitesDirective', (session, Backend) ->
     restrict: 'E'
     templateUrl: 'scripts/views/site/list_sites.html'
     scope:
@@ -18,10 +18,14 @@ angular.module('siteViews', ['ngRoute', 'textAngular', 'xin_backend'])
         Backend.all('sites').getList(lookup).then (sites) ->
           scope.sites = sites.plain()
           scope.loading = false
-      attrs.$observe('protocoleId', (protocoleId) ->
+      attrs.$observe 'protocoleId', (protocoleId) ->
         if protocoleId
-          scope.loadSites({where: protocole: protocoleId})
-      )
+          session.getUserPromise().then (user) ->
+            scope.loadSites(
+              where:
+                protocole: protocoleId
+                observateur: user._id
+            )
       attrs.$observe('protocoleAlgoSite', (value) ->
         if value
           scope.protocoleAlgoSite = value
@@ -99,14 +103,14 @@ angular.module('siteViews', ['ngRoute', 'textAngular', 'xin_backend'])
       $scope.isAdmin = isAdmin
     $scope.site = {}
     drawCallback = (overlay) ->
-      if $scope.protocoleAlgoSite == "CARRE" && overlay.type == "Polygon"
-        return true
-      else
-        return true
       $scope.siteForm.$pristine = false
       $scope.siteForm.$dirty = true
       $scope.$apply()
       googleMaps.addListener(overlay, 'rightclick', overlayRightclickGenerator)
+      if $scope.protocoleAlgoSite == "CARRE" && overlay.type == "Polygon"
+        return true
+      else
+        return true
       return true
     $scope.loadMap = (mapDiv) ->
       if not mapLoaded
