@@ -15,10 +15,9 @@ angular.module('siteViews', ['ngRoute', 'textAngular', 'xin_backend'])
         Backend.all('sites').getList(lookup).then (sites) ->
           scope.sites = sites.plain()
           scope.loading = false
-      attrs.$observe('protocoleId', (value) ->
-        if value
-          lookup = {where: protocole: value}
-          scope.loadSites(lookup)
+      attrs.$observe('protocoleId', (protocoleId) ->
+        if protocoleId
+          scope.loadSites({where: protocole: protocoleId})
       )
 
   .controller 'ShowSiteCtrl', ($timeout, $route, $routeParams, $scope, session, Backend, GoogleMaps) ->
@@ -35,24 +34,12 @@ angular.module('siteViews', ['ngRoute', 'textAngular', 'xin_backend'])
       $scope.siteForm.$pristine = false
       $scope.siteForm.$dirty = true
       $scope.$apply()
-      true
-    # Wait for the collapse to be opened before load the google map
-    $scope.openCollapse = (collapseTarget) ->
+      return true
+    $scope.loadMap = (mapDiv) ->
       if not mapLoaded
         mapLoaded = true
-        collapse = $(collapseTarget)
-        # TODO : add a watch on .collapse.in to remove this ugly $timeout
-        $timeout(
-          ->
-            googleMaps = new GoogleMaps(collapse.find('.g-maps')[0], drawCallback)
-            # TODO : find a solution for center map with load without timeout
-            $timeout(
-              ->
-                googleMaps.loadMap($scope.site.localites)
-              50
-              )
-          100
-          )
+        googleMaps = new GoogleMaps(mapDiv, drawCallback)
+        googleMaps.loadMap($scope.site.localites)
     $scope.saveSite = ->
       $scope.submitted = true
       if (not $scope.siteForm.$valid or
@@ -83,9 +70,15 @@ angular.module('siteViews', ['ngRoute', 'textAngular', 'xin_backend'])
       title: '@'
       collapsed: '@'
     link: (scope, elem, attrs) ->
-      attrs.$observe('collapsed', (value) ->
-        if value == undefined
-          scope.openCollapse(elem)
+      # Wait for the collapse to be opened before load the google map
+      attrs.$observe('collapsed', (collapsed) ->
+        if collapsed?
+          $(elem).on('shown.bs.collapse', ->
+            scope.loadMap(elem.find('.g-maps')[0])
+            return
+          )
+        else
+          scope.loadMap(elem.find('.g-maps')[0])
       )
 
   .controller 'CreateSiteCtrl', ($timeout, $route, $routeParams, $scope, session, Backend, GoogleMaps) ->
@@ -100,17 +93,12 @@ angular.module('siteViews', ['ngRoute', 'textAngular', 'xin_backend'])
       $scope.siteForm.$pristine = false
       $scope.siteForm.$dirty = true
       $scope.$apply()
-      true
-    # Wait for the collapse to be opened before load the google map
-    $scope.openCollapse = (collapseTarget) ->
+      return true
+    $scope.loadMap = (mapDiv) ->
       if not mapLoaded
         mapLoaded = true
-        collapse = $(collapseTarget)
-        # TODO : add a watch on .collapse.in to remove this ugly $timeout
-        $timeout(
-          -> googleMaps = new GoogleMaps(collapse.find('.g-maps')[0], drawCallback)
-          100
-          )
+        googleMaps = new GoogleMaps(mapDiv, drawCallback)
+        googleMaps.loadMap($scope.site.localites)
     $scope.saveSite = ->
       $scope.submitted = true
       if (not $scope.siteForm.$valid or
@@ -142,7 +130,10 @@ angular.module('siteViews', ['ngRoute', 'textAngular', 'xin_backend'])
     templateUrl: 'scripts/views/site/create_site.html'
     controller: 'CreateSiteCtrl'
     link: (scope, elem, attrs) ->
-      attrs.$observe('protocoleId', (value) ->
-        if value
-          scope.protocoleId = value
+      attrs.$observe('protocoleId', (protocoleId) ->
+        scope.protocoleId = protocoleId
+      )
+      $(elem).on('shown.bs.collapse', ->
+        scope.loadMap(elem.find('.g-maps')[0])
+        return
       )

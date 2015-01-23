@@ -8,6 +8,9 @@ angular.module('xin_google_maps', [])
   .factory 'GoogleMaps', ($rootScope) ->
     class GoogleMaps
       constructor: (@div, eventCallback) ->
+        # Map center policy (lowest to highest priority) :
+        # 1) go over France, 2) try to geolocalize user, 3) center on the site
+        @_isMapCenteredOnSite = false
         @eventCallback = eventCallback
         # France
         @mapOptions =
@@ -39,9 +42,10 @@ angular.module('xin_google_maps', [])
         # user Geoloc html5
         if navigator.geolocation
           navigator.geolocation.getCurrentPosition((position) =>
-            pos = new google.maps.LatLng(position.coords.latitude, position.coords.longitude)
-            @_map.setCenter(pos)
-            @_map.setZoom(9)
+            if not @_isMapCenteredOnSite
+              pos = new google.maps.LatLng(position.coords.latitude, position.coords.longitude)
+              @_map.setCenter(pos)
+              @_map.setZoom(9)
           )
 
         @_overlay = []
@@ -119,6 +123,7 @@ angular.module('xin_google_maps', [])
         if (newCenter.set)
           @_map.setCenter(newCenter.center)
           @_map.setZoom(10)
+          @_isMapCenteredOnSite = true
 
       saveMap: ->
         toSave = []
