@@ -1,5 +1,8 @@
 'use strict'
 
+overlayRightclickGenerator = (googleMaps) ->
+  (event) ->
+    googleMaps.deleteOverlay(this)
 
 angular.module('siteViews', ['ngRoute', 'textAngular', 'xin_backend'])
 
@@ -19,6 +22,10 @@ angular.module('siteViews', ['ngRoute', 'textAngular', 'xin_backend'])
         if protocoleId
           scope.loadSites({where: protocole: protocoleId})
       )
+      attrs.$observe('protocoleAlgoSite', (value) ->
+        if value
+          scope.protocoleAlgoSite = value
+      )
 
   .controller 'ShowSiteCtrl', ($timeout, $route, $routeParams, $scope, session, Backend, GoogleMaps) ->
     googleMaps = undefined
@@ -30,9 +37,11 @@ angular.module('siteViews', ['ngRoute', 'textAngular', 'xin_backend'])
       $scope.isAdmin = isAdmin
     Backend.one('sites', $scope.site._id).get().then (site) ->
       siteResource = site
-    drawCallback = (event) ->
+    drawCallback = (overlay) ->
       $scope.siteForm.$pristine = false
       $scope.siteForm.$dirty = true
+      overlayRightclicked = overlayRightclickGenerator(googleMaps)
+      googleMaps.addListener(overlay, 'rightclick', overlayRightclicked)
       $scope.$apply()
       return true
     $scope.loadMap = (mapDiv) ->
@@ -89,10 +98,15 @@ angular.module('siteViews', ['ngRoute', 'textAngular', 'xin_backend'])
     session.getIsAdminPromise().then (isAdmin) ->
       $scope.isAdmin = isAdmin
     $scope.site = {}
-    drawCallback = (event) ->
+    drawCallback = (overlay) ->
+      if $scope.protocoleAlgoSite == "CARRE" && overlay.type == "Polygon"
+        return true
+      else
+        return true
       $scope.siteForm.$pristine = false
       $scope.siteForm.$dirty = true
       $scope.$apply()
+      googleMaps.addListener(overlay, 'rightclick', overlayRightclickGenerator)
       return true
     $scope.loadMap = (mapDiv) ->
       if not mapLoaded
@@ -136,4 +150,8 @@ angular.module('siteViews', ['ngRoute', 'textAngular', 'xin_backend'])
       $(elem).on('shown.bs.collapse', ->
         scope.loadMap(elem.find('.g-maps')[0])
         return
+      )
+      attrs.$observe('protocoleAlgoSite', (value) ->
+        if value
+          scope.protocoleAlgoSite = value
       )

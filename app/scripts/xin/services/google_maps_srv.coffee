@@ -53,21 +53,23 @@ angular.module('xin_google_maps', [])
 
       overlayCreated: (event) =>
         new_overlay = event.overlay
-        if @eventCallback?(event)
-          # Converting into mongo geoJSON type
-          if (event.type == google.maps.drawing.OverlayType.MARKER)
-            new_overlay.type = "Point"
-          else if (event.type == google.maps.drawing.OverlayType.POLYGON)
-            new_overlay.type = "Polygon"
-          else if (event.type == google.maps.drawing.OverlayType.POLYLINE)
-            new_overlay.type = "LineString"
-          else
-            return
+        # Converting into mongo geoJSON type
+        if (event.type == google.maps.drawing.OverlayType.MARKER)
+          new_overlay.type = "Point"
+        else if (event.type == google.maps.drawing.OverlayType.POLYGON)
+          new_overlay.type = "Polygon"
+        else if (event.type == google.maps.drawing.OverlayType.POLYLINE)
+          new_overlay.type = "LineString"
+        else
+          return
+        if @eventCallback?(new_overlay)
           @_overlay.push(new_overlay)
         else
           event.overlay.setMap(null)
 
-      loadMap: (mongoShapes) =>
+      addListener: google.maps.event.addListener
+
+      loadMap: (mongoShapes, eventCallback=@eventCallback) =>
         if not mongoShapes
           return
         newCenter =
@@ -118,8 +120,9 @@ angular.module('xin_google_maps', [])
             console.log('Error: Bad map shape', shape)
             continue
           topush.type = shape.type
-          topush.setMap(@_map)
-          @_overlay.push(topush)
+          if @eventCallback?(topush)
+            topush.setMap(@_map)
+            @_overlay.push(topush)
         if (newCenter.set)
           @_map.setCenter(newCenter.center)
           @_map.setZoom(10)
@@ -148,3 +151,8 @@ angular.module('xin_google_maps', [])
             shapetosave.coordinates = latlngs
           toSave.push(shapetosave)
         return toSave
+
+      deleteOverlay: (overlay) =>
+        overlay.setMap(null)
+        index = @_overlay.indexOf(overlay)
+        @_overlay.splice(index, 1);
