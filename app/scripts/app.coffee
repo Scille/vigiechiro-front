@@ -30,8 +30,6 @@ angular
     'xin_protocoles_maps'
   ])
   .run (Backend, SETTINGS) ->
-    # Disable the spinner waiting for angular
-    angular.element('.waiting-for-angular').hide()
     Backend.setBaseUrl(SETTINGS.API_DOMAIN)
   .config ($routeProvider, RestangularProvider) ->
     $routeProvider
@@ -58,5 +56,7 @@ angular
         $scope.isAdmin = isAdmin
       session.getUserPromise().then (user) ->
         $scope.user = user
+        # Disable the spinner waiting for angular
+        angular.element('.waiting-for-angular').hide()
       $scope.logout = ->
         session.logout()
