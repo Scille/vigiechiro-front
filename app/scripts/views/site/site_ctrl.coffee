@@ -1,7 +1,44 @@
 'use strict'
 
-angular.module('siteViews', ['ngRoute', 'textAngular', 'xin_backend'])
+mapsCallback = (scope, Backend) ->
+  overlayCreated: (overlay) ->
+    isModified = false
+    if scope.protocoleAlgoSite == "ROUTIER"
+      if overlay.type == "LineString"
+        isModified = true
+      else if overlay.type == "Point"
+        nbPoints = scope.googleMaps.getCountOverlays('Point')
+        if nbPoints <= 0
+          isModified = true
+    else if scope.protocoleAlgoSite == "CARRE"
+      isModified = true
+    else if scope.protocoleAlgoSite == "POINT_FIXE"
+      isModified = true
+    if isModified
+      scope.googleMaps.addListener(overlay, 'rightclick', (event) ->
+        scope.googleMaps.deleteOverlay(this)
+      )
+      scope.siteForm.$pristine = false
+      scope.siteForm.$dirty = true
+      scope.$apply()
+      return true
+    else
+      return false
 
+  zoomChanged: -> mapsChanged(scope, Backend)
+  mapsMoved: -> mapsChanged(scope, Backend)
+
+mapsChanged = (scope, Backend) ->
+  zoomLevel = scope.googleMaps.getZoom()
+  center = scope.googleMaps.getCenter()
+  if zoomLevel > 10
+    Backend.all('grille_stoc').getList().then (grille_stoc) ->
+      grille_stoc = grille_stoc.plain()
+      console.log(grille_stoc)
+      for cell in grille_stoc
+        console.log(cell)
+
+angular.module('siteViews', ['ngRoute', 'textAngular', 'xin_backend'])
   .directive 'listSitesDirective', (session, Backend) ->
     restrict: 'E'
     templateUrl: 'scripts/views/site/list_sites.html'
@@ -28,7 +65,7 @@ angular.module('siteViews', ['ngRoute', 'textAngular', 'xin_backend'])
       )
 
   .controller 'ShowSiteCtrl', ($timeout, $route, $routeParams, $scope, session, Backend, GoogleMaps) ->
-    googleMaps = undefined
+    $scope.googleMaps = undefined
     siteResource = undefined
     mapLoaded = false
     $scope.submitted = false
@@ -37,41 +74,18 @@ angular.module('siteViews', ['ngRoute', 'textAngular', 'xin_backend'])
       $scope.isAdmin = isAdmin
     Backend.one('sites', $scope.site._id).get().then (site) ->
       siteResource = site
-    drawCallback = (overlay) ->
-      isModified = false
-      if $scope.protocoleAlgoSite == "ROUTIER"
-        if overlay.type == "LineString"
-          isModified = true
-        else if overlay.type == "Point"
-          nbPoints = googleMaps.getCountOverlays('Point')
-          if nbPoints <= 0
-            isModified = true
-      else if $scope.protocoleAlgoSite == "CARRE"
-        isModified = true
-      else if $scope.protocoleAlgoSite == "POINT_FIXE"
-        isModified = true
-      if isModified
-        googleMaps.addListener(overlay, 'rightclick', (event) ->
-          googleMaps.deleteOverlay(this)
-        )
-        $scope.siteForm.$pristine = false
-        $scope.siteForm.$dirty = true
-        $scope.$apply()
-        return true
-      else
-        return false
     $scope.loadMap = (mapDiv) ->
       if not mapLoaded
         mapLoaded = true
-        googleMaps = new GoogleMaps(mapDiv, drawCallback)
-        googleMaps.loadMap($scope.site.localites)
+        $scope.googleMaps = new GoogleMaps(mapDiv, mapsCallback($scope, Backend))
+        $scope.googleMaps.loadMap($scope.site.localites)
     $scope.saveSite = ->
       $scope.submitted = true
       if (not $scope.siteForm.$valid or
           not $scope.siteForm.$dirty or
-          not googleMaps and siteResource)
+          not $scope.googleMaps and siteResource)
         return
-      mapDump = googleMaps.saveMap()
+      mapDump = $scope.googleMaps.saveMap()
       localites = []
       for shape in mapDump
         geometries =
@@ -107,48 +121,25 @@ angular.module('siteViews', ['ngRoute', 'textAngular', 'xin_backend'])
       )
 
   .controller 'CreateSiteCtrl', ($timeout, $route, $routeParams, $scope, session, Backend, GoogleMaps) ->
-    googleMaps = undefined
+    $scope.googleMaps = undefined
     mapLoaded = false
     $scope.submitted = false
     $scope.isAdmin = false
     session.getIsAdminPromise().then (isAdmin) ->
       $scope.isAdmin = isAdmin
     $scope.site = {}
-    drawCallback = (overlay) ->
-      isModified = false
-      if $scope.protocoleAlgoSite == "ROUTIER"
-        if overlay.type == "LineString"
-          isModified = true
-        else if overlay.type == "Point"
-          nbPoints = googleMaps.getCountOverlays('Point')
-          if nbPoints <= 0
-            isModified = true
-      else if $scope.protocoleAlgoSite == "CARRE"
-        isModified = true
-      else if $scope.protocoleAlgoSite == "POINT_FIXE"
-        isModified = true
-      if isModified
-        googleMaps.addListener(overlay, 'rightclick', (event) ->
-          googleMaps.deleteOverlay(this)
-        )
-        $scope.siteForm.$pristine = false
-        $scope.siteForm.$dirty = true
-        $scope.$apply()
-        return true
-      else
-        return false
     $scope.loadMap = (mapDiv) ->
       if not mapLoaded
         mapLoaded = true
-        googleMaps = new GoogleMaps(mapDiv, drawCallback)
-        googleMaps.loadMap($scope.site.localites)
+        $scope.googleMaps = new GoogleMaps(mapDiv, mapsCallback($scope, Backend))
+        $scope.googleMaps.loadMap($scope.site.localites)
     $scope.saveSite = ->
       $scope.submitted = true
       if (not $scope.siteForm.$valid or
           not $scope.siteForm.$dirty or
-          not googleMaps)
+          not $scope.googleMaps)
         return
-      mapDump = googleMaps.saveMap()
+      mapDump = $scope.googleMaps.saveMap()
       localites = []
       for shape in mapDump
         geometries =

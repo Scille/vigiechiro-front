@@ -7,11 +7,11 @@
 angular.module('xin_google_maps', [])
   .factory 'GoogleMaps', ($rootScope) ->
     class GoogleMaps
-      constructor: (@div, eventCallback) ->
+      constructor: (@div, callbackDict) ->
         # Map center policy (lowest to highest priority) :
         # 1) go over France, 2) try to geolocalize user, 3) center on the site
         @_isMapCenteredOnSite = false
-        @eventCallback = eventCallback
+        @callbackDict = callbackDict
         # France
         @mapOptions =
           center: new google.maps.LatLng(46.71109, 1.7191036)
@@ -47,7 +47,10 @@ angular.module('xin_google_maps', [])
               @_map.setCenter(pos)
               @_map.setZoom(9)
           )
-
+        if @callbackDict.zoomChanged?
+          google.maps.event.addListener(@_map, 'zoom_changed', @callbackDict.zoomChanged)
+        if @callbackDict.mapsMoved?
+          google.maps.event.addListener(@_map, 'dragend', @callbackDict.mapsMoved)
         @_overlay = []
         google.maps.event.addListener(@drawingManager, 'overlaycomplete', @overlayCreated)
 
@@ -62,14 +65,14 @@ angular.module('xin_google_maps', [])
           new_overlay.type = "LineString"
         else
           return
-        if @eventCallback?(new_overlay)
+        if @callbackDict.overlayCreated?(new_overlay)
           @_overlay.push(new_overlay)
         else
           event.overlay.setMap(null)
 
       addListener: google.maps.event.addListener
 
-      loadMap: (mongoShapes, eventCallback=@eventCallback) =>
+      loadMap: (mongoShapes, callbackDict=@callbackDict.overlayCreated) =>
         if not mongoShapes
           return
         newCenter =
@@ -120,7 +123,7 @@ angular.module('xin_google_maps', [])
             console.log('Error: Bad map shape', shape)
             continue
           topush.type = shape.type
-          if @eventCallback?(topush)
+          if @callbackDict?(topush)
             topush.setMap(@_map)
             @_overlay.push(topush)
         if (newCenter.set)
@@ -163,3 +166,14 @@ angular.module('xin_google_maps', [])
           if overlay.type == type
             result++
         return result
+
+      displayInfo: (overlay) =>
+        infoWindow = new google.maps.InfoWindow()
+        infoWindow.setContent("lat : " + overlay.getPosition().lat() + ", lng : " + overlay.getPosition().lng())
+        infoWindow.open(@_map, overlay)
+
+      getZoom: =>
+        @_map.getZoom()
+
+      getCenter: =>
+        @_map.getCenter()
