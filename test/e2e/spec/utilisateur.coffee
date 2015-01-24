@@ -118,11 +118,11 @@ describe 'Test list utilisateurs', ->
     expect($$('.list-group-item').count()).toEqual(4)
 
   it 'Test filter', ->
-    element(`by`.id("search-field")).sendKeys('observateur')
+    $("search-field").sendKeys('observateur')
     expect($$('.list-group-item').count()).toEqual(1)
 
   it 'Test result per page', ->
-    element(`by`.id("max-result-field"))
+    $("max-result-field")
       .sendKeys(protractor.Key.chord(protractor.Key.CONTROL, "a"))
       .sendKeys('2')
     expect($$('.list-group-item').count()).toEqual(2)
