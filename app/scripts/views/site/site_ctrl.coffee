@@ -32,11 +32,20 @@ mapsChanged = (scope, Backend) ->
   zoomLevel = scope.googleMaps.getZoom()
   center = scope.googleMaps.getCenter()
   if zoomLevel > 10
-    Backend.all('grille_stoc').getList().then (grille_stoc) ->
+    where = JSON.stringify(
+      location:
+        $near:
+          $geometry:
+            type: "Point"
+            coordinates: [ center.lat(), center.lng() ]
+          $maxDistance: 5000
+    )
+    Backend.all('grille_stoc').getList({ $where: where }).then (grille_stoc) ->
       grille_stoc = grille_stoc.plain()
-      console.log(grille_stoc)
       for cell in grille_stoc
-        console.log(cell)
+        scope.googleMaps.createPoint()
+        console.log(cell.numero)
+        console.log(cell.centre.coordinates)
 
 angular.module('siteViews', ['ngRoute', 'textAngular', 'xin_backend'])
   .directive 'listSitesDirective', (session, Backend) ->

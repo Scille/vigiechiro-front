@@ -177,3 +177,6 @@ angular.module('xin_google_maps', [])
 
       getCenter: =>
         @_map.getCenter()
+
+      createPoint: =>
+        return
