@@ -103,3 +103,26 @@ describe 'Test utilisateur access', ->
         browser.get("#{helper.baseUrl}/utilisateurs/#{helper.observateurId}").then ->
           element(`by`.model('utilisateur.commentaire')).getAttribute('value').then (comment) ->
             expect(comment).toBe(input)
+
+
+describe 'Test list utilisateurs', ->
+
+  beforeEach ->
+    helper.login('Administrateur')
+    browser.setLocation('utilisateurs')
+
+  afterEach ->
+    browser.executeScript("window.localStorage.clear()")
+
+  it 'Test list count', ->
+    expect($$('.list-group-item').count()).toEqual(4)
+
+  it 'Test filter', ->
+    element(`by`.id("search-field")).sendKeys('observateur')
+    expect($$('.list-group-item').count()).toEqual(1)
+
+  it 'Test result per page', ->
+    element(`by`.id("max-result-field"))
+      .sendKeys(protractor.Key.chord(protractor.Key.CONTROL, "a"))
+      .sendKeys('2')
+    expect($$('.list-group-item').count()).toEqual(2)
