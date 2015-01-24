@@ -1,9 +1,5 @@
 'use strict'
 
-overlayRightclickGenerator = (googleMaps) ->
-  (event) ->
-    googleMaps.deleteOverlay(this)
-
 angular.module('siteViews', ['ngRoute', 'textAngular', 'xin_backend'])
 
   .directive 'listSitesDirective', (session, Backend) ->
@@ -42,12 +38,28 @@ angular.module('siteViews', ['ngRoute', 'textAngular', 'xin_backend'])
     Backend.one('sites', $scope.site._id).get().then (site) ->
       siteResource = site
     drawCallback = (overlay) ->
-      $scope.siteForm.$pristine = false
-      $scope.siteForm.$dirty = true
-      overlayRightclicked = overlayRightclickGenerator(googleMaps)
-      googleMaps.addListener(overlay, 'rightclick', overlayRightclicked)
-      $scope.$apply()
-      return true
+      isModified = false
+      if $scope.protocoleAlgoSite == "ROUTIER"
+        if overlay.type == "LineString"
+          isModified = true
+        else if overlay.type == "Point"
+          nbPoints = googleMaps.getCountOverlays('Point')
+          if nbPoints <= 0
+            isModified = true
+      else if $scope.protocoleAlgoSite == "CARRE"
+        isModified = true
+      else if $scope.protocoleAlgoSite == "POINT_FIXE"
+        isModified = true
+      if isModified
+        googleMaps.addListener(overlay, 'rightclick', (event) ->
+          googleMaps.deleteOverlay(this)
+        )
+        $scope.siteForm.$pristine = false
+        $scope.siteForm.$dirty = true
+        $scope.$apply()
+        return true
+      else
+        return false
     $scope.loadMap = (mapDiv) ->
       if not mapLoaded
         mapLoaded = true
@@ -103,15 +115,28 @@ angular.module('siteViews', ['ngRoute', 'textAngular', 'xin_backend'])
       $scope.isAdmin = isAdmin
     $scope.site = {}
     drawCallback = (overlay) ->
-      $scope.siteForm.$pristine = false
-      $scope.siteForm.$dirty = true
-      $scope.$apply()
-      googleMaps.addListener(overlay, 'rightclick', overlayRightclickGenerator)
-      if $scope.protocoleAlgoSite == "CARRE" && overlay.type == "Polygon"
+      isModified = false
+      if $scope.protocoleAlgoSite == "ROUTIER"
+        if overlay.type == "LineString"
+          isModified = true
+        else if overlay.type == "Point"
+          nbPoints = googleMaps.getCountOverlays('Point')
+          if nbPoints <= 0
+            isModified = true
+      else if $scope.protocoleAlgoSite == "CARRE"
+        isModified = true
+      else if $scope.protocoleAlgoSite == "POINT_FIXE"
+        isModified = true
+      if isModified
+        googleMaps.addListener(overlay, 'rightclick', (event) ->
+          googleMaps.deleteOverlay(this)
+        )
+        $scope.siteForm.$pristine = false
+        $scope.siteForm.$dirty = true
+        $scope.$apply()
         return true
       else
-        return true
-      return true
+        return false
     $scope.loadMap = (mapDiv) ->
       if not mapLoaded
         mapLoaded = true

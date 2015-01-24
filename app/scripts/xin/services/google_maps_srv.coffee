@@ -156,3 +156,10 @@ angular.module('xin_google_maps', [])
         overlay.setMap(null)
         index = @_overlay.indexOf(overlay)
         @_overlay.splice(index, 1);
+
+      getCountOverlays: (type) =>
+        result = 0
+        for overlay in @_overlay
+          if overlay.type == type
+            result++
+        return result

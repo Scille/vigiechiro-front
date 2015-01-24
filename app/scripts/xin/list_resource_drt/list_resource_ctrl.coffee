@@ -17,9 +17,13 @@ angular.module('xin_listResource', ['ngRoute', 'angularUtils.directives.dirPagin
     $scope.totalItems = 0
     $scope.currentPage = parseInt(params.page) or 1
 
-    $scope.$watch 'filter', (filterValue) ->
+    $scope.$watch 'filter', (filterValue, oldValue) ->
       if not filterValue
-        return
+        if not oldValue
+          return
+        else
+          $scope.pageChanged($scope.currentPage)
+          return
       $scope.loading = true
       where = JSON.stringify(
         $text:

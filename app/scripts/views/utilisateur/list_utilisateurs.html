@@ -1,16 +1,30 @@
 <div class="container">
-    <div ng-if="!loading">
-        <div class="page-header">
-            <h3>Utilisateurs</h3>
+    <div class="page-header">
+        <h3>Utilisateurs</h3>
+    </div>
+
+    <div class="row">
+        <div class="col-xs-8">
+            <label for="search">Filtre :</label>
+            <input ng-model="filter" id="search" class="form-control" placeholder="texte">
         </div>
+        <div class="col-xs-4">
+            <label for="search">Nb de Résultats par page :</label>
+            <input type="number" class="form-control" ng-model="itemsPerPage">
+        </div>
+    </div>
+
+    <div ng-if="!loading">
         <div ng-if="utilisateurs.length != 0">
             <ul class="list-group">
-                <li class="list-group-item" ng-repeat="utilisateur in utilisateurs">
+                <li class="list-group-item" dir-paginate="utilisateur in utilisateurs | itemsPerPage: itemsPerPage"
+                    total-items="totalItems" current-page="currentPage">
                     <a class="btn" ng-href='#/utilisateurs/{{ utilisateur._id }}'>
                         {{ utilisateur.pseudo }}
                     </a>
                 </li>
             </ul>
+            <dir-pagination-controls boundary-links="true" on-page-change="pageChanged(newPageNumber)"></dir-pagination-controls>
         </div>
 
         <div ng-show="utilisateurs.length == 0" class="text-center">
