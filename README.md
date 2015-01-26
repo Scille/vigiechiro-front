@@ -16,11 +16,3 @@ sudo npm install -g protractor
 sudo webdriver-manager update
 ./test/e2e/bootstrap_e2e.sh
 ```
-
-Activer l'indexation text sur tous les champs des taxons
--------------------------
-url de la doc : http://docs.mongodb.org/manual/tutorial/create-text-index-on-multiple-fields/
-db.taxons.ensureIndex(
-  { "$**": "text" },
-  { name: "TaxonsTextIndex" }
-)

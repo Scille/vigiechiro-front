@@ -5,36 +5,43 @@ angular.module('xin_listResource', ['ngRoute', 'angularUtils.directives.dirPagin
   .config (paginationTemplateProvider) ->
     paginationTemplateProvider.setPath('scripts/xin/list_resource_drt/dirPagination.tpl.html')
 
-  .controller 'ListResourceCtrl', ($scope, $location, session, resourceBackend) ->
+  .controller 'ListResourceCtrl', ($scope, $timeout, $location, session, resourceBackend) ->
     resourceName = resourceBackend.route
     session.getIsAdminPromise().then (isAdmin) ->
       $scope.isAdmin = isAdmin
     $scope[resourceName] = []
     $scope.loading = true
+    $scope.filter = undefined
     # Pagination
     params = $location.search()
     $scope.itemsPerPage = parseInt(params.items) or 20
     $scope.totalItems = 0
     $scope.currentPage = parseInt(params.page) or 1
+    typingCount = 0
 
-    $scope.$watch 'filter', (filterValue, oldValue) ->
-      if not filterValue
-        if not oldValue
-          return
+    $scope.$watch 'filter', (filterValue) ->
+      triggerSearch = ->
+        if filterValue
+          params =
+            where: JSON.stringify(
+              $text:
+                $search: filterValue
+            )
         else
-          $scope.pageChanged($scope.currentPage)
-          return
-      $scope.loading = true
-      where = JSON.stringify(
-        $text:
-          $search: filterValue
+          params = undefined
+        resourceBackend.getList(params).then (items) ->
+          $scope[resourceName] = items.plain()
+          $scope.totalItems = items._meta.total
+          $scope.loading = false
+      # Delay the request not to flood while the user is typing
+      typingCount += 1
+      currTyping = typingCount
+      $timeout(
+        ->
+          if currTyping == typingCount
+            triggerSearch()
+        500
       )
-      params =
-        where: where
-      resourceBackend.getList(params).then (items) ->
-        $scope[resourceName] = items.plain()
-        $scope.totalItems = items._meta.total
-        $scope.loading = false
 
     $scope.pageChanged = (newPage) ->
       $scope.currentPage = newPage
