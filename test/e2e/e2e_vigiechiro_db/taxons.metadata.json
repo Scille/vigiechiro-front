@@ -1,1 +1,1 @@
-{ "indexes" : [ { "v" : 1, "name" : "_id_", "key" : { "_id" : 1 }, "ns" : "vigiechiro.taxons" } ] }
+{ "indexes" : [ { "v" : 1, "key" : { "_id" : 1 }, "name" : "_id_", "ns" : "vigiechiro.taxons" }, { "v" : 1, "key" : { "_fts" : "text", "_ftsx" : 1 }, "name" : "taxonsTextIndex", "ns" : "vigiechiro.taxons", "default_language" : "french", "weights" : { "libelle_court" : 1, "libelle_long" : 1, "tags" : 1 }, "language_override" : "language", "textIndexVersion" : 2 } ] }
