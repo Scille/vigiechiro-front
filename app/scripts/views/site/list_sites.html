@@ -6,7 +6,9 @@
             </div>
             <ul class="list-group">
                 <li class="list-group-item" ng-repeat="site in sites">
-                    <show-site-directive title="Site {{$index + 1}}" site="site"></show-site-directive>
+                    <show-site-directive title="Site {{$index + 1}}" site="site"
+                        protocole-algo-site="{{ protocoleAlgoSite }}">
+                    </show-site-directive>
                 </li>
             </ul>
         <div ng-show="taxons.length == 0" class="text-center">

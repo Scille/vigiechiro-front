@@ -1,52 +1,5 @@
 'use strict'
 
-mapsCallback = (scope, Backend) ->
-  overlayCreated: (overlay) ->
-    isModified = false
-    if scope.protocoleAlgoSite == "ROUTIER"
-      if overlay.type == "LineString"
-        isModified = true
-      else if overlay.type == "Point"
-        nbPoints = scope.googleMaps.getCountOverlays('Point')
-        if nbPoints <= 0
-          isModified = true
-    else if scope.protocoleAlgoSite == "CARRE"
-      isModified = true
-    else if scope.protocoleAlgoSite == "POINT_FIXE"
-      isModified = true
-    if isModified
-      scope.googleMaps.addListener(overlay, 'rightclick', (event) ->
-        scope.googleMaps.deleteOverlay(this)
-      )
-      scope.siteForm.$pristine = false
-      scope.siteForm.$dirty = true
-      scope.$apply()
-      return true
-    else
-      return false
-
-  zoomChanged: -> mapsChanged(scope, Backend)
-  mapsMoved: -> mapsChanged(scope, Backend)
-
-mapsChanged = (scope, Backend) ->
-  zoomLevel = scope.googleMaps.getZoom()
-  center = scope.googleMaps.getCenter()
-  if zoomLevel > 10
-    where = JSON.stringify(
-      location:
-        $near:
-          $geometry:
-            type: "Point"
-            coordinates: [ center.lat(), center.lng() ]
-          $maxDistance: 5000
-    )
-    Backend.all('grille_stoc').getList({ $where: where }).then (grille_stoc) ->
-      grille_stoc = grille_stoc.plain()
-      for cell in grille_stoc
-        scope.googleMaps.createPoint()
-        console.log(cell.numero)
-        console.log(cell.centre.coordinates)
-
 angular.module('siteViews', ['ngRoute', 'textAngular', 'xin_backend'])
   .directive 'listSitesDirective', (session, Backend) ->
     restrict: 'E'
@@ -73,7 +26,7 @@ angular.module('siteViews', ['ngRoute', 'textAngular', 'xin_backend'])
           scope.protocoleAlgoSite = value
       )
 
-  .controller 'ShowSiteCtrl', ($timeout, $route, $routeParams, $scope, session, Backend, GoogleMaps) ->
+  .controller 'ShowSiteCtrl', ($timeout, $route, $routeParams, $scope, session, Backend, GoogleMaps, ProtocolesMaps) ->
     $scope.googleMaps = undefined
     siteResource = undefined
     mapLoaded = false
@@ -86,7 +39,8 @@ angular.module('siteViews', ['ngRoute', 'textAngular', 'xin_backend'])
     $scope.loadMap = (mapDiv) ->
       if not mapLoaded
         mapLoaded = true
-        $scope.googleMaps = new GoogleMaps(mapDiv, mapsCallback($scope, Backend))
+        protocolesMaps = new ProtocolesMaps($scope)
+        $scope.googleMaps = new GoogleMaps(mapDiv, protocolesMaps.mapsCallback())
         $scope.googleMaps.loadMap($scope.site.localites)
     $scope.saveSite = ->
       $scope.submitted = true
@@ -122,14 +76,20 @@ angular.module('siteViews', ['ngRoute', 'textAngular', 'xin_backend'])
       attrs.$observe('collapsed', (collapsed) ->
         if collapsed?
           $(elem).on('shown.bs.collapse', ->
+            scope.numero_grille_stoc = elem.find('.numero_grille_stoc')[0]
             scope.loadMap(elem.find('.g-maps')[0])
             return
           )
         else
           scope.loadMap(elem.find('.g-maps')[0])
       )
+      attrs.$observe('protocoleAlgoSite', (value) ->
+        if value
+          scope.protocoleAlgoSite = value
+      )
 
-  .controller 'CreateSiteCtrl', ($timeout, $route, $routeParams, $scope, session, Backend, GoogleMaps) ->
+
+  .controller 'CreateSiteCtrl', ($timeout, $route, $routeParams, $scope, session, Backend, GoogleMaps, ProtocolesMaps) ->
     $scope.googleMaps = undefined
     mapLoaded = false
     $scope.submitted = false
@@ -140,7 +100,8 @@ angular.module('siteViews', ['ngRoute', 'textAngular', 'xin_backend'])
     $scope.loadMap = (mapDiv) ->
       if not mapLoaded
         mapLoaded = true
-        $scope.googleMaps = new GoogleMaps(mapDiv, mapsCallback($scope, Backend))
+        protocolesMaps = new ProtocolesMaps($scope)
+        $scope.googleMaps = new GoogleMaps(mapDiv, protocolesMaps.mapsCallback())
         $scope.googleMaps.loadMap($scope.site.localites)
     $scope.saveSite = ->
       $scope.submitted = true
@@ -177,6 +138,7 @@ angular.module('siteViews', ['ngRoute', 'textAngular', 'xin_backend'])
         scope.protocoleId = protocoleId
       )
       $(elem).on('shown.bs.collapse', ->
+        scope.numero_grille_stoc = elem.find('.numero_grille_stoc')[0]
         scope.loadMap(elem.find('.g-maps')[0])
         return
       )

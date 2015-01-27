@@ -1,40 +1,41 @@
 <div class="panel panel-default">
   <div class="panel-heading" role="tab" id="headingOne">
-      <h4 class="panel-title">
-          <a data-toggle="collapse" data-target="#create-site-collapse"
-             aria-expanded="false" aria-controls="create-site-collapse"
-             ng-click="openCollapse('#create-site-collapse')">
-          Nouveau site</a>
-      </h4>
+    <h4 class="panel-title">
+      <a data-toggle="collapse" data-target="#create-site-collapse"
+         aria-expanded="false" aria-controls="create-site-collapse"
+         ng-click="openCollapse('#create-site-collapse')">
+      Nouveau site</a>
+    </h4>
   </div>
 
   <div class="collapse" id="create-site-collapse">
     <div class="panel-body">
-
       <form class="simple-form" novalidate name="siteForm" ng-submit="saveSite()">
         <div class="form-group">
+          <input type="text" class="numero_grille_stoc" value="numéro grille stoc"
+                ng-if="protocoleAlgoSite != 'ROUTIER'">
           <div class="g-maps"></div>
-          </div>
-          <span ng-show="submitted && (!site.coordonnee || !site.coordonnee.lattitude || !site.coordonnee.lattitude)"
-                class="help-block">Au moins un point est requis</span>
+        </div>
+        <span ng-show="submitted && (!site.coordonnee || !site.coordonnee.lattitude || !site.coordonnee.lattitude)"
+              class="help-block">Au moins un point est requis</span>
 
-          <div class="form-group">
-              <textarea rows="3" class="form-control" name="commentaire"
-                        ng-model="site.commentaire" ng-disabled="readOnly"
-                        placeholder="Commentaire"></textarea>
-          </div>
+        <div class="form-group">
+            <textarea rows="3" class="form-control" name="commentaire"
+                      ng-model="site.commentaire" ng-disabled="readOnly"
+                      placeholder="Commentaire"></textarea>
+        </div>
 
-          <div class="checkbox" ng-show="isAdmin">
-            <label>
-              <input type="checkbox" ng-model="site.verrouille" ng-value="true"
-                     ng-checked="site.verrouille">
-                     Verrouillé
-            </label>
-          </div>
+        <div class="checkbox" ng-show="isAdmin">
+          <label>
+            <input type="checkbox" ng-model="site.verrouille" ng-value="true"
+                   ng-checked="site.verrouille">
+                   Verrouillé
+          </label>
+        </div>
 
-          <div class="form-group">
-              <input class="save-user btn btn-primary" type="submit" value="Sauvegarder" ng-hide="siteForm.$pristine">
-          </div>
+        <div class="form-group">
+            <input class="save-user btn btn-primary" type="submit" value="Sauvegarder" ng-hide="siteForm.$pristine">
+        </div>
       </form>
     </div>
   </div>

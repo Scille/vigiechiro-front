@@ -22,6 +22,7 @@ angular
     'xin_session',
     'xin_backend',
     'xin_google_maps',
+    'xin_protocoles_maps',
     'utilisateurViews',
     'taxonViews',
     'protocoleViews'

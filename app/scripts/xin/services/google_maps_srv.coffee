@@ -7,11 +7,10 @@
 angular.module('xin_google_maps', [])
   .factory 'GoogleMaps', ($rootScope) ->
     class GoogleMaps
-      constructor: (@div, callbackDict) ->
+      constructor: (@div, @callbackDict) ->
         # Map center policy (lowest to highest priority) :
         # 1) go over France, 2) try to geolocalize user, 3) center on the site
         @_isMapCenteredOnSite = false
-        @callbackDict = callbackDict
         # France
         @mapOptions =
           center: new google.maps.LatLng(46.71109, 1.7191036)
@@ -72,7 +71,7 @@ angular.module('xin_google_maps', [])
 
       addListener: google.maps.event.addListener
 
-      loadMap: (mongoShapes, callbackDict=@callbackDict.overlayCreated) =>
+      loadMap: (mongoShapes, callbackDict=@callbackDict.overlayCreated) ->
         if not mongoShapes
           return
         newCenter =
@@ -123,7 +122,7 @@ angular.module('xin_google_maps', [])
             console.log('Error: Bad map shape', shape)
             continue
           topush.type = shape.type
-          if @callbackDict?(topush)
+          if @callbackDict.overlayCreated?(topush)
             topush.setMap(@_map)
             @_overlay.push(topush)
         if (newCenter.set)
@@ -167,16 +166,16 @@ angular.module('xin_google_maps', [])
             result++
         return result
 
-      displayInfo: (overlay) =>
+      displayInfo: (overlay) ->
         infoWindow = new google.maps.InfoWindow()
         infoWindow.setContent("lat : " + overlay.getPosition().lat() + ", lng : " + overlay.getPosition().lng())
         infoWindow.open(@_map, overlay)
 
-      getZoom: =>
+      getZoom: ->
         @_map.getZoom()
 
-      getCenter: =>
+      getCenter: ->
         @_map.getCenter()
 
-      createPoint: =>
-        return
+      getMaps: ->
+        return @_map
