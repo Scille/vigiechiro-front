@@ -19,7 +19,7 @@ angular.module('utilisateurViews', ['ngRoute', 'xin_listResource', 'xin_session'
         templateUrl: 'scripts/views/utilisateur/show_utilisateur.html'
         controller: 'ShowUtilisateurCtrl'
 
-  .controller 'ShowUtilisateurCtrl', ($scope, $routeParams, Backend, session) ->
+  .controller 'ShowUtilisateurCtrl', ($scope, $route, $routeParams, Backend, session) ->
     $scope.submitted = false
     $scope.utilisateur = {}
     $scope.readOnly = false
@@ -52,6 +52,6 @@ angular.module('utilisateurViews', ['ngRoute', 'xin_listResource', 'xin_session'
       if $scope.utilisateur.role != origin_role
         payload.role = $scope.utilisateur.role
       userResource.patch(payload).then(
-        -> $scope.userForm.$setPristine()
+        -> $route.reload()
         ->
       )

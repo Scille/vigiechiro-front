@@ -12,11 +12,9 @@
 angular
   .module('vigiechiroApp', [
     'ngAnimate',
-    'ngCookies',
     'ngRoute',
     'ngSanitize',
     'ngTouch',
-    'ngResource',
     'flow',
     'appSettings',
     'xin_login',
