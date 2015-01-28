@@ -4,31 +4,22 @@
  # args
  ## @div : element html (div) dans laquelle la map sera instanciée
 ###
-angular.module('xin_protocoles_maps', [])
-  .factory 'ProtocolesMaps', ($rootScope, Backend) ->
-    class ProtocolesMaps
-      constructor: (@scope) ->
+angular.module('xin_protocole_carre', [])
+  .factory 'ProtocoleCarre', ($rootScope, Backend, GoogleMaps) ->
+    class ProtocoleCarre
+      constructor: (@scope, mapDiv) ->
         @_grille = []
         @_stocValid = false
+        @_googleMaps = new GoogleMaps(mapDiv, @mapsCallback())
+        @_googleMaps.setDrawingManagerOptions(drawingControl: false)
         return
 
       mapsCallback: ->
         overlayCreated: (overlay) =>
-          isModified = false
-          if @scope.protocoleAlgoSite == "ROUTIER"
-            if overlay.type == "LineString"
-              isModified = true
-            else if overlay.type == "Point"
-              nbPoints = @scope.googleMaps.getCountOverlays('Point')
-              if nbPoints <= 0
-                isModified = true
-          else if @scope.protocoleAlgoSite == "CARRE"
-            isModified = true
-          else if @scope.protocoleAlgoSite == "POINT_FIXE"
-            isModified = true
+          isModified = true
           if isModified
-            @scope.googleMaps.addListener(overlay, 'rightclick', (event) =>
-              @scope.googleMaps.deleteOverlay(overlay)
+            @_googleMaps.addListener(overlay, 'rightclick', (event) =>
+              @_googleMaps.deleteOverlay(overlay)
             )
             @scope.siteForm.$pristine = false
             @scope.siteForm.$dirty = true
@@ -40,10 +31,11 @@ angular.module('xin_protocoles_maps', [])
         mapsMoved: => @mapsChanged()
 
       mapsChanged: ->
-        if (@scope.protocoleAlgoSite == "ROUTIER") || (@_stocValid)
+        console.log(@scope.site.verrouille)
+        if @scope.site.verrouille or @_stocValid
           return
-        map = @scope.googleMaps.getMaps()
-        zoomLevel = @scope.googleMaps.getZoom()
+        map = @_googleMaps.getMaps()
+        zoomLevel = @_googleMaps.getZoom()
         bounds = map.getBounds()
         southWest = bounds.getSouthWest()
         northEast = bounds.getNorthEast()
@@ -92,10 +84,10 @@ angular.module('xin_protocoles_maps', [])
             strokeOpacity: 0.65
             strokeWeight: 0.5
             fillOpacity: 0
-            map: @scope.googleMaps.getMaps()
+            map: @_googleMaps.getMaps()
           )
-          @scope.googleMaps.addListener(item, 'click', validItem(item))
-          @scope.googleMaps.addListener(item, 'mouseover', displayItem(item))
+          @_googleMaps.addListener(item, 'click', validItem(item))
+          @_googleMaps.addListener(item, 'mouseover', displayItem(item))
           @_grille.push({"item": item, "numero": cell.numero})
 
       validNumeroGrille: (event, cell) ->
@@ -111,6 +103,7 @@ angular.module('xin_protocoles_maps', [])
               strokeWeight: 2
             )
             @_stocValid = true
+            @_googleMaps.setDrawingManagerOptions(drawingControl: true)
 
       displayNumeroGrille: (event, cell) ->
         for stoc in @_grille
@@ -119,3 +112,9 @@ angular.module('xin_protocoles_maps', [])
             if @scope.numero_grille_stoc
               @scope.numero_grille_stoc.value = newString
             return
+
+      loadMap: (mongoShapes) ->
+        return @_googleMaps.loadMap(mongoShapes)
+
+      saveMap: ->
+        return @_googleMaps.saveMap()

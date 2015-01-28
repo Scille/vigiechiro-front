@@ -16,7 +16,7 @@ angular.module('xin_google_maps', [])
           center: new google.maps.LatLng(46.71109, 1.7191036)
           zoom: 6
         @_map = new google.maps.Map(@div, @mapOptions)
-        @drawingManager = new google.maps.drawing.DrawingManager(
+        @_drawingManager = new google.maps.drawing.DrawingManager(
           drawingControl: true
           drawingControlOptions:
             position: google.maps.ControlPosition.TOP_CENTER
@@ -37,7 +37,7 @@ angular.module('xin_google_maps', [])
             draggable: true
             editable: true
         )
-        @drawingManager.setMap(@_map)
+        @_drawingManager.setMap(@_map)
         # user Geoloc html5
         if navigator.geolocation
           navigator.geolocation.getCurrentPosition((position) =>
@@ -51,7 +51,7 @@ angular.module('xin_google_maps', [])
         if @callbackDict.mapsMoved?
           google.maps.event.addListener(@_map, 'dragend', @callbackDict.mapsMoved)
         @_overlay = []
-        google.maps.event.addListener(@drawingManager, 'overlaycomplete', @overlayCreated)
+        google.maps.event.addListener(@_drawingManager, 'overlaycomplete', @overlayCreated)
 
       overlayCreated: (event) =>
         new_overlay = event.overlay
@@ -179,3 +179,6 @@ angular.module('xin_google_maps', [])
 
       getMaps: ->
         return @_map
+
+      setDrawingManagerOptions: (options) ->
+        @_drawingManager.setOptions(options)

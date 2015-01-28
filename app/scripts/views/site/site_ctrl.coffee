@@ -26,8 +26,10 @@ angular.module('siteViews', ['ngRoute', 'textAngular', 'xin_backend'])
           scope.protocoleAlgoSite = value
       )
 
-  .controller 'ShowSiteCtrl', ($timeout, $route, $routeParams, $scope, session, Backend, GoogleMaps, ProtocolesMaps) ->
-    $scope.googleMaps = undefined
+  .controller 'ShowSiteCtrl', ($timeout, $route, $routeParams,
+    $scope, session, Backend,
+    ProtocoleRoutier, ProtocoleCarre, ProtocolePointFixe) ->
+    mapProtocole = undefined
     siteResource = undefined
     mapLoaded = false
     $scope.submitted = false
@@ -39,16 +41,19 @@ angular.module('siteViews', ['ngRoute', 'textAngular', 'xin_backend'])
     $scope.loadMap = (mapDiv) ->
       if not mapLoaded
         mapLoaded = true
-        protocolesMaps = new ProtocolesMaps($scope)
-        $scope.googleMaps = new GoogleMaps(mapDiv, protocolesMaps.mapsCallback())
-        $scope.googleMaps.loadMap($scope.site.localites)
+        if $scope.protocoleAlgoSite == 'ROUTIER'
+          mapProtocole = new ProtocoleRoutier($scope, mapDiv)
+        else if $scope.protocoleAlgoSite == 'CARRE'
+          mapProtocole = new ProtocoleCarre($scope, mapDiv)
+        else if $scope.protocoleAlgoSite == 'POINT_FIXE'
+          mapProtocole = new ProtocolePointFixe($scope, mapDiv)
+        mapProtocole.loadMap($scope.site.localites)
     $scope.saveSite = ->
       $scope.submitted = true
       if (not $scope.siteForm.$valid or
-          not $scope.siteForm.$dirty or
-          not $scope.googleMaps and siteResource)
+          not $scope.siteForm.$dirty)
         return
-      mapDump = $scope.googleMaps.saveMap()
+      mapDump = mapProtocole.saveMap()
       localites = []
       for shape in mapDump
         geometries =
@@ -88,9 +93,10 @@ angular.module('siteViews', ['ngRoute', 'textAngular', 'xin_backend'])
           scope.protocoleAlgoSite = value
       )
 
-
-  .controller 'CreateSiteCtrl', ($timeout, $route, $routeParams, $scope, session, Backend, GoogleMaps, ProtocolesMaps) ->
-    $scope.googleMaps = undefined
+  .controller 'CreateSiteCtrl', ($timeout, $route, $routeParams, $scope,
+    session, Backend,
+    ProtocoleRoutier, ProtocoleCarre, ProtocolePointFixe) ->
+    mapProtocole = undefined
     mapLoaded = false
     $scope.submitted = false
     $scope.isAdmin = false
@@ -100,16 +106,19 @@ angular.module('siteViews', ['ngRoute', 'textAngular', 'xin_backend'])
     $scope.loadMap = (mapDiv) ->
       if not mapLoaded
         mapLoaded = true
-        protocolesMaps = new ProtocolesMaps($scope)
-        $scope.googleMaps = new GoogleMaps(mapDiv, protocolesMaps.mapsCallback())
-        $scope.googleMaps.loadMap($scope.site.localites)
+        if $scope.protocoleAlgoSite == 'ROUTIER'
+          mapProtocole = new ProtocoleRoutier($scope, mapDiv)
+        else if $scope.protocoleAlgoSite == 'CARRE'
+          mapProtocole = new ProtocoleCarre($scope, mapDiv)
+        else if $scope.protocoleAlgoSite == 'POINT_FIXE'
+          mapProtocole = new ProtocolePointFixe($scope, mapDiv)
+        mapProtocole.loadMap($scope.site.localites)
     $scope.saveSite = ->
       $scope.submitted = true
       if (not $scope.siteForm.$valid or
-          not $scope.siteForm.$dirty or
-          not $scope.googleMaps)
+          not $scope.siteForm.$dirty)
         return
-      mapDump = $scope.googleMaps.saveMap()
+      mapDump = mapProtocole.saveMap()
       localites = []
       for shape in mapDump
         geometries =
