@@ -22,6 +22,17 @@
           <text-angular ng-model="taxon.description"></text-angular>
         </div>
 
+
+        <div class="input-group form-group">
+          <label class="input-group-addon" for="libelle_court">Taxons parents</label>
+          <ui-select multiple ng-model="taxon.parents" theme="bootstrap" ng-disabled="disabled">
+            <ui-select-match>{{$item.libelle_long}}</ui-select-match>
+            <ui-select-choices repeat="taxon in availableTaxons | filter:$select.search">
+              {{taxon.libelle_long}}
+            </ui-select-choices>
+          </ui-select>
+        </div>
+
         <div class="input-group form-group">
             <input class="save-taxon btn btn-primary" type="submit" value="Sauvegarder" ng-hide="taxonForm.$pristine">
         </div>
