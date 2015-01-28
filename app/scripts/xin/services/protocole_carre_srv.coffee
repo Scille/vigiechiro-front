@@ -4,10 +4,10 @@
  # args
  ## @div : element html (div) dans laquelle la map sera instanciée
 ###
-angular.module('xin_protocole_carre', [])
+angular.module('protocole_carre', [])
   .factory 'ProtocoleCarre', ($rootScope, Backend, GoogleMaps) ->
     class ProtocoleCarre
-      constructor: (@scope, mapDiv) ->
+      constructor: (mapDiv, @factoryCallback) ->
         @_grille = []
         @_stocValid = false
         @_googleMaps = new GoogleMaps(mapDiv, @mapsCallback())
@@ -21,18 +21,14 @@ angular.module('xin_protocole_carre', [])
             @_googleMaps.addListener(overlay, 'rightclick', (event) =>
               @_googleMaps.deleteOverlay(overlay)
             )
-            @scope.siteForm.$pristine = false
-            @scope.siteForm.$dirty = true
-            # @scope.$apply()
+            @factoryCallback.overlayCreated()
             return true
-          else
-            return false
+          return false
         zoomChanged: => @mapsChanged()
         mapsMoved: => @mapsChanged()
 
       mapsChanged: ->
-        console.log(@scope.site)
-        if @scope.site.verrouille or @_stocValid
+        if @_stocValid
           return
         map = @_googleMaps.getMaps()
         zoomLevel = @_googleMaps.getZoom()
@@ -53,14 +49,7 @@ angular.module('xin_protocole_carre', [])
           Backend.all('grille_stoc').getList({ where: where, max_results: 40 }).then (@createGrille)
 
       createGrille: (grille_stoc) =>
-        toRadian = Math.PI / 180
-        # 360 / (2 * Pi * rayon de la terre)
-        rapport = 0.008983153
         grille_stoc = grille_stoc.plain()
-        validItem = (item) =>
-          (event) => @validNumeroGrille(event, item)
-        displayItem = (item) =>
-          (event) => @displayNumeroGrille(event, item)
         for cell in grille_stoc
           exist = false
           for item in @_grille
@@ -71,26 +60,48 @@ angular.module('xin_protocole_carre', [])
             continue
           lat = cell.centre.coordinates[1]
           lng = cell.centre.coordinates[0]
-          onePoint =
-            lat: lat + 0.0089982311916
-            lng: lng - rapport / Math.cos(lat*toRadian)
-          twoPoint =
-            lat: lat - 0.0089982311916
-            lng: lng + rapport / Math.cos(lat*toRadian)
-          item = new google.maps.Rectangle(
-            bounds: new google.maps.LatLngBounds(
-              new google.maps.LatLng(onePoint.lat, onePoint.lng)
-              new google.maps.LatLng(twoPoint.lat, twoPoint.lng)
-            )
+          @createCell(lat, lng, cell.numero, false)
+
+      createCell: (lat, lng, numero, isValid) ->
+        validItem = (item) =>
+          (event) => @validNumeroGrille(event, item)
+        displayItem = (item) =>
+          (event) => @displayNumeroGrille(event, item)
+        removeItem = (item) =>
+          (event) => @removeNumeroGrille(event, item)
+        toRadian = Math.PI / 180
+        # 360 / (2 * Pi * rayon de la terre)
+        rapport = 0.008983153
+        onePoint =
+          lat: lat + 0.0089982311916
+          lng: lng - rapport / Math.cos(lat*toRadian)
+        twoPoint =
+          lat: lat - 0.0089982311916
+          lng: lng + rapport / Math.cos(lat*toRadian)
+        item = new google.maps.Rectangle(
+          bounds: new google.maps.LatLngBounds(
+            new google.maps.LatLng(onePoint.lat, onePoint.lng)
+            new google.maps.LatLng(twoPoint.lat, twoPoint.lng)
+          )
+          map: @_googleMaps.getMaps()
+          fillOpacity: 0
+        )
+        if isValid
+          item.setOptions(
+            strokeColor: '#00E000'
+            strokeOpacity: 1
+            strokeWeight: 2
+          )
+          @_googleMaps.addListener(item, 'rightclick', removeItem(item))
+        else
+          item.setOptions(
             strokeColor: '#606060'
             strokeOpacity: 0.65
             strokeWeight: 0.5
-            fillOpacity: 0
-            map: @_googleMaps.getMaps()
           )
           @_googleMaps.addListener(item, 'click', validItem(item))
           @_googleMaps.addListener(item, 'mouseover', displayItem(item))
-          @_grille.push({"item": item, "numero": cell.numero})
+        @_grille.push({"item": item, "numero": numero})
 
       validNumeroGrille: (event, cell) ->
         nbStoc = @_grille.length
@@ -105,18 +116,27 @@ angular.module('xin_protocole_carre', [])
               strokeWeight: 2
             )
             @_stocValid = true
+            #TODO addListener
+#            @_googleMaps.addListener(cell, 'rightclick', removeItem(item))
             @_googleMaps.setDrawingManagerOptions(drawingControl: true)
 
       displayNumeroGrille: (event, cell) ->
         for stoc in @_grille
           if stoc.item == cell
             newString = "n° grille stoc : " + stoc.numero
-            if @scope.numero_grille_stoc
-              @scope.numero_grille_stoc.value = newString
+            #TODO afficher numero_grille_stoc quelque part
+#            if @scope.numero_grille_stoc
+#              @scope.numero_grille_stoc.value = newString
             return
 
+      removeNumeroGrille: (event, cell) ->
+        console.log("remove")
+
       loadMap: (mongoShapes) ->
-        return @_googleMaps.loadMap(mongoShapes)
+        loadResult = @_googleMaps.loadMap(mongoShapes)
+        if loadResult
+          @_grille = []
+          @_stocValid = true
 
       saveMap: ->
         return @_googleMaps.saveMap()

@@ -8,7 +8,6 @@ angular.module('xin_google_maps', [])
   .factory 'GoogleMaps', ($rootScope) ->
     class GoogleMaps
       constructor: (@div, @callbackDict) ->
-        console.log("constructeur")
         # Map center policy (lowest to highest priority) :
         # 1) go over France, 2) try to geolocalize user, 3) center on the site
         @_isMapCenteredOnSite = false

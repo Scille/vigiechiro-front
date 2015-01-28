@@ -4,10 +4,10 @@
  # args
  ## @div : element html (div) dans laquelle la map sera instanciée
 ###
-angular.module('xin_protocole_point_fixe', [])
+angular.module('protocole_point_fixe', [])
   .factory 'ProtocolePointFixe', ($rootScope, Backend, GoogleMaps) ->
     class ProtocolePointFixe
-      constructor: (@scope, mapDiv) ->
+      constructor: (mapDiv, @factoryCallback) ->
         @_grille = []
         @_stocValid = false
         @_googleMaps = new GoogleMaps(mapDiv, @mapsCallback())
@@ -21,9 +21,6 @@ angular.module('xin_protocole_point_fixe', [])
             @_googleMaps.addListener(overlay, 'rightclick', (event) =>
               @_googleMaps.deleteOverlay(overlay)
             )
-            @scope.siteForm.$pristine = false
-            @scope.siteForm.$dirty = true
-            @scope.$apply()
             return true
           else
             return false
@@ -31,8 +28,7 @@ angular.module('xin_protocole_point_fixe', [])
         mapsMoved: => @mapsChanged()
 
       mapsChanged: ->
-        console.log(@scope.site)
-        if @scope.site.verrouille or @_stocValid
+        if @_stocValid
           return
         map = @_googleMaps.getMaps()
         zoomLevel = @_googleMaps.getZoom()
@@ -109,8 +105,9 @@ angular.module('xin_protocole_point_fixe', [])
         for stoc in @_grille
           if stoc.item == cell
             newString = "n° grille stoc : " + stoc.numero
-            if @scope.numero_grille_stoc
-              @scope.numero_grille_stoc.value = newString
+            #TODO : afficher numero_grille_stoc quelque part
+#            if @scope.numero_grille_stoc
+#              @scope.numero_grille_stoc.value = newString
             return
 
       loadMap: (mongoShapes) ->

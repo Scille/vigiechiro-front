@@ -4,10 +4,10 @@
  # args
  ## @div : element html (div) dans laquelle la map sera instanciée
 ###
-angular.module('xin_protocole_routier', [])
+angular.module('protocole_routier', [])
   .factory 'ProtocoleRoutier', ($rootScope, Backend, GoogleMaps) ->
     class ProtocoleRoutier
-      constructor: (@scope, mapDiv) ->
+      constructor: (mapDiv, @factoryCallback) ->
         @_grille = []
         @_stocValid = false
         @_googleMaps = new GoogleMaps(mapDiv, @mapsCallback())
@@ -39,9 +39,6 @@ angular.module('xin_protocole_routier', [])
             @_googleMaps.addListener(overlay, 'rightclick', (event) =>
               @_googleMaps.deleteOverlay(overlay)
             )
-            @scope.siteForm.$pristine = false
-            @scope.siteForm.$dirty = true
-            @scope.$apply()
             return true
           else
             return false

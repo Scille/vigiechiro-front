@@ -22,9 +22,6 @@ angular
     'xin_session',
     'xin_backend',
     'xin_google_maps',
-    'xin_protocole_carre',
-    'xin_protocole_routier',
-    'xin_protocole_point_fixe',
     'utilisateurViews',
     'taxonViews',
     'protocoleViews'

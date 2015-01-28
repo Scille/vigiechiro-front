@@ -1,6 +1,6 @@
 'use strict'
 
-angular.module('siteViews', ['ngRoute', 'textAngular', 'xin_backend'])
+angular.module('siteViews', ['ngRoute', 'textAngular', 'xin_backend', 'protocole_factory'])
   .directive 'listSitesDirective', (session, Backend) ->
     restrict: 'E'
     templateUrl: 'scripts/views/site/list_sites.html'
@@ -24,8 +24,7 @@ angular.module('siteViews', ['ngRoute', 'textAngular', 'xin_backend'])
             )
 
   .controller 'ShowSiteCtrl', ($timeout, $route, $routeParams,
-    $scope, session, Backend,
-    ProtocoleRoutier, ProtocoleCarre, ProtocolePointFixe) ->
+    $scope, session, Backend, ProtocoleFactory) ->
     mapProtocole = undefined
     siteResource = undefined
     mapLoaded = false
@@ -38,29 +37,19 @@ angular.module('siteViews', ['ngRoute', 'textAngular', 'xin_backend'])
     $scope.loadMap = (mapDiv) ->
       if not mapLoaded
         mapLoaded = true
-        if $scope.protocoleAlgoSite == 'ROUTIER'
-          mapProtocole = new ProtocoleRoutier($scope, mapDiv)
-        else if $scope.protocoleAlgoSite == 'CARRE'
-          mapProtocole = new ProtocoleCarre($scope, mapDiv)
-        else if $scope.protocoleAlgoSite == 'POINT_FIXE'
-          mapProtocole = new ProtocolePointFixe($scope, mapDiv)
-        else
-          throw "Error : unknown protocole #{$scope.protocoleAlgoSite}"
-        mapProtocole.loadMap($scope.site.localites)
+        mapProtocole = new ProtocoleFactory($scope.site, $scope.protocoleAlgoSite, mapDiv, ->
+          $scope.siteForm.$pristine = false
+          $scope.siteForm.$dirty = true
+          $scope.$apply()
+        )
     $scope.saveSite = ->
       $scope.submitted = true
       if (not $scope.siteForm.$valid or
           not $scope.siteForm.$dirty)
         return
-      mapDump = mapProtocole.saveMap()
-      localites = []
-      for shape in mapDump
-        geometries =
-          geometries: [shape]
-        localites.push(geometries)
       payload =
         'protocole': $scope.protocoleId
-        'localites': localites
+        'localites': mapProtocole.saveMap()
         'commentaire': $scope.siteForm.commentaire.$modelValue
       siteResource.patch(payload).then(
         -> $scope.siteForm.$setPristine()
@@ -88,8 +77,7 @@ angular.module('siteViews', ['ngRoute', 'textAngular', 'xin_backend'])
         )
 
   .controller 'CreateSiteCtrl', ($timeout, $route, $routeParams, $scope,
-    session, Backend,
-    ProtocoleRoutier, ProtocoleCarre, ProtocolePointFixe) ->
+    session, Backend, ProtocoleFactory) ->
     mapProtocole = undefined
     mapLoaded = false
     $scope.submitted = false
@@ -100,29 +88,19 @@ angular.module('siteViews', ['ngRoute', 'textAngular', 'xin_backend'])
     $scope.loadMap = (mapDiv) ->
       if not mapLoaded
         mapLoaded = true
-        if $scope.protocoleAlgoSite == 'ROUTIER'
-          mapProtocole = new ProtocoleRoutier($scope, mapDiv)
-        else if $scope.protocoleAlgoSite == 'CARRE'
-          mapProtocole = new ProtocoleCarre($scope, mapDiv)
-        else if $scope.protocoleAlgoSite == 'POINT_FIXE'
-          mapProtocole = new ProtocolePointFixe($scope, mapDiv)
-        else
-          throw "Error : unknown protocole #{$scope.protocoleAlgoSite}"
-        mapProtocole.loadMap($scope.site.localites)
+        mapProtocole = new ProtocoleFactory($scope.site, $scope.protocoleAlgoSite, mapDiv, ->
+          $scope.siteForm.$pristine = false
+          $scope.siteForm.$dirty = true
+          $scope.$apply()
+        )
     $scope.saveSite = ->
       $scope.submitted = true
       if (not $scope.siteForm.$valid or
           not $scope.siteForm.$dirty)
         return
-      mapDump = mapProtocole.saveMap()
-      localites = []
-      for shape in mapDump
-        geometries =
-          geometries: [shape]
-        localites.push(geometries)
       payload =
         'protocole': $scope.protocoleId
-        'localites': localites
+        'localites': mapProtocole.saveMap()
 # TODO : use coordonnee to center the map
 #        'coordonnee':
 #          'type': 'Point'
