@@ -78,16 +78,14 @@ angular.module('siteViews', ['ngRoute', 'textAngular', 'xin_backend'])
       collapsed: '@'
     link: (scope, elem, attrs) ->
       # Wait for the collapse to be opened before load the google map
-      attrs.$observe('collapsed', (collapsed) ->
-        if collapsed?
-          $(elem).on('shown.bs.collapse', ->
-            scope.numero_grille_stoc = elem.find('.numero_grille_stoc')[0]
-            scope.loadMap(elem.find('.g-maps')[0])
-            return
-          )
-        else
+      if not attrs.collapsed?
+        scope.loadMap(elem.find('.g-maps')[0])
+      else
+        $(elem).on('shown.bs.collapse', ->
+          scope.numero_grille_stoc = elem.find('.numero_grille_stoc')[0]
           scope.loadMap(elem.find('.g-maps')[0])
-      )
+          return
+        )
       attrs.$observe('protocoleAlgoSite', (value) ->
         if value
           scope.protocoleAlgoSite = value
