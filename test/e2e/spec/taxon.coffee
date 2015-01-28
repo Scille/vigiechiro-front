@@ -14,7 +14,7 @@ describe 'Test taxon for observateur', ->
   it 'Test get taxon list', ->
     browser.setLocation('taxons').then ->
       taxons = $$('.list-group-item')
-      expect(taxons.count()).toEqual(3)
+      expect(taxons.count()).toEqual(4)
 
   it 'Test view taxon', ->
     browser.setLocation('taxons').then ->
@@ -88,4 +88,4 @@ describe 'Test taxon for adminstrateur', ->
               browser.getCurrentUrl().then (url) ->
                 expect(url).toBe("#{helper.baseUrl}/taxons?items=20&page=1")
                 taxons = $$('.list-group-item')
-                expect(taxons.count()).toEqual(4)
+                expect(taxons.count()).toEqual(5)
