@@ -49,7 +49,7 @@ angular.module('taxonViews', ['ngRoute', 'ngSanitize', 'textAngular',
     $scope.isAdmin = false
     session.getIsAdminPromise().then (isAdmin) ->
       $scope.isAdmin = isAdmin
-    Backend.one('taxons', $routeParams.taxonId).get().then (taxon) ->
+    Backend.one('taxons', $routeParams.taxonId).get({embedded: {parents: 1}}).then (taxon) ->
       $scope.taxon = taxon.plain()
 
   .controller 'EditTaxonCtrl', ($route, $routeParams, $scope, Backend) ->

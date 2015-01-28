@@ -14,7 +14,7 @@
     <h4>Parents </h4>
     <ul>
       <li ng-repeat="parent in taxon.parents">
-        <a href="#/taxons/{{parent}}">parent {{$index}}</a>
+        <a href="#/taxons/{{parent._id}}">{{parent.libelle_long}}</a>
       </li>
     </ul>
   </div>
