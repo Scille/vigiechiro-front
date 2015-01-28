@@ -1,16 +1,16 @@
 <div class="panel panel-default">
   <div class="panel-heading" role="tab" id="headingOne">
     <h4 class="panel-title">
-        <a data-toggle="collapse" data-target="#show-site-collapse-{{site._id}}"
-           aria-expanded="false" aria-controls="show-site-collapse-{{site._id}}"
-           ng-click="openCollapse('#show-site-collapse-' + site._id)">
-        {{title}}</a>
+      <a data-toggle="collapse" data-target="#show-site-collapse-{{site._id}}"
+         aria-expanded="false" aria-controls="show-site-collapse-{{site._id}}"
+         ng-click="openCollapse('#show-site-collapse-' + site._id)">
+        {{title}}
+      </a>
     </h4>
   </div>
 
   <div class="collapse {{collapsed === undefined ? 'in' : ''}}" id="show-site-collapse-{{site._id}}">
     <div class="panel-body">
-
       <form class="simple-form" novalidate name="siteForm" ng-submit="saveSite()">
         <div class="form-group">
           <div class="g-maps"></div>

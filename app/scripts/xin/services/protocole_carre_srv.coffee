@@ -31,7 +31,7 @@ angular.module('xin_protocole_carre', [])
         mapsMoved: => @mapsChanged()
 
       mapsChanged: ->
-        console.log(@scope.site.verrouille)
+        console.log(@scope.site)
         if @scope.site.verrouille or @_stocValid
           return
         map = @_googleMaps.getMaps()
