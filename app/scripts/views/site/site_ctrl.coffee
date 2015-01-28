@@ -6,6 +6,7 @@ angular.module('siteViews', ['ngRoute', 'textAngular', 'xin_backend'])
     templateUrl: 'scripts/views/site/list_sites.html'
     scope:
       protocoleId: '@'
+      protocoleAlgoSite: '='
     link: (scope, elem, attrs) ->
       scope.loading = true
       scope.sites = []
@@ -21,10 +22,6 @@ angular.module('siteViews', ['ngRoute', 'textAngular', 'xin_backend'])
                 protocole: protocoleId
                 observateur: user._id
             )
-      attrs.$observe('protocoleAlgoSite', (value) ->
-        if value
-          scope.protocoleAlgoSite = value
-      )
 
   .controller 'ShowSiteCtrl', ($timeout, $route, $routeParams,
     $scope, session, Backend,
@@ -47,6 +44,8 @@ angular.module('siteViews', ['ngRoute', 'textAngular', 'xin_backend'])
           mapProtocole = new ProtocoleCarre($scope, mapDiv)
         else if $scope.protocoleAlgoSite == 'POINT_FIXE'
           mapProtocole = new ProtocolePointFixe($scope, mapDiv)
+        else
+          throw "Error : unknown protocole #{$scope.protocoleAlgoSite}"
         mapProtocole.loadMap($scope.site.localites)
     $scope.saveSite = ->
       $scope.submitted = true
@@ -76,6 +75,7 @@ angular.module('siteViews', ['ngRoute', 'textAngular', 'xin_backend'])
       site: '='
       title: '@'
       collapsed: '@'
+      protocoleAlgoSite: '='
     link: (scope, elem, attrs) ->
       # Wait for the collapse to be opened before load the google map
       if not attrs.collapsed?
@@ -86,10 +86,6 @@ angular.module('siteViews', ['ngRoute', 'textAngular', 'xin_backend'])
           scope.loadMap(elem.find('.g-maps')[0])
           return
         )
-      attrs.$observe('protocoleAlgoSite', (value) ->
-        if value
-          scope.protocoleAlgoSite = value
-      )
 
   .controller 'CreateSiteCtrl', ($timeout, $route, $routeParams, $scope,
     session, Backend,
@@ -110,6 +106,8 @@ angular.module('siteViews', ['ngRoute', 'textAngular', 'xin_backend'])
           mapProtocole = new ProtocoleCarre($scope, mapDiv)
         else if $scope.protocoleAlgoSite == 'POINT_FIXE'
           mapProtocole = new ProtocolePointFixe($scope, mapDiv)
+        else
+          throw "Error : unknown protocole #{$scope.protocoleAlgoSite}"
         mapProtocole.loadMap($scope.site.localites)
     $scope.saveSite = ->
       $scope.submitted = true

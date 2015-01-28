@@ -19,7 +19,7 @@
      ng-href="#/protocoles/{{protocoleId}}/edition">Éditer</a>
 
   <list-sites-directive protocole-id="{{ protocole._id }}"
-                        protocole-algo-site="{{ protocole.algo_tirage_site }}"
+                        protocole-algo-site="protocole.algo_tirage_site"
                         ng-show="userRegistered">
   </list-sites-directive>
   <create-site-directive protocole-id="{{ protocole._id }}"

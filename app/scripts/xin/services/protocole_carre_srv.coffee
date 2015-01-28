@@ -23,7 +23,7 @@ angular.module('xin_protocole_carre', [])
             )
             @scope.siteForm.$pristine = false
             @scope.siteForm.$dirty = true
-            @scope.$apply()
+            # @scope.$apply()
             return true
           else
             return false
@@ -37,6 +37,8 @@ angular.module('xin_protocole_carre', [])
         map = @_googleMaps.getMaps()
         zoomLevel = @_googleMaps.getZoom()
         bounds = map.getBounds()
+        if not bounds?
+          return
         southWest = bounds.getSouthWest()
         northEast = bounds.getNorthEast()
         if zoomLevel > 11
