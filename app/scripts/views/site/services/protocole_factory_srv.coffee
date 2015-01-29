@@ -1,9 +1,9 @@
 'use strict'
 
-angular.module('protocole_factory', ['protocole_carre', 'protocole_point_fixe', 'protocole_routier'])
-  .factory 'ProtocoleFactory', ($rootScope, Backend,
+angular.module('protocole_map', ['protocole_carre', 'protocole_point_fixe', 'protocole_routier'])
+  .factory 'ProtocoleMap', ($rootScope, Backend,
     ProtocoleCarre, ProtocoleRoutier, ProtocolePointFixe) ->
-    class ProtocoleFactory
+    class ProtocoleMap
       constructor: (@site, protocoleAlgoSite, mapDiv, @siteCallback) ->
         if protocoleAlgoSite == 'ROUTIER'
           @mapProtocole = new ProtocoleRoutier(mapDiv, @factoryCallback())
@@ -14,9 +14,8 @@ angular.module('protocole_factory', ['protocole_carre', 'protocole_point_fixe', 
         else
           throw "Error : unknown protocole @_protocoleAlgoSite"
         @loading = true
-        @mapProtocole.loadMap(@site.localites)
+        @mapProtocole.loadMap(@site.localites, @site.grille_stoc)
         @loading = false
-        return @mapProtocole
 
       factoryCallback: ->
         allowMapChanged: ->
@@ -41,3 +40,8 @@ angular.module('protocole_factory', ['protocole_carre', 'protocole_point_fixe', 
             geometries: [shape]
           localites.push(geometries)
         return localites
+
+      getIdGrilleStoc: ->
+        if @mapProtocole.getIdGrilleStoc?
+          return @mapProtocole.getIdGrilleStoc()
+        return ""

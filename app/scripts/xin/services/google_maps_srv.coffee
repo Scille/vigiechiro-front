@@ -74,9 +74,6 @@ angular.module('xin_google_maps', [])
       loadMap: (mongoShapes, callbackDict=@callbackDict.overlayCreated) ->
         if not mongoShapes
           return
-        newCenter =
-          set: false
-          center: null
         for mongoShape, key in mongoShapes
           shape = mongoShape.geometries[0]
           topush = {}
@@ -86,17 +83,11 @@ angular.module('xin_google_maps', [])
               position: point
               draggable: true
             )
-            if (not newCenter.set)
-              newCenter.set = true
-              newCenter.center = point
           else if shape.type == "Polygon"
             paths = []
             for latlng in shape.coordinates[0]
               point = new google.maps.LatLng(latlng[0], latlng[1])
               paths.push(point)
-              if (not newCenter.set)
-                newCenter.set = true
-                newCenter.center = point
             topush = new google.maps.Polygon(
               paths: paths
               draggable: true
@@ -115,9 +106,6 @@ angular.module('xin_google_maps', [])
               draggable: true
               editable: true
             )
-            if (not newCenter.set)
-              newCenter.set = true
-              newCenter.center = point
           else
             console.log('Error: Bad map shape', shape)
             continue
@@ -125,10 +113,7 @@ angular.module('xin_google_maps', [])
           if @callbackDict.overlayCreated?(topush)
             topush.setMap(@_map)
             @_overlay.push(topush)
-        if (newCenter.set)
-          @_map.setCenter(newCenter.center)
-          @_map.setZoom(10)
-          @_isMapCenteredOnSite = true
+        return @_overlay
 
       saveMap: ->
         toSave = []
@@ -174,11 +159,35 @@ angular.module('xin_google_maps', [])
       getZoom: ->
         @_map.getZoom()
 
+      setZoom: (level) ->
+        @_map.setZoom(level)
+
       getCenter: ->
         @_map.getCenter()
 
-      getMaps: ->
+      setCenter: (lat, lng) ->
+        @_isMapCenteredOnSite = true
+        @_map.setCenter(new google.maps.LatLng(lat, lng))
+
+      getBounds: ->
+        @_map.getBounds()
+
+      getMap: ->
         return @_map
 
       setDrawingManagerOptions: (options) ->
         @_drawingManager.setOptions(options)
+
+      isLineInPolygon: (line, polygon) ->
+        vertices = line.getPath()
+        for i in [0..vertices.getLength()-1]
+          if not google.maps.geometry.poly.containsLocation(vertices.getAt(i), polygon)
+            return false
+        return true
+
+      isPolyInPolygon: (poly, polygon) ->
+        vertices = poly.getPath()
+        for i in [0..vertices.getLength()-1]
+          if not google.maps.geometry.poly.containsLocation(vertices.getAt(i), polygon)
+            return false
+        return true

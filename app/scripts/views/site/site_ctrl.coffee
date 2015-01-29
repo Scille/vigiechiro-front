@@ -1,6 +1,6 @@
 'use strict'
 
-angular.module('siteViews', ['ngRoute', 'textAngular', 'xin_backend', 'protocole_factory'])
+angular.module('siteViews', ['ngRoute', 'textAngular', 'xin_backend', 'protocole_map'])
   .directive 'listSitesDirective', (session, Backend) ->
     restrict: 'E'
     templateUrl: 'scripts/views/site/list_sites.html'
@@ -21,10 +21,11 @@ angular.module('siteViews', ['ngRoute', 'textAngular', 'xin_backend', 'protocole
               where:
                 protocole: protocoleId
                 observateur: user._id
+              embedded: { "grille_stoc": 1 }
             )
 
   .controller 'ShowSiteCtrl', ($timeout, $route, $routeParams,
-    $scope, session, Backend, ProtocoleFactory) ->
+    $scope, session, Backend, ProtocoleMap) ->
     mapProtocole = undefined
     siteResource = undefined
     mapLoaded = false
@@ -37,7 +38,7 @@ angular.module('siteViews', ['ngRoute', 'textAngular', 'xin_backend', 'protocole
     $scope.loadMap = (mapDiv) ->
       if not mapLoaded
         mapLoaded = true
-        mapProtocole = new ProtocoleFactory($scope.site, $scope.protocoleAlgoSite, mapDiv, ->
+        mapProtocole = new ProtocoleMap($scope.site, $scope.protocoleAlgoSite, mapDiv, ->
           $scope.siteForm.$pristine = false
           $scope.siteForm.$dirty = true
           $scope.$apply()
@@ -51,6 +52,7 @@ angular.module('siteViews', ['ngRoute', 'textAngular', 'xin_backend', 'protocole
         'protocole': $scope.protocoleId
         'localites': mapProtocole.saveMap()
         'commentaire': $scope.siteForm.commentaire.$modelValue
+        'grille_stoc': mapProtocole.getIdGrilleStoc()
       siteResource.patch(payload).then(
         -> $scope.siteForm.$setPristine()
         (error) -> console.log("error", error)
@@ -77,7 +79,7 @@ angular.module('siteViews', ['ngRoute', 'textAngular', 'xin_backend', 'protocole
         )
 
   .controller 'CreateSiteCtrl', ($timeout, $route, $routeParams, $scope,
-    session, Backend, ProtocoleFactory) ->
+    session, Backend, ProtocoleMap) ->
     mapProtocole = undefined
     mapLoaded = false
     $scope.submitted = false
@@ -88,7 +90,7 @@ angular.module('siteViews', ['ngRoute', 'textAngular', 'xin_backend', 'protocole
     $scope.loadMap = (mapDiv) ->
       if not mapLoaded
         mapLoaded = true
-        mapProtocole = new ProtocoleFactory($scope.site, $scope.protocoleAlgoSite, mapDiv, ->
+        mapProtocole = new ProtocoleMap($scope.site, $scope.protocoleAlgoSite, mapDiv, ->
           $scope.siteForm.$pristine = false
           $scope.siteForm.$dirty = true
           $scope.$apply()
@@ -107,6 +109,7 @@ angular.module('siteViews', ['ngRoute', 'textAngular', 'xin_backend', 'protocole
 #          'coordinates': [mapDump[0].lng, mapDump[0].lat]
 #        'numero_grille_stoc': 
         'commentaire': $scope.siteForm.commentaire.$modelValue
+        'grille_stoc': mapProtocole.getIdGrilleStoc()
       Backend.all('sites').post(payload).then(
         -> $route.reload()
         (error) -> console.log("error", error)
