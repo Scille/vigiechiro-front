@@ -1,6 +1,32 @@
 'use strict'
 
 
+class TaxonsParents
+  constructor: (Backend, currentTaxonId) ->
+    @error = undefined
+    @availableTaxons = []
+    @_initPromise = Backend.all('taxons').all('liste').getList()
+  init: (callback) ->
+    # Retrieve all the existing taxons to let the user choose parents
+    @_initPromise.then (items) =>
+      # Remove the current taxon from the list of possible parents
+      if currentTaxonId?
+        @availableTaxons = items.filter (item) -> item._id != currentTaxonId
+      else
+        @availableTaxons = items
+      @parentTaxonsDict = {}
+      for taxon in items
+        @parentTaxonsDict[taxon._id] = taxon
+      if callback?
+        callback()
+  parseResponse: (response) ->
+    if (response.status == 422 and
+        response.data._error.message.match('^circular dependency'))
+      @error = true
+  idToData: (ids) -> (@parentTaxonsDict[id] for id in ids)
+  dataToId: (datas) -> (data._id for data in datas)
+
+
 angular.module('taxonViews', ['ngRoute', 'ngSanitize', 'textAngular',
                               'ui.select', 'xin_listResource',
                               'xin_backend', 'xin_session'])
@@ -21,11 +47,10 @@ angular.module('taxonViews', ['ngRoute', 'ngSanitize', 'textAngular',
         controller: 'EditTaxonCtrl'
 
   .controller 'CreateTaxonCtrl', ($scope, Backend) ->
+    $scope.submitted = false
     $scope.taxon = {parents: []}
-    $scope.availableTaxons = []
-    # Retrieve all the existing taxons to let the user choose parents
-    Backend.all('taxons').all('liste').getList().then (items) ->
-      $scope.availableTaxons = items
+    $scope.taxonsParents = new TaxonsParents(Backend, $scope.taxonId)
+    $scope.taxonsParents.init()
     $scope.saveTaxon = ->
       $scope.submitted = true
       if not $scope.taxonForm.$valid or not $scope.taxonForm.$dirty
@@ -37,10 +62,10 @@ angular.module('taxonViews', ['ngRoute', 'ngSanitize', 'textAngular',
         'libelle_long': $scope.taxonForm.libelle_long.$modelValue
         'libelle_court': $scope.taxonForm.libelle_court.$modelValue
         'description': $scope.taxon.description
-        'parents': parents
+        'parents': $scope.taxonsParents.dataToId($scope.taxon.parents)
       Backend.all('taxons').post(payload).then(
         -> window.location = '#/taxons'
-        ->
+        (response) -> $scope.taxonsParents.parseResponse(response)
       )
 
   .controller 'DisplayTaxonCtrl', ($routeParams, $scope, session, Backend) ->
@@ -53,20 +78,12 @@ angular.module('taxonViews', ['ngRoute', 'ngSanitize', 'textAngular',
       $scope.taxon = taxon.plain()
 
   .controller 'EditTaxonCtrl', ($route, $routeParams, $scope, Backend) ->
-    $scope.submitted = false
-    $scope.taxon = {}
-    $scope.availableTaxons = []
-    parentTaxonsDict = {}
-    $scope.selectedParentTaxons = []
     taxonResource = undefined
+    $scope.submitted = false
     $scope.taxonId = $routeParams.taxonId
-    # Retrieve all the existing taxons to let the user choose parents
-    Backend.all('taxons').all('liste').getList().then (items) ->
-      $scope.availableTaxons = items
-      parentTaxonsDict = {}
-      for taxon in items
-        parentTaxonsDict[taxon._id] = taxon
-      console.log(parentTaxonsDict)
+    $scope.taxon = {}
+    $scope.taxonsParents = new TaxonsParents(Backend, $scope.taxonId)
+    $scope.taxonsParents.init ->
       # Force the cache control to get back the last version on the serveur
       Backend.one('taxons', $routeParams.taxonId).get(
         {}
@@ -74,19 +91,14 @@ angular.module('taxonViews', ['ngRoute', 'ngSanitize', 'textAngular',
       ).then (taxon) ->
         taxonResource = taxon
         $scope.taxon = taxon.plain()
-        parents = []
-        for parentId in $scope.taxon.parents or []
-          parents.push(parentTaxonsDict[parentId])
-        $scope.taxon.parents = parents
+        $scope.taxon.parents = $scope.taxonsParents.idToData($scope.taxon.parents)
     $scope.saveTaxon = ->
       $scope.submitted = true
       if (not $scope.taxonForm.$valid or
           not $scope.taxonForm.$dirty or
           not taxonResource?)
         return
-      payload = {parents: []}
-      for parent in $scope.taxon.parents
-        payload.parents.push(parent._id)
+      payload = {parents: $scope.taxonsParents.dataToId($scope.taxon.parents)}
       # Retrieve the modified fields from the form
       for key, value of $scope.taxonForm
         if key.charAt(0) != '$' and value.$dirty
@@ -95,6 +107,6 @@ angular.module('taxonViews', ['ngRoute', 'ngSanitize', 'textAngular',
       payload.description = $scope.taxon.description
       # Finally refresh the page (needed for cache reasons)
       taxonResource.patch(payload).then(
-        -> $route.reload();
-        ->
+        -> $route.reload()
+        (response) -> $scope.taxonsParents.parseResponse(response)
       )

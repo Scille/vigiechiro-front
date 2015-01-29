@@ -1,41 +1,51 @@
 <div class="container">
+  <form class="simple-form" novalidate name="taxonForm" ng-submit="saveTaxon()">
 
-    <form class="simple-form" novalidate name="taxonForm" ng-submit="saveTaxon()">
+    <div class="form-group" ng-class="{'has-error': taxonForm.libelle_long.$invalid && !taxonForm.$pristine}">
+      <div class="input-group">
+        <label class="input-group-addon" for="libelle_long">Libellé long</label>
+        <input type="text" class="form-control" id="libelle_long" name="libelle_long"
+               ng-model="taxon.libelle_long" ng-disabled="readOnly" required>
+      </div>
+      <span ng-show="submitted && taxonForm.libelle_long.$error.required"
+            class="help-block">Champ requis</span>
+    </div>
 
-        <div class="input-group form-group">
-            <label class="input-group-addon" for="libelle_long">Libellé long</label>
-            <input type="text" class="form-control" id="libelle_long" name="libelle_long"
-                   ng-model="taxon.libelle_long" ng-disabled="readOnly" required>
-        </div>
-        <span ng-show="submitted && taxonForm.libelle_long.$error.required"
-              class="help-block">Champ requis</span>
+    <div class="form-group" ng-class="{'has-error': taxonForm.libelle_court.$invalid && !taxonForm.$pristine}">
+      <div class="input-group">
+        <label class="input-group-addon" for="libelle_court">Libellé court</label>
+        <input type="text" class="form-control" id="libelle_court" name="libelle_court"
+               ng-model="taxon.libelle_court" ng-disabled="readOnly" required>
+      </div>
+      <span ng-show="submitted && taxonForm.libelle_court.$error.required"
+            class="help-block">Champ requis</span>
+    </div>
 
-        <div class="input-group form-group">
-            <label class="input-group-addon" for="libelle_court">Libellé court</label>
-            <input type="text" class="form-control" id="libelle_court" name="libelle_court"
-                   ng-model="taxon.libelle_court" ng-disabled="readOnly" required>
-        </div>
-        <span ng-show="submitted && taxonForm.libelle_court.$error.required"
-              class="help-block">Champ requis</span>
-
-        <div class="input-group form-group">
-          <text-angular ng-model="taxon.description"></text-angular>
-        </div>
+    <div class="input-group form-group">
+      <text-angular ng-model="taxon.description"></text-angular>
+    </div>
 
 
-        <div class="input-group form-group">
-          <label class="input-group-addon" for="libelle_court">Taxons parents</label>
-          <ui-select multiple ng-model="taxon.parents" theme="bootstrap" ng-disabled="disabled">
-            <ui-select-match>{{$item.libelle_long}}</ui-select-match>
-            <ui-select-choices repeat="taxon in availableTaxons | filter:$select.search">
-              {{taxon.libelle_long}}
-            </ui-select-choices>
-          </ui-select>
-        </div>
+    <div class="form-group" ng-class="{'has-error': taxonsParents.error && !taxonForm.$pristine}">
+      <div class="input-group">
+        <label class="input-group-addon" for="taxons_parents">Taxons parents</label>
+        <ui-select multiple id="taxons_parents" name="taxons_parents"
+                   ng-model="taxon.parents" theme="bootstrap"
+                   ng-disabled="disabled" on-select="someFunction($item, $model)">
+          <ui-select-match>{{$item.libelle_long}}</ui-select-match>
+          <ui-select-choices repeat="taxon in taxonsParents.availableTaxons | filter:$select.search">
+            {{taxon.libelle_long}}
+          </ui-select-choices>
+        </ui-select>
+      </div>
+      <span ng-show="submitted && taxonsParents.error"
+            class="help-block">Les parents ne doivent pas former de boucle de dépendance</span>
+    </div>
 
-        <div class="input-group form-group">
-            <input class="save-taxon btn btn-primary" type="submit" value="Sauvegarder" ng-hide="taxonForm.$pristine">
-        </div>
+    <div class="input-group form-group">
+      <input class="save-taxon btn btn-primary" type="submit"
+             value="Sauvegarder" ng-hide="taxonForm.$pristine">
+    </div>
 
-    </form>
+  </form>
 </div>
