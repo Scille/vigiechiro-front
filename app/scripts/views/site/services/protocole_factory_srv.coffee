@@ -30,7 +30,10 @@ angular.module('protocole_map', ['protocole_carre', 'protocole_point_fixe', 'pro
 
         overlayCreated: =>
           if not @loading
-            @siteCallback()
+            @siteCallback().updateForm()
+
+        updateSteps: (steps) =>
+          @siteCallback().updateSteps(steps)
 
       saveMap: ->
         mapDump = @mapProtocole.saveMap()

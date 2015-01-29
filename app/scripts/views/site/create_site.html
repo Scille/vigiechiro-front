@@ -11,6 +11,12 @@
   <div class="collapse" id="create-site-collapse">
     <div class="panel-body">
       <form class="simple-form" novalidate name="siteForm" ng-submit="saveSite()">
+        <ul class="list-group">
+          <li class="list-group-item" ng-repeat="step in steps">
+            {{ step }}
+          </li>
+        </ul>
+
         <div class="form-group">
           <input type="text" class="numero_grille_stoc" value="numéro grille stoc"
                 ng-if="protocoleAlgoSite != 'ROUTIER'">

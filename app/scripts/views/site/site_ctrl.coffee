@@ -90,11 +90,15 @@ angular.module('siteViews', ['ngRoute', 'textAngular', 'xin_backend', 'protocole
     $scope.loadMap = (mapDiv) ->
       if not mapLoaded
         mapLoaded = true
-        mapProtocole = new ProtocoleMap($scope.site, $scope.protocoleAlgoSite, mapDiv, ->
-          $scope.siteForm.$pristine = false
-          $scope.siteForm.$dirty = true
-          $scope.$apply()
-        )
+        mapProtocole = new ProtocoleMap($scope.site, $scope.protocoleAlgoSite, mapDiv, siteCallback)
+    siteCallback = ->
+      updateForm: ->
+        $scope.siteForm.$pristine = false
+        $scope.siteForm.$dirty = true
+        $scope.$apply()
+      updateSteps: (steps) ->
+        $scope.steps = steps.steps
+        $scope.$apply()
     $scope.saveSite = ->
       $scope.submitted = true
       if (not $scope.siteForm.$valid or

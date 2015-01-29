@@ -10,15 +10,20 @@ angular.module('protocole_carre', [])
       constructor: (mapDiv, @factoryCallback) ->
         @_grille = []
         @_step = 0
+        @_steps = [
+          "Sélectionner un carré.",
+          "Définir les localités à l'intérieur du carré."
+        ]
         @_idGrilleStoc = ''
         @_googleMaps = new GoogleMaps(mapDiv, @mapsCallback())
         @_googleMaps.setDrawingManagerOptions(drawingControl: false)
-        return
+        @factoryCallback.updateSteps(@getSteps())
 
-      steps: [
-        "Sélectionner un carré.",
-        "Définir les localités à l'intérieur du carré."
-      ]
+      getSteps: ->
+        return {
+          steps: @_steps
+          step: @_step
+        }
 
       mapsCallback: ->
         overlayCreated: (overlay) =>

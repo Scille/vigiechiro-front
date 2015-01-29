@@ -12,6 +12,11 @@
   <div class="collapse {{collapsed === undefined ? 'in' : ''}}" id="show-site-collapse-{{site._id}}">
     <div class="panel-body">
       <form class="simple-form" novalidate name="siteForm" ng-submit="saveSite()">
+        <ul class="list-group">
+          <li class="list-group-item" ng-repeat="step in steps">
+            {{ step }}
+          </li>
+        </ul>
         <div class="form-group">
           <div class="g-maps"></div>
         </div>
