@@ -23,8 +23,16 @@ class TaxonsParents
     if (response.status == 422 and
         response.data._error.message.match('^circular dependency'))
       @error = true
-  idToData: (ids) -> (@parentTaxonsDict[id] for id in ids)
-  dataToId: (datas) -> (data._id for data in datas)
+  idToData: (ids) ->
+    if ids?
+      (@parentTaxonsDict[id] for id in ids)
+    else
+      ids
+  dataToId: (datas) ->
+    if datas?
+      (data._id for data in datas)
+    else
+      datas
 
 
 angular.module('taxonViews', ['ngRoute', 'ngSanitize', 'textAngular',

@@ -68,8 +68,8 @@ describe 'Test taxon for adminstrateur', ->
 
   it 'Test add taxon', ->
     browser.setLocation('taxons').then ->
-      expect($('a[name="create-taxon"]').isDisplayed()).toBe(true)
-      $('a[name="create-taxon"]').click().then ->
+      expect($('.create-taxon').isDisplayed()).toBe(true)
+      $('.create-taxon').click().then ->
         browser.getCurrentUrl().then (url) ->
           expect(url).toBe("#{helper.baseUrl}/taxons/nouveau")
           libelle_longElement = element(`by`.model('taxon.libelle_long'))
@@ -82,6 +82,11 @@ describe 'Test taxon for adminstrateur', ->
               .sendKeys(protractor.Key.chord(protractor.Key.CONTROL, "a"))
               .sendKeys(protractor.Key.DELETE)
               .sendKeys('new taxon description').perform()
+            taxonsParents = $('#taxons_parents')
+            taxonsParents.click().then ->
+              taxonsParents.element(`by`.css('input'))
+                .sendKeys('Chauve')
+                .sendKeys(protractor.Key.ENTER)
             saveTaxonButton = $('.save-taxon')
             expect(saveTaxonButton.isDisplayed()).toBe(true)
             saveTaxonButton.click().then ->
