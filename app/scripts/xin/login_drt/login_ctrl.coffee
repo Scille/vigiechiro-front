@@ -18,7 +18,7 @@ angular.module('xin_login', ['ngRoute', 'xin_session', 'appSettings'])
       if routeParams.token?
         # Remove token in params to avoid infinite loop
         token = routeParams.token
-        $location.search('token', null)
+        $location.search('token', null).replace()
         session.login(token)
       $scope.api_domain = SETTINGS.API_DOMAIN
       elem.hide()
