@@ -40,7 +40,6 @@ angular.module('protocole_map', ['protocole_carre', 'protocole_point_fixe', 'pro
           steps: @_steps
           step: @_step
           loading: @loading
-        console.log(steps)
         @siteCallback.updateSteps(steps)
         if not @loading
           @siteCallback.updateForm()

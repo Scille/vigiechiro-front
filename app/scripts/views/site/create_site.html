@@ -13,7 +13,7 @@
       <form class="simple-form" novalidate name="siteForm" ng-submit="saveSite()">
         <ul class="list-group">
           <li class="list-group-item" ng-repeat="step in steps">
-            <span ng-show="$index < stepId">✓</span> {{ step }}
+            <span ng-show="$index < stepId">✓</span> {{ $index+1 }}) {{ step }}
           </li>
         </ul>
 

@@ -67,7 +67,7 @@ angular.module('xin_google_maps', [])
         if @callbackDict.overlayCreated?(new_overlay)
           @_overlay.push(new_overlay)
         else
-          event.overlay.setMap(null)
+          new_overlay.setMap(null)
 
       addListener: google.maps.event.addListener
 

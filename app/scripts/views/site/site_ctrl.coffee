@@ -47,9 +47,7 @@ angular.module('siteViews', ['ngRoute', 'textAngular', 'xin_backend', 'protocole
       updateSteps: (steps) ->
         $scope.steps = steps.steps
         $scope.stepId = steps.step
-        console.log(steps.steps)
-        if not steps.loading
-          $scope.$apply()
+        $scope.$apply()
     $scope.saveSite = ->
       $scope.submitted = true
       if (not $scope.siteForm.$valid or

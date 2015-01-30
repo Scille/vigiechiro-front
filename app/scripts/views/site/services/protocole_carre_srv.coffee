@@ -14,6 +14,9 @@ angular.module('protocole_carre', [])
           "Définir les localités à l'intérieur du carré."
         ]
         @_googleMaps.setDrawingManagerOptions(drawingControl: false)
+        @loading = true
+        @updateSite()
+        @loading = false
 
       mapsCallback: ->
         overlayCreated: (overlay) =>
@@ -29,7 +32,7 @@ angular.module('protocole_carre', [])
               @_googleMaps.deleteOverlay(overlay)
               if @_googleMaps.getCountOverlays() == 0
                 @_step = 1
-                @updateSite()                
+              @updateSite()
             )
             @_step = 2
             @updateSite()

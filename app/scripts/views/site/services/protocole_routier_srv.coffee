@@ -7,10 +7,14 @@
 angular.module('protocole_routier', [])
   .factory 'ProtocoleRoutier', ($rootScope, Backend, GoogleMaps, ProtocoleMap) ->
     class ProtocoleRoutier extends ProtocoleMap
-      constructor: (mapDiv, @factoryCallback) ->
-        @_grille = []
-        @_stocValid = false
-        @_googleMaps = new GoogleMaps(mapDiv, @mapsCallback())
+      constructor: (@site, mapDiv, @siteCallback) ->
+        super @site, mapDiv, @siteCallback
+        @_steps = [
+          "Positionner le point d'origine.",
+          "Tracer le parcours par plusieurs segments de 2 km (+/-10%). "+
+          "Les segments trop courts sont en violet et les trop longs en rouge.",
+          "Atteindre une longueur de tracé globale de 30 km ou plus."
+        ]
         @_googleMaps.setDrawingManagerOptions(
           drawingControlOptions:
             position: google.maps.ControlPosition.TOP_CENTER
@@ -19,7 +23,9 @@ angular.module('protocole_routier', [])
               google.maps.drawing.OverlayType.POLYLINE
             ]
         )
-        return
+        @loading = true
+        @updateSite()
+        @loading = false
 
       mapsCallback: ->
         overlayCreated: (overlay) =>
@@ -29,22 +35,27 @@ angular.module('protocole_routier', [])
             if nbPoints <= 0
               isModified = true
           else if overlay.type == "LineString"
-            length = google.maps.geometry.spherical.computeLength(overlay.getPath())
-            if length >= 1800 and length <= 2200
-              isModified = true
-            else
-              error = "Les tracés doivent avoir une longueur comprise entre 1800 et 2200 mètres. La longueur de votre tracé est de "+length+"m"
-              console.log(error)
+            @checkLength(overlay)
+            isModified = true
+            # when use mouseup, overlay is still not changed.
+            @_googleMaps.addListener(overlay, 'mouseout', (event) =>
+              @checkLength(overlay)
+            )
+          else
+            console.log("Error : géométrie non autorisée "+overlay.type)
           if isModified
+            @updateSite()
             @_googleMaps.addListener(overlay, 'rightclick', (event) =>
               @_googleMaps.deleteOverlay(overlay)
             )
             return true
-          else
-            return false
+          return false
 
-      loadMap: (mongoShapes) ->
-        return @_googleMaps.loadMap(mongoShapes)
-
-      saveMap: ->
-        return @_googleMaps.saveMap()
+      checkLength: (overlay) ->
+        length = google.maps.geometry.spherical.computeLength(overlay.getPath())
+        if length < 1800
+          overlay.setOptions(strokeColor: '#800090')
+        else if length > 2200
+          overlay.setOptions(strokeColor: '#FF0000')
+        else
+          overlay.setOptions(strokeColor: '#000000')
