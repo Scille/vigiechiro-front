@@ -360,11 +360,6 @@ module.exports = (grunt) ->
         "imagemin"
         "svgmin"
       ]
-      test_e2e: [
-        "coffee"
-        "copy:styles"
-        "run:bootstrap_e2e"
-      ]
 
     
     # Test settings
@@ -422,7 +417,8 @@ module.exports = (grunt) ->
   ]
 
   grunt.registerTask "test-e2e", [
-    "concurrent:test_e2e"
+    "concurrent:test"
+    "run:bootstrap_e2e"
     "protractor:all"
   ]
 
