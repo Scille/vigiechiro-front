@@ -24,10 +24,13 @@ angular
     'xin_google_maps',
     'utilisateurViews',
     'taxonViews',
-    'protocoleViews'
+    'protocoleViews',
+    'participationViews'
   ])
+
   .run (Backend, SETTINGS) ->
     Backend.setBaseUrl(SETTINGS.API_DOMAIN)
+
   .config ($routeProvider, RestangularProvider) ->
     $routeProvider
       .when '/',
@@ -42,6 +45,7 @@ angular
         templateUrl: '404.html'
       .otherwise
         redirectTo: '/404'
+
   .directive 'navbarDirective', (session)->
     restrict: 'E'
     templateUrl: 'navbar.html'
