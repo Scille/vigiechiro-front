@@ -107,9 +107,9 @@ describe 'Test once logged', ->
       taxons = element.all(`by`.repeater('taxon in taxons'))
       taxons.get(0).element(`by`.css('a')).click().then ->
         browser.setLocation('/protocoles').then ->
-          browser.getLocationAbsUrl().then (url) -> expect(url).toBe("/protocoles?items=20&page=1")
+          expect(browser.getLocationAbsUrl()).toBe("/protocoles?items=20&page=1")
           browser.navigate().back().then ->
             browser.navigate().back().then ->
-              browser.getLocationAbsUrl().then (url) -> expect(url).toBe("/taxons?items=20&page=1")
+              expect(browser.getLocationAbsUrl()).toBe("/taxons?items=20&page=1")
               browser.navigate().back().then ->
-                browser.getLocationAbsUrl().then (url) -> expect(url).toBe("/")
+                expect(browser.getLocationAbsUrl()).toBe("/")

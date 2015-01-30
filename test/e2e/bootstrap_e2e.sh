@@ -74,3 +74,10 @@ fi
 # Reset the bdd
 echo "Setting the bdd..."
 mongorestore -d vigiechiro e2e_vigiechiro_db --drop
+
+# If on codeship integration server, wait a bit for startup
+1>/dev/null which cs
+if [ "$?" -eq 0 ]
+then
+    sleep 5
+fi
