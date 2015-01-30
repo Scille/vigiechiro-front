@@ -98,9 +98,6 @@ angular.module('xin_google_maps', [])
             for latlng in shape.coordinates
               point = new google.maps.LatLng(latlng[0], latlng[1])
               path.push(point)
-              if (not newCenter.set)
-                newCenter.set = true
-                newCenter.center = point
             topush = new google.maps.Polyline(
               path: path
               draggable: true
@@ -144,11 +141,14 @@ angular.module('xin_google_maps', [])
         index = @_overlay.indexOf(overlay)
         @_overlay.splice(index, 1);
 
-      getCountOverlays: (type) =>
+      getCountOverlays: (type = '') =>
         result = 0
         for overlay in @_overlay
-          if overlay.type == type
+          if type == ''
             result++
+          else
+            if overlay.type == type
+              result++
         return result
 
       displayInfo: (overlay) ->
@@ -178,16 +178,15 @@ angular.module('xin_google_maps', [])
       setDrawingManagerOptions: (options) ->
         @_drawingManager.setOptions(options)
 
-      isLineInPolygon: (line, polygon) ->
-        vertices = line.getPath()
-        for i in [0..vertices.getLength()-1]
-          if not google.maps.geometry.poly.containsLocation(vertices.getAt(i), polygon)
-            return false
-        return true
-
+      # works with lineString and polygon
       isPolyInPolygon: (poly, polygon) ->
         vertices = poly.getPath()
         for i in [0..vertices.getLength()-1]
           if not google.maps.geometry.poly.containsLocation(vertices.getAt(i), polygon)
             return false
         return true
+
+      emptyMap: ->
+        for overlay in @_overlay
+          overlay.setMap(null)
+        @_overlay = []

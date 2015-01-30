@@ -25,7 +25,7 @@ angular.module('siteViews', ['ngRoute', 'textAngular', 'xin_backend', 'protocole
             )
 
   .controller 'ShowSiteCtrl', ($timeout, $route, $routeParams,
-    $scope, session, Backend, ProtocoleMap) ->
+    $scope, session, Backend, protocolesFactory) ->
     mapProtocole = undefined
     siteResource = undefined
     mapLoaded = false
@@ -38,11 +38,18 @@ angular.module('siteViews', ['ngRoute', 'textAngular', 'xin_backend', 'protocole
     $scope.loadMap = (mapDiv) ->
       if not mapLoaded
         mapLoaded = true
-        mapProtocole = new ProtocoleMap($scope.site, $scope.protocoleAlgoSite, mapDiv, ->
-          $scope.siteForm.$pristine = false
-          $scope.siteForm.$dirty = true
+        mapProtocole = protocolesFactory($scope.site, $scope.protocoleAlgoSite, mapDiv, siteCallback)
+    siteCallback =
+      updateForm: ->
+        $scope.siteForm.$pristine = false
+        $scope.siteForm.$dirty = true
+        $scope.$apply()
+      updateSteps: (steps) ->
+        $scope.steps = steps.steps
+        $scope.stepId = steps.step
+        console.log(steps.steps)
+        if not steps.loading
           $scope.$apply()
-        )
     $scope.saveSite = ->
       $scope.submitted = true
       if (not $scope.siteForm.$valid or
@@ -79,7 +86,7 @@ angular.module('siteViews', ['ngRoute', 'textAngular', 'xin_backend', 'protocole
         )
 
   .controller 'CreateSiteCtrl', ($timeout, $route, $routeParams, $scope,
-    session, Backend, ProtocoleMap) ->
+    session, Backend, protocolesFactory) ->
     mapProtocole = undefined
     mapLoaded = false
     $scope.submitted = false
@@ -90,14 +97,15 @@ angular.module('siteViews', ['ngRoute', 'textAngular', 'xin_backend', 'protocole
     $scope.loadMap = (mapDiv) ->
       if not mapLoaded
         mapLoaded = true
-        mapProtocole = new ProtocoleMap($scope.site, $scope.protocoleAlgoSite, mapDiv, siteCallback)
-    siteCallback = ->
+        mapProtocole = protocolesFactory($scope.site, $scope.protocoleAlgoSite, mapDiv, siteCallback)
+    siteCallback =
       updateForm: ->
         $scope.siteForm.$pristine = false
         $scope.siteForm.$dirty = true
         $scope.$apply()
       updateSteps: (steps) ->
         $scope.steps = steps.steps
+        $scope.stepId = steps.step
         $scope.$apply()
     $scope.saveSite = ->
       $scope.submitted = true

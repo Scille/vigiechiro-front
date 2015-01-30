@@ -5,8 +5,8 @@
  ## @div : element html (div) dans laquelle la map sera instanciée
 ###
 angular.module('protocole_routier', [])
-  .factory 'ProtocoleRoutier', ($rootScope, Backend, GoogleMaps) ->
-    class ProtocoleRoutier
+  .factory 'ProtocoleRoutier', ($rootScope, Backend, GoogleMaps, ProtocoleMap) ->
+    class ProtocoleRoutier extends ProtocoleMap
       constructor: (mapDiv, @factoryCallback) ->
         @_grille = []
         @_stocValid = false

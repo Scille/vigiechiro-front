@@ -14,10 +14,13 @@
       <form class="simple-form" novalidate name="siteForm" ng-submit="saveSite()">
         <ul class="list-group">
           <li class="list-group-item" ng-repeat="step in steps">
-            {{ step }}
+            <span ng-show="$index < stepId">✓</span> {{ step }}
           </li>
         </ul>
+
         <div class="form-group">
+          <input type="text" class="numero_grille_stoc" value="numéro grille stoc"
+            ng-if="protocoleAlgoSite != 'ROUTIER'">
           <div class="g-maps"></div>
         </div>
 <!--           <span ng-show="submitted && (!site.coordonnee.lattitude || !site.coordonnee.lattitude)"
