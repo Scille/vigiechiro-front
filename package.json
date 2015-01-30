@@ -1,8 +1,7 @@
 {
   "name": "vigiechiroapp",
   "version": "0.0.0",
-  "dependencies": {
-  },
+  "dependencies": {},
   "devDependencies": {
     "grunt": "^0.4.5",
     "grunt-autoprefixer": "^0.7.3",
@@ -34,7 +33,8 @@
     "karma": "^0.12.24",
     "karma-jasmine": "^0.2.2",
     "karma-phantomjs-launcher": "^0.1.4",
-    "grunt-protractor-runner": "^1.1.4"
+    "grunt-protractor-runner": "^1.1.4",
+    "grunt-run": "~0.3.0"
   },
   "engines": {
     "node": ">=0.10.0"

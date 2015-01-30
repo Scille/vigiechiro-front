@@ -372,7 +372,12 @@ module.exports = function (grunt) {
         'copy:styles',
         'imagemin',
         'svgmin'
-      ]
+      ],
+      test_e2e: [
+        'coffee',
+        'copy:styles',
+        'run:bootstrap_e2e'
+      ],
     },
 
     // Test settings
@@ -397,7 +402,14 @@ module.exports = function (grunt) {
         args: {}
       },
       all: {}
+    },
+
+    run: {
+      bootstrap_e2e: {
+        cmd: './test/e2e/bootstrap_e2e.sh'
+      }
     }
+
   });
 
 
@@ -430,7 +442,7 @@ module.exports = function (grunt) {
   ]);
 
   grunt.registerTask('test-e2e', [
-    'concurrent:test',
+    'concurrent:test_e2e',
     'protractor:all'
   ]);
 
