@@ -1,17 +1,17 @@
 'use strict'
 
 
-angular.module('protocole_map', ['protocole_carre', 'protocole_point_fixe', 'protocole_routier'])
-  .factory 'protocolesFactory', (ProtocoleCarre, ProtocoleRoutier, ProtocolePointFixe) ->
+angular.module('protocole_map', ['protocole_map_carre', 'protocole_map_point_fixe', 'protocole_map_routier'])
+  .factory 'protocolesFactory', (ProtocoleMapCarre, ProtocoleMapRoutier, ProtocoleMapPointFixe) ->
     (site, protocoleAlgoSite, mapDiv, siteCallback) ->
       if protocoleAlgoSite == 'ROUTIER'
-        return new ProtocoleRoutier(site, mapDiv, siteCallback)
+        return new ProtocoleMapRoutier(site, mapDiv, siteCallback)
       else if protocoleAlgoSite == 'CARRE'
-        return new ProtocoleCarre(site, mapDiv, siteCallback)
+        return new ProtocoleMapCarre(site, mapDiv, siteCallback)
       else if protocoleAlgoSite == 'POINT_FIXE'
-        return new ProtocolePointFixe(site, mapDiv, siteCallback)
+        return new ProtocoleMapPointFixe(site, mapDiv, siteCallback)
       else
-        throw "Error : unknown protocole protocoleAlgoSite"
+        throw "Error : unknown protocole #{protocoleAlgoSite}"
 
   .factory 'ProtocoleMap', ($rootScope, Backend, GoogleMaps) ->
     class ProtocoleMap
@@ -45,20 +45,22 @@ angular.module('protocole_map', ['protocole_carre', 'protocole_point_fixe', 'pro
           @siteCallback.updateForm()
 
       saveMap: ->
-        mapDump = @_googleMaps.saveMap()
         localites = []
-        for shape in mapDump
-          geometries =
-            geometries: [shape]
-          localites.push(geometries)
+        geoDump = @_googleMaps.saveGeoJson()
+        for geoJson in geoDump.geometries
+          localite =
+            geometries:
+              type: 'GeometryCollection'
+              geometries: [geoJson]
+          localites.push(localite)
         return localites
 
       mapsCallback: ->
-        overlayCreated: -> return false
-        zoomChanged: -> return false
-        mapsMoved: -> return false
+        overlayCreated: -> false
+        zoomChanged: -> false
+        mapsMoved: -> false
 
-      loadMap: (mongoShapes) ->
+      loadMap: (localites) ->
         if @site.grille_stoc?
           @_step = 1
           @_googleMaps.setCenter(
@@ -71,7 +73,8 @@ angular.module('protocole_map', ['protocole_carre', 'protocole_point_fixe', 'pro
             @site.grille_stoc.centre.coordinates[0]
           )
           @validNumeroGrille(newCell, @site.grille_stoc.numero, @site.grille_stoc._id)
-        @_googleMaps.loadMap(mongoShapes)
+        for localite in localites or []
+          @_googleMaps.loadGeoJson(localite.geometries)
 
       getIdGrilleStoc: ->
         return @_idGrilleStoc

@@ -1,5 +1,6 @@
 'use strict'
 
+
 angular.module('siteViews', ['ngRoute', 'textAngular', 'xin_backend', 'protocole_map'])
   .directive 'listSitesDirective', (session, Backend) ->
     restrict: 'E'
@@ -43,11 +44,11 @@ angular.module('siteViews', ['ngRoute', 'textAngular', 'xin_backend', 'protocole
       updateForm: ->
         $scope.siteForm.$pristine = false
         $scope.siteForm.$dirty = true
-        $scope.$apply()
+        $timeout(-> $scope.$apply())
       updateSteps: (steps) ->
         $scope.steps = steps.steps
         $scope.stepId = steps.step
-        $scope.$apply()
+        $timeout(-> $scope.$apply())
     $scope.saveSite = ->
       $scope.submitted = true
       if (not $scope.siteForm.$valid or
@@ -63,7 +64,7 @@ angular.module('siteViews', ['ngRoute', 'textAngular', 'xin_backend', 'protocole
         (error) -> console.log("error", error)
       )
 
-  .directive 'showSiteDirective', ->
+  .directive 'showSiteDirective', ($timeout) ->
     restrict: 'E'
     templateUrl: 'scripts/views/site/show_site.html'
     controller: 'ShowSiteCtrl'
@@ -75,7 +76,9 @@ angular.module('siteViews', ['ngRoute', 'textAngular', 'xin_backend', 'protocole
     link: (scope, elem, attrs) ->
       # Wait for the collapse to be opened before load the google map
       if not attrs.collapsed?
-        scope.loadMap(elem.find('.g-maps')[0])
+        # Use $timeout to load google map at the end of the stack
+        # to prevent display issues
+        $timeout(-> scope.loadMap(elem.find('.g-maps')[0]))
       else
         $(elem).on('shown.bs.collapse', ->
           scope.numero_grille_stoc = elem.find('.numero_grille_stoc')[0]
@@ -84,7 +87,7 @@ angular.module('siteViews', ['ngRoute', 'textAngular', 'xin_backend', 'protocole
         )
 
   .controller 'CreateSiteCtrl', ($timeout, $route, $routeParams, $scope,
-    session, Backend, protocolesFactory) ->
+                                 session, Backend, protocolesFactory) ->
     mapProtocole = undefined
     mapLoaded = false
     $scope.submitted = false
@@ -100,11 +103,11 @@ angular.module('siteViews', ['ngRoute', 'textAngular', 'xin_backend', 'protocole
       updateForm: ->
         $scope.siteForm.$pristine = false
         $scope.siteForm.$dirty = true
-        $scope.$apply()
+        $timeout(-> $scope.$apply())
       updateSteps: (steps) ->
         $scope.steps = steps.steps
         $scope.stepId = steps.step
-        $scope.$apply()
+        $timeout(-> $scope.$apply())
     $scope.saveSite = ->
       $scope.submitted = true
       if (not $scope.siteForm.$valid or
@@ -127,9 +130,11 @@ angular.module('siteViews', ['ngRoute', 'textAngular', 'xin_backend', 'protocole
 
   .directive 'createSiteDirective', ->
     restrict: 'E'
-    templateUrl: 'scripts/views/site/create_site.html'
+    templateUrl: 'scripts/views/site/show_site.html'
     controller: 'CreateSiteCtrl'
     link: (scope, elem, attrs) ->
+      scope.collapsed = true
+      scope.title = 'Nouveau site'
       attrs.$observe('protocoleId', (protocoleId) ->
         scope.protocoleId = protocoleId
       )

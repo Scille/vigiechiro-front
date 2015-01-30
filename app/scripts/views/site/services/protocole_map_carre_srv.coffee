@@ -4,9 +4,9 @@
  # args
  ## @div : element html (div) dans laquelle la map sera instanciée
 ###
-angular.module('protocole_point_fixe', [])
-  .factory 'ProtocolePointFixe', ($rootScope, Backend, GoogleMaps, ProtocoleMap) ->
-    class ProtocolePointFixe extends ProtocoleMap
+angular.module('protocole_map_carre', [])
+  .factory 'ProtocoleMapCarre', ($rootScope, Backend, GoogleMaps, ProtocoleMap) ->
+    class ProtocoleMapCarre extends ProtocoleMap
       constructor: (@site, mapDiv, @siteCallback) ->
         super @site, mapDiv, @siteCallback
         @_steps = [

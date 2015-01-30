@@ -71,49 +71,50 @@ angular.module('xin_google_maps', [])
 
       addListener: google.maps.event.addListener
 
-      loadMap: (mongoShapes, callbackDict=@callbackDict.overlayCreated) ->
-        if not mongoShapes
+      loadGeoJson: (geoJson, callbackDict=@callbackDict.overlayCreated) ->
+        if not geoJson
           return
-        for mongoShape, key in mongoShapes
-          shape = mongoShape.geometries[0]
-          topush = {}
-          if shape.type == "Point"
-            point = new google.maps.LatLng(shape.coordinates[0], shape.coordinates[1])
-            topush = new google.maps.Marker(
-              position: point
-              draggable: true
-            )
-          else if shape.type == "Polygon"
-            paths = []
-            for latlng in shape.coordinates[0]
-              point = new google.maps.LatLng(latlng[0], latlng[1])
-              paths.push(point)
-            topush = new google.maps.Polygon(
-              paths: paths
-              draggable: true
-              editable: true
-            )
-          else if shape.type == "LineString"
-            path = []
-            for latlng in shape.coordinates
-              point = new google.maps.LatLng(latlng[0], latlng[1])
-              path.push(point)
-            topush = new google.maps.Polyline(
-              path: path
-              draggable: true
-              editable: true
-            )
-          else
-            console.log('Error: Bad map shape', shape)
-            continue
-          topush.type = shape.type
-          if @callbackDict.overlayCreated?(topush)
-            topush.setMap(@_map)
-            @_overlay.push(topush)
-        return @_overlay
+        if geoJson.type == 'GeometryCollection'
+          for geometry in geoJson.geometries
+            @loadGeoJson(geometry)
+          return
+        if geoJson.type == 'Point'
+          point = new google.maps.LatLng(geoJson.coordinates[0], geoJson.coordinates[1])
+          topush = new google.maps.Marker(
+            position: point
+            draggable: true
+          )
+        else if geoJson.type == 'Polygon'
+          paths = []
+          for latlng in geoJson.coordinates[0]
+            point = new google.maps.LatLng(latlng[0], latlng[1])
+            paths.push(point)
+          topush = new google.maps.Polygon(
+            paths: paths
+            draggable: true
+            editable: true
+          )
+        else if geoJson.type == 'LineString'
+          path = []
+          for latlng in geoJson.coordinates
+            point = new google.maps.LatLng(latlng[0], latlng[1])
+            path.push(point)
+          topush = new google.maps.Polyline(
+            path: path
+            draggable: true
+            editable: true
+          )
+        else
+          throw "Error: Bad GeoJSON object #{geoJson}"
+        topush.type = geoJson.type
+        if @callbackDict.overlayCreated?(topush)
+          topush.setMap(@_map)
+          @_overlay.push(topush)
 
-      saveMap: ->
-        toSave = []
+      saveGeoJson: ->
+        geoJson =
+          type: 'GeometryCollection'
+          geometries: []
         for shape in @_overlay
           shapetosave = {}
           shapetosave.type = shape.type
@@ -133,8 +134,8 @@ angular.module('xin_google_maps', [])
               xy = vertices.getAt(i-1)
               latlngs.push([xy.lat(), xy.lng()])
             shapetosave.coordinates = latlngs
-          toSave.push(shapetosave)
-        return toSave
+          geoJson.geometries.push(shapetosave)
+        return geoJson
 
       deleteOverlay: (overlay) =>
         overlay.setMap(null)

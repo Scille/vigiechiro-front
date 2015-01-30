@@ -14,7 +14,8 @@
       <form class="simple-form" novalidate name="siteForm" ng-submit="saveSite()">
         <ul class="list-group">
           <li class="list-group-item" ng-repeat="step in steps">
-            <span ng-show="$index < stepId">✓</span> {{ $index+1 }}) {{ step }}
+            <span ng-show="$index < stepId">✓&nbsp;<strike>{{step}}</strike></span>
+            <span ng-hide="$index < stepId">{{step}}</span>
           </li>
         </ul>
 
@@ -23,8 +24,8 @@
             ng-if="protocoleAlgoSite != 'ROUTIER'">
           <div class="g-maps"></div>
         </div>
-<!--           <span ng-show="submitted && (!site.coordonnee.lattitude || !site.coordonnee.lattitude)"
-                class="help-block">Au moins un point est requis</span> -->
+        <span ng-show="submitted && (!site.coordonnee || !site.coordonnee.lattitude || !site.coordonnee.lattitude)"
+              class="help-block">Au moins un point est requis</span>
 
         <div class="form-group">
           <textarea rows="3" class="form-control" name="commentaire"
@@ -36,7 +37,7 @@
           <label>
             <input type="checkbox" ng-model="site.verrouille" ng-value="true"
                    ng-checked="site.verrouille">
-                     Verrouillé
+              Verrouillé
           </label>
         </div>
 
