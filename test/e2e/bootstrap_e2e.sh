@@ -89,5 +89,5 @@ while [ "$?" -ne 0 ]
 do
     echo "Waiting 1s for starup..."
     sleep 1
-    test_all
+    test_backend && test_frontend
 done
