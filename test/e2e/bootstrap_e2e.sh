@@ -43,10 +43,6 @@ test_frontend() {
     echo 'GET /' | 1>/dev/null 2>&1 nc localhost 9000
 }
 
-test_all() {
-    test_backend && test_frontend
-}
-
 # Bootstrap in script's directory
 OLD_DIR=`pwd`
 cd $BASEDIR
@@ -88,7 +84,7 @@ echo "Setting the bdd..."
 mongorestore -d vigiechiro e2e_vigiechiro_db --drop
 
 # If on codeship integration server, wait a bit for startup
-test_all
+test_backend && test_frontend
 while [ "$?" -ne 0 ]
 do
     echo "Waiting 1s for starup..."
