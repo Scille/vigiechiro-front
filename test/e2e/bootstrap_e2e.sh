@@ -35,12 +35,24 @@ run_backend() {
     cd ..
 }
 
+test_backend() {
+    echo 'GET /' | 1>/dev/null 2>&1 nc localhost 8080
+}
+
+test_frontend() {
+    echo 'GET /' | 1>/dev/null 2>&1 nc localhost 9000
+}
+
+test_all() {
+    test_backend && test_frontend
+}
+
 # Bootstrap in script's directory
 OLD_DIR=`pwd`
 cd $BASEDIR
 
 # Make sure the backend is running
-1>/dev/null 2>&1 echo 'GET /' | nc localhost 8080
+test_backend
 if [ "$?" -ne 0 ]
 then
     run_backend
@@ -49,7 +61,7 @@ else
 fi
 
 # Same thing for the frontend
-echo 'GET /' | nc localhost 9000
+test_frontend
 if [ "$?" -ne 0 ]
 then
     echo "Starting frontend"
@@ -76,8 +88,10 @@ echo "Setting the bdd..."
 mongorestore -d vigiechiro e2e_vigiechiro_db --drop
 
 # If on codeship integration server, wait a bit for startup
-1>/dev/null which cs
-if [ "$?" -eq 0 ]
-then
-    sleep 5
-fi
+test_all
+while [ "$?" -ne 0 ]
+do
+    echo "Waiting 1s for starup..."
+    sleep 1
+    test_all
+done
