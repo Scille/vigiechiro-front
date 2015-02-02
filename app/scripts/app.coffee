@@ -34,7 +34,7 @@ angular
   .config ($routeProvider, RestangularProvider) ->
     $routeProvider
       .when '/',
-        templateUrl: 'scripts/views/welcome/welcome.html'
+        templateUrl: 'scripts/views/accueil/accueil.html'
       .when '/profil',
         templateUrl: 'scripts/views/utilisateur/show_utilisateur.html'
         controller: 'ShowUtilisateurCtrl'
