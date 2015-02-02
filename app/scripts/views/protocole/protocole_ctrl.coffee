@@ -26,7 +26,7 @@ angular.module('protocoleViews', ['ngRoute', 'textAngular', 'xin_listResource',
             protocolesBackend.getList = () -> deferred.promise
             session.getUserPromise().then (user) ->
               userProtocolesDict = {}
-              for userProtocole in user.protocoles
+              for userProtocole in user.protocoles or []
                 userProtocolesDict[userProtocole.protocole] = userProtocole
               protocolesBackend_getList().then (protocoles) ->
                 for protocole in protocoles
