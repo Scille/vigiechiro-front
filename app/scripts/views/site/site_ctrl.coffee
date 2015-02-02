@@ -7,7 +7,7 @@ angular.module('siteViews', ['ngRoute', 'textAngular', 'xin_backend', 'protocole
     templateUrl: 'scripts/views/site/list_sites.html'
     scope:
       protocoleId: '@'
-      protocoleAlgoSite: '='
+      protocoleAlgoSite: '@'
     link: (scope, elem, attrs) ->
       scope.loading = true
       scope.sites = []
@@ -25,8 +25,8 @@ angular.module('siteViews', ['ngRoute', 'textAngular', 'xin_backend', 'protocole
               embedded: { "grille_stoc": 1 }
             )
 
-  .controller 'ShowSiteCtrl', ($timeout, $route, $routeParams,
-    $scope, session, Backend, protocolesFactory) ->
+  .controller 'ShowSiteCtrl', ($timeout, $route, $routeParams, $scope
+                               session, Backend, protocolesFactory) ->
     mapProtocole = undefined
     siteResource = undefined
     mapLoaded = false
@@ -72,7 +72,7 @@ angular.module('siteViews', ['ngRoute', 'textAngular', 'xin_backend', 'protocole
       site: '='
       title: '@'
       collapsed: '@'
-      protocoleAlgoSite: '='
+      protocoleAlgoSite: '@'
     link: (scope, elem, attrs) ->
       # Wait for the collapse to be opened before load the google map
       if not attrs.collapsed?
@@ -132,6 +132,9 @@ angular.module('siteViews', ['ngRoute', 'textAngular', 'xin_backend', 'protocole
     restrict: 'E'
     templateUrl: 'scripts/views/site/show_site.html'
     controller: 'CreateSiteCtrl'
+    scope:
+      protocoleId: '@'
+      protocoleAlgoSite: '@'
     link: (scope, elem, attrs) ->
       scope.collapsed = true
       scope.title = 'Nouveau site'

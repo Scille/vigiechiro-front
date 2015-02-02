@@ -18,7 +18,26 @@ angular.module('protocoleViews', ['ngRoute', 'textAngular', 'xin_listResource',
       .when '/protocoles',
         templateUrl: 'scripts/views/protocole/list_protocoles.html'
         controller: 'ListResourceCtrl'
-        resolve: {resourceBackend: (Backend) -> Backend.all('protocoles')}
+        resolve:
+          resourceBackend: ($q, Backend, session) ->
+            deferred = $q.defer()
+            protocolesBackend = Backend.all('protocoles')
+            protocolesBackend_getList = protocolesBackend.getList
+            protocolesBackend.getList = () -> deferred.promise
+            session.getUserPromise().then (user) ->
+              userProtocolesDict = {}
+              for userProtocole in user.protocoles
+                userProtocolesDict[userProtocole.protocole] = userProtocole
+              protocolesBackend_getList().then (protocoles) ->
+                for protocole in protocoles
+                  if userProtocolesDict[protocole._id]?
+                    if userProtocolesDict[protocole._id].valide
+                      protocole._status_toValidate = true
+                    else
+                      protocole._status_registered = true
+                deferred.resolve(protocoles)
+            return protocolesBackend
+
       .when '/protocoles/nouveau',
         templateUrl: 'scripts/views/protocole/edit_protocole.html'
         controller: 'CreateProtocoleCtrl'

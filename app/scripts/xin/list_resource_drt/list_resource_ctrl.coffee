@@ -9,6 +9,8 @@ angular.module('xin_listResource', ['ngRoute', 'angularUtils.directives.dirPagin
     resourceName = resourceBackend.route
     session.getIsAdminPromise().then (isAdmin) ->
       $scope.isAdmin = isAdmin
+    session.getUserPromise().then (user) ->
+      $scope.user = user
     $scope[resourceName] = []
     $scope.loading = true
     $scope.filter = undefined

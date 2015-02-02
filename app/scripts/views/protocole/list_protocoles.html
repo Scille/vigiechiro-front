@@ -24,6 +24,8 @@
           <a class="btn" ng-href='#/protocoles/{{ protocole._id }}'>
             {{ protocole.titre }}
           </a>
+          <span class="label label-success pull-right" ng-if="protocole._status_registered">Inscrit</span>
+          <span class="label label-warning pull-right" ng-if="protocole._status_toValidate">En attente de validation</span>
         </li>
       </ul>
       <dir-pagination-controls boundary-links="true" on-page-change="pageChanged(newPageNumber)"></dir-pagination-controls>

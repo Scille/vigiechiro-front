@@ -11,19 +11,19 @@
   </div>
 
   <button name="register-protocole" ng-click="registerProtocole()"
-          ng-show="! userRegistered && ! protocole.macro_protocole"
+          ng-show="!userRegistered && !protocole.macro_protocole"
           class="btn btn-primary">
     S'inscrire
   </button>
   <a name="edit-protocole" class="btn btn-primary" ng-show="isAdmin"
      ng-href="#/protocoles/{{protocoleId}}/edition">Éditer</a>
 
-  <list-sites-directive protocole-id="{{ protocole._id }}"
-                        protocole-algo-site="protocole.algo_tirage_site"
+  <list-sites-directive protocole-id="{{protocole._id}}"
+                        protocole-algo-site="{{protocole.algo_tirage_site}}"
                         ng-show="userRegistered">
   </list-sites-directive>
-  <create-site-directive protocole-id="{{ protocole._id }}"
-                         protocole-algo-site="{{ protocole.algo_tirage_site }}"
+  <create-site-directive protocole-id="{{protocole._id}}"
+                         protocole-algo-site="{{protocole.algo_tirage_site}}"
                          ng-show="userRegistered">
   </create-site-directive>
 
