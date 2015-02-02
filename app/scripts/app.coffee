@@ -22,6 +22,7 @@ angular
     'xin_session',
     'xin_backend',
     'xin_google_maps',
+    'accueilViews',
     'utilisateurViews',
     'taxonViews',
     'protocoleViews',
@@ -34,7 +35,7 @@ angular
   .config ($routeProvider, RestangularProvider) ->
     $routeProvider
       .when '/',
-        templateUrl: 'scripts/views/accueil/accueil.html'
+        redirectTo: '/accueil'
       .when '/profil',
         templateUrl: 'scripts/views/utilisateur/show_utilisateur.html'
         controller: 'ShowUtilisateurCtrl'

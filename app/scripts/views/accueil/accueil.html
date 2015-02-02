@@ -1,9 +1,20 @@
-<div class="container">
-    <h1>Bienvenue sur Vigiechiro !</h1>
-    <a href="#/protocoles"><h2>Protocoles et sites</h2></a>
-    <span>Rejoindre/lister les protocoles</span>
-    <a href="#/taxons"><h2>Taxons</h2></a>
-    <span>Parcourir les taxons existants</span>
-    <a href="#/participations"><h2>Participations</h2></a>
-    <span>Parcourir les participations existantes</span>
+<div class="col-md-8">
+  <a href="#/protocoles"><h2>Protocoles et sites</h2></a>
+  <span>Rejoindre/lister les protocoles</span>
+  <a href="#/taxons"><h2>Taxons</h2></a>
+  <span>Parcourir les taxons existants</span>
+  <a href="#/participations"><h2>Participations</h2></a>
+  <span>Parcourir les participations existantes</span>
+</div>
+
+ <div class="col-md-4 panel panel-default">
+  <ul class="list-group">
+    <li class="list-group-item"><b>Mes sites</b></li>
+    <li ng-repeat="site in userSites" class="list-group-item">
+      <a href="#/sites/{{site._id}}">Site {{$index + 1}}</a>
+    </li>
+    <li ng-if="!userSites || userSites.length == 0" class="list-group-item">
+      Pas de sites pour le moment
+    </li>
+  </ul>
 </div>
