@@ -24,6 +24,8 @@
           <a class="btn" ng-href='#/utilisateurs/{{ utilisateur._id }}'>
             {{ utilisateur.pseudo }}
           </a>
+          <span class="label label-primary pull-right" ng-if="utilisateur.role == 'Administrateur'">Administrateur</span>
+          <span class="label label-info pull-right" ng-if="utilisateur.role == 'Validateur'">Validateur</span>
         </li>
       </ul>
       <dir-pagination-controls boundary-links="true" on-page-change="pageChanged(newPageNumber)"></dir-pagination-controls>
