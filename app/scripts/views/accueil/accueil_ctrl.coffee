@@ -1,7 +1,7 @@
 'use strict'
 
 
-angular.module('accueilViews', ['ngRoute', 'xin_backend', 'xin_session', 'siteViews'])
+angular.module('accueilViews', ['ngRoute', 'xin_backend', 'xin_session'])
   .config ($routeProvider) ->
     $routeProvider
       .when '/accueil',
