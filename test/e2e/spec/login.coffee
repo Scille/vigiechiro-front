@@ -112,4 +112,4 @@ describe 'Test once logged', ->
             browser.navigate().back().then ->
               expect(browser.getLocationAbsUrl()).toBe("/taxons?items=20&page=1")
               browser.navigate().back().then ->
-                expect(browser.getLocationAbsUrl()).toBe("/")
+                expect(browser.getLocationAbsUrl()).toBe("/accueil")
