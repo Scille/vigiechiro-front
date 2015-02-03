@@ -58,7 +58,9 @@ angular.module('siteViews', ['ngRoute', 'textAngular', 'xin_backend', 'protocole
         'protocole': $scope.protocoleId
         'localites': mapProtocole.saveMap()
         'commentaire': $scope.siteForm.commentaire.$modelValue
-        'grille_stoc': mapProtocole.getIdGrilleStoc()
+      grille_stoc = mapProtocole.getIdGrilleStoc()
+      if grille_stoc != ''
+        payload.grille_stoc = grille_stoc
       siteResource.patch(payload).then(
         -> $scope.siteForm.$setPristine()
         (error) -> console.log("error", error)
@@ -122,7 +124,9 @@ angular.module('siteViews', ['ngRoute', 'textAngular', 'xin_backend', 'protocole
 #          'coordinates': [mapDump[0].lng, mapDump[0].lat]
 #        'numero_grille_stoc': 
         'commentaire': $scope.siteForm.commentaire.$modelValue
-        'grille_stoc': mapProtocole.getIdGrilleStoc()
+      grille_stoc = mapProtocole.getIdGrilleStoc()
+      if grille_stoc != ''
+        payload.grille_stoc = grille_stoc
       Backend.all('sites').post(payload).then(
         -> $route.reload()
         (error) -> console.log("error", error)

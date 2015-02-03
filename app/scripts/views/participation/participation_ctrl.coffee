@@ -12,12 +12,31 @@ angular.module('participationViews', ['ngRoute', 'textAngular', 'xin_listResourc
       .when '/participations/nouveau',
         templateUrl: 'scripts/views/participation/create_participation.html'
         controller: 'CreateParticipationCtrl'
+#      .when '/sites/:siteId/nouvelle-participation',
+#        templateUrl: 'scripts/views/participation/create_participation.html'
+#        controller: 'CreateParticipationCtrl'
       .when '/participations/:participationId',
         templateUrl: 'scripts/views/participation/display_participation.html'
         controller: 'DisplayParticipationCtrl'
 
+  .directive 'createParticipationDirective', ->
+    restrict: 'E'
+    templateUrl: 'scripts/views/participation/create_participation.html'
+    controller: 'CreateParticipationCtrl'
+    scope:
+      siteId: '@'
+    link: (scope, elem, attrs) ->
+      scope.collapsed = true
+      scope.title = 'Nouvelle participation'
+      attrs.$observe('siteId', (siteId) ->
+        scope.siteId = siteId
+      )
+
   .controller 'CreateParticipationCtrl', ($route, $routeParams, $scope,
     session, Backend) ->
+    $scope.participation = {}
+    session.getUserPromise().then (user) ->
+      $scope.observateur = user._id
     Backend.all('protocoles').getList().then((protocoles) ->
       $scope.protocoles = protocoles.plain()
     )
@@ -30,6 +49,10 @@ angular.module('participationViews', ['ngRoute', 'textAngular', 'xin_listResourc
           $scope.sites = sites.plain()
         )
     )
+    if $scope.siteId
+      Backend.one('sites', $scope.siteId).get().then (site) ->
+        $scope.participation.protocole = site.protocole
+        $scope.participation.site = site._id
     $scope.saveParticipation = ->
       $scope.submitted = true
       if (not $scope.siteForm.$valid or

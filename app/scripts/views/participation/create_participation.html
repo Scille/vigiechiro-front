@@ -1,152 +1,168 @@
-<div class="container">
-  <form class="simple-form" novalidate name="participationForm"
-    ng-submit="saveParticipation()">
+<div class="panel panel-default">
+  <div class="panel-heading" role="tab" id="headingOne">
+    <h4 class="panel-title">
+      <a data-toggle="collapse" data-target="#show-participation-collapse-{{participation._id}}"
+         aria-expanded="false" aria-controls="show-participation-collapse-{{participation._id}}"
+         ng-click="openCollapse('#show-participation-collapse-' + participation._id)">
+        {{title}}
+      </a>
+    </h4>
+  </div>
 
-    <div class="form-group" ng-class="{'has-error': participationForm.observateur.$invalid && !participationForm.$pristine}">
-      <div class="input-group">
-        <label class="input-group-addon" for="observateur">Observateur</label>
-        <input type="text" class="form-control" id="observateur" name="observateur"
-          ng-model="participation.observateur" ng-disabled="readOnly" required>
-      </div>
-      <span ng-show="submitted && participationForm.observateur.$error.required" class="help-block">
-        Champ requis
-      </span>
+  <div class="collapse {{collapsed === undefined ? 'in' : ''}}" id="show-participation-collapse-{{participation._id}}">
+    <div class="panel-body">
+      <form class="simple-form" novalidate name="participationForm"
+        ng-submit="saveParticipation()">
+
+        <div class="form-group" ng-class="{'has-error': participationForm.observateur.$invalid && !participationForm.$pristine}">
+          <div class="input-group">
+            <label class="input-group-addon" for="observateur">Observateur</label>
+            <input type="text" class="form-control" id="observateur" name="observateur"
+              ng-model="participation.observateur" ng-disabled="readOnly" required>
+          </div>
+          <span ng-show="submitted && participationForm.observateur.$error.required" class="help-block">
+            Champ requis
+          </span>
+        </div>
+
+        <div class="input-group form-group">
+          <span class="input-group-addon">Protocole</span>
+          <select class="form-control" ng-model="participation.protocole"
+            ng-disabled="readOnly" required>
+            <option ng-repeat="protocole in protocoles"
+              value="{{protocole._id}}">{{ protocole.titre }}
+            </option>
+          </select>
+        </div>
+        <span ng-show="submitted && !participationForm.protocole.$error.required" class="help-block">
+          Champ requis
+        </span>
+
+        <div class="input-group form-group">
+          <span class="input-group-addon">Site</span>
+          <select class="form-control" ng-model="participation.site"
+            ng-disabled="readOnly" required>
+            <option ng-repeat="site in sites" value="{{site._id}}">
+              {{ site._id }}
+            </option>
+          </select>
+        </div>
+        <span ng-show="submitted && !participationForm.site.$error.required" class="help-block">
+          Champ requis
+        </span>
+
+        <div class="form-group" ng-class="{'has-error': participationForm.date_debut.$invalid && !participationForm.$pristine}">
+          <div class="input-group">
+            <label class="input-group-addon" for="date_debut">Date de début</label>
+            <input type="date" class="form-control" id="date_debut" name="date_debut"
+              ng-model="participation.date_debut" ng-disabled="readOnly" required>
+          </div>
+          <span ng-show="submitted && participationForm.date_debut.$error.required"
+                class="help-block">Champ requis</span>
+        </div>
+
+        <div class="form-group" ng-class="{'has-error': participationForm.date_fin.$invalid && !participationForm.$pristine}">
+          <div class="input-group">
+            <label class="input-group-addon" for="date_fin">Date de fin</label>
+            <input type="date" class="form-control" id="date_fin" name="date_fin"
+                   ng-model="participation.date_fin" ng-disabled="readOnly">
+          </div>
+        </div>
+
+        <div class="form-group" ng-class="{'has-error': participationForm.temperature_debut.$invalid && !participationForm.$pristine}">
+          <div class="input-group">
+            <label class="input-group-addon" for="temperature_debut">
+              Température au début
+            </label>
+            <input type="text" class="form-control" id="temperature_debut" name="temperature_debut"
+              ng-model="participation.temperature_debut" ng-disabled="readOnly">
+          </div>
+        </div>
+
+        <div class="form-group" ng-class="{'has-error': participationForm.temperature_fin.$invalid && !participationForm.$pristine}">
+          <div class="input-group">
+            <label class="input-group-addon" for="temperature_fin">
+              Température à la fin
+            </label>
+            <input type="text" class="form-control" id="temperature_fin" name="temperature_fin"
+              ng-model="participation.temperature_fin" ng-disabled="readOnly">
+          </div>
+        </div>
+
+        <div class="input-group form-group">
+          <span class="input-group-addon">Vent</span>
+          <select class="form-control"
+            ng-model="participation.vent"
+            ng-disabled="readOnly">
+            <option value="NUL">nul</option>
+            <option value="FAIBLE">faible</option>
+            <option value="MOYEN">moyen</option>
+            <option value="FORT">fort</option>
+          </select>
+        </div>
+
+        <div class="input-group form-group">
+          <span class="input-group-addon">Couverture</span>
+          <select class="form-control"
+            ng-model="participation.couverture"
+            ng-disabled="readOnly">
+            <option value="0-25">0-25</option>
+            <option value="25-50">25-50</option>
+            <option value="50-75">50-75</option>
+            <option value="75-100">75-100</option>
+          </select>
+        </div>
+
+        <div class="form-group" ng-class="{'has-error': participationForm.commentaire.$invalid && !participationForm.$pristine}">
+          <div class="input-group">
+            <label class="input-group-addon" for="commentaire">Commentaire</label>
+            <input type="text" class="form-control" id="commentaire"
+              name="commentaire"
+              ng-model="participation.commentaire" ng-disabled="readOnly">
+          </div>
+        </div>
+
+        <div class="form-group" ng-class="{'has-error': participationForm.pieces_jointes.$invalid && !participationForm.$pristine}">
+          <div class="input-group">
+            <label class="input-group-addon" for="pieces_jointes">
+              Pièces jointes
+            </label>
+            <input type="file" class="form-control" id="pieces_jointes"
+              name="pieces_jointes"
+              ng-model="participation.pieces_jointes" ng-disabled="readOnly">
+          </div>
+          <span ng-show="submitted && participationForm.pieces_jointes.$error.required" class="help-block">
+            Champ requis
+          </span>
+        </div>
+
+    post fil de discussion
+      auteur
+      message
+    configuration
+      detecteur numero série
+      detecteur type
+      micro0 position, (SOL / CANOPEE)
+      micro0 numéro série
+      micro0 type
+      micro0 hauteur
+      micro0 position
+      micro1 position, (SOL / CANOPEE)
+      micro1 numéro série
+      micro1 type
+      micro1 hauteur
+      micro1 position
+      piste0 expansion
+      piste 1 expansion
+    donnee
+    observation
+
+        <div class="input-group form-group">
+          <input class="save-participation btn btn-primary" type="submit"
+                 value="Sauvegarder" ng-hide="participationForm.$pristine">
+        </div>
+
+      </form>
     </div>
-
-    <div class="input-group form-group">
-      <span class="input-group-addon">Protocole</span>
-      <select class="form-control" ng-model="participation.protocole"
-        ng-disabled="readOnly"
-        ng-options="protocole._id as protocole.titre for protocole in protocoles"
-        required>
-      </select>
-    </div>
-    <span ng-show="submitted && !participationForm.protocole.$error.required" class="help-block">
-      Champ requis
-    </span>
-
-    <div class="input-group form-group">
-      <span class="input-group-addon">Site</span>
-      <select class="form-control" ng-model="participation.site"
-        ng-disabled="readOnly"
-        ng-options="site._id as site._id for site in sites"
-        required>
-      </select>
-    </div>
-    <span ng-show="submitted && !participationForm.site.$error.required" class="help-block">
-      Champ requis
-    </span>
-
-    <div class="form-group" ng-class="{'has-error': participationForm.date_debut.$invalid && !participationForm.$pristine}">
-      <div class="input-group">
-        <label class="input-group-addon" for="date_debut">Date de début</label>
-        <input type="date" class="form-control" id="date_debut" name="date_debut"
-          ng-model="participation.date_debut" ng-disabled="readOnly" required>
-      </div>
-      <span ng-show="submitted && participationForm.date_debut.$error.required"
-            class="help-block">Champ requis</span>
-    </div>
-
-    <div class="form-group" ng-class="{'has-error': participationForm.date_fin.$invalid && !participationForm.$pristine}">
-      <div class="input-group">
-        <label class="input-group-addon" for="date_fin">Date de fin</label>
-        <input type="date" class="form-control" id="date_fin" name="date_fin"
-               ng-model="participation.date_fin" ng-disabled="readOnly">
-      </div>
-    </div>
-
-    <div class="form-group" ng-class="{'has-error': participationForm.temperature_debut.$invalid && !participationForm.$pristine}">
-      <div class="input-group">
-        <label class="input-group-addon" for="temperature_debut">
-          Température au début
-        </label>
-        <input type="text" class="form-control" id="temperature_debut" name="temperature_debut"
-          ng-model="participation.temperature_debut" ng-disabled="readOnly">
-      </div>
-    </div>
-
-    <div class="form-group" ng-class="{'has-error': participationForm.temperature_fin.$invalid && !participationForm.$pristine}">
-      <div class="input-group">
-        <label class="input-group-addon" for="temperature_fin">
-          Température à la fin
-        </label>
-        <input type="text" class="form-control" id="temperature_fin" name="temperature_fin"
-          ng-model="participation.temperature_fin" ng-disabled="readOnly">
-      </div>
-    </div>
-
-    <div class="input-group form-group">
-      <span class="input-group-addon">Vent</span>
-      <select class="form-control"
-        ng-model="participation.vent"
-        ng-disabled="readOnly">
-        <option value="NUL">nul</option>
-        <option value="FAIBLE">faible</option>
-        <option value="MOYEN">moyen</option>
-        <option value="FORT">fort</option>
-      </select>
-    </div>
-
-    <div class="input-group form-group">
-      <span class="input-group-addon">Couverture</span>
-      <select class="form-control"
-        ng-model="participation.couverture"
-        ng-disabled="readOnly">
-        <option value="0-25">0-25</option>
-        <option value="25-50">25-50</option>
-        <option value="50-75">50-75</option>
-        <option value="75-100">75-100</option>
-      </select>
-    </div>
-
-    <div class="form-group" ng-class="{'has-error': participationForm.commentaire.$invalid && !participationForm.$pristine}">
-      <div class="input-group">
-        <label class="input-group-addon" for="commentaire">Commentaire</label>
-        <input type="text" class="form-control" id="commentaire"
-          name="commentaire"
-          ng-model="participation.commentaire" ng-disabled="readOnly">
-      </div>
-    </div>
-
-    <div class="form-group" ng-class="{'has-error': participationForm.pieces_jointes.$invalid && !participationForm.$pristine}">
-      <div class="input-group">
-        <label class="input-group-addon" for="pieces_jointes">
-          Pièces jointes
-        </label>
-        <input type="file" class="form-control" id="pieces_jointes"
-          name="pieces_jointes"
-          ng-model="participation.pieces_jointes" ng-disabled="readOnly">
-      </div>
-      <span ng-show="submitted && participationForm.pieces_jointes.$error.required" class="help-block">
-        Champ requis
-      </span>
-    </div>
-
-post fil de discussion
-  auteur
-  message
-configuration
-  detecteur numero série
-  detecteur type
-  micro0 position, (SOL / CANOPEE)
-  micro0 numéro série
-  micro0 type
-  micro0 hauteur
-  micro0 position
-  micro1 position, (SOL / CANOPEE)
-  micro1 numéro série
-  micro1 type
-  micro1 hauteur
-  micro1 position
-  piste0 expansion
-  piste 1 expansion
-donnee
-observation
-
-    <div class="input-group form-group">
-      <input class="save-participation btn btn-primary" type="submit"
-             value="Sauvegarder" ng-hide="participationForm.$pristine">
-    </div>
-
-  </form>
+  </div>
 </div>
