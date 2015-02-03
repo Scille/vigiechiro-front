@@ -1,0 +1,20 @@
+<div ng-show="!loading">
+  <div ng-show="resources.length != 0">
+    <ul class="list-group">
+      <li class="list-group-item" dir-paginate="resource in resources | itemsPerPage: lookup.max_results"
+          total-items="resources._meta.total" current-page="resources._meta.page">
+        <div compile="resourceTemplate"></div>
+      </li>
+    </ul>
+    <dir-pagination-controls boundary-links="true" on-page-change="pageChange(newPageNumber)"></dir-pagination-controls>
+  </div>
+
+  <div ng-if="resources.length == 0" class="text-center">
+    <h3><i>Pas de résultats</i></h3>
+  </div>
+</div>
+
+<div ng-if="loading">
+  <center><img src="images/spinner.gif"></img></center>
+  <center>Changement...</center>
+</div>

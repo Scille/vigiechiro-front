@@ -7,41 +7,28 @@
     <div class="row">
       <div class="col-xs-8">
           <label for="search">Filtre :</label>
-          <input ng-model="filter" id="search" class="form-control" placeholder="texte">
+          <input ng-model="filterField" id="search" class="form-control" placeholder="texte">
       </div>
       <div class="col-xs-4">
           <label for="search">Nb de Résultats par page :</label>
-          <input type="number" class="form-control" ng-model="itemsPerPage">
+          <input type="number" class="form-control" ng-model="lookup.max_results">
       </div>
     </div>
   </div>
 
-  <div ng-if="!loading">
-    <div ng-if="protocoles.length != 0">
-      <ul class="list-group">
-        <li class="list-group-item" dir-paginate="protocole in protocoles | itemsPerPage: itemsPerPage"
-            total-items="totalItems" current-page="currentPage">
-          <a class="btn" ng-href='#/protocoles/{{ protocole._id }}'>
-            {{ protocole.titre }}
-          </a>
-          <span class="label label-success pull-right" ng-if="protocole._status_registered">Inscrit</span>
-          <span class="label label-warning pull-right" ng-if="protocole._status_toValidate">En attente de validation</span>
-        </li>
-      </ul>
-      <dir-pagination-controls boundary-links="true" on-page-change="pageChanged(newPageNumber)"></dir-pagination-controls>
-    </div>
+  <list-resource-directive resource-backend="resourceBackend" lookup="lookup">
+    <a class="btn" ng-href='#/protocoles/{{resource._id}}'>
+      {{resource.titre}}
+    </a>
+    <span class="label label-success pull-right" ng-show="resource._status_registered">
+      Inscrit
+    </span>
+    <span class="label label-warning pull-right" ng-show="resource._status_toValidate">
+      En attente de validation
+    </span>
+  </list-resource-directive>
 
-    <div ng-if="protocoles.length == 0" class="text-center">
-      <h3><i>Pas de protocoles</i></h3>
-    </div>
-
-    <div class="text-center" ng-show="isAdmin">
-      <a name="create-protocole" class="btn btn-default" href="#/protocoles/nouveau">Nouveau protocole</a>
-    </div>
-  </div>
-
-  <div ng-if="loading">
-    <center><img src="images/spinner.gif"></img></center>
-    <center>Changement de la liste des protocoles...</center>
+  <div class="text-center" ng-show="isAdmin">
+    <a name="create-protocole" class="btn btn-default" href="#/protocoles/nouveau">Nouveau protocole</a>
   </div>
 </div>

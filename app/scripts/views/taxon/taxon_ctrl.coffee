@@ -42,8 +42,7 @@ angular.module('taxonViews', ['ngRoute', 'ngSanitize', 'textAngular',
     $routeProvider
       .when '/taxons',
         templateUrl: 'scripts/views/taxon/list_taxons.html'
-        controller: 'ListResourceCtrl'
-        resolve: {resourceBackend: (Backend) -> Backend.all('taxons')}
+        controller: 'ListTaxonsCtrl'
       .when '/taxons/nouveau',
         templateUrl: 'scripts/views/taxon/edit_taxon.html'
         controller: 'CreateTaxonCtrl'
@@ -53,6 +52,24 @@ angular.module('taxonViews', ['ngRoute', 'ngSanitize', 'textAngular',
       .when '/taxons/:taxonId/edition',
         templateUrl: 'scripts/views/taxon/edit_taxon.html'
         controller: 'EditTaxonCtrl'
+
+  .controller 'ListTaxonsCtrl', ($scope, Backend, session, DelayedEvent) ->
+    session.getIsAdminPromise().then (isAdmin) ->
+      $scope.isAdmin = isAdmin
+    $scope.lookup = {}
+    # Filter field is trigger after 500ms of inactivity
+    delayedFilter = new DelayedEvent(500)
+    $scope.filterField = ''
+    $scope.$watch 'filterField', (filterValue) ->
+      delayedFilter.triggerEvent ->
+        if filterValue? and filterValue != ''
+          $scope.lookup.where = JSON.stringify(
+              $text:
+                $search: filterValue
+          )
+        else if $scope.lookup.where?
+          delete $scope.lookup.where
+    $scope.resourceBackend = Backend.all('taxons')
 
   .controller 'CreateTaxonCtrl', ($scope, Backend) ->
     $scope.submitted = false

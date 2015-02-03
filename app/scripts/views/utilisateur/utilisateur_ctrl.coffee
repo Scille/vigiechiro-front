@@ -13,11 +13,26 @@ angular.module('utilisateurViews', ['ngRoute', 'xin_listResource', 'xin_session'
     $routeProvider
       .when '/utilisateurs',
         templateUrl: 'scripts/views/utilisateur/list_utilisateurs.html'
-        controller: 'ListResourceCtrl'
-        resolve: {resourceBackend: (Backend) -> Backend.all('utilisateurs')}
+        controller: 'ListUtilisateursCtrl'
       .when '/utilisateurs/:userId',
         templateUrl: 'scripts/views/utilisateur/show_utilisateur.html'
         controller: 'ShowUtilisateurCtrl'
+
+  .controller 'ListUtilisateursCtrl', ($scope, Backend, DelayedEvent) ->
+    $scope.lookup = {}
+    # Filter field is trigger after 500ms of inactivity
+    delayedFilter = new DelayedEvent(500)
+    $scope.filterField = ''
+    $scope.$watch 'filterField', (filterValue) ->
+      delayedFilter.triggerEvent ->
+        if filterValue? and filterValue != ''
+          $scope.lookup.where = JSON.stringify(
+              $text:
+                $search: filterValue
+          )
+        else if $scope.lookup.where?
+          delete $scope.lookup.where
+    $scope.resourceBackend = Backend.all('utilisateurs')
 
   .controller 'ShowUtilisateurCtrl', ($scope, $route, $routeParams, Backend, session) ->
     $scope.submitted = false

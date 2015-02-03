@@ -17,27 +17,7 @@ angular.module('protocoleViews', ['ngRoute', 'textAngular', 'xin_listResource',
     $routeProvider
       .when '/protocoles',
         templateUrl: 'scripts/views/protocole/list_protocoles.html'
-        controller: 'ListResourceCtrl'
-        resolve:
-          resourceBackend: ($q, Backend, session) ->
-            deferred = $q.defer()
-            protocolesBackend = Backend.all('protocoles')
-            protocolesBackend_getList = protocolesBackend.getList
-            protocolesBackend.getList = () -> deferred.promise
-            session.getUserPromise().then (user) ->
-              userProtocolesDict = {}
-              for userProtocole in user.protocoles or []
-                userProtocolesDict[userProtocole.protocole] = userProtocole
-              protocolesBackend_getList().then (protocoles) ->
-                for protocole in protocoles
-                  if userProtocolesDict[protocole._id]?
-                    if userProtocolesDict[protocole._id].valide
-                      protocole._status_toValidate = true
-                    else
-                      protocole._status_registered = true
-                deferred.resolve(protocoles)
-            return protocolesBackend
-
+        controller: 'ListProtocolesCtrl'
       .when '/protocoles/nouveau',
         templateUrl: 'scripts/views/protocole/edit_protocole.html'
         controller: 'CreateProtocoleCtrl'
@@ -50,6 +30,42 @@ angular.module('protocoleViews', ['ngRoute', 'textAngular', 'xin_listResource',
       .when '/protocoles/:protocoleId/edition',
         templateUrl: 'scripts/views/protocole/edit_protocole.html'
         controller: 'EditProtocoleCtrl'
+
+  .controller 'ListProtocolesCtrl', ($scope, $q, Backend, session, DelayedEvent) ->
+    $scope.lookup = {}
+    # Filter field is trigger after 500ms of inactivity
+    delayedFilter = new DelayedEvent(500)
+    $scope.filterField = ''
+    $scope.$watch 'filterField', (filterValue) ->
+      delayedFilter.triggerEvent ->
+        if filterValue? and filterValue != ''
+          $scope.lookup.where = JSON.stringify(
+              $text:
+                $search: filterValue
+          )
+        else if $scope.lookup.where?
+          delete $scope.lookup.where
+    $scope.resourceBackend = Backend.all('protocoles')
+    # Wrap protocole backend to check if the user is registered (see _status_*)
+    resourceBackend_getList = $scope.resourceBackend.getList
+    userProtocolesDictDefer = $q.defer()
+    session.getUserPromise().then (user) ->
+      userProtocolesDict = {}
+      for userProtocole in user.protocoles or []
+        userProtocolesDict[userProtocole.protocole] = userProtocole
+      userProtocolesDictDefer.resolve(userProtocolesDict)
+    $scope.resourceBackend.getList = (lookup) ->
+      deferred = $q.defer()
+      userProtocolesDictDefer.promise.then (userProtocolesDict) ->
+        resourceBackend_getList(lookup).then (protocoles) ->
+          for protocole in protocoles
+            if userProtocolesDict[protocole._id]?
+              if userProtocolesDict[protocole._id].valide
+                protocole._status_toValidate = true
+              else
+                protocole._status_registered = true
+          deferred.resolve(protocoles)
+      return deferred.promise
 
   .controller 'DisplayProtocoleCtrl', ($route, $routeParams, $scope, Backend, session) ->
     $scope.protocole = {}
@@ -70,7 +86,7 @@ angular.module('protocoleViews', ['ngRoute', 'textAngular', 'xin_listResource',
         ->
           session.refreshPromise()
           $route.reload()
-        (error) -> console.log("error", error)
+        (error) -> throw error
       )
 
   .controller 'EditProtocoleCtrl', ($route, $routeParams, $scope, Backend) ->
@@ -98,7 +114,7 @@ angular.module('protocoleViews', ['ngRoute', 'textAngular', 'xin_listResource',
       # Finally refresh the page (needed for cache reasons)
       protocoleResource.patch(payload).then(
         -> $route.reload();
-        (error) -> console.log("error", error)
+        (error) -> throw error
       )
 
   .controller 'CreateProtocoleCtrl', ($scope, Backend) ->
@@ -115,7 +131,7 @@ angular.module('protocoleViews', ['ngRoute', 'textAngular', 'xin_listResource',
       payload = make_payload($scope)
       Backend.all('protocoles').post(payload).then(
         -> window.location = '#/protocoles'
-        (error) -> console.log("error", error)
+        (error) -> throw error
       )
 
   .controller 'ValidationsProtocoleCtrl', ($routeParams, $scope, $filter, Backend) ->
@@ -160,7 +176,7 @@ angular.module('protocoleViews', ['ngRoute', 'textAngular', 'xin_listResource',
             protocole.valide = true
             utilisateur.patch(patch).then (
               -> console.log 'Patch OK'
-              -> console.log 'Erreur patch'
+              (error) -> throw error
             )
             return
 
@@ -173,6 +189,6 @@ angular.module('protocoleViews', ['ngRoute', 'textAngular', 'xin_listResource',
             patch.protocoles.splice(index, 1)
             utilisateur.patch(patch).then (
               -> console.log 'Patch OK'
-              -> console.log 'Erreur patch'
+              (error) -> throw error
             )
             return

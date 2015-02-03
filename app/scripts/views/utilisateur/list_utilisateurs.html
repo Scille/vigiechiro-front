@@ -6,38 +6,26 @@
   <div class="list-group">
     <div class="row">
       <div class="col-xs-8">
-        <label for="search">Filtre :</label>
-        <input ng-model="filter" class="search-field form-control" placeholder="texte">
+          <label for="search">Filtre :</label>
+          <input ng-model="filterField" id="search" class="form-control" placeholder="texte">
       </div>
       <div class="col-xs-4">
-        <label for="search">Nb de Résultats par page :</label>
-        <input type="number" class="max-result-field form-control" ng-model="itemsPerPage">
+          <label for="search">Nb de Résultats par page :</label>
+          <input type="number" class="form-control" ng-model="lookup.max_results">
       </div>
     </div>
   </div>
 
-  <div ng-if="!loading">
-    <div ng-if="utilisateurs.length != 0">
-      <ul class="list-group">
-        <li class="list-group-item" dir-paginate="utilisateur in utilisateurs | itemsPerPage: itemsPerPage"
-              total-items="totalItems" current-page="currentPage">
-          <a class="btn" ng-href='#/utilisateurs/{{ utilisateur._id }}'>
-            {{ utilisateur.pseudo }}
-          </a>
-          <span class="label label-primary pull-right" ng-if="utilisateur.role == 'Administrateur'">Administrateur</span>
-          <span class="label label-info pull-right" ng-if="utilisateur.role == 'Validateur'">Validateur</span>
-        </li>
-      </ul>
-      <dir-pagination-controls boundary-links="true" on-page-change="pageChanged(newPageNumber)"></dir-pagination-controls>
-    </div>
+  <list-resource-directive resource-backend="resourceBackend" lookup="lookup">
+    <a class="btn" ng-href='#/utilisateurs/{{resource._id}}'>
+      {{resource.pseudo}}
+    </a>
+    <span class="label label-primary pull-right" ng-show="resource.role == 'Administrateur'">
+      Administrateur
+    </span>
+    <span class="label label-info pull-right" ng-show="resource.role == 'Validateur'">
+      Validateur
+    </span>
+  </list-resource-directive>
 
-    <div ng-show="utilisateurs.length == 0" class="text-center">
-      <h3><i>Pas de utilisateurs</i></h3>
-    </div>
-  </div>
-
-  <div ng-if="loading">
-    <center><img src="images/spinner.gif"></img></center>
-    <center>Changement de la liste des utilisateurs...</center>
-  </div>
 </div>

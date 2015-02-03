@@ -2,61 +2,67 @@
 
 
 angular.module('xin_listResource', ['ngRoute', 'angularUtils.directives.dirPagination', 'xin_session'])
-  .config (paginationTemplateProvider) ->
+
+  .config ($compileProvider, paginationTemplateProvider) ->
     paginationTemplateProvider.setPath('scripts/xin/list_resource_drt/dirPagination.tpl.html')
+    # Directive used to inject dynamic html node in the template
+    $compileProvider.directive 'compile', ($compile) ->
+      return (scope, element, attrs) ->
+        scope.$watch(
+          (scope) ->
+            return scope.$eval(attrs.compile)
+          (value) ->
+            element.html(value)
+            $compile(element.contents())(scope)
+        )
 
-  .controller 'ListResourceCtrl', ($scope, $timeout, $location, session, resourceBackend) ->
-    resourceName = resourceBackend.route
-    session.getIsAdminPromise().then (isAdmin) ->
-      $scope.isAdmin = isAdmin
-    session.getUserPromise().then (user) ->
-      $scope.user = user
-    $scope[resourceName] = []
+  .service 'DelayedEvent', ($timeout) ->
+    class DelayedEvent
+      constructor: (@timer) ->
+        @eventCount = 0
+      triggerEvent: (action) ->
+        @eventCount += 1
+        eventCurrent = @eventCount
+        $timeout(
+          =>
+            if eventCurrent == @eventCount
+              action()
+          @timer
+        )
+
+  .controller 'ListResourceCtrl', ($scope, $timeout, session) ->
+    $scope.resources = []
     $scope.loading = true
-    $scope.filter = undefined
-    # Pagination
-    params = $location.search()
-    $scope.itemsPerPage = parseInt(params.items) or 20
-    $scope.totalItems = 0
-    $scope.currentPage = parseInt(params.page) or 1
-    typingCount = 0
-    $scope.$watch 'filter', (filterValue) ->
-      triggerSearch = ->
-        if filterValue
-          params =
-            where: JSON.stringify(
-              $text:
-                $search: filterValue
-            )
-        else
-          params = undefined
-        resourceBackend.getList(params).then (items) ->
-          $scope[resourceName] = items.plain()
-          $scope.totalItems = items._meta.total
-          $scope.loading = false
-      # Delay the request not to flood while the user is typing
-      typingCount += 1
-      currTyping = typingCount
-      $timeout(
-        ->
-          if currTyping == typingCount
-            triggerSearch()
-        500
-      )
-
-    $scope.pageChanged = (newPage) ->
-      $scope.currentPage = newPage
+    updateResourcesList = (lookup) ->
       $scope.loading = true
-      # Query & load the results
-      params =
-        page: newPage
-        max_results: $scope.itemsPerPage
-      resourceBackend.getList(params).then (items) ->
-        $scope[resourceName] = items.plain()
-        $scope.totalItems = items._meta.total
-        # Finally update the url's params and disable loading spinner
-        $location.search('items', $scope.itemsPerPage)
-                 .search('page', newPage)
-                 .replace()
+      $scope.resourceBackend.getList(lookup).then (items) ->
+        $scope.resources = items
         $scope.loading = false
-    $scope.pageChanged($scope.currentPage)
+    $scope.$watch('lookup', updateResourcesList, true)
+    $scope.pageChange = (newPage) ->
+      $scope.lookup.page = newPage
+      updateResourcesList($scope.lookup)
+    updateResourcesList($scope.lookup)
+
+  .directive 'listResourceDirective', (session, Backend) ->
+    restrict: 'E'
+    transclude: true
+    templateUrl: 'scripts/xin/list_resource_drt/list_resource.html'
+    controller: 'ListResourceCtrl'
+    scope:
+      resourceBackend: '='
+      lookup: '=?'
+    link: (scope, elem, attrs, ctrl, transclude) ->
+      if not attrs.lookup?
+        scope.lookup = {}
+      scope.lookup.page = scope.lookup.page or 1
+      scope.lookup.max_results = scope.lookup.max_results or 10
+      if !transclude
+        throw "Illegal use of lgTranscludeReplace directive in the template," +
+              " no parent directive that requires a transclusion found."
+        return
+      transclude (clone) ->
+        scope.resourceTemplate = ''
+        clone.each (index, node) ->
+          if node.outerHTML?
+            scope.resourceTemplate += node.outerHTML

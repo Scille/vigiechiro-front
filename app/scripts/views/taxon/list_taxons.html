@@ -6,40 +6,23 @@
   <div class="list-group">
     <div class="row">
       <div class="col-xs-8">
-        <label for="search">Filtre :</label>
-        <input ng-model="filter" class="search-field form-control" placeholder="texte">
+          <label for="search">Filtre :</label>
+          <input ng-model="filterField" id="search" class="form-control" placeholder="texte">
       </div>
       <div class="col-xs-4">
-        <label for="search">Nb de Résultats par page :</label>
-        <input type="number" class="max-result-field form-control" ng-model="itemsPerPage">
+          <label for="search">Nb de Résultats par page :</label>
+          <input type="number" class="form-control" ng-model="lookup.max_results">
       </div>
     </div>
   </div>
 
-  <div ng-if="!loading">
-    <div ng-if="taxons.length != 0">
-      <ul class="list-group">
-        <li class="list-group-item" dir-paginate="taxon in taxons | itemsPerPage: itemsPerPage"
-            total-items="totalItems" current-page="currentPage">
-          <a class="btn" ng-href='#/taxons/{{ taxon._id }}'>
-            {{ taxon.libelle_long }}
-          </a>
-        </li>
-      </ul>
-      <dir-pagination-controls boundary-links="true" on-page-change="pageChanged(newPageNumber)"></dir-pagination-controls>
-    </div>
-
-    <div ng-if="taxons.length == 0" class="text-center">
-      <h3><i>Pas de taxons</i></h3>
-    </div>
+  <list-resource-directive resource-backend="resourceBackend" lookup="lookup">
+    <a class="btn" ng-href='#/taxons/{{resource._id}}'>
+      {{resource.libelle_long}}
+    </a>
+  </list-resource-directive>
 
     <div class="text-center" ng-if="isAdmin">
       <a class="btn btn-default create-taxon" href="#/taxons/nouveau">Nouveau taxon</a>
     </div>
-  </div>
-
-  <div ng-if="loading">
-    <center><img src="images/spinner.gif"></img></center>
-    <center>Changement de la liste des taxons...</center>
-  </div>
 </div>
