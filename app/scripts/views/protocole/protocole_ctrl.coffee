@@ -31,10 +31,15 @@ angular.module('protocoleViews', ['ngRoute', 'textAngular', 'xin_listResource',
         templateUrl: 'scripts/views/protocole/edit_protocole.html'
         controller: 'EditProtocoleCtrl'
 
-  .controller 'ListProtocolesCtrl', ($scope, $q, Backend, session, DelayedEvent) ->
+  .controller 'ListProtocolesCtrl', ($scope, $q, $location, Backend, session,
+                                     DelayedEvent) ->
     $scope.lookup = {}
     # Filter field is trigger after 500ms of inactivity
     delayedFilter = new DelayedEvent(500)
+    # params = $location.search()
+    # if params.where?
+    #   $scope.filterField = JSON.parse(params.where).$text.$search
+    # else
     $scope.filterField = ''
     $scope.$watch 'filterField', (filterValue) ->
       delayedFilter.triggerEvent ->
@@ -45,6 +50,8 @@ angular.module('protocoleViews', ['ngRoute', 'textAngular', 'xin_listResource',
           )
         else if $scope.lookup.where?
           delete $scope.lookup.where
+        # TODO : fix reloadOnSearch: true
+        # $location.search('where', $scope.lookup.where)
     $scope.resourceBackend = Backend.all('protocoles')
     # Wrap protocole backend to check if the user is registered (see _status_*)
     resourceBackend_getList = $scope.resourceBackend.getList

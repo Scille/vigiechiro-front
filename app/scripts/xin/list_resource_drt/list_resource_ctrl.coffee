@@ -30,19 +30,35 @@ angular.module('xin_listResource', ['ngRoute', 'angularUtils.directives.dirPagin
           @timer
         )
 
-  .controller 'ListResourceCtrl', ($scope, $timeout, session) ->
+  .controller 'ListResourceCtrl', ($scope, $timeout, $location, session) ->
+    # Load lookup pagination from $location
+    # params = $location.search()
+    # if params.page?
+    #   $scope.lookup.page = parseInt(params.page)
+    # if params.items?
+    #   $scope.lookup.max_results = parseInt(params.items)
     $scope.resources = []
     $scope.loading = true
-    updateResourcesList = (lookup) ->
+    updateResourcesList = () ->
       $scope.loading = true
-      $scope.resourceBackend.getList(lookup).then (items) ->
+      $scope.resourceBackend.getList($scope.lookup).then (items) ->
         $scope.resources = items
         $scope.loading = false
-    $scope.$watch('lookup', updateResourcesList, true)
+    $scope.$watch(
+      'lookup'
+      ->
+        updateResourcesList()
+        # Save pagination in $location
+        # params = $location.search()
+        # if $scope.lookup.max_results != params.max_results
+        #   $location.search('items', $scope.lookup.max_results)
+        # if $scope.lookup.page != params.page
+        #   $location.search('page', $scope.lookup.page)
+      true
+    )
     $scope.pageChange = (newPage) ->
       $scope.lookup.page = newPage
-      updateResourcesList($scope.lookup)
-    updateResourcesList($scope.lookup)
+      updateResourcesList()
 
   .directive 'listResourceDirective', (session, Backend) ->
     restrict: 'E'
@@ -56,7 +72,7 @@ angular.module('xin_listResource', ['ngRoute', 'angularUtils.directives.dirPagin
       if not attrs.lookup?
         scope.lookup = {}
       scope.lookup.page = scope.lookup.page or 1
-      scope.lookup.max_results = scope.lookup.max_results or 10
+      scope.lookup.max_results = scope.lookup.max_results or 20
       if !transclude
         throw "Illegal use of lgTranscludeReplace directive in the template," +
               " no parent directive that requires a transclusion found."

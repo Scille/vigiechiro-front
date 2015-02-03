@@ -78,7 +78,7 @@ describe 'Test utilisateur access', ->
   it 'Test for Validateur', ->
     helper.login('Validateur')
     browser.setLocation('utilisateurs').then ->
-      expect(browser.getCurrentUrl()).toBe("#{helper.baseUrl}/utilisateurs?items=20&page=1")
+      expect(browser.getCurrentUrl()).toBe("#{helper.baseUrl}/utilisateurs")
 
   it 'Test Validateur read only', ->
     helper.login('Validateur')
@@ -89,7 +89,7 @@ describe 'Test utilisateur access', ->
   it 'Test for Administrateur', ->
     helper.login('Administrateur')
     browser.setLocation('utilisateurs').then ->
-      expect(browser.getCurrentUrl()).toBe("#{helper.baseUrl}/utilisateurs?items=20&page=1")
+      expect(browser.getCurrentUrl()).toBe("#{helper.baseUrl}/utilisateurs")
 
   it 'Test Administrateur all powerfull', ->
     input = "I'm the mighty admin."
@@ -122,7 +122,7 @@ describe 'Test list utilisateurs', ->
     expect($$('.list-group-item').count()).toEqual(1)
 
   it 'Test result per page', ->
-    $(".max-result-field")
+    $(".max-result-fields")
       .sendKeys(protractor.Key.chord(protractor.Key.CONTROL, "a"))
       .sendKeys('2')
     expect($$('.list-group-item').count()).toEqual(2)

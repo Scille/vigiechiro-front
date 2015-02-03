@@ -38,7 +38,7 @@ describe 'Test taxon for adminstrateur', ->
 
   it 'Test edit taxon', ->
     browser.setLocation('taxons').then ->
-      taxons = element.all(`by`.repeater('taxon in taxons'))
+      taxons = element.all(`by`.repeater('resource in resources'))
       taxons.get(0).element(`by`.css('a')).click().then ->
         browser.getCurrentUrl().then (url) ->
           taxonUrl = url
@@ -91,6 +91,6 @@ describe 'Test taxon for adminstrateur', ->
             expect(saveTaxonButton.isDisplayed()).toBe(true)
             saveTaxonButton.click().then ->
               browser.getCurrentUrl().then (url) ->
-                expect(url).toBe("#{helper.baseUrl}/taxons?items=20&page=1")
+                expect(url).toBe("#{helper.baseUrl}/taxons")
                 taxons = $$('.list-group-item')
                 expect(taxons.count()).toEqual(5)

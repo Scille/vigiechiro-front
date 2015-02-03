@@ -103,13 +103,13 @@ describe 'Test once logged', ->
 
   it 'Test history', ->
     browser.setLocation('/taxons').then ->
-      browser.getLocationAbsUrl().then (url) -> expect(url).toBe("/taxons?items=20&page=1")
-      taxons = element.all(`by`.repeater('taxon in taxons'))
+      browser.getLocationAbsUrl().then (url) -> expect(url).toBe("/taxons")
+      taxons = element.all(`by`.repeater('resource in resources'))
       taxons.get(0).element(`by`.css('a')).click().then ->
         browser.setLocation('/protocoles').then ->
-          expect(browser.getLocationAbsUrl()).toBe("/protocoles?items=20&page=1")
+          expect(browser.getLocationAbsUrl()).toBe("/protocoles")
           browser.navigate().back().then ->
             browser.navigate().back().then ->
-              expect(browser.getLocationAbsUrl()).toBe("/taxons?items=20&page=1")
+              expect(browser.getLocationAbsUrl()).toBe("/taxons")
               browser.navigate().back().then ->
                 expect(browser.getLocationAbsUrl()).toBe("/accueil")
