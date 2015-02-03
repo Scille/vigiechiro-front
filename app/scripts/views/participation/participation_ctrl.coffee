@@ -55,14 +55,39 @@ angular.module('participationViews', ['ngRoute', 'textAngular', 'xin_listResourc
         $scope.participation.site = site._id
     $scope.saveParticipation = ->
       $scope.submitted = true
-      if (not $scope.siteForm.$valid or
-          not $scope.siteForm.$dirty)
+      if (not $scope.participationForm.$valid or
+          not $scope.participationForm.$dirty)
         return
-      payload = {}
-#        'protocole': $scope.protocoleId
-#        'localites': mapProtocole.saveMap()
-#        'commentaire': $scope.siteForm.commentaire.$modelValue
-#        'grille_stoc': mapProtocole.getIdGrilleStoc()
+      date_debut = new Date($scope.participation.date_debut)
+      date_debut = date_debut.toGMTString()
+      payload =
+        'observateur': $scope.observateur
+        'protocole' : $scope.participation.protocole
+        'site' : $scope.participation.site
+      # Retrieve the modified fields from the form
+      for key, value of $scope.participationForm
+        if key.charAt(0) != '$' and value.$dirty
+          if key == 'date_fin'
+            if $scope.participation.date_fin
+              date_fin = new Date($scope.participation.date_fin)
+              payload.date_fin = date_fin.toGMTString()
+          else if key == 'date_debut'
+            payload.date_debut = date_debut
+          else if key == 'temperature_debut' or
+             key == 'temperature_fin' or
+             key == 'vent' or key == 'couverture'
+            if not payload.meteo
+              payload.meteo = {}
+            payload.meteo[key] = $scope.participation.meteo[key]
+          else if key == 'detecteur_enregisteur_numero_serie' or
+             key == 'micro0_position' or key == 'micro0_numero_serie' or
+             key == 'micro0_hauteur' or key == 'micro1_position' or
+             key == 'micro1_numero_serie' or key == 'micro1_hauteur'
+            if not payload.configuration
+              payload.configuration = {}
+            payload.configuration[key] = $scope.participation.configuration[key]
+          else
+            payload[key] = $scope.participation[key]
       Backend.all('participations').post(payload).then(
         -> $route.reload()
         (error) -> console.log("error", error)

@@ -14,20 +14,10 @@
       <form class="simple-form" novalidate name="participationForm"
         ng-submit="saveParticipation()">
 
-        <div class="form-group" ng-class="{'has-error': participationForm.observateur.$invalid && !participationForm.$pristine}">
-          <div class="input-group">
-            <label class="input-group-addon" for="observateur">Observateur</label>
-            <input type="text" class="form-control" id="observateur" name="observateur"
-              ng-model="participation.observateur" ng-disabled="readOnly" required>
-          </div>
-          <span ng-show="submitted && participationForm.observateur.$error.required" class="help-block">
-            Champ requis
-          </span>
-        </div>
-
         <div class="input-group form-group">
           <span class="input-group-addon">Protocole</span>
-          <select class="form-control" ng-model="participation.protocole"
+          <select class="form-control" name="protocole"
+            ng-model="participation.protocole"
             ng-disabled="readOnly" required>
             <option ng-repeat="protocole in protocoles"
               value="{{protocole._id}}">{{ protocole.titre }}
@@ -40,7 +30,8 @@
 
         <div class="input-group form-group">
           <span class="input-group-addon">Site</span>
-          <select class="form-control" ng-model="participation.site"
+          <select class="form-control" name="site"
+            ng-model="participation.site"
             ng-disabled="readOnly" required>
             <option ng-repeat="site in sites" value="{{site._id}}">
               {{ site._id }}
@@ -69,30 +60,30 @@
           </div>
         </div>
 
-        <div class="form-group" ng-class="{'has-error': participationForm.temperature_debut.$invalid && !participationForm.$pristine}">
+        <div class="form-group" ng-class="{'has-error': participationForm.meteo.temperature_debut.$invalid && !participationForm.$pristine}">
           <div class="input-group">
-            <label class="input-group-addon" for="temperature_debut">
+            <label class="input-group-addon" for="meteo.temperature_debut">
               Température au début
             </label>
-            <input type="text" class="form-control" id="temperature_debut" name="temperature_debut"
-              ng-model="participation.temperature_debut" ng-disabled="readOnly">
+            <input type="text" class="form-control" id="meteo.temperature_debut" name="temperature_debut"
+              ng-model="participation.meteo.temperature_debut" ng-disabled="readOnly">
           </div>
         </div>
 
-        <div class="form-group" ng-class="{'has-error': participationForm.temperature_fin.$invalid && !participationForm.$pristine}">
+        <div class="form-group" ng-class="{'has-error': participationForm.meteo.temperature_fin.$invalid && !participationForm.$pristine}">
           <div class="input-group">
-            <label class="input-group-addon" for="temperature_fin">
+            <label class="input-group-addon" for="meteo.temperature_fin">
               Température à la fin
             </label>
-            <input type="text" class="form-control" id="temperature_fin" name="temperature_fin"
-              ng-model="participation.temperature_fin" ng-disabled="readOnly">
+            <input type="text" class="form-control" id="meteo.temperature_fin" name="temperature_fin"
+              ng-model="participation.meteo.temperature_fin" ng-disabled="readOnly">
           </div>
         </div>
 
         <div class="input-group form-group">
           <span class="input-group-addon">Vent</span>
-          <select class="form-control"
-            ng-model="participation.vent"
+          <select class="form-control" name="vent"
+            ng-model="participation.meteo.vent"
             ng-disabled="readOnly">
             <option value="NUL">nul</option>
             <option value="FAIBLE">faible</option>
@@ -103,8 +94,8 @@
 
         <div class="input-group form-group">
           <span class="input-group-addon">Couverture</span>
-          <select class="form-control"
-            ng-model="participation.couverture"
+          <select class="form-control" name="couverture"
+            ng-model="participation.meteo.couverture"
             ng-disabled="readOnly">
             <option value="0-25">0-25</option>
             <option value="25-50">25-50</option>
@@ -136,26 +127,96 @@
           </span>
         </div>
 
-    post fil de discussion
-      auteur
-      message
-    configuration
-      detecteur numero série
-      detecteur type
-      micro0 position, (SOL / CANOPEE)
-      micro0 numéro série
-      micro0 type
-      micro0 hauteur
-      micro0 position
-      micro1 position, (SOL / CANOPEE)
-      micro1 numéro série
-      micro1 type
-      micro1 hauteur
-      micro1 position
-      piste0 expansion
-      piste 1 expansion
-    donnee
-    observation
+        <div class="form-group" ng-class="{'has-error': participationForm.posts.$invalid && !participationForm.$pristine}">
+          <div class="input-group" ng-repeat="post in posts">
+            {{ post.auteur }} le {{ post.date }}<br>
+            {{ post.message }}
+          </div>
+          <div class="input-group">
+            <label class="input-group-addon" for="posts">
+              Nouveau post
+            </label>
+            <input type="text" class="form-control" id="posts"
+              name="posts"
+              ng-model="participation.posts" ng-disabled="readOnly">
+          </div>
+          <button class="btn btn-primary" ng-action="">Envoyer</button>
+        </div>
+
+        <div class="form-group" ng-class="{'has-error': participationForm.configuration.detecteur_enregisteur_numero_serie.$invalid && !participationForm.$pristine}">
+          <div class="input-group">
+            <label class="input-group-addon" for="configuration.detecteur_enregisteur_numero_serie">
+              Numéro de série du détecteur enregisteur
+            </label>
+            <input type="text" class="form-control" id="configuration.detecteur_enregisteur_numero_serie"
+              name="detecteur_enregisteur_numero_serie"
+              ng-model="participation.configuration.detecteur_enregisteur_numero_serie" ng-disabled="readOnly">
+          </div>
+        </div>
+
+        <div class="input-group form-group" ng-class="{'has-error': participationForm.configuration.micro0_position.$invalid && !participationForm.$pristine}">
+          <span class="input-group-addon">Position micro 0</span>
+          <select class="form-control" name="micro0_position"
+            ng-model="participation.configuration.micro0_position"
+            ng-disabled="readOnly">
+            <option value="SOL">Sol</option>
+            <option value="CANOPEE">Canopée</option>
+          </select>
+        </div>
+
+        <div class="form-group" ng-class="{'has-error': participationForm.configuration.micro0_numero_serie.$invalid && !participationForm.$pristine}">
+          <div class="input-group">
+            <label class="input-group-addon" for="configuration.micro0_numero_serie">
+              Numéro de série du micro 0
+            </label>
+            <input type="text" class="form-control" id="configuration.micro0_numero_serie"
+              name="micro0_numero_serie"
+              ng-model="participation.configuration.micro0_numero_serie" ng-disabled="readOnly">
+          </div>
+        </div>
+
+        <div class="form-group" ng-class="{'has-error': participationForm.configuration.micro0_hauteur.$invalid && !participationForm.$pristine}">
+          <div class="input-group">
+            <label class="input-group-addon" for="configuration.micro0_hauteur">
+              Hauteur du micro 0
+            </label>
+            <input type="text" class="form-control" id="configuration.micro0_hauteur"
+              name="micro0_hauteur"
+              ng-model="participation.configuration.micro0_hauteur" ng-disabled="readOnly">
+          </div>
+        </div>
+
+        <div class="input-group form-group" ng-class="{'has-error': participationForm.configuration.micro1_position.$invalid && !participationForm.$pristine}">
+          <span class="input-group-addon">Position micro 1</span>
+          <select class="form-control" name="micro1_position"
+            ng-model="participation.configuration.micro1_position"
+            ng-disabled="readOnly">
+            <option value="SOL">Sol</option>
+            <option value="CANOPEE">Canopée</option>
+          </select>
+        </div>
+
+        <div class="form-group" ng-class="{'has-error': participationForm.configuration.micro1_numero_serie.$invalid && !participationForm.$pristine}">
+          <div class="input-group">
+            <label class="input-group-addon" for="configuration.micro1_numero_serie">
+              Numéro de série du micro 1
+            </label>
+            <input type="text" class="form-control" id="configuration.micro1_numero_serie"
+              name="micro1_numero_serie"
+              ng-model="participation.configuration.micro1_numero_serie" ng-disabled="readOnly">
+          </div>
+        </div>
+
+        <div class="form-group" ng-class="{'has-error': participationForm.configuration.micro1_hauteur.$invalid && !participationForm.$pristine}">
+          <div class="input-group">
+            <label class="input-group-addon" for="configuration.micro1_hauteur">
+              Hauteur du micro 1
+            </label>
+            <input type="text" class="form-control" id="configuration.micro1_hauteur"
+              name="micro1_hauteur"
+              ng-model="participation.configuration.micro1_hauteur" ng-disabled="readOnly">
+          </div>
+        </div>
 
         <div class="input-group form-group">
           <input class="save-participation btn btn-primary" type="submit"
