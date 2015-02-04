@@ -68,9 +68,9 @@ angular.module('protocoleViews', ['ngRoute', 'textAngular', 'xin_listResource',
           for protocole in protocoles
             if userProtocolesDict[protocole._id]?
               if userProtocolesDict[protocole._id].valide
-                protocole._status_toValidate = true
-              else
                 protocole._status_registered = true
+              else
+                protocole._status_toValidate = true
           deferred.resolve(protocoles)
       return deferred.promise
 
