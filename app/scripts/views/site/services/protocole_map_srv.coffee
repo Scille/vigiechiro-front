@@ -3,7 +3,7 @@
 
 angular.module('protocole_map', ['protocole_map_carre', 'protocole_map_point_fixe', 'protocole_map_routier'])
   .factory 'protocolesFactory', (ProtocoleMapCarre, ProtocoleMapRoutier, ProtocoleMapPointFixe) ->
-    (site, protocoleAlgoSite, mapDiv, siteCallback) ->
+    (site, protocoleAlgoSite, mapDiv, siteCallback = {}) ->
       if protocoleAlgoSite == 'ROUTIER'
         return new ProtocoleMapRoutier(site, mapDiv, siteCallback)
       else if protocoleAlgoSite == 'CARRE'
@@ -40,8 +40,9 @@ angular.module('protocole_map', ['protocole_map_carre', 'protocole_map_point_fix
           steps: @_steps
           step: @_step
           loading: @loading
-        @siteCallback.updateSteps(steps)
-        if not @loading
+        if @siteCallback.updateSteps?
+          @siteCallback.updateSteps(steps)
+        if not @loading and @siteCallback.updateForm?
           @siteCallback.updateForm()
 
       saveMap: ->

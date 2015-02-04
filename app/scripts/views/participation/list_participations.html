@@ -16,30 +16,15 @@
     </div>
   </div>
 
-  <div ng-if="!loading">
-    <div ng-if="participations.length != 0">
-      <ul class="list-group">
-        <li class="list-group-item" dir-paginate="participation in participations | itemsPerPage: itemsPerPage"
-            total-items="totalItems" current-page="currentPage">
-          <a class="btn" ng-href='#/participations/{{ participation._id }}'>
-            {{ participation.date_debut }}
-          </a>
-        </li>
-      </ul>
-      <dir-pagination-controls boundary-links="true" on-page-change="pageChanged(newPageNumber)"></dir-pagination-controls>
-    </div>
+  <list-resource-directive resource-backend="resourceBackend" lookup="lookup">
+    <a class="btn" ng-href='#/participations/{{resource._id}}'>
+      {{resource.date_debut}}
+    </a>
+  </list-resource-directive>
 
-    <div ng-if="participations.length == 0" class="text-center">
-      <h3><i>Pas de participations</i></h3>
-    </div>
-
-    <div class="text-center" ng-show="isAdmin">
-      <a name="create-participation" class="btn btn-default" href="#/participations/nouveau">Nouveau participation</a>
-    </div>
-  </div>
-
-  <div ng-if="loading">
-    <center><img src="images/spinner.gif"></img></center>
-    <center>Changement de la liste des participations...</center>
+  <div class="text-center" ng-show="isAdmin">
+    <a class="btn btn-default" href="#/participations/nouveau">
+      Nouveau participation
+    </a>
   </div>
 </div>

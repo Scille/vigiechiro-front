@@ -1,0 +1,109 @@
+<div class="form-group input-group">
+  <span class="input-group-addon" for="date_debut">Date de début</span>
+  <span class="form-control">{{ participation.date_debut }}</span>
+</div>
+
+<div class="form-group input-group">
+  <span class="input-group-addon">Date de fin</span>
+  <span class="form-control">{{ participation.date_fin }}</span>
+</div>
+
+<div class="form-group input-group">
+  <span class="input-group-addon">Température au début</span>
+  <span class="form-control">
+    {{ participation.meteo.temperature_debut }}
+  </span>
+</div>
+
+<div class="form-group input-group">
+  <span class="input-group-addon">Température à la fin</span>
+  <span class="form-control">
+    {{ participation.meteo.temperature_fin }}
+  </span>
+</div>
+
+<div class="form-group input-group">
+  <span class="input-group-addon">Vent</span>
+  <span class="form-control">
+    {{ participation.meteo.vent }}
+  </span>
+</div>
+
+<div class="input-group form-group">
+  <span class="input-group-addon">Couverture</span>
+  <span class="form-control">
+    {{ participation.meteo.couverture }}
+  </span>
+</div>
+
+<div class="form-group input-group">
+  <span class="input-group-addon">Commentaire</span>
+  <span class="form-control">{{ participation.commentaire }}</span>
+</div>
+
+<div class="form-group input-group">
+  <span class="input-group-addon">Pièces jointes</span>
+  <span class="form-control">{{ participation.pieces_jointes }}</span>
+</div>
+
+<div class="form-group input-group">
+  <span class="input-group-addon">
+    Numéro de série du détecteur enregistreur
+  </span>
+  <span class="form-control">
+    {{ participation.configuration.detecteur_enregistreur_numero_serie }}
+  </span>
+</div>
+
+<div class="form-group input-group">
+  <span class="input-group-addon">Position micro 0</span>
+  <span class="form-control">
+    {{ participation.configuration.micro0_position }}
+  </span>
+</div>
+
+<div class="form-group input-group">
+  <span class="input-group-addon">Numéro de série du micro 0</span>
+  <span class="form-control">
+    {{ participation.configuration.micro0_numero_serie }}
+  </span>
+</div>
+
+<div class="form-group input-group">
+  <span class="input-group-addon">Hauteur du micro 0</span>
+  <span class="form-control">
+    {{ participation.configuration.micro0_hauteur }}
+  </span>
+</div>
+
+<div class="form-group input-group">
+  <span class="input-group-addon">Position micro 1</span>
+  <span class="form-control">
+    {{ participation.configuration.micro1_position }}
+  </span>
+</div>
+
+<div class="form-group input-group">
+  <span class="input-group-addon">Numéro de série du micro 1</span>
+  <span class="form-control">
+    {{ participation.configuration.micro1_numero_serie }}
+  </span>
+</div>
+
+<div class="form-group input-group">
+  <span class="input-group-addon">Hauteur du micro 1</span>
+  <span class="form-control">
+    {{ participation.configuration.micro1_hauteur }}
+  </span>
+</div>
+
+<div class="form-group input-group">
+  <span class="input-group-addon">Posts</span>
+  <span class="form-control">
+    <div ng-repeat="post in participation.posts">
+      auteur : {{ post.auteur }}
+      date : {{ post.date }}
+      message : {{ post.message }}
+    </div>
+  </span>
+</div>

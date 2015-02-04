@@ -1,0 +1,16 @@
+<a href="#/protocoles/{{site.protocole._id}}">Voir le protocole</a>
+
+<div class="panel-body">
+  <display-site-directive site="site"
+    protocole-algo-site="{{protocoleAlgoSite}}">
+  </display-site-directive>
+</div>
+
+<div class="panel-body">
+  <list-participations-directive site-id="{{site._id}}">
+  </list-participations-directive>
+</div>
+
+<a class="btn btn-default" href="#/sites/{{site._id}}/nouvelle-participation">
+  Nouvelle participation
+</a>

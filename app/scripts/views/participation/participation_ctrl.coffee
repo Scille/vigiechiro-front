@@ -7,52 +7,49 @@ angular.module('participationViews', ['ngRoute', 'textAngular', 'xin_listResourc
     $routeProvider
       .when '/participations',
         templateUrl: 'scripts/views/participation/list_participations.html'
-        controller: 'ListResourceCtrl'
-        resolve: {resourceBackend: (Backend) -> Backend.all('participations')}
-      .when '/participations/nouveau',
+        controller: 'ListParticipationsCtrl'
+      .when '/sites/:siteId/nouvelle-participation',
         templateUrl: 'scripts/views/participation/create_participation.html'
         controller: 'CreateParticipationCtrl'
-#      .when '/sites/:siteId/nouvelle-participation',
-#        templateUrl: 'scripts/views/participation/create_participation.html'
-#        controller: 'CreateParticipationCtrl'
       .when '/participations/:participationId',
         templateUrl: 'scripts/views/participation/display_participation.html'
         controller: 'DisplayParticipationCtrl'
 
+  .controller 'ListParticipationsCtrl', ($scope, Backend, DelayedEvent) ->
+    $scope.lookup = {}
+    # Filter field is trigger after 500ms of inactivity
+    delayedFilter = new DelayedEvent(500)
+    $scope.filterField = ''
+    $scope.$watch 'filterField', (filterValue) ->
+      delayedFilter.triggerEvent ->
+        if filterValue? and filterValue != ''
+          $scope.lookup.where = JSON.stringify(
+              $text:
+                $search: filterValue
+          )
+        else if $scope.lookup.where?
+          delete $scope.lookup.where
+    $scope.resourceBackend = Backend.all('participations')
+
+  .controller 'CreateParticipationCtrl', ($routeParams, $scope, Backend) ->
+    params =
+      embedded: { protocole: 1 }
+    Backend.one('sites', $routeParams.siteId).get(params).then (site) ->
+      $scope.site = site
+
   .directive 'createParticipationDirective', ->
     restrict: 'E'
-    templateUrl: 'scripts/views/participation/create_participation.html'
-    controller: 'CreateParticipationCtrl'
+    templateUrl: 'scripts/views/participation/create_participation_drt.html'
+    controller: 'CreateParticipationDirectiveCtrl'
     scope:
       siteId: '@'
-    link: (scope, elem, attrs) ->
-      scope.collapsed = true
-      scope.title = 'Nouvelle participation'
-      attrs.$observe('siteId', (siteId) ->
-        scope.siteId = siteId
-      )
+      protocoleId: '@'
 
-  .controller 'CreateParticipationCtrl', ($route, $routeParams, $scope,
-    session, Backend) ->
+  .controller 'CreateParticipationDirectiveCtrl', ($route, $scope, session, Backend) ->
     $scope.participation = {}
     session.getUserPromise().then (user) ->
-      $scope.observateur = user._id
-    Backend.all('protocoles').getList().then((protocoles) ->
-      $scope.protocoles = protocoles.plain()
-    )
-    $scope.$watch("participation.protocole", (newValue) ->
-      if newValue?
-        where = JSON.stringify(
-          'protocole': newValue
-        )
-        Backend.all('sites').getList('where': where).then((sites) ->
-          $scope.sites = sites.plain()
-        )
-    )
-    if $scope.siteId
-      Backend.one('sites', $scope.siteId).get().then (site) ->
-        $scope.participation.protocole = site.protocole
-        $scope.participation.site = site._id
+      $scope.observateurId = user._id
+
     $scope.saveParticipation = ->
       $scope.submitted = true
       if (not $scope.participationForm.$valid or
@@ -61,9 +58,9 @@ angular.module('participationViews', ['ngRoute', 'textAngular', 'xin_listResourc
       date_debut = new Date($scope.participation.date_debut)
       date_debut = date_debut.toGMTString()
       payload =
-        'observateur': $scope.observateur
-        'protocole' : $scope.participation.protocole
-        'site' : $scope.participation.site
+        'observateur': $scope.observateurId
+        'protocole' : $scope.protocoleId
+        'site' : $scope.siteId
       # Retrieve the modified fields from the form
       for key, value of $scope.participationForm
         if key.charAt(0) != '$' and value.$dirty
@@ -93,5 +90,59 @@ angular.module('participationViews', ['ngRoute', 'textAngular', 'xin_listResourc
         (error) -> console.log("error", error)
       )
 
-  .controller 'DisplayParticipationCtrl', ($route, $routeParams, $scope,
-    session, Backend) ->
+  .directive 'listParticipationsDirective', (session, Backend) ->
+    restrict: 'E'
+    templateUrl: 'scripts/views/participation/list_participations_drt.html'
+    scope:
+      siteId: '@'
+    link: (scope, elem, attrs) ->
+      scope.loading = true
+      attrs.$observe 'siteId', (siteId) ->
+        if siteId
+          params =
+            where:
+              site: siteId
+          Backend.all('participations').getList(params).then (participations) ->
+            scope.participations = participations.plain()
+            scope.loading = false
+
+  .directive 'showParticipationDirective', ->
+    restrict: 'E'
+    templateUrl: 'scripts/views/participation/show_participation_drt.html'
+    scope:
+      participation: '='
+      title: '@'
+
+  .controller 'DisplayParticipationCtrl', ($scope, $route, $routeParams, session, Backend) ->
+    saveParticipation = undefined
+    $scope.userId = undefined
+    session.getUserPromise().then (user) ->
+      $scope.userId = user._id
+    params =
+      embedded: { protocole: 1 }
+    Backend.one('participations', $routeParams.participationId).get(params).then (participation) ->
+      saveParticipation = participation
+      $scope.participation = participation.plain()
+    $scope.addPost = (post) ->
+      origPosts = $scope.participation.posts
+      if not origPosts?
+        origPosts = []
+      newPost =
+        auteur: $scope.userId
+        date: new Date().toGMTString()
+        message: post
+      origPosts.push(newPost)
+      payload =
+        posts: origPosts
+      saveParticipation.patch(payload).then (
+        -> $route.reload()
+        (error) -> throw "Error patch"
+      )
+
+
+
+  .directive 'displayParticipationDirective', ->
+    restrict: 'E'
+    templateUrl: 'scripts/views/participation/display_participation_drt.html'
+    scope:
+      participation: '='

@@ -1,0 +1,19 @@
+<a href="#/protocoles/{{participation.protocole._id}}">
+  {{ participation.protocole.titre }}
+</a>
+<a href="#/sites/{{participation.site}}">
+  {{ participation.site }}
+</a>
+
+<display-participation-directive participation="participation">
+</display-participation-directive>
+
+<div class="form-group input-group">
+  <input class="form-control" type="text"
+    ng-model="post">
+  <a class="input-group-addon" ng-click="addPost(post)">Ajouter un message</a>
+</div>
+
+<a class="btn btn-default" href="#/participations/">
+  Editer la participation
+</a>

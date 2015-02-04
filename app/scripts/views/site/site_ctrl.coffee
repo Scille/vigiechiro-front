@@ -2,6 +2,20 @@
 
 
 angular.module('siteViews', ['ngRoute', 'textAngular', 'xin_backend', 'protocole_map'])
+  .config ($routeProvider) ->
+    $routeProvider
+      .when '/sites/:siteId',
+        templateUrl: 'scripts/views/site/display_site.html'
+        controller: 'DisplaySiteCtrl'
+
+  .controller 'DisplaySiteCtrl', ($routeParams, $scope
+                                  Backend) ->
+    params =
+      embedded: { "protocole": 1, "grille_stoc": 1 }
+    Backend.one('sites', $routeParams.siteId).get(params).then (site) ->
+      $scope.site = site.plain()
+      $scope.protocoleAlgoSite = $scope.site.protocole.algo_tirage_site
+
   .directive 'listSitesDirective', (session, Backend) ->
     restrict: 'E'
     templateUrl: 'scripts/views/site/list_sites.html'
@@ -122,7 +136,6 @@ angular.module('siteViews', ['ngRoute', 'textAngular', 'xin_backend', 'protocole
 #        'coordonnee':
 #          'type': 'Point'
 #          'coordinates': [mapDump[0].lng, mapDump[0].lat]
-#        'numero_grille_stoc': 
         'commentaire': $scope.siteForm.commentaire.$modelValue
       grille_stoc = mapProtocole.getIdGrilleStoc()
       if grille_stoc != ''
@@ -154,3 +167,19 @@ angular.module('siteViews', ['ngRoute', 'textAngular', 'xin_backend', 'protocole
         if value
           scope.protocoleAlgoSite = value
       )
+
+  .directive 'displaySiteDirective', ->
+    restrict: 'E'
+    templateUrl: 'scripts/views/site/display_site_drt.html'
+    controller: 'DisplaySiteDirectiveCtrl'
+    scope:
+      site: '='
+      protocoleAlgoSite: '@'
+    link: (scope, elem, attrs) ->
+      attrs.$observe 'protocoleAlgoSite', (protocoleAlgoSite) ->
+        if protocoleAlgoSite
+          scope.loadMap(elem.find('.g-maps')[0])
+
+  .controller 'DisplaySiteDirectiveCtrl', ($scope, Backend, protocolesFactory) ->
+    $scope.loadMap = (mapDiv) ->
+      protocolesFactory($scope.site, $scope.protocoleAlgoSite, mapDiv)
