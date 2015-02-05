@@ -37,6 +37,10 @@ angular.module('protocoleViews', ['ngRoute', 'textAngular', 'xin_listResource',
   .controller 'ListProtocolesCtrl', ($scope, $q, $location, Backend,
                                      session, DelayedEvent) ->
     $scope.lookup = {}
+    $scope.title = "Tous les protocoles"
+    $scope.swap =
+      title: "Voir mes protocoles"
+      value: "/mes-protocoles"
     # Filter field is trigger after 500ms of inactivity
     delayedFilter = new DelayedEvent(500)
     # params = $location.search()
@@ -80,6 +84,10 @@ angular.module('protocoleViews', ['ngRoute', 'textAngular', 'xin_listResource',
   .controller 'ListMesProtocolesCtrl', ($scope, $q, $location, Backend,
                                      session, DelayedEvent) ->
     $scope.lookup = {}
+    $scope.title = "Mes protocoles"
+    $scope.swap =
+      title: "Voir tous les protocoles"
+      value: ''
     $scope.userProtocolesArray = []
     # Filter field is trigger after 500ms of inactivity
     delayedFilter = new DelayedEvent(500)
