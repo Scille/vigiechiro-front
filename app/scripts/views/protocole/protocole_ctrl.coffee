@@ -18,6 +18,9 @@ angular.module('protocoleViews', ['ngRoute', 'textAngular', 'xin_listResource',
       .when '/protocoles',
         templateUrl: 'scripts/views/protocole/list_protocoles.html'
         controller: 'ListProtocolesCtrl'
+      .when '/protocoles/mes-protocoles',
+        templateUrl: 'scripts/views/protocole/list_protocoles.html'
+        controller: 'ListMesProtocolesCtrl'
       .when '/protocoles/nouveau',
         templateUrl: 'scripts/views/protocole/edit_protocole.html'
         controller: 'CreateProtocoleCtrl'
@@ -31,8 +34,8 @@ angular.module('protocoleViews', ['ngRoute', 'textAngular', 'xin_listResource',
         templateUrl: 'scripts/views/protocole/edit_protocole.html'
         controller: 'EditProtocoleCtrl'
 
-  .controller 'ListProtocolesCtrl', ($scope, $q, $location, Backend, session,
-                                     DelayedEvent) ->
+  .controller 'ListProtocolesCtrl', ($scope, $q, $location, Backend,
+                                     session, DelayedEvent) ->
     $scope.lookup = {}
     # Filter field is trigger after 500ms of inactivity
     delayedFilter = new DelayedEvent(500)
@@ -60,6 +63,58 @@ angular.module('protocoleViews', ['ngRoute', 'textAngular', 'xin_listResource',
       userProtocolesDict = {}
       for userProtocole in user.protocoles or []
         userProtocolesDict[userProtocole.protocole] = userProtocole
+      userProtocolesDictDefer.resolve(userProtocolesDict)
+    $scope.resourceBackend.getList = (lookup) ->
+      deferred = $q.defer()
+      userProtocolesDictDefer.promise.then (userProtocolesDict) ->
+        resourceBackend_getList(lookup).then (protocoles) ->
+          for protocole in protocoles
+            if userProtocolesDict[protocole._id]?
+              if userProtocolesDict[protocole._id].valide
+                protocole._status_registered = true
+              else
+                protocole._status_toValidate = true
+          deferred.resolve(protocoles)
+      return deferred.promise
+
+  .controller 'ListMesProtocolesCtrl', ($scope, $q, $location, Backend,
+                                     session, DelayedEvent) ->
+    $scope.lookup = {}
+    $scope.userProtocolesArray = []
+    # Filter field is trigger after 500ms of inactivity
+    delayedFilter = new DelayedEvent(500)
+    # params = $location.search()
+    # if params.where?
+    #   $scope.filterField = JSON.parse(params.where).$text.$search
+    # else
+    $scope.filterField = ''
+    $scope.$watch 'filterField', (filterValue) ->
+      delayedFilter.triggerEvent ->
+        if filterValue? and filterValue != ''
+          console.log($scope.lookup.where)
+          $scope.lookup.where = JSON.stringify(
+            $text:
+              $search: filterValue
+            _id:
+              $in: [$scope.userProtocolesArray.toString()]
+          )
+        else
+          $scope.lookup.where = JSON.stringify(
+            _id:
+              $in: [$scope.userProtocolesArray.toString()]
+          )
+        # TODO : fix reloadOnSearch: true
+        # $location.search('where', $scope.lookup.where)
+    $scope.resourceBackend = Backend.all('protocoles')
+    # Wrap protocole backend to check if the user is registered (see _status_*)
+    resourceBackend_getList = $scope.resourceBackend.getList
+    userProtocolesDictDefer = $q.defer()
+    session.getUserPromise().then (user) ->
+      userProtocolesDict = {}
+      userProtocolesArray = []
+      for userProtocole in user.protocoles or []
+        userProtocolesDict[userProtocole.protocole] = userProtocole
+        $scope.userProtocolesArray.push(userProtocole.protocole)
       userProtocolesDictDefer.resolve(userProtocolesDict)
     $scope.resourceBackend.getList = (lookup) ->
       deferred = $q.defer()
