@@ -54,7 +54,8 @@ angular.module('siteViews', ['ngRoute', 'textAngular', 'xin_backend', 'protocole
       if not mapLoaded
         mapLoaded = true
         mapProtocole = protocolesFactory($scope.site, $scope.protocoleAlgoSite,
-                                         mapDiv, true, siteCallback)
+                                         mapDiv, !$scope.site.verrouille,
+                                         siteCallback)
     siteCallback =
       updateForm: ->
         $scope.siteForm.$pristine = false
@@ -76,6 +77,8 @@ angular.module('siteViews', ['ngRoute', 'textAngular', 'xin_backend', 'protocole
       grille_stoc = mapProtocole.getIdGrilleStoc()
       if grille_stoc != ''
         payload.grille_stoc = grille_stoc
+      if $scope.isAdmin
+        payload.verrouille = $scope.site.verrouille
       siteResource.patch(payload).then(
         -> $scope.siteForm.$setPristine()
         (error) -> console.log("error", error)
