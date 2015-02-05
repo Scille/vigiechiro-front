@@ -137,12 +137,12 @@ angular.module('xin_google_maps', [])
           geoJson.geometries.push(shapetosave)
         return geoJson
 
-      deleteOverlay: (overlay) =>
+      deleteOverlay: (overlay) ->
         overlay.setMap(null)
         index = @_overlay.indexOf(overlay)
         @_overlay.splice(index, 1);
 
-      getCountOverlays: (type = '') =>
+      getCountOverlays: (type = '') ->
         result = 0
         for overlay in @_overlay
           if type == ''
@@ -150,6 +150,13 @@ angular.module('xin_google_maps', [])
           else
             if overlay.type == type
               result++
+        return result
+
+      getTotalLength: ->
+        result = 0
+        for overlay in @_overlay
+          if overlay.type == 'LineString'
+            result += google.maps.geometry.spherical.computeLength(overlay.getPath())
         return result
 
       displayInfo: (overlay) ->

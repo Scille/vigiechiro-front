@@ -8,13 +8,8 @@ angular.module('protocole_map_routier', [])
   .factory 'ProtocoleMapRoutier', ($rootScope, Backend, GoogleMaps, ProtocoleMap) ->
     class ProtocoleMapRoutier extends ProtocoleMap
       constructor: (@site, mapDiv, @allowEdit, @siteCallback) ->
+        @_totalLength = 0
         super @site, mapDiv, @allowEdit, @siteCallback
-        @_steps = [
-          "Positionner le point d'origine.",
-          "Tracer le parcours par plusieurs segments de 2 km (+/-10%). "+
-          "Les segments trop courts sont en violet et les trop longs en rouge.",
-          "Atteindre une longueur de tracé globale de 30 km ou plus."
-        ]
         @_googleMaps.setDrawingManagerOptions(
           drawingControlOptions:
             position: google.maps.ControlPosition.TOP_CENTER
@@ -27,19 +22,31 @@ angular.module('protocole_map_routier', [])
         @updateSite()
         @loading = false
 
+      getSteps: ->
+        return [
+          "Positionner le point d'origine.",
+          "Tracer le parcours par plusieurs segments de 2 km (+/-10%). "+
+          "Les segments trop courts sont en violet et les trop longs en rouge.",
+          "Atteindre une longueur de tracé globale de 30 km ou plus. "+
+          "Longueur actuelle "+@_totalLength+" mètres"
+        ]
+
       mapsCallback: ->
         overlayCreated: (overlay) =>
           isModified = false
           if overlay.type == "Point"
             nbPoints = @_googleMaps.getCountOverlays('Point')
             if nbPoints <= 0
+              @_step = 1
               isModified = true
           else if overlay.type == "LineString"
-            @checkLength(overlay)
+            @_totalLength += @checkLength(overlay)
             isModified = true
             # when use mouseup, overlay is still not changed.
             @_googleMaps.addListener(overlay, 'mouseout', (event) =>
               @checkLength(overlay)
+              @_totalLength = @_googleMaps.getTotalLength()
+              @updateSite()
             )
           else
             console.log("Error : géométrie non autorisée "+overlay.type)
@@ -48,6 +55,8 @@ angular.module('protocole_map_routier', [])
             if @allowEdit
               @_googleMaps.addListener(overlay, 'rightclick', (event) =>
                 @_googleMaps.deleteOverlay(overlay)
+                @_totalLength = @_googleMaps.getTotalLength()
+                @updateSite()
               )
             else
               overlay.setOptions(
@@ -56,12 +65,3 @@ angular.module('protocole_map_routier', [])
               )
             return true
           return false
-
-      checkLength: (overlay) ->
-        length = google.maps.geometry.spherical.computeLength(overlay.getPath())
-        if length < 1800
-          overlay.setOptions(strokeColor: '#800090')
-        else if length > 2200
-          overlay.setOptions(strokeColor: '#FF0000')
-        else
-          overlay.setOptions(strokeColor: '#000000')

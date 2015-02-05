@@ -53,7 +53,8 @@ angular.module('siteViews', ['ngRoute', 'textAngular', 'xin_backend', 'protocole
     $scope.loadMap = (mapDiv) ->
       if not mapLoaded
         mapLoaded = true
-        mapProtocole = protocolesFactory($scope.site, $scope.protocoleAlgoSite, mapDiv, siteCallback)
+        mapProtocole = protocolesFactory($scope.site, $scope.protocoleAlgoSite,
+                                         mapDiv, true, siteCallback)
     siteCallback =
       updateForm: ->
         $scope.siteForm.$pristine = false
@@ -114,7 +115,8 @@ angular.module('siteViews', ['ngRoute', 'textAngular', 'xin_backend', 'protocole
     $scope.loadMap = (mapDiv) ->
       if not mapLoaded
         mapLoaded = true
-        mapProtocole = protocolesFactory($scope.site, $scope.protocoleAlgoSite, mapDiv, siteCallback)
+        mapProtocole = protocolesFactory($scope.site, $scope.protocoleAlgoSite,
+                                         mapDiv, true, siteCallback)
     siteCallback =
       updateForm: ->
         $scope.siteForm.$pristine = false

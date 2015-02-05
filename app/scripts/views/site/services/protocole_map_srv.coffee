@@ -37,7 +37,7 @@ angular.module('protocole_map', ['protocole_map_carre', 'protocole_map_point_fix
 
       updateSite: ->
         steps =
-          steps: @_steps
+          steps: @getSteps()
           step: @_step
           loading: @loading
         if @siteCallback.updateSteps?
@@ -178,3 +178,16 @@ angular.module('protocole_map', ['protocole_map_carre', 'protocole_map_point_fix
               @mapsChanged()
           )
         @_googleMaps.setDrawingManagerOptions(drawingControl: true)
+
+      checkLength: (overlay) ->
+        length = google.maps.geometry.spherical.computeLength(overlay.getPath())
+        if length < 1800
+          overlay.setOptions(strokeColor: '#800090')
+        else if length > 2200
+          overlay.setOptions(strokeColor: '#FF0000')
+        else
+          overlay.setOptions(strokeColor: '#000000')
+        return length
+
+      getSteps: ->
+        return @_steps
