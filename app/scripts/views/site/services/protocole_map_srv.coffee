@@ -3,19 +3,19 @@
 
 angular.module('protocole_map', ['protocole_map_carre', 'protocole_map_point_fixe', 'protocole_map_routier'])
   .factory 'protocolesFactory', (ProtocoleMapCarre, ProtocoleMapRoutier, ProtocoleMapPointFixe) ->
-    (site, protocoleAlgoSite, mapDiv, siteCallback = {}) ->
+    (site, protocoleAlgoSite, mapDiv, allowEdit = true, siteCallback = {}) ->
       if protocoleAlgoSite == 'ROUTIER'
-        return new ProtocoleMapRoutier(site, mapDiv, siteCallback)
+        return new ProtocoleMapRoutier(site, mapDiv, allowEdit, siteCallback)
       else if protocoleAlgoSite == 'CARRE'
-        return new ProtocoleMapCarre(site, mapDiv, siteCallback)
+        return new ProtocoleMapCarre(site, mapDiv, allowEdit, siteCallback)
       else if protocoleAlgoSite == 'POINT_FIXE'
-        return new ProtocoleMapPointFixe(site, mapDiv, siteCallback)
+        return new ProtocoleMapPointFixe(site, mapDiv, allowEdit, siteCallback)
       else
         throw "Error : unknown protocole #{protocoleAlgoSite}"
 
   .factory 'ProtocoleMap', ($rootScope, Backend, GoogleMaps) ->
     class ProtocoleMap
-      constructor: (@site, mapDiv, @siteCallback) ->
+      constructor: (@site, mapDiv, @allowEdit, @siteCallback) ->
         @_grille = []
         @_step = 0
         @_steps = []
@@ -167,13 +167,14 @@ angular.module('protocole_map', ['protocole_map_carre', 'protocole_map_point_fix
         @_idGrilleStoc = @_grille[0].id
         @_step = 1
         @updateSite()
-        @_googleMaps.addListener(@_grille[0].item, 'rightclick', (event) =>
-          if confirm("Etes vous sûre de vouloir supprimer ce carré ainsi que toutes les localités qu'il contient ?")
-            @_step = 0
-            @_grille[0].item.setMap(null)
-            @_grille = []
-            @_googleMaps.emptyMap()
-            @updateSite() 
-            @mapsChanged()
-        )
+        if @allowEdit
+          @_googleMaps.addListener(@_grille[0].item, 'rightclick', (event) =>
+            if confirm("Etes vous sûre de vouloir supprimer ce carré ainsi que toutes les localités qu'il contient ?")
+              @_step = 0
+              @_grille[0].item.setMap(null)
+              @_grille = []
+              @_googleMaps.emptyMap()
+              @updateSite()
+              @mapsChanged()
+          )
         @_googleMaps.setDrawingManagerOptions(drawingControl: true)

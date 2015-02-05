@@ -7,8 +7,8 @@
 angular.module('protocole_map_routier', [])
   .factory 'ProtocoleMapRoutier', ($rootScope, Backend, GoogleMaps, ProtocoleMap) ->
     class ProtocoleMapRoutier extends ProtocoleMap
-      constructor: (@site, mapDiv, @siteCallback) ->
-        super @site, mapDiv, @siteCallback
+      constructor: (@site, mapDiv, @allowEdit, @siteCallback) ->
+        super @site, mapDiv, @allowEdit, @siteCallback
         @_steps = [
           "Positionner le point d'origine.",
           "Tracer le parcours par plusieurs segments de 2 km (+/-10%). "+
@@ -45,9 +45,15 @@ angular.module('protocole_map_routier', [])
             console.log("Error : géométrie non autorisée "+overlay.type)
           if isModified
             @updateSite()
-            @_googleMaps.addListener(overlay, 'rightclick', (event) =>
-              @_googleMaps.deleteOverlay(overlay)
-            )
+            if @allowEdit
+              @_googleMaps.addListener(overlay, 'rightclick', (event) =>
+                @_googleMaps.deleteOverlay(overlay)
+              )
+            else
+              overlay.setOptions(
+                draggable: false
+                editable: false
+              )
             return true
           return false
 

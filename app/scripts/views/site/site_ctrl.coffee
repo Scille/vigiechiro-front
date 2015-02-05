@@ -182,4 +182,4 @@ angular.module('siteViews', ['ngRoute', 'textAngular', 'xin_backend', 'protocole
 
   .controller 'DisplaySiteDirectiveCtrl', ($scope, Backend, protocolesFactory) ->
     $scope.loadMap = (mapDiv) ->
-      protocolesFactory($scope.site, $scope.protocoleAlgoSite, mapDiv)
+      protocolesFactory($scope.site, $scope.protocoleAlgoSite, mapDiv, false)

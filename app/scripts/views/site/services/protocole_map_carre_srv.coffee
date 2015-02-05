@@ -7,8 +7,8 @@
 angular.module('protocole_map_carre', [])
   .factory 'ProtocoleMapCarre', ($rootScope, Backend, GoogleMaps, ProtocoleMap) ->
     class ProtocoleMapCarre extends ProtocoleMap
-      constructor: (@site, mapDiv, @siteCallback) ->
-        super @site, mapDiv, @siteCallback
+      constructor: (@site, mapDiv, @allowEdit, @siteCallback) ->
+        super @site, mapDiv, @allowEdit, @siteCallback
         @_steps = [
           "Sélectionner un carré.",
           "Définir les localités à l'intérieur du carré."
@@ -28,12 +28,18 @@ angular.module('protocole_map_carre', [])
             if @_googleMaps.isPolyInPolygon(overlay, @_grille[0].item)
               isModified = true
           if isModified
-            @_googleMaps.addListener(overlay, 'rightclick', (event) =>
-              @_googleMaps.deleteOverlay(overlay)
-              if @_googleMaps.getCountOverlays() == 0
-                @_step = 1
-              @updateSite()
-            )
+            if @allowEdit
+              @_googleMaps.addListener(overlay, 'rightclick', (event) =>
+                @_googleMaps.deleteOverlay(overlay)
+                if @_googleMaps.getCountOverlays() == 0
+                  @_step = 1
+                @updateSite()
+              )
+            else
+              overlay.setOptions(
+                draggable: false
+                editable: false
+              )
             @_step = 2
             @updateSite()
             return true
