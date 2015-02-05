@@ -10,14 +10,17 @@ angular.module('protocole_map_routier', [])
       constructor: (@site, mapDiv, @allowEdit, @siteCallback) ->
         @_totalLength = 0
         super @site, mapDiv, @allowEdit, @siteCallback
-        @_googleMaps.setDrawingManagerOptions(
-          drawingControlOptions:
-            position: google.maps.ControlPosition.TOP_CENTER
-            drawingModes: [
-              google.maps.drawing.OverlayType.MARKER
-              google.maps.drawing.OverlayType.POLYLINE
-            ]
-        )
+        if @allowEdit
+          @_googleMaps.setDrawingManagerOptions(
+            drawingControlOptions:
+              position: google.maps.ControlPosition.TOP_CENTER
+              drawingModes: [
+                google.maps.drawing.OverlayType.MARKER
+                google.maps.drawing.OverlayType.POLYLINE
+              ]
+          )
+        else
+          @_googleMaps.setDrawingManagerOptions(drawingControl: false)
         @loading = true
         @updateSite()
         @loading = false

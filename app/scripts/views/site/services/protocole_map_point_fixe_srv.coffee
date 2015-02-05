@@ -13,7 +13,8 @@ angular.module('protocole_map_point_fixe', [])
           "Sélectionner un carré.",
           "Définir les localités à l'intérieur du carré."
         ]
-        @_googleMaps.setDrawingManagerOptions(drawingControl: false)
+        if (@_step < 1 or not @allowEdit)
+          @_googleMaps.setDrawingManagerOptions(drawingControl: false)
         @loading = true
         @updateSite()
         @loading = false

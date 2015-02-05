@@ -177,7 +177,7 @@ angular.module('protocole_map', ['protocole_map_carre', 'protocole_map_point_fix
               @updateSite()
               @mapsChanged()
           )
-        @_googleMaps.setDrawingManagerOptions(drawingControl: true)
+          @_googleMaps.setDrawingManagerOptions(drawingControl: true)
 
       checkLength: (overlay) ->
         length = google.maps.geometry.spherical.computeLength(overlay.getPath())
