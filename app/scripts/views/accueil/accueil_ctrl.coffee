@@ -9,9 +9,12 @@ angular.module('accueilViews', ['ngRoute', 'xin_backend', 'xin_session'])
         controller: 'AccueilCtrl'
 
   .controller 'AccueilCtrl', ($scope, Backend, session) ->
-      session.getUserPromise().then (user) ->
-        where = JSON.stringify(
-          'observateur': user._id
-        )
-        Backend.all('sites').getList('where': where).then (sites) ->
-          $scope.userSites = sites.plain()
+    session.getUserPromise().then (user) ->
+      $scope.isAdmin = false
+      if user.role == "Administrateur"
+        $scope.isAdmin = true
+      where = JSON.stringify(
+        'observateur': user._id
+      )
+      Backend.all('sites').getList('where': where).then (sites) ->
+        $scope.userSites = sites.plain()
