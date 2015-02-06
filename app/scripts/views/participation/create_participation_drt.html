@@ -75,17 +75,17 @@
 
     <div class="form-group" ng-class="{'has-error': participationForm.pieces_jointes.$invalid && !participationForm.$pristine}">
       <div class="input-group">
-        <label class="input-group-addon" for="pieces_jointes">
-          Pièces jointes
-        </label>
-        <input type="file" class="form-control" id="pieces_jointes"
-          name="pieces_jointes"
-          ng-model="participation.pieces_jointes" ng-disabled="readOnly">
+        <span class="input-group-addon">Pièces jointes</span>
+        <div style="padding-right: 1em; border-left: 1px solid #ccc">
+          <upload-file-directive multiple uploaders="uploaders">
+          </upload-file-directive>
+        </div>
       </div>
       <span ng-show="submitted && participationForm.pieces_jointes.$error.required" class="help-block">
         Champ requis
       </span>
     </div>
+
 
     <div class="form-group" ng-class="{'has-error': participationForm.configuration.detecteur_enregistreur_numero_serie.$invalid && !participationForm.$pristine}">
       <div class="input-group">

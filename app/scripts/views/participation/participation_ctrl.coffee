@@ -45,7 +45,8 @@ angular.module('participationViews', ['ngRoute', 'textAngular', 'xin_listResourc
       siteId: '@'
       protocoleId: '@'
 
-  .controller 'CreateParticipationDirectiveCtrl', ($route, $scope, session, Backend) ->
+  .controller 'CreateParticipationDirectiveCtrl', ($route, $scope, xin_uploadFile,
+                                                   session, Backend) ->
     $scope.participation = {}
     session.getUserPromise().then (user) ->
       $scope.observateurId = user._id
