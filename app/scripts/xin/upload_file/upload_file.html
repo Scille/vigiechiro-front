@@ -1,10 +1,23 @@
-<input type="file" multiple class="files-input" custom-on-change="s3Upload"/>
-<div ng-repeat="uploader in uploaders">
-  {{uploader.fileName}}
-  <div class="progress">
-    <div class="progress-bar" role="progressbar" aria-valuenow="{{uploader.progress}}"
-         aria-valuemin="0" aria-valuemax="100" style="width: {{uploader.progress}}%;">
-      {{uploader.progress + '%'}}
+<div dropzone class="drop row" ng-class="dragOverClass" ng-click="clickFileInput()">
+  <input type="file" class="btn hidden files-input" custom-on-change="fileInputUploadFiles"/>
+  <center>Cliquez ou déposez vos fichiers ici</center>
+</div>
+
+<div ng-repeat="uploader in uploaders" class="form-group">
+  <div>
+    {{uploader.file.name}}
+    {{uploader.id}}
+    <div class="progress">
+      <div class="progress-bar" role="progressbar" aria-valuenow="{{uploader.progress}}"
+           aria-valuemin="0" aria-valuemax="100" style="width: {{uploader.progress}}%;">
+        {{uploader.progress + '%'}}
+      </div>
     </div>
+    <button class="btn btn-warning btn-xs" type="button" ng-click="uploader.pause()"
+            ng-if="uploader.status == 'started'">Pause</button>
+    <button class="btn btn-warning btn-xs" type="button" ng-click="uploader.start()"
+            ng-if="uploader.status == 'pause'">Continuer</button>
+    <button class="btn btn-danger btn-xs" type="button" ng-click="stopUploader(uploader)"
+            ng-if="uploader.status != 'dead' && uploader.status != 'done'">Annuler</button>
   </div>
 </div>
