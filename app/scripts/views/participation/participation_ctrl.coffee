@@ -2,7 +2,8 @@
 
 
 angular.module('participationViews', ['ngRoute', 'textAngular', 'xin_listResource',
-                                      'xin_backend', 'xin_session', 'siteViews'])
+                                      'xin_backend', 'xin_session', 'xin_uploadFile',
+                                      'siteViews'])
   .config ($routeProvider) ->
     $routeProvider
       .when '/participations',
@@ -45,9 +46,10 @@ angular.module('participationViews', ['ngRoute', 'textAngular', 'xin_listResourc
       siteId: '@'
       protocoleId: '@'
 
-  .controller 'CreateParticipationDirectiveCtrl', ($route, $scope, xin_uploadFile,
+  .controller 'CreateParticipationDirectiveCtrl', ($route, $scope,
                                                    session, Backend) ->
     $scope.participation = {}
+    $scope.uploaders = []
     session.getUserPromise().then (user) ->
       $scope.observateurId = user._id
 
@@ -60,8 +62,11 @@ angular.module('participationViews', ['ngRoute', 'textAngular', 'xin_listResourc
       date_debut = date_debut.toGMTString()
       payload =
         'observateur': $scope.observateurId
-        'protocole' : $scope.protocoleId
-        'site' : $scope.siteId
+        'protocole': $scope.protocoleId
+        'site': $scope.siteId
+        'pieces_jointes': []
+      for file in $scope.uploaders
+        payload.pieces_jointes.push(file.id)
       # Retrieve the modified fields from the form
       for key, value of $scope.participationForm
         if key.charAt(0) != '$' and value.$dirty
@@ -120,7 +125,10 @@ angular.module('participationViews', ['ngRoute', 'textAngular', 'xin_listResourc
     session.getUserPromise().then (user) ->
       $scope.userId = user._id
     params =
-      embedded: { protocole: 1 }
+      embedded: {
+        protocole: 1
+        pieces_jointes: 1
+      }
     Backend.one('participations', $routeParams.participationId).get(params).then (participation) ->
       saveParticipation = participation
       $scope.participation = participation.plain()
