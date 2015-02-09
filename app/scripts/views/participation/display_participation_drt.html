@@ -45,7 +45,9 @@
   <span class="input-group-addon">Pièces jointes</span>
   <div>
     <div ng-repeat="piece_jointe in participation.pieces_jointes">
-      {{ piece_jointe.titre }}
+      <div class="col-xs-2">
+        <access-file-directive file="piece_jointe"></access-file-directive>
+      </div>
     </div>
   </div>
 </div>

@@ -64,6 +64,7 @@ angular.module('participationViews', ['ngRoute', 'textAngular', 'xin_listResourc
         'observateur': $scope.observateurId
         'protocole': $scope.protocoleId
         'site': $scope.siteId
+        'date_debut': date_debut
         'pieces_jointes': []
       for file in $scope.uploaders
         payload.pieces_jointes.push(file.id)

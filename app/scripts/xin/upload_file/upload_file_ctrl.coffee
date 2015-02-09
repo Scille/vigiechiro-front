@@ -1,7 +1,7 @@
 'use strict'
 
 
-angular.module('xin_uploadFile', [])
+angular.module('xin_uploadFile', ['appSettings'])
   .directive 'customOnChange', () ->
     restrict: "A"
     link: (scope, element, attrs) ->
@@ -31,6 +31,19 @@ angular.module('xin_uploadFile', [])
         $scope.uploaders.push(uploader)
         uploader.start()
       resetFileInput()
+
+  .directive 'accessFileDirective', (SETTINGS, Backend) ->
+    restrict: 'E'
+    template: '<button class="btn btn-primary" ng-click="accessFile()">{{file.titre}}</button>'
+    scope:
+      file: '='
+    link: (scope, elem, attrs) ->
+      scope.fileLink = "#{SETTINGS.API_DOMAIN}/fichiers/#{scope.file._id}/action/acces"
+      scope.accessFile = () ->
+        Backend.all('fichiers').one(scope.file._id).customGET('action/acces').then(
+          (response) -> window.open(response.signed_request)
+          (error) -> throw error
+        )
 
   .directive 'uploadFileDirective', ->
     restrict: 'E'
@@ -207,9 +220,15 @@ angular.module('xin_uploadFile', [])
         callbacks =
           onError: (error) => @_onError(error)
           onProgress: (percent) => @_onProgress(percent)
-          onFinished: => @_onFinished()
+          onFinished: =>
+            Backend.one('fichiers', @id).get().then (fileBackend) =>
+              fileBackend.patch({'S3_upload_realise': true}).then(
+                =>  @_onFinished()
+                (error) -> throw error
+              )
         Backend.one('fichiers').post('s3', payload).then(
           (response) =>
+            etag = response._etag
             @id = response._id
             uploadToS3(callbacks, 'PUT', @file, response.signed_request, {'Content-Type': @file.type})
           (error) -> throw error
