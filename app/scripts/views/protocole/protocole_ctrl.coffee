@@ -104,12 +104,12 @@ angular.module('protocoleViews', ['ngRoute', 'textAngular', 'xin_listResource',
             $text:
               $search: filterValue
             _id:
-              $in: [$scope.userProtocolesArray.toString()]
+              $in: $scope.userProtocolesArray
           )
         else
           $scope.lookup.where = JSON.stringify(
             _id:
-              $in: [$scope.userProtocolesArray.toString()]
+              $in: $scope.userProtocolesArray
           )
         # TODO : fix reloadOnSearch: true
         # $location.search('where', $scope.lookup.where)
