@@ -20,7 +20,7 @@ angular.module('xin_uploadFile', [])
       $scope.uploadFiles($scope.fileInput.files)
     $scope.uploadFiles = (files) ->
       files = files or $scope.fileInput.files
-      if not $scope.multiple and $scope.uploaders.length > 0
+      if not $scope.multipleSelect and $scope.uploaders.length > 0
         return
       for file in files
         uploader = new S3FileUploader(file,
@@ -47,9 +47,9 @@ angular.module('xin_uploadFile', [])
       input = drop.find('input')
       if attrs.multiple?
         input.attr('multiple', '')
-        scope.multiple = true
+        scope.multipleSelect = true
       else
-        scope.multiple = false
+        scope.multipleSelect = false
       scope.clickFileInput = ->
         _.defer(-> input.click())
         return
