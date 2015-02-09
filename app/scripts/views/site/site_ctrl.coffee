@@ -9,12 +9,18 @@ angular.module('siteViews', ['ngRoute', 'textAngular', 'xin_backend', 'protocole
         controller: 'DisplaySiteCtrl'
 
   .controller 'DisplaySiteCtrl', ($routeParams, $scope
-                                  Backend) ->
+                                  Backend, session) ->
     params =
       embedded: { "protocole": 1, "grille_stoc": 1 }
     Backend.one('sites', $routeParams.siteId).get(params).then (site) ->
       $scope.site = site.plain()
       $scope.protocoleAlgoSite = $scope.site.protocole.algo_tirage_site
+      session.getUserPromise().then (user) ->
+        for protocole in user.protocoles
+          if protocole.protocole == $scope.site.protocole._id
+            if protocole.valide?
+              $scope.isProtocoleValid = true
+          break
 
   .directive 'listSitesDirective', (session, Backend) ->
     restrict: 'E'

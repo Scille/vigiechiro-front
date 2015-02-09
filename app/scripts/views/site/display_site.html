@@ -11,6 +11,10 @@
   </list-participations-directive>
 </div>
 
-<a class="btn btn-default" href="#/sites/{{site._id}}/nouvelle-participation">
+<a class="btn btn-primary" href="#/sites/{{site._id}}/nouvelle-participation"
+   ng-disabled="!site.verrouille || !isProtocoleValid">
   Nouvelle participation
 </a>
+<div ng-if="!site.verrouille || !isProtocoleValid">
+  Le protocole et/ou le site ne sont pas encore validés.
+</div>
