@@ -8,8 +8,10 @@
         <input type="date" class="form-control" id="date_debut" name="date_debut"
           ng-model="participation.date_debut" ng-disabled="readOnly" required>
       </div>
-      <span ng-show="submitted && participationForm.date_debut.$error.required"
-            class="help-block">Champ requis</span>
+      <span ng-show="participationForm.date_debut.$error.required"
+            class="help-block has-error">Champ requis</span>
+      <span ng-show="participationForm.date_debut.$error.$invalid"
+            class="help-block has-error">Date invalide</span>
     </div>
 
     <div class="form-group" ng-class="{'has-error': participationForm.date_fin.$invalid && !participationForm.$pristine}">
@@ -17,27 +19,33 @@
         <label class="input-group-addon" for="date_fin">Date de fin</label>
         <input type="date" class="form-control" id="date_fin" name="date_fin"
                ng-model="participation.date_fin" ng-disabled="readOnly">
+      <span ng-show="submitted && participationForm.date_fin.$error.$invalid"
+            class="help-block has-error">Date invalide</span>
       </div>
     </div>
 
-    <div class="form-group" ng-class="{'has-error': participationForm.meteo.temperature_debut.$invalid && !participationForm.$pristine}">
+    <div class="form-group" ng-class="{'has-error': participationForm.temperature_debut.$invalid && !participationForm.$pristine}">
       <div class="input-group">
         <label class="input-group-addon" for="meteo.temperature_debut">
           Température au début
         </label>
-        <input type="text" class="form-control" id="meteo.temperature_debut" name="temperature_debut"
-          ng-model="participation.meteo.temperature_debut" ng-disabled="readOnly">
+        <input type="number" class="form-control" id="meteo.temperature_debut" name="temperature_debut"
+          ng-model="participation.meteo.temperature_debut" ng-disabled="readOnly" min="-20" max="40">
       </div>
+      <span ng-show="participationForm.temperature_debut.$error.max || participationForm.temperature_debut.$error.min || participationForm.temperature_debut.$error.number"
+            class="help-block has-error">La température doit être comprise en -20°C et +40°C</span>
     </div>
 
-    <div class="form-group" ng-class="{'has-error': participationForm.meteo.temperature_fin.$invalid && !participationForm.$pristine}">
+    <div class="form-group" ng-class="{'has-error': participationForm.temperature_fin.$invalid && !participationForm.$pristine}">
       <div class="input-group">
         <label class="input-group-addon" for="meteo.temperature_fin">
           Température à la fin
         </label>
-        <input type="text" class="form-control" id="meteo.temperature_fin" name="temperature_fin"
-          ng-model="participation.meteo.temperature_fin" ng-disabled="readOnly">
+        <input type="number" class="form-control" id="meteo.temperature_fin" name="temperature_fin"
+          ng-model="participation.meteo.temperature_fin" ng-disabled="readOnly" min="-20" max="40">
       </div>
+      <span ng-show="participationForm.temperature_fin.$error.max || participationForm.temperature_fin.$error.min || participationForm.temperature_fin.$error.number"
+            class="help-block has-error">La température doit être comprise en -20°C et +40°C</span>
     </div>
 
     <div class="input-group form-group">

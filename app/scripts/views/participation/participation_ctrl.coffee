@@ -48,7 +48,7 @@ angular.module('participationViews', ['ngRoute', 'textAngular', 'xin_listResourc
 
   .controller 'CreateParticipationDirectiveCtrl', ($route, $scope,
                                                    session, Backend) ->
-    $scope.participation = {}
+    $scope.participation = {date_debut: new Date()}
     $scope.uploaders = []
     session.getUserPromise().then (user) ->
       $scope.observateurId = user._id
@@ -145,10 +145,8 @@ angular.module('participationViews', ['ngRoute', 'textAngular', 'xin_listResourc
         posts: origPosts
       saveParticipation.patch(payload).then (
         -> $route.reload()
-        (error) -> throw "Error patch"
+        (error) -> throw error
       )
-
-
 
   .directive 'displayParticipationDirective', ->
     restrict: 'E'
