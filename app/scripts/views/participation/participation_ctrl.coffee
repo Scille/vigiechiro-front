@@ -93,7 +93,7 @@ angular.module('participationViews', ['ngRoute', 'textAngular', 'xin_listResourc
           else
             payload[key] = $scope.participation[key]
       Backend.all('participations').post(payload).then(
-        -> $route.reload()
+        -> window.location = '#/sites/'+$scope.siteId
         (error) -> console.log("error", error)
       )
 
