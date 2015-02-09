@@ -38,12 +38,25 @@ angular.module('xin_uploadFile', ['appSettings'])
     scope:
       file: '='
     link: (scope, elem, attrs) ->
-      scope.fileLink = "#{SETTINGS.API_DOMAIN}/fichiers/#{scope.file._id}/action/acces"
-      scope.accessFile = () ->
-        Backend.all('fichiers').one(scope.file._id).customGET('action/acces').then(
-          (response) -> window.open(response.signed_request)
-          (error) -> throw error
-        )
+      if scope.file.S3_upload_realise? and scope.file.S3_id?
+        scope.fileLink = "#{SETTINGS.API_DOMAIN}/fichiers/#{scope.file._id}/action/acces"
+        scope.accessFile = () ->
+          Backend.all('fichiers').one(scope.file._id).customGET('action/acces').then(
+            (response) -> window.open(response.signed_request)
+            (error) ->
+              if error.status == 410
+              else
+                throw error
+          )
+      else
+        # File is not available, notify it to the user
+        btn = elem.find('button')
+        btn.removeClass('btn-primary', '')
+        btn.addClass('btn-warning', '')
+        btn.attr('data-toggle', 'tooltip')
+        btn.attr('data-placement', 'top')
+        btn.attr('title', "Ce fichier n'est pas disponible en ligne")
+        btn.tooltip()
 
   .directive 'uploadFileDirective', ->
     restrict: 'E'
