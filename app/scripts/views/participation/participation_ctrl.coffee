@@ -53,6 +53,10 @@ angular.module('participationViews', ['ngRoute', 'textAngular', 'xin_listResourc
     session.getUserPromise().then (user) ->
       $scope.observateurId = user._id
 
+    $scope.$watchCollection 'uploaders', (newValue, oldValue) ->
+      if newValue != oldValue
+        $scope.participationForm.$setDirty()
+
     $scope.saveParticipation = ->
       $scope.submitted = true
       if (not $scope.participationForm.$valid or
