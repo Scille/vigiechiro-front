@@ -50,7 +50,8 @@ angular.module('participationViews', ['ngRoute', 'textAngular', 'xin_listResourc
 
   .controller 'CreateParticipationDirectiveCtrl', ($route, $scope,
                                                    session, Backend) ->
-    $scope.participation = {date_debut: new Date()}
+    $scope.participation =
+      date_debut: new Date()
     $scope.uploaders = []
     session.getUserPromise().then (user) ->
       $scope.observateurId = user._id

@@ -10,8 +10,9 @@
             <label class="input-group-addon" for="date_debut">
               Date de début
             </label>
-            <input type="text" class="form-control"
-              data-ng-model="participation.date_debut">
+            <span class="form-control">
+              {{ participation.date_debut | xinDate: 'medium' }}
+            </span>
             <span class="input-group-addon">
               <i class="glyphicon glyphicon-calendar"></i>
             </span>
@@ -38,8 +39,10 @@
             <label class="input-group-addon" for="date_fin">
               Date de fin
             </label>
-            <input type="text" class="form-control"
-              data-ng-model="participation.date_fin">
+            <span class="form-control" ng-hide="participation.date_fin"></span>
+            <span class="form-control" ng-show="participation.date_fin">
+              {{ participation.date_fin | xinDate: 'medium' }}
+            </span>
             <span class="input-group-addon">
               <i class="glyphicon glyphicon-calendar"></i>
             </span>

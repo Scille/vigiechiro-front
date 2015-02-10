@@ -18,7 +18,7 @@
 
   <list-resource-directive resource-backend="resourceBackend" lookup="lookup">
     <a class="btn" ng-href='#/participations/{{resource._id}}'>
-      {{resource.date_debut}}
+      Participation du {{ resource.date_debut | xinDate: 'medium' }}
     </a>
   </list-resource-directive>
 
