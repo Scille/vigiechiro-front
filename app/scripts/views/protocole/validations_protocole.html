@@ -1,26 +1,30 @@
 <div ng-if="!loading">
-    <div dir-paginate="inscription in inscriptions | itemsPerPage: 20" total-items="totalResults">
-        <div class="text-center">
-            <a href='#/utilisateurs/{{ inscription.utilisateur_id}}'>
-                {{ inscription.utilisateur_pseudo }}
-            </a>
-            s'est inscrit au protocole
-            <a href="#/protocoles/{{ inscription.protocole_id }}">
-                {{ inscription.protocole_titre }}
-            </a>
-            le {{ inscription.date_inscription | xinDate: 'medium' }}
-            <button ng-click="validate(inscription.utilisateur_id, inscription.protocole_id)">Valider</button>
-            <button ng-click="refuse(inscription.utilisateur_id, inscription.protocole_id)">Refuser</button>
-        </div>
+  <div dir-paginate="inscription in inscriptions | itemsPerPage: 20" total-items="totalResults" class="form-group">
+    <div class="input-group">
+      <a href='#/utilisateurs/{{ inscription.utilisateur_id}}'>
+        {{ inscription.utilisateur_pseudo }}
+      </a>
+      s'est inscrit au protocole
+      <a href="#/protocoles/{{ inscription.protocole_id }}">
+        {{ inscription.protocole_titre }}
+      </a>
+      le {{ inscription.date_inscription | xinDate: 'medium' }}
+      <button ng-if="!inscription.validated" class='btn btn-primary btn-sm'
+              ng-click="validate(inscription)">
+        Valider
+      </button>
+      <span ng-if="inscription.validated" class="text-success glyphicon glyphicon-ok"
+            aria-hidden="true"></span>
     </div>
+  </div>
 
-    <div ng-show="inscriptions.length == 0" class="text-center">
-        <h3><i>Aucune inscription à valider</i></h3>
-    </div>
-    <dir-pagination-controls on-page-change="pageChanged(newPageNumber)"></dir-pagination-controls>
+  <div ng-show="inscriptions.length == 0" class="text-center">
+    <h3><i>Aucune inscription à valider</i></h3>
+  </div>
+  <dir-pagination-controls on-page-change="pageChanged(newPageNumber)"></dir-pagination-controls>
 </div>
 
 <div ng-if="loading">
-    <center><img src="images/spinner.gif"></img></center>
-    <center>Changement de la liste des inscriptions...</center>
+  <center><img src="images/spinner.gif"></img></center>
+  <center>Changement de la liste des inscriptions...</center>
 </div>

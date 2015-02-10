@@ -228,9 +228,10 @@ angular.module('protocoleViews', ['ngRoute', 'textAngular', 'xin_listResource',
         if not utilisateur.protocoles?
           continue
         for inscription in utilisateur.protocoles
-          if not inscription.protocole.valide?
+          if not inscription.valide?
             date = new Date(inscription.protocole._updated)
             $scope.inscriptions.push(
+              validated: false
               utilisateur_id: utilisateur._id
               utilisateur_pseudo: utilisateur.pseudo
               protocole_id: inscription.protocole._id
@@ -239,28 +240,17 @@ angular.module('protocoleViews', ['ngRoute', 'textAngular', 'xin_listResource',
             )
       $scope.loading = false
 
-    $scope.validate = (utilisateur_id, protocole_id) ->
-      Backend.one('utilisateurs', utilisateur_id).get().then (utilisateur) ->
+    $scope.validate = (validateInscription) ->
+      Backend.one('utilisateurs', validateInscription.utilisateur_id).get().then (utilisateur) ->
         patch = {}
         patch.protocoles = utilisateur.protocoles
         for inscription in patch.protocoles
-          if inscription.protocole == protocole_id
+          if inscription.protocole == validateInscription.protocole_id
             inscription.valide = true
             utilisateur.patch(patch).then (
-              -> console.log 'Patch OK'
+              # TODO : fix patch return error on success...
               (error) -> throw error
-            )
-            return
-
-    $scope.refuse = (utilisateur_id, protocole_id) ->
-      Backend.one('utilisateurs', utilisateur_id).get().then (utilisateur) ->
-        patch = {}
-        patch.protocoles = utilisateur.protocoles
-        for inscription, index in patch.protocoles
-          if inscription.protocole == protocole_id
-            patch.protocoles.splice(index, 1)
-            utilisateur.patch(patch).then (
-              -> console.log 'Patch OK'
-              (error) -> throw error
+              ->
+                validateInscription.validated = true
             )
             return
