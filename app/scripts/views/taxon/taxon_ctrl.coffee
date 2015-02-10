@@ -37,7 +37,7 @@ class TaxonsParents
 
 angular.module('taxonViews', ['ngRoute', 'ngSanitize', 'textAngular',
                               'ui.select', 'xin_listResource',
-                              'xin_backend', 'xin_session'])
+                              'xin_backend', 'xin_session', 'xin_tools'])
   .config ($routeProvider) ->
     $routeProvider
       .when '/taxons',

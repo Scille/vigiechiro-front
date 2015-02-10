@@ -8,7 +8,8 @@
  # # ShowUtilisateurCtrl
  # Controller of the vigiechiroApp
 ###
-angular.module('utilisateurViews', ['ngRoute', 'xin_listResource', 'xin_session', 'xin_backend'])
+angular.module('utilisateurViews', ['ngRoute', 'xin_listResource', 'xin_tools',
+                                    'xin_session', 'xin_backend'])
   .config ($routeProvider) ->
     $routeProvider
       .when '/utilisateurs',

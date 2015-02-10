@@ -16,20 +16,6 @@ angular.module('xin_listResource', ['ngRoute', 'angularUtils.directives.dirPagin
             $compile(element.contents())(scope)
         )
 
-  .service 'DelayedEvent', ($timeout) ->
-    class DelayedEvent
-      constructor: (@timer) ->
-        @eventCount = 0
-      triggerEvent: (action) ->
-        @eventCount += 1
-        eventCurrent = @eventCount
-        $timeout(
-          =>
-            if eventCurrent == @eventCount
-              action()
-          @timer
-        )
-
   .controller 'ListResourceCtrl', ($scope, $timeout, $location, session) ->
     # Load lookup pagination from $location
     # params = $location.search()
