@@ -41,7 +41,26 @@ angular.module('siteViews', ['ngRoute', 'textAngular', 'xin_backend', 'protocole
           if protocole.protocole == $scope.site.protocole._id
             if protocole.valide?
               $scope.isProtocoleValid = true
-          break
+            break
+    session.getIsAdminPromise().then (isAdmin) ->
+      $scope.isAdmin = isAdmin
+
+  .directive 'displaySiteDirective', ->
+    restrict: 'E'
+    templateUrl: 'scripts/views/site/display_site_drt.html'
+    controller: 'DisplaySiteDirectiveCtrl'
+    scope:
+      site: '='
+      protocoleAlgoSite: '@'
+      isAdmin: '@'
+    link: (scope, elem, attrs) ->
+      attrs.$observe 'protocoleAlgoSite', (protocoleAlgoSite) ->
+        if protocoleAlgoSite
+          scope.loadMap(elem.find('.g-maps')[0])
+
+  .controller 'DisplaySiteDirectiveCtrl', ($scope, Backend, protocolesFactory) ->
+    $scope.loadMap = (mapDiv) ->
+      protocolesFactory($scope.site, $scope.protocoleAlgoSite, mapDiv, false)
 
   .directive 'listSitesDirective', (session, Backend) ->
     restrict: 'E'
@@ -199,19 +218,3 @@ angular.module('siteViews', ['ngRoute', 'textAngular', 'xin_backend', 'protocole
         if value
           scope.protocoleAlgoSite = value
       )
-
-  .directive 'displaySiteDirective', ->
-    restrict: 'E'
-    templateUrl: 'scripts/views/site/display_site_drt.html'
-    controller: 'DisplaySiteDirectiveCtrl'
-    scope:
-      site: '='
-      protocoleAlgoSite: '@'
-    link: (scope, elem, attrs) ->
-      attrs.$observe 'protocoleAlgoSite', (protocoleAlgoSite) ->
-        if protocoleAlgoSite
-          scope.loadMap(elem.find('.g-maps')[0])
-
-  .controller 'DisplaySiteDirectiveCtrl', ($scope, Backend, protocolesFactory) ->
-    $scope.loadMap = (mapDiv) ->
-      protocolesFactory($scope.site, $scope.protocoleAlgoSite, mapDiv, false)

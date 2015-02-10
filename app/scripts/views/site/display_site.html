@@ -1,8 +1,10 @@
-<a href="#/protocoles/{{site.protocole._id}}">Voir le protocole</a>
+<a class="btn btn-primary" href="#/protocoles/{{site.protocole._id}}">
+  Voir le protocole {{ site.protocole.titre }}
+</a>
 
 <div class="panel-body">
   <display-site-directive site="site"
-    protocole-algo-site="{{protocoleAlgoSite}}">
+    protocole-algo-site="{{protocoleAlgoSite}}" is-admin="{{isAdmin}}">
   </display-site-directive>
 </div>
 

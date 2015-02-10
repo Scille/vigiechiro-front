@@ -1,8 +1,8 @@
-<a class="btn btn-primary" href="#/protocoles/{{participation.protocole._id}}">
-  {{ participation.protocole.titre }}
+<a class="btn btn-default" href="#/protocoles/{{participation.protocole._id}}">
+  Voir le protocole {{ participation.protocole.titre }}
 </a>
-<a class="btn btn-primary" href="#/sites/{{participation.site}}">
-  {{ participation.site }}
+<a class="btn btn-default" href="#/sites/{{participation.site}}">
+  Voir le site {{ participation.site }}
 </a>
 
 <display-participation-directive participation="participation">
@@ -14,6 +14,6 @@
   <a class="input-group-addon" ng-click="addPost(post)">Ajouter un message</a>
 </div>
 
-<a class="btn btn-default" href="#/participations/">
+<a class="btn btn-primary" href="#/participations/{{participation._id}}/edit">
   Editer la participation
 </a>
