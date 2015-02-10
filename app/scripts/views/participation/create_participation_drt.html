@@ -3,10 +3,26 @@
     ng-submit="saveParticipation()">
 
     <div class="form-group" ng-class="{'has-error': participationForm.date_debut.$invalid && !participationForm.$pristine}">
-      <div class="input-group">
-        <label class="input-group-addon" for="date_debut">Date de début</label>
-        <input type="date" class="form-control" id="date_debut" name="date_debut"
-          ng-model="participation.date_debut" ng-disabled="readOnly" required>
+      <div class="dropdown">
+        <a class="dropdown-toggle" id="start-toggle-select"
+           role="button" data-toggle="dropdown" data-target="#" href="">
+          <div class="input-group">
+            <label class="input-group-addon" for="date_debut">
+              Date de début
+            </label>
+            <input type="text" class="form-control"
+              data-ng-model="participation.date_debut">
+            <span class="input-group-addon">
+              <i class="glyphicon glyphicon-calendar"></i>
+            </span>
+          </div>
+        </a>
+        <ul class="dropdown-menu" role="menu">
+          <datetimepicker
+            data-ng-model="participation.date_debut"
+            data-datetimepicker-config="{ dropdownSelector: '#start-toggle-select' }">
+          </datetimepicker>
+        </ul>
       </div>
       <span ng-show="participationForm.date_debut.$error.required"
             class="help-block has-error">Champ requis</span>
@@ -15,10 +31,27 @@
     </div>
 
     <div class="form-group" ng-class="{'has-error': participationForm.date_fin.$invalid && !participationForm.$pristine}">
-      <div class="input-group">
-        <label class="input-group-addon" for="date_fin">Date de fin</label>
-        <input type="date" class="form-control" id="date_fin" name="date_fin"
-               ng-model="participation.date_fin" ng-disabled="readOnly">
+      <div class="dropdown">
+        <a class="dropdown-toggle" id="stop-toggle-select"
+           role="button" data-toggle="dropdown" data-target="#" href="">
+          <div class="input-group">
+            <label class="input-group-addon" for="date_fin">
+              Date de fin
+            </label>
+            <input type="text" class="form-control"
+              data-ng-model="participation.date_fin">
+            <span class="input-group-addon">
+              <i class="glyphicon glyphicon-calendar"></i>
+            </span>
+          </div>
+        </a>
+        <ul class="dropdown-menu" role="menu">
+          <datetimepicker
+            data-ng-model="participation.date_fin"
+            data-datetimepicker-config="{ dropdownSelector: '#stop-toggle-select' }">
+          </datetimepicker>
+        </ul>
+      </div>
       <span ng-show="submitted && participationForm.date_fin.$error.$invalid"
             class="help-block has-error">Date invalide</span>
       </div>

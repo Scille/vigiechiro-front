@@ -3,7 +3,8 @@
 
 angular.module('participationViews', ['ngRoute', 'textAngular', 'xin_listResource',
                                       'xin_backend', 'xin_session', 'xin_uploadFile',
-                                      'xin_tools', 'siteViews'])
+                                      'xin_tools',
+                                      'siteViews', 'ui.bootstrap.datetimepicker'])
   .config ($routeProvider) ->
     $routeProvider
       .when '/participations',
