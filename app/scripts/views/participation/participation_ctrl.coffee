@@ -3,7 +3,7 @@
 
 angular.module('participationViews', ['ngRoute', 'textAngular', 'xin_listResource',
                                       'xin_backend', 'xin_session', 'xin_uploadFile',
-                                      'siteViews'])
+                                      'xin_tools', 'siteViews'])
   .config ($routeProvider) ->
     $routeProvider
       .when '/participations',
@@ -17,7 +17,8 @@ angular.module('participationViews', ['ngRoute', 'textAngular', 'xin_listResourc
         controller: 'DisplayParticipationCtrl'
 
   .controller 'ListParticipationsCtrl', ($scope, Backend, DelayedEvent) ->
-    $scope.lookup = {}
+    $scope.lookup =
+      sort: "-date_debut"
     # Filter field is trigger after 500ms of inactivity
     delayedFilter = new DelayedEvent(500)
     $scope.filterField = ''
@@ -113,16 +114,10 @@ angular.module('participationViews', ['ngRoute', 'textAngular', 'xin_listResourc
           params =
             where:
               site: siteId
+            sort: '-date_debut'
           Backend.all('participations').getList(params).then (participations) ->
             scope.participations = participations.plain()
             scope.loading = false
-
-  .directive 'showParticipationDirective', ->
-    restrict: 'E'
-    templateUrl: 'scripts/views/participation/show_participation_drt.html'
-    scope:
-      participation: '='
-      title: '@'
 
   .controller 'DisplayParticipationCtrl', ($scope, $route, $routeParams, session, Backend) ->
     saveParticipation = undefined

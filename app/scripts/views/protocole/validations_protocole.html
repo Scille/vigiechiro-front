@@ -8,7 +8,7 @@
             <a href="#/protocoles/{{ inscription.protocole_id }}">
                 {{ inscription.protocole_titre }}
             </a>
-            le {{ inscription.protocole_updated }}
+            le {{ inscription.date_inscription | xinDate: 'medium' }}
             <button ng-click="validate(inscription.utilisateur_id, inscription.protocole_id)">Valider</button>
             <button ng-click="refuse(inscription.utilisateur_id, inscription.protocole_id)">Refuser</button>
         </div>

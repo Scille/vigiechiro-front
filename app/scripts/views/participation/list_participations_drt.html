@@ -5,11 +5,10 @@
         <h3>Mes participations</h3>
       </div>
       <ul class="list-group">
-        <li class="list-group-item"
-          ng-repeat="participation in participations">
-          <show-participation-directive participation="participation"
-            title="Participation {{$index + 1}}">
-          </show-participation-directive>
+        <li class="list-group-item" ng-repeat="participation in participations">
+            <a href="#/participations/{{participation._id}}">
+              Participation du {{ participation.date_debut | xinDate: 'medium' }}
+            </a>
         </li>
       </ul>
       <div ng-show="participations.length == 0" class="text-center">

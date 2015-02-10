@@ -12,7 +12,8 @@ make_payload = ($scope) ->
 
 
 angular.module('protocoleViews', ['ngRoute', 'textAngular', 'xin_listResource',
-                                  'xin_backend', 'xin_session', 'siteViews'])
+                                  'xin_backend', 'xin_session', 'xin_tools',
+                                  'siteViews'])
   .config ($routeProvider) ->
     $routeProvider
       .when '/protocoles',
@@ -215,6 +216,7 @@ angular.module('protocoleViews', ['ngRoute', 'textAngular', 'xin_listResource',
     )
     queryParams = {
       where: where
+      sort: "-protocoles.date_inscription"
      # projection:
      #   "protocoles": 1
      #   "pseudo": 1
@@ -225,15 +227,15 @@ angular.module('protocoleViews', ['ngRoute', 'textAngular', 'xin_listResource',
       for utilisateur in utilisateurs
         if not utilisateur.protocoles?
           continue
-        for protocole in utilisateur.protocoles
-          if not protocole.protocole.valide?
-            date = new Date(protocole.protocole._updated)
+        for inscription in utilisateur.protocoles
+          if not inscription.protocole.valide?
+            date = new Date(inscription.protocole._updated)
             $scope.inscriptions.push(
               utilisateur_id: utilisateur._id
               utilisateur_pseudo: utilisateur.pseudo
-              protocole_id: protocole.protocole._id
-              protocole_titre: protocole.protocole.titre
-              protocole_updated: $filter('date')(date, 'EEEE dd/MM/yyyy')
+              protocole_id: inscription.protocole._id
+              protocole_titre: inscription.protocole.titre
+              date_inscription: inscription.date_inscription
             )
       $scope.loading = false
 
@@ -241,9 +243,9 @@ angular.module('protocoleViews', ['ngRoute', 'textAngular', 'xin_listResource',
       Backend.one('utilisateurs', utilisateur_id).get().then (utilisateur) ->
         patch = {}
         patch.protocoles = utilisateur.protocoles
-        for protocole in patch.protocoles
-          if protocole.protocole == protocole_id
-            protocole.valide = true
+        for inscription in patch.protocoles
+          if inscription.protocole == protocole_id
+            inscription.valide = true
             utilisateur.patch(patch).then (
               -> console.log 'Patch OK'
               (error) -> throw error
@@ -254,8 +256,8 @@ angular.module('protocoleViews', ['ngRoute', 'textAngular', 'xin_listResource',
       Backend.one('utilisateurs', utilisateur_id).get().then (utilisateur) ->
         patch = {}
         patch.protocoles = utilisateur.protocoles
-        for protocole, index in patch.protocoles
-          if protocole.protocole == protocole_id
+        for inscription, index in patch.protocoles
+          if inscription.protocole == protocole_id
             patch.protocoles.splice(index, 1)
             utilisateur.patch(patch).then (
               -> console.log 'Patch OK'
