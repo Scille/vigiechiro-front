@@ -4,9 +4,30 @@
 angular.module('siteViews', ['ngRoute', 'textAngular', 'xin_backend', 'protocole_map'])
   .config ($routeProvider) ->
     $routeProvider
+      .when '/sites',
+        templateUrl: 'scripts/views/site/list_sites.html'
+        controller: 'ListSitesCtrl'
       .when '/sites/:siteId',
         templateUrl: 'scripts/views/site/display_site.html'
         controller: 'DisplaySiteCtrl'
+
+  .controller 'ListSitesCtrl', ($scope, Backend, session, DelayedEvent) ->
+    session.getIsAdminPromise().then (isAdmin) ->
+      $scope.isAdmin = isAdmin
+    $scope.lookup = {}
+    # Filter field is trigger after 500ms of inactivity
+    delayedFilter = new DelayedEvent(500)
+    $scope.filterField = ''
+    $scope.$watch 'filterField', (filterValue) ->
+      delayedFilter.triggerEvent ->
+        if filterValue? and filterValue != ''
+          $scope.lookup.where = JSON.stringify(
+              $text:
+                $search: filterValue
+          )
+        else if $scope.lookup.where?
+          delete $scope.lookup.where
+    $scope.resourceBackend = Backend.all('sites')
 
   .controller 'DisplaySiteCtrl', ($routeParams, $scope
                                   Backend, session) ->
@@ -24,7 +45,7 @@ angular.module('siteViews', ['ngRoute', 'textAngular', 'xin_backend', 'protocole
 
   .directive 'listSitesDirective', (session, Backend) ->
     restrict: 'E'
-    templateUrl: 'scripts/views/site/list_sites.html'
+    templateUrl: 'scripts/views/site/list_sites_drt.html'
     scope:
       protocoleId: '@'
       protocoleAlgoSite: '@'
