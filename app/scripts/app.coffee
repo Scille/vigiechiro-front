@@ -26,7 +26,8 @@ angular
     'utilisateurViews',
     'taxonViews',
     'protocoleViews',
-    'participationViews'
+    'participationViews',
+    'actualiteViews'
   ])
 
   .run (Backend, SETTINGS) ->

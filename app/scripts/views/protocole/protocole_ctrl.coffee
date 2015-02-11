@@ -48,6 +48,8 @@ angular.module('protocoleViews', ['ngRoute', 'textAngular', 'xin_listResource',
     # if params.where?
     #   $scope.filterField = JSON.parse(params.where).$text.$search
     # else
+    session.getIsAdminPromise().then (isAdmin) ->
+      $scope.isAdmin = isAdmin
     $scope.filterField = ''
     $scope.$watch 'filterField', (filterValue) ->
       delayedFilter.triggerEvent ->
@@ -196,7 +198,6 @@ angular.module('protocoleViews', ['ngRoute', 'textAngular', 'xin_listResource',
       $scope.taxons = taxons.plain()
     $scope.saveProtocole = ->
       $scope.submitted = true
-      console.log($scope.protocoleForm.algo_tirage_site)
       if not $scope.protocoleForm.$valid or not $scope.protocoleForm.$dirty
         return
       payload = make_payload($scope)

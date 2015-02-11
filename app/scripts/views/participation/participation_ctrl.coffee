@@ -101,7 +101,7 @@ angular.module('participationViews', ['ngRoute', 'textAngular', 'xin_listResourc
             payload[key] = $scope.participation[key]
       Backend.all('participations').post(payload).then(
         -> window.location = '#/sites/'+$scope.siteId
-        (error) -> console.log("error", error)
+        (error) -> throw "Error : participation save "+error
       )
 
   .directive 'listParticipationsDirective', (session, Backend) ->

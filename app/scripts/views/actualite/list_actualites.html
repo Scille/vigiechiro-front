@@ -1,0 +1,41 @@
+<div class="container">
+  <div class="page-header">
+    <h3>Toutes les actualités</h3>
+  </div>
+
+  <div class="list-group">
+    <div class="row">
+      <div class="col-xs-8">
+<!--          <label for="search">Filtre :</label>
+          <input ng-model="filterField" class="form-control search-field" placeholder="texte">-->
+      </div>
+      <div class="col-xs-4">
+          <label for="search">Nb de Résultats par page :</label>
+          <input type="number" class="form-control max-results-field" ng-model="lookup.max_results">
+      </div>
+    </div>
+  </div>
+
+  <list-resource-directive resource-backend="resourceBackend" lookup="lookup">
+    <div ng-show="resource.action == 'INSCRIPTION_PROTOCOLE'">
+      L'utilisateur
+      <a href="#/utilisateurs/{{resource.sujet._id}}">{{ resource.sujet.pseudo }}</a>
+      s'est incrit au protocole
+      <a href="#/protocoles/{{resource.objet._id}}">{{ resource.objet.titre }}</a>
+    </div>
+
+    <div ng-show="resource.action == 'NOUVEAU_SITE'">
+      L'utilisateur
+      <a href="#/utilisateurs/{{resource.sujet._id}}">{{ resource.sujet.pseudo }}</a>
+      a créé le site
+      <a href="#/sites/{{resource.objet._id}}">{{ resource.objet._id }}</a>
+    </div>
+
+    <div ng-show="resource.action == 'NOUVELLE_PARTICIPATION'">
+      L'utilisateur
+      <a href="#/utilisateurs/{{resource.sujet._id}}">{{ resource.sujet.pseudo }}</a>
+      a créé la participation
+      <a href="#/participations/{{resource.objet._id}}">{{ resource.objet._id }}</a>
+    </div>
+  </list-resource-directive>
+</div>
