@@ -15,7 +15,7 @@ angular.module('xin_session', ['xin_storage', 'xin_backend'])
         token = storage.getItem('auth-session-token')
         if token?
           # Force the cache to really get current user
-          @_userPromise = Backend.one('utilisateurs', 'moi').get(
+          @_userPromise = Backend.one('moi').get(
             {},
             {'Cache-Control': 'no-cache'}
           )

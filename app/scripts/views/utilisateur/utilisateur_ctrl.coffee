@@ -42,7 +42,12 @@ angular.module('utilisateurViews', ['ngRoute', 'xin_listResource', 'xin_tools',
     $scope.isAdmin = false
     userResource = undefined
     origin_role = undefined
-    Backend.one('utilisateurs', $routeParams.userId).get().then (utilisateur) ->
+    userBackend = undefined
+    if $routeParams.userId == 'moi'
+      userBackend = Backend.one('moi')
+    else
+      userBackend = Backend.one('utilisateurs', $routeParams.userId)
+    userBackend.get().then (utilisateur) ->
       userResource = utilisateur
       $scope.utilisateur = utilisateur.plain()
       origin_role = $scope.utilisateur.role
@@ -50,6 +55,7 @@ angular.module('utilisateurViews', ['ngRoute', 'xin_listResource', 'xin_tools',
         $scope.isAdmin = user.role == 'Administrateur'
         $scope.readOnly = (not $scope.isAdmin and
                            user._id != utilisateur._id)
+
     $scope.saveUser = ->
       $scope.submitted = true
       if (not $scope.userForm.$valid or

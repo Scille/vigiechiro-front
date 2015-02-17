@@ -116,7 +116,7 @@ angular.module('protocoleViews', ['ngRoute', 'textAngular', 'xin_listResource',
           )
         # TODO : fix reloadOnSearch: true
         # $location.search('where', $scope.lookup.where)
-    $scope.resourceBackend = Backend.all('protocoles')
+    $scope.resourceBackend = Backend.all('moi/protocoles')
     # Wrap protocole backend to check if the user is registered (see _status_*)
     resourceBackend_getList = $scope.resourceBackend.getList
     userProtocolesDictDefer = $q.defer()
@@ -155,7 +155,7 @@ angular.module('protocoleViews', ['ngRoute', 'textAngular', 'xin_listResource',
       Backend.one('taxons', $scope.protocole.taxon).get().then (taxon) ->
         $scope.taxon = taxon.plain()
     $scope.registerProtocole = ->
-      Backend.one('protocoles', $scope.protocole._id+"/action/join").post().then(
+      Backend.one('moi/protocoles/'+$scope.protocole._id).put().then(
         ->
           session.refreshPromise()
           $route.reload()
