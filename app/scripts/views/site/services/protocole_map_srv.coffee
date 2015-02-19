@@ -90,15 +90,12 @@ angular.module('protocole_map', ['protocole_map_carre', 'protocole_map_point_fix
         southWest = bounds.getSouthWest()
         northEast = bounds.getNorthEast()
         if zoomLevel > 11
-          where = JSON.stringify(
-            centre:
-              $geoWithin:
-                $box: [
-                  [southWest.lng(), southWest.lat()]
-                  [northEast.lng(), northEast.lat()]
-                ]
-          )
-          Backend.all('grille_stoc').getList({ where: where, max_results: 40 })
+          parameters =
+            sw_lat: southWest.lat()
+            sw_lng: southWest.lng()
+            ne_lat: northEast.lat()
+            ne_lng: northEast.lng()
+          Backend.all('grille_stoc').getList(parameters)
             .then (@createGrille)
 
       createGrille: (grille_stoc) =>
