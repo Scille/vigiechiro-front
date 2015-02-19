@@ -148,7 +148,7 @@ angular.module('protocoleViews', ['ngRoute', 'textAngular', 'xin_listResource',
       session.getUserPromise().then (user) ->
         userRegistered = false
         for protocole in user.protocoles or []
-          if protocole.protocole == $scope.protocole._id
+          if protocole.protocole._id == $scope.protocole._id
             userRegistered = true
             break
         $scope.userRegistered = userRegistered
