@@ -10,10 +10,18 @@ angular.module('protocole_map_carre', [])
       constructor: (@site, mapDiv, @allowEdit, @siteCallback) ->
         super @site, mapDiv, @allowEdit, @siteCallback
         @_steps = [
+          "Positionner le point d'origine.",
           "Sélectionner un carré.",
           "Définir les localités à l'intérieur du carré."
         ]
-        if (@_step < 1 or not @allowEdit)
+        @_googleMaps.setDrawingManagerOptions(
+          drawingControlOptions:
+            position: google.maps.ControlPosition.TOP_CENTER
+            drawingModes: [
+              google.maps.drawing.OverlayType.MARKER
+            ]
+        )
+        if (@_step < 2 or not @allowEdit)
           @_googleMaps.setDrawingManagerOptions(drawingControl: false)
         @loading = true
         @updateSite()

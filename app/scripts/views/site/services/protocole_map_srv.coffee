@@ -16,14 +16,36 @@ angular.module('protocole_map', ['protocole_map_carre', 'protocole_map_point_fix
   .factory 'ProtocoleMap', ($rootScope, Backend, GoogleMaps) ->
     class ProtocoleMap
       constructor: (@site, mapDiv, @allowEdit, @siteCallback) ->
+        @_origin = undefined
         @_grille = []
         @_step = 0
         @_steps = []
-        @_idGrilleStoc = ''
         @_googleMaps = new GoogleMaps(mapDiv, @mapsCallback())
-        @loading = true
-        @loadMap(@site.localites)
-        @loading = false
+
+      selectGrilleStoc: ->
+        @_step = 1
+        @updateSite()
+
+      validOrigin: (grille_stoc) ->
+        cell = @createCell(grille_stoc.centre.coordinates[1],
+                           grille_stoc.centre.coordinates[0])
+        @validNumeroGrille(cell, grille_stoc.numero, grille_stoc._id)
+        @removeOrigin()
+        @updateSite()
+
+      createOriginPoint: ->
+        @_origin = new google.maps.Marker(
+          map: @_googleMaps.getMap()
+          title: "Point d'origine du tirage"
+          position: @_googleMaps.getCenter()
+          draggable: true
+        )
+
+      removeOrigin: ->
+        @_origin.setMap(null)
+
+      getOrigin: ->
+        return @_origin
 
       allowMapChanged: ->
         if not @site.verrouille?
@@ -61,7 +83,8 @@ angular.module('protocole_map', ['protocole_map_carre', 'protocole_map_point_fix
         zoomChanged: -> false
         mapsMoved: -> false
 
-      loadMap: (localites) ->
+      loadMap: ->
+        @loading = true
         if @site.grille_stoc?
           @_step = 1
           @_googleMaps.setCenter(
@@ -74,14 +97,19 @@ angular.module('protocole_map', ['protocole_map_carre', 'protocole_map_point_fix
             @site.grille_stoc.centre.coordinates[0]
           )
           @validNumeroGrille(newCell, @site.grille_stoc.numero, @site.grille_stoc._id)
-        for localite in localites or []
+        for localite in @site.localites or []
           @_googleMaps.loadGeoJson(localite.geometries)
+        @loading = false
 
       getIdGrilleStoc: ->
-        return @_idGrilleStoc
+        return @_grille[0].id
 
       mapsChanged: ->
-        if @_step != 0
+        if (@_step == 0)
+          if @_origin
+            @_origin.setPosition(@_googleMaps.getCenter())
+          return
+        if @_step != 1
           return
         zoomLevel = @_googleMaps.getZoom()
         bounds = @_googleMaps.getBounds()
@@ -147,7 +175,7 @@ angular.module('protocole_map', ['protocole_map_carre', 'protocole_map_point_fix
 #              @scope.numero_grille_stoc.value = newString
             return
 
-      validNumeroGrille: (cell, numero = 0, id = '') =>
+      validNumeroGrille: (cell, numero, id) =>
         nbStoc = @_grille.length
         if nbStoc
           for index in [nbStoc-1..0]
@@ -161,8 +189,7 @@ angular.module('protocole_map', ['protocole_map_carre', 'protocole_map_point_fix
           strokeOpacity: 1
           strokeWeight: 2
         )
-        @_idGrilleStoc = @_grille[0].id
-        @_step = 1
+        @_step = 2
         @updateSite()
         if @allowEdit
           @_googleMaps.addListener(@_grille[0].item, 'rightclick', (event) =>
