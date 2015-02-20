@@ -75,5 +75,5 @@ angular.module('utilisateurViews', ['ngRoute', 'xin_listResource', 'xin_tools',
         payload.role = $scope.utilisateur.role
       userResource.patch(payload).then(
         -> $route.reload()
-        ->
+        (error) -> throw "Error " + error
       )
