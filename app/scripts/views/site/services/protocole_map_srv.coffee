@@ -123,7 +123,7 @@ angular.module('protocole_map', ['protocole_map_carre', 'protocole_map_point_fix
             sw_lng: southWest.lng()
             ne_lat: northEast.lat()
             ne_lng: northEast.lng()
-          Backend.all('grille_stoc').getList(parameters)
+          Backend.all('grille_stoc/rectangle').getList(parameters)
             .then (@createGrille)
 
       createGrille: (grille_stoc) =>
