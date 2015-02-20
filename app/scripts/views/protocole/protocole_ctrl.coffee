@@ -54,12 +54,9 @@ angular.module('protocoleViews', ['ngRoute', 'textAngular', 'xin_listResource',
     $scope.$watch 'filterField', (filterValue) ->
       delayedFilter.triggerEvent ->
         if filterValue? and filterValue != ''
-          $scope.lookup.where = JSON.stringify(
-              $text:
-                $search: filterValue
-          )
-        else if $scope.lookup.where?
-          delete $scope.lookup.where
+          $scope.lookup.q = filterValue
+        else if $scope.lookup.q?
+          delete $scope.lookup.q
         # TODO : fix reloadOnSearch: true
         # $location.search('where', $scope.lookup.where)
     $scope.resourceBackend = Backend.all('protocoles')
@@ -102,18 +99,9 @@ angular.module('protocoleViews', ['ngRoute', 'textAngular', 'xin_listResource',
     $scope.$watch 'filterField', (filterValue) ->
       delayedFilter.triggerEvent ->
         if filterValue? and filterValue != ''
-          console.log($scope.lookup.where)
-          $scope.lookup.where = JSON.stringify(
-            $text:
-              $search: filterValue
-            _id:
-              $in: $scope.userProtocolesArray
-          )
-        else
-          $scope.lookup.where = JSON.stringify(
-            _id:
-              $in: $scope.userProtocolesArray
-          )
+          $scope.lookup.q = filterValue
+        else if $scope.lookup.q?
+          delete $scope.lookup.q
         # TODO : fix reloadOnSearch: true
         # $location.search('where', $scope.lookup.where)
     $scope.resourceBackend = Backend.all('moi/protocoles')

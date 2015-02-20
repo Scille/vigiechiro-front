@@ -13,8 +13,5 @@ angular.module('accueilViews', ['ngRoute', 'xin_backend', 'xin_session', 'xin_up
       $scope.isAdmin = false
       if user.role == "Administrateur"
         $scope.isAdmin = true
-      where = JSON.stringify(
-        'observateur': user._id
-      )
-      Backend.all('sites').getList('where': where).then (sites) ->
+      Backend.all('moi/sites').getList().then (sites) ->
         $scope.userSites = sites.plain()
