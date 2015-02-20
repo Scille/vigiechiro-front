@@ -73,7 +73,7 @@ angular.module('utilisateurViews', ['ngRoute', 'xin_listResource', 'xin_tools',
       # Special handling for select
       if $scope.utilisateur.role != origin_role
         payload.role = $scope.utilisateur.role
-      userResource.patch(payload).then(
+      userBackend.patch(payload).then(
         -> $route.reload()
         (error) -> throw "Error " + error
       )
