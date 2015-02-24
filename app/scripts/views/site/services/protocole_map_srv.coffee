@@ -17,6 +17,8 @@ angular.module('protocole_map', ['protocole_map_carre', 'protocole_map_point_fix
     class ProtocoleMap
       constructor: (@site, mapDiv, @allowEdit, @siteCallback) ->
         @_origin = undefined
+        @_circleLimit = undefined
+        @_newSelection = false
         @_grille = []
         @_step = 0
         @_steps = []
@@ -40,9 +42,24 @@ angular.module('protocole_map', ['protocole_map_carre', 'protocole_map_point_fix
           position: @_googleMaps.getCenter()
           draggable: true
         )
+        @_circleLimit = new google.maps.Circle(
+          map: @_googleMaps.getMap()
+          center: @_googleMaps.getCenter()
+          radius: 10000
+        )
+        @_googleMaps.addListener(@_origin, 'drag', (event) =>
+          @_circleLimit.setCenter(event.latLng)
+        )
 
       removeOrigin: ->
+        @_newSelection = true
+        @_origin.setDraggable(false)
         @_origin.setMap(null)
+        @_circleLimit.setMap(null)
+
+      deleteValidCell: ->
+        @_grille[0].item.setMap(null)
+        @_grille = []
 
       getOrigin: ->
         return @_origin
@@ -106,8 +123,9 @@ angular.module('protocole_map', ['protocole_map_carre', 'protocole_map_point_fix
 
       mapsChanged: ->
         if (@_step == 0)
-          if @_origin
+          if @_origin && !@_newSelection
             @_origin.setPosition(@_googleMaps.getCenter())
+            @_circleLimit.setCenter(@_googleMaps.getCenter())
           return
         if @_step != 1
           return

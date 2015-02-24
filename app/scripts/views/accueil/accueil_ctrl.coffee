@@ -1,7 +1,8 @@
 'use strict'
 
 
-angular.module('accueilViews', ['ngRoute', 'xin_backend', 'xin_session', 'xin_uploadFile'])
+angular.module('accueilViews', ['ngRoute', 'xin_backend', 'xin_session',
+                                'xin_uploadFile'])
   .config ($routeProvider) ->
     $routeProvider
       .when '/accueil',

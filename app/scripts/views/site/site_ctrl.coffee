@@ -28,9 +28,7 @@ angular.module('siteViews', ['ngRoute', 'textAngular', 'xin_backend', 'protocole
 
   .controller 'DisplaySiteCtrl', ($routeParams, $scope
                                   Backend, session) ->
-    params =
-      embedded: { "protocole": 1, "grille_stoc": 1 }
-    Backend.one('sites', $routeParams.siteId).get(params).then (site) ->
+    Backend.one('sites', $routeParams.siteId).get().then (site) ->
       $scope.site = site.plain()
       $scope.protocoleAlgoSite = $scope.site.protocole.algo_tirage_site
       session.getUserPromise().then (user) ->
@@ -161,29 +159,8 @@ angular.module('siteViews', ['ngRoute', 'textAngular', 'xin_backend', 'protocole
       $scope.isAdmin = isAdmin
     $scope.site = {}
     $scope.site.titre = "Nouveau site"
-
-    $scope.loadMap = (mapDiv, randomSelection) ->
-      if not mapLoaded
-        mapLoaded = true
-        mapProtocole = protocolesFactory($scope.site, $scope.protocoleAlgoSite,
-                                         mapDiv, true, siteCallback)
-        if randomSelection
-          mapProtocole.createOriginPoint()
-        else
-          mapProtocole.selectGrilleStoc()
-
-    $scope.removeOrigin = ->
-      mapProtocole.removeOrigin()
-
-    $scope.validOrigin = ->
-      parameters =
-        lat: mapProtocole.getOrigin().getPosition().lat()
-        lng: mapProtocole.getOrigin().getPosition().lng()
-      Backend.one('grille_stoc/nearest').get(parameters).then (grille_stoc) ->
-        mapProtocole.validOrigin(grille_stoc)
-
-    $scope.newSelection = ->
-      console.log("new selection")
+    $scope.listGrilleStocOrigin = []
+    $scope.listNumberUsed = []
 
     siteCallback =
       updateForm: ->
@@ -195,6 +172,38 @@ angular.module('siteViews', ['ngRoute', 'textAngular', 'xin_backend', 'protocole
         $scope.stepId = steps.step
         $timeout(-> $scope.$apply())
 
+    $scope.loadMap = (mapDiv, randomSelection) ->
+      if not mapLoaded
+        mapLoaded = true
+        mapProtocole = protocolesFactory($scope.site, $scope.protocoleAlgoSite,
+                                         mapDiv, true, siteCallback)
+        if randomSelection
+          mapProtocole.createOriginPoint()
+        else
+          mapProtocole.selectGrilleStoc()
+
+    $scope.validOrigin = ->
+      parameters =
+        lat: mapProtocole.getOrigin().getPosition().lat()
+        lng: mapProtocole.getOrigin().getPosition().lng()
+        r: 10000
+      Backend.all('grille_stoc/cercle').getList(parameters).then (grille_stoc) ->
+        $scope.listGrilleStocOrigin = grille_stoc.plain()
+        number = Math.floor(Math.random() * $scope.listGrilleStocOrigin.length)
+        $scope.listNumberUsed.push(number)
+        mapProtocole.validOrigin($scope.listGrilleStocOrigin[number])
+
+    $scope.newSelection = ->
+      if $scope.listNumberUsed.length == $scope.listGrilleStocOrigin.length
+        throw "Error: All cells picked"
+        return
+      mapProtocole.deleteValidCell()
+      number = Math.floor(Math.random() * $scope.listGrilleStocOrigin.length)
+      while (number in $scope.listNumberUsed)
+        number = Math.floor(Math.random() * $scope.listGrilleStocOrigin.length)
+      $scope.listNumberUsed.push(number)
+      mapProtocole.validOrigin($scope.listGrilleStocOrigin[number])
+
     $scope.saveSite = ->
       $scope.submitted = true
       if (not $scope.siteForm.$valid or
@@ -203,7 +212,6 @@ angular.module('siteViews', ['ngRoute', 'textAngular', 'xin_backend', 'protocole
       payload =
         'titre': $scope.protocoleTitre
         'protocole': $scope.protocoleId
-#        'localites': mapProtocole.saveMap()
 # TODO : use coordonnee to center the map
 #        'coordonnee':
 #          'type': 'Point'
@@ -213,7 +221,19 @@ angular.module('siteViews', ['ngRoute', 'textAngular', 'xin_backend', 'protocole
       if grille_stoc != ''
         payload.grille_stoc = grille_stoc
       Backend.all('sites').post(payload).then(
-        -> $route.reload()
+        (site) ->
+          localites = mapProtocole.saveMap()
+          for localite in localites
+            payload =
+              nom: "nom"
+              coordonnee: localite.geometries.geometries[0].coordinates
+#              geometries:
+              representatif: false
+            site.customPUT(payload, "localite").then(
+              -> console.log("ok")
+              -> console.log("ko")
+            )
+#          $route.reload()
         (error) -> throw "error " + error
       )
 

@@ -1,71 +1,52 @@
 'use strict'
 
 
-angular.module('actualiteViews', ['ngRoute', 'xin_backend', 'xin_session'])
-  .config ($routeProvider) ->
-    $routeProvider
-      .when '/actualites',
-        templateUrl: 'scripts/views/actualite/list_actualites.html'
-        controller: 'ListActualitesCtrl'
+angular.module('actualiteViews', ['xin_backend', 'xin_session'])
+#  .config ($routeProvider) ->
+#    $routeProvider
+#      .when '/actualites',
+#        templateUrl: 'scripts/views/actualite/list_actualites.html'
+#        controller: 'ListActualitesCtrl'#
 
-  .controller 'ListActualitesCtrl', ($scope, $q, Backend, DelayedEvent) ->
-    $scope.lookup = {}
-    $scope.lookup.embedded =
-      sujet: 1
-    # Filter field is trigger after 500ms of inactivity
-    delayedFilter = new DelayedEvent(500)
-    # params = $location.search()
-    # if params.where?
-    #   $scope.filterField = JSON.parse(params.where).$text.$search
-    # else
-    $scope.filterField = ''
-    $scope.$watch 'filterField', (filterValue) ->
-      delayedFilter.triggerEvent ->
-        if filterValue? and filterValue != ''
-          $scope.lookup.where = JSON.stringify(
-              $text:
-                $search: filterValue
-          )
-        else if $scope.lookup.where?
-          delete $scope.lookup.where
-        # TODO : fix reloadOnSearch: true
-        # $location.search('where', $scope.lookup.where)
-    $scope.resourceBackend = Backend.all('actualites')
-    # Wrap protocole backend to check if the user is registered (see _status_*)
-    resourceBackend_getList = $scope.resourceBackend.getList
-    sitesDictDefer = $q.defer()
-    protocolesDictDefer = $q.defer()
-    participationsDictDefer = $q.defer()
-    Backend.all('sites').getList().then (sites) ->
-      sitesDict = {}
-      for site in sites or []
-        sitesDict[site._id] = site
-      sitesDictDefer.resolve(sitesDict)
-    Backend.all('protocoles').getList().then (protocoles) ->
-      protocolesDict = {}
-      for protocole in protocoles or []
-        protocolesDict[protocole._id] = protocole
-      protocolesDictDefer.resolve(protocolesDict)
-    Backend.all('participations').getList().then (participations) ->
-      participationsDict = {}
-      for participation in participations or []
-        participationsDict[participation._id] = participation
-      participationsDictDefer.resolve(participationsDict)
+#  .controller 'ListActualitesCtrl', ($scope, $q, Backend, DelayedEvent) ->
+#    $scope.lookup = {}
+#    # Filter field is trigger after 500ms of inactivity
+#    delayedFilter = new DelayedEvent(500)
+#    # params = $location.search()
+#    # if params.where?
+#    #   $scope.filterField = JSON.parse(params.where).$text.$search
+#    # else
+#    $scope.filterField = ''
+#    $scope.$watch 'filterField', (filterValue) ->
+#      delayedFilter.triggerEvent ->
+#        if filterValue? and filterValue != ''
+#          $scope.lookup.q = filterValue
+#        else if $scope.lookup.q?
+#          delete $scope.lookup.q
+#        # TODO : fix reloadOnSearch: true
+#        # $location.search('where', $scope.lookup.where)
+#    $scope.resourceBackend = Backend.all('actualites')
 
-    $scope.resourceBackend.getList = (lookup) ->
-      deferred = $q.defer()
-      sitesDictDefer.promise.then (sitesDict) ->
-        protocolesDictDefer.promise.then (protocolesDict) ->
-          participationsDictDefer.promise.then (participationsDict) ->
-            resourceBackend_getList(lookup).then (actualites) ->
-              for actualite in actualites
-                if actualite.action == "INSCRIPTION_PROTOCOLE"
-                  actualite.objet = protocolesDict[actualite.objet]
-                else if actualite.action == "NOUVEAU_SITE"
-                  actualite.objet = sitesDict[actualite.objet]
-                else if actualite.action == "NOUVELLE_PARTICIPATION"
-                  actualite.objet = participationsDict[actualite.objet]
-                else
-                  throw "Error : unknow action "+actualite.action
-              deferred.resolve(actualites)
-      return deferred.promise
+  .directive 'listMesActualitesDirective', (Backend) ->
+    restrict: 'E'
+    templateUrl: 'scripts/views/actualite/list_actualites_drt.html'
+    scope:
+      isAdmin: '@'
+    link: (scope, elem, attrs) ->
+      scope.loading = true
+      scope.actualites = []
+      Backend.all('moi/actualites').getList().then (actualites) ->
+        scope.actualites = actualites.plain()
+        scope.loading = false
+
+  .directive 'displayActualiteDirective', ->
+    restrict: 'E'
+    templateUrl: 'scripts/views/actualite/display_actualite_drt.html'
+    controller: 'DisplayActualiteDirectiveCtrl'
+    scope:
+      actualite: '='
+      isAdmin: '@'
+
+  .controller 'DisplayActualiteDirectiveCtrl', ($scope, $q, Backend) ->
+    $scope.validProtocole = ->
+      console.log("validProtocole")
