@@ -16,8 +16,8 @@
     {{ actualite.sujet.pseudo }}
   </a>
   a créé le site
-  <a href="#/sites/{{actualite.objet._id}}">
-    {{ actualite.objet._id }}
+  <a href="#/sites/{{actualite.site._id}}">
+    {{ actualite.site.titre }}
   </a>
   le {{actualite._created | xinDate: 'medium'}}
 </span>
@@ -28,8 +28,8 @@
     {{ actualite.sujet.pseudo }}
   </a>
   a créé la participation
-  <a href="#/participations/{{actualite.objet._id}}">
-    {{ actualite.objet._id }}
+  <a href="#/participations/{{actualite.participation._id}}">
+    {{ actualite.participation._id }}
   </a>
   le {{actualite._created | xinDate: 'medium'}}
 </span>

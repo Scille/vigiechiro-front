@@ -12,7 +12,7 @@ angular.module('protocole_map_carre', [])
         @_steps = [
           "Positionner le point d'origine.",
           "Sélectionner un carré.",
-          "Définir les localités à l'intérieur du carré."
+          "Définir entre 5 et 13 localités à l'intérieur du carré."
         ]
         @_googleMaps.setDrawingManagerOptions(
           drawingControlOptions:
@@ -31,7 +31,7 @@ angular.module('protocole_map_carre', [])
         overlayCreated: (overlay) =>
           isModified = false
           if overlay.type == "Point"
-            if google.maps.geometry.poly.containsLocation(overlay.getPosition(), @_grille[0].item)
+            if @_googleMaps.isPointInPolygon(overlay, @_grille[0].item)
               isModified = true
           else if overlay.type == "Polygon" or overlay.type == "LineString"
             if @_googleMaps.isPolyInPolygon(overlay, @_grille[0].item)
@@ -39,9 +39,9 @@ angular.module('protocole_map_carre', [])
           if isModified
             if @allowEdit
               @_googleMaps.addListener(overlay, 'rightclick', (event) =>
-                @_googleMaps.deleteOverlay(overlay)
-                if @_googleMaps.getCountOverlays() == 0
-                  @_step = 1
+                @deleteOverlay(overlay)
+                if @getCountOverlays() == 0
+                  @_step = 2
                 @updateSite()
               )
             else
@@ -49,9 +49,25 @@ angular.module('protocole_map_carre', [])
                 draggable: false
                 editable: false
               )
+            # TODO : Check number of overlay
             @_step = 2
             @updateSite()
             return true
           return false
+
+        saveOverlay: (overlay) =>
+          localite = {}
+          localite.overlay = overlay
+          localite.name = @setLocaliteName()
+          localite.representatif = false
+          @_localites.push(localite)
+
         zoomChanged: => @mapsChanged()
         mapsMoved: => @mapsChanged()
+
+      setLocaliteName: (name = 1) ->
+        used = false
+        for localite in @_localites
+          if parseInt(localite.name) == name
+            return @setLocaliteName(name + 1)
+        return name+''

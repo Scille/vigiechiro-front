@@ -18,13 +18,6 @@ angular.module('xin_google_maps', [])
         @_map = new google.maps.Map(@div, @mapOptions)
         @_drawingManager = new google.maps.drawing.DrawingManager(
           drawingControl: true
-          drawingControlOptions:
-            position: google.maps.ControlPosition.TOP_CENTER
-            drawingModes: [
-              google.maps.drawing.OverlayType.MARKER,
-              google.maps.drawing.OverlayType.POLYGON,
-              google.maps.drawing.OverlayType.POLYLINE
-            ]
           markerOptions:
             draggable: true
           polygonOptions:
@@ -50,7 +43,6 @@ angular.module('xin_google_maps', [])
           google.maps.event.addListener(@_map, 'zoom_changed', @callbackDict.zoomChanged)
         if @callbackDict.mapsMoved?
           google.maps.event.addListener(@_map, 'dragend', @callbackDict.mapsMoved)
-        @_overlay = []
         google.maps.event.addListener(@_drawingManager, 'overlaycomplete', @overlayCreated)
 
       overlayCreated: (event) =>
@@ -65,99 +57,14 @@ angular.module('xin_google_maps', [])
         else
           return
         if @callbackDict.overlayCreated?(new_overlay)
-          @_overlay.push(new_overlay)
+          @callbackDict.saveOverlay?(new_overlay)
         else
           new_overlay.setMap(null)
 
       addListener: google.maps.event.addListener
 
-      loadGeoJson: (geoJson, callbackDict=@callbackDict.overlayCreated) ->
-        if not geoJson
-          return
-        if geoJson.type == 'GeometryCollection'
-          for geometry in geoJson.geometries
-            @loadGeoJson(geometry)
-          return
-        if geoJson.type == 'Point'
-          point = new google.maps.LatLng(geoJson.coordinates[0], geoJson.coordinates[1])
-          topush = new google.maps.Marker(
-            position: point
-            draggable: true
-          )
-        else if geoJson.type == 'Polygon'
-          paths = []
-          for latlng in geoJson.coordinates[0]
-            point = new google.maps.LatLng(latlng[0], latlng[1])
-            paths.push(point)
-          topush = new google.maps.Polygon(
-            paths: paths
-            draggable: true
-            editable: true
-          )
-        else if geoJson.type == 'LineString'
-          path = []
-          for latlng in geoJson.coordinates
-            point = new google.maps.LatLng(latlng[0], latlng[1])
-            path.push(point)
-          topush = new google.maps.Polyline(
-            path: path
-            draggable: true
-            editable: true
-          )
-        else
-          throw "Error: Bad GeoJSON object #{geoJson}"
-        topush.type = geoJson.type
-        if @callbackDict.overlayCreated?(topush)
-          topush.setMap(@_map)
-          @_overlay.push(topush)
-
-      saveGeoJson: ->
-        geoJson =
-          type: 'GeometryCollection'
-          geometries: []
-        for shape in @_overlay
-          shapetosave = {}
-          shapetosave.type = shape.type
-          if shape.type == "Point"
-            shapetosave.coordinates = [shape.getPosition().lat(), shape.getPosition().lng()]
-          if shape.type == "Polygon"
-            vertices = shape.getPath()
-            latlngs = []
-            for i in [1..vertices.getLength()]
-              xy = vertices.getAt(i-1)
-              latlngs.push([xy.lat(), xy.lng()])
-            shapetosave.coordinates = [ latlngs ]
-          if shape.type == "LineString"
-            vertices = shape.getPath()
-            latlngs = []
-            for i in [1..vertices.getLength()]
-              xy = vertices.getAt(i-1)
-              latlngs.push([xy.lat(), xy.lng()])
-            shapetosave.coordinates = latlngs
-          geoJson.geometries.push(shapetosave)
-        return geoJson
-
       deleteOverlay: (overlay) ->
         overlay.setMap(null)
-        index = @_overlay.indexOf(overlay)
-        @_overlay.splice(index, 1);
-
-      getCountOverlays: (type = '') ->
-        result = 0
-        for overlay in @_overlay
-          if type == ''
-            result++
-          else
-            if overlay.type == type
-              result++
-        return result
-
-      getTotalLength: ->
-        result = 0
-        for overlay in @_overlay
-          if overlay.type == 'LineString'
-            result += google.maps.geometry.spherical.computeLength(overlay.getPath())
-        return result
 
       displayInfo: (overlay) ->
         infoWindow = new google.maps.InfoWindow()
@@ -186,6 +93,11 @@ angular.module('xin_google_maps', [])
       setDrawingManagerOptions: (options) ->
         @_drawingManager.setOptions(options)
 
+      isPointInPolygon: (marker, polygon) ->
+        result = google.maps.geometry.poly.containsLocation(marker.getPosition(),
+                                                            polygon)
+        return result
+
       # works with lineString and polygon
       isPolyInPolygon: (poly, polygon) ->
         vertices = poly.getPath()
@@ -194,7 +106,51 @@ angular.module('xin_google_maps', [])
             return false
         return true
 
-      emptyMap: ->
-        for overlay in @_overlay
-          overlay.setMap(null)
-        @_overlay = []
+      createPoint: (lat, lng, draggable = false) ->
+        latlng = new google.maps.LatLng(lat, lng)
+        point = new google.maps.Marker(
+          position: latlng
+          map: @_map
+          draggable: draggable
+        )
+        return point
+
+      createPolygon: (latlngs, draggable = false, editable = false) ->
+        paths = []
+        for latlng in latlngs
+          point = new google.maps.LatLng(latlng[0], latlng[1])
+          paths.push(point)
+        polygon = new google.maps.Polygon(
+          paths: paths
+          map: @_map
+          draggable: draggable
+          editable: editable
+        )
+        return polygon
+
+      createLineString: (latlngs, draggable = false, editable = false) ->
+        path = []
+        for latlng in latlngs
+          point = new google.maps.LatLng(latlng[0], latlng[1])
+          path.push(point)
+        lineString = new google.maps.Polyline(
+          path: path
+          map: @_map
+          draggable: draggable
+          editable: editable
+        )
+        return lineString
+
+      getPosition: (overlay) ->
+        return [overlay.getPosition().lat(), overlay.getPosition().lng()]
+
+      getPath: (overlay) ->
+        vertices = overlay.getPath()
+        latlngs = []
+        for i in [1..vertices.getLength()]
+          vertice = vertices.getAt(i-1)
+          latlngs.push([xy.lat(), xy.lng()])
+        return latlngs
+
+      computeLength: (overlay) ->
+        return google.maps.geometry.spherical.computeLength(overlay.getPath())

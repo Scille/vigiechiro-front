@@ -16,6 +16,7 @@ angular.module('protocole_map', ['protocole_map_carre', 'protocole_map_point_fix
   .factory 'ProtocoleMap', ($rootScope, Backend, GoogleMaps) ->
     class ProtocoleMap
       constructor: (@site, mapDiv, @allowEdit, @siteCallback) ->
+        @_localites = []
         @_origin = undefined
         @_circleLimit = undefined
         @_newSelection = false
@@ -85,25 +86,43 @@ angular.module('protocole_map', ['protocole_map_carre', 'protocole_map_point_fix
           @siteCallback.updateForm()
 
       saveMap: ->
-        localites = []
-        geoDump = @_googleMaps.saveGeoJson()
-        for geoJson in geoDump.geometries
-          localite =
+        result = []
+        for localite in @_localites
+          localiteToSave = {}
+          shapetosave = {}
+          shapetosave.type = localite.overlay.type
+          if shapetosave.type == "Point"
+            shapetosave.coordinates = @_googleMaps.getPosition(localite.overlay)
+          else if shapetosave.type == "Polygon"
+            shapetosave.coordinates = [ @_googleMaps.getPath(localite.overlay) ]
+          else if shapetosave.type == "LineString"
+            shapetosave.coordinates = @_googleMaps.getPath(localite.overlay)
+          else
+            continue
+          localiteToSave =
+            name: localite.name
             geometries:
               type: 'GeometryCollection'
-              geometries: [geoJson]
-          localites.push(localite)
-        return localites
+              geometries: [shapetosave]
+            representatif: false
+          result.push(localiteToSave)
+        return result
 
       mapsCallback: ->
         overlayCreated: -> false
+        saveOverlay: -> false
         zoomChanged: -> false
         mapsMoved: -> false
 
+      setLocaliteName: ->
+        return ''
+
       loadMap: ->
+        # start loading
         @loading = true
+        # generate grille_stoc
         if @site.grille_stoc?
-          @_step = 1
+          @_step = 2
           @_googleMaps.setCenter(
             @site.grille_stoc.centre.coordinates[1],
             @site.grille_stoc.centre.coordinates[0]
@@ -114,9 +133,37 @@ angular.module('protocole_map', ['protocole_map_carre', 'protocole_map_point_fix
             @site.grille_stoc.centre.coordinates[0]
           )
           @validNumeroGrille(newCell, @site.grille_stoc.numero, @site.grille_stoc._id)
+        # load localites
         for localite in @site.localites or []
-          @_googleMaps.loadGeoJson(localite.geometries)
+          newLocalite =
+            name: localite.nom
+            representatif: localite.representatif
+          newLocalite.overlay = @loadGeoJson(localite.geometries)
+          @_localites.push(newLocalite)
+        # end loading
         @loading = false
+
+      loadGeoJson: (geoJson, callback=@mapsCallback.overlayCreated) ->
+        overlay = undefined
+        if not geoJson
+          return
+        if geoJson.type == 'GeometryCollection'
+          for geometry in geoJson.geometries
+            return @loadGeoJson(geometry)
+        if geoJson.type == 'Point'
+          overlay = @_googleMaps.createPoint(geoJson.coordinates[0],
+                                            geoJson.coordinates[1],
+                                            true)
+        else if geoJson.type == 'Polygon'
+          overlay = @_googleMaps.createPolygon(geoJson.coordinates[0], true, true)
+        else if geoJson.type == 'LineString'
+          overlay = @_googleMaps.createLineString(geoJson.coordinates, true, true)
+        else
+          throw "Error: Bad GeoJSON object #{geoJson}"
+        overlay.type = geoJson.type
+        if !@mapsCallback().overlayCreated(overlay)
+          @_googleMaps.deleteOverlay(overlay)
+        return overlay
 
       getIdGrilleStoc: ->
         return @_grille[0].id
@@ -222,7 +269,7 @@ angular.module('protocole_map', ['protocole_map_carre', 'protocole_map_point_fix
           @_googleMaps.setDrawingManagerOptions(drawingControl: true)
 
       checkLength: (overlay) ->
-        length = google.maps.geometry.spherical.computeLength(overlay.getPath())
+        length = @_googleMaps.computeLength(overlay)
         if length < 1800
           overlay.setOptions(strokeColor: '#800090')
         else if length > 2200
@@ -233,3 +280,32 @@ angular.module('protocole_map', ['protocole_map_carre', 'protocole_map_point_fix
 
       getSteps: ->
         return @_steps
+
+      emptyMap: ->
+        for overlay in @_overlay
+          overlay.setMap(null)
+        @_overlay = []
+
+      deleteOverlay: (overlay) ->
+        for localite, key in @_localites
+          if localite.overlay == overlay
+            @_googleMaps.deleteOverlay(localite.overlay)
+            @_localites.splice(key, 1);
+            return
+
+      getCountOverlays: (type = '') ->
+        if type == ''
+          return @_localites.length
+        else
+          result = 0
+          for localite in @_localites
+            if localite.overlay.type == type
+              result++
+          return result
+
+      getTotalLength: ->
+        result = 0
+        for localite in @_localites
+          if localite.overlay.type == 'LineString'
+            result += @_googleMaps.computeLength(localite.overlay)
+        return result

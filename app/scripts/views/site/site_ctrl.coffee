@@ -225,13 +225,13 @@ angular.module('siteViews', ['ngRoute', 'textAngular', 'xin_backend', 'protocole
           localites = mapProtocole.saveMap()
           for localite in localites
             payload =
-              nom: "nom"
-              coordonnee: localite.geometries.geometries[0].coordinates
-#              geometries:
+              nom: localite.name
+#              coordonnee: localite.geometries.geometries[0]
+              geometries: localite.geometries
               representatif: false
-            site.customPUT(payload, "localite").then(
+            site.customPUT(payload, "localites").then(
               -> console.log("ok")
-              -> console.log("ko")
+              (error) -> throw "Error : "+error
             )
 #          $route.reload()
         (error) -> throw "error " + error
