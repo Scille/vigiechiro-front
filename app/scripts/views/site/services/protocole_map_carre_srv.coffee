@@ -1,9 +1,6 @@
 'use strict'
 
-###*
- # args
- ## @div : element html (div) dans laquelle la map sera instanciée
-###
+
 angular.module('protocole_map_carre', [])
   .factory 'ProtocoleMapCarre', ($rootScope, Backend, GoogleMaps, ProtocoleMap) ->
     class ProtocoleMapCarre extends ProtocoleMap
@@ -33,9 +30,8 @@ angular.module('protocole_map_carre', [])
           if overlay.type == "Point"
             if @_googleMaps.isPointInPolygon(overlay, @_grille[0].item)
               isModified = true
-          else if overlay.type == "Polygon" or overlay.type == "LineString"
-            if @_googleMaps.isPolyInPolygon(overlay, @_grille[0].item)
-              isModified = true
+          else
+            throw "Error : bad shape type " + overlay.type
           if isModified
             if @allowEdit
               @_googleMaps.addListener(overlay, 'rightclick', (event) =>

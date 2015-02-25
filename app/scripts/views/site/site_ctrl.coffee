@@ -55,7 +55,10 @@ angular.module('siteViews', ['ngRoute', 'textAngular', 'xin_backend', 'protocole
 
   .controller 'DisplaySiteDirectiveCtrl', ($scope, Backend, protocolesFactory) ->
     $scope.loadMap = (mapDiv) ->
-      protocolesFactory($scope.site, $scope.protocoleAlgoSite, mapDiv, false)
+      console.log("loadmap")
+      mapProtocole = protocolesFactory($scope.site, $scope.protocoleAlgoSite,
+                                       mapDiv, false)
+      mapProtocole.loadMap()
 
   .directive 'listSitesDirective', (session, Backend) ->
     restrict: 'E'
@@ -66,19 +69,14 @@ angular.module('siteViews', ['ngRoute', 'textAngular', 'xin_backend', 'protocole
     link: (scope, elem, attrs) ->
       scope.loading = true
       scope.sites = []
-      scope.loadSites = (lookup) ->
-        Backend.all('sites').getList(lookup).then (sites) ->
+      scope.loadSites = ->
+        Backend.all('sites').getList().then (sites) ->
           scope.sites = sites.plain()
           scope.loading = false
       attrs.$observe 'protocoleId', (protocoleId) ->
         if protocoleId
           session.getUserPromise().then (user) ->
-            scope.loadSites(
-              where:
-                protocole: protocoleId
-                observateur: user._id
-              embedded: { "grille_stoc": 1 }
-            )
+            scope.loadSites()
 
   .controller 'ShowSiteCtrl', ($timeout, $route, $routeParams, $scope
                                session, Backend, protocolesFactory) ->
@@ -172,14 +170,21 @@ angular.module('siteViews', ['ngRoute', 'textAngular', 'xin_backend', 'protocole
         $scope.stepId = steps.step
         $timeout(-> $scope.$apply())
 
-    $scope.loadMap = (mapDiv, randomSelection) ->
+    $scope.loadMap = (mapDiv) ->
       if not mapLoaded
         mapLoaded = true
+        randomSelection = false
+        if $scope.protocoleAlgoSite == 'CARRE' or
+           $scope.protocoleAlgoSite == 'POINT_FIXE'
+          if confirm("Voulez-vous un tirage aléatoire ?")
+            randomSelection = true
+
         mapProtocole = protocolesFactory($scope.site, $scope.protocoleAlgoSite,
                                          mapDiv, true, siteCallback)
         if randomSelection
           mapProtocole.createOriginPoint()
-        else
+        else if $scope.protocoleAlgoSite == 'CARRE' or
+                $scope.protocoleAlgoSite == 'POINT_FIXE'
           mapProtocole.selectGrilleStoc()
 
     $scope.validOrigin = ->
@@ -212,10 +217,6 @@ angular.module('siteViews', ['ngRoute', 'textAngular', 'xin_backend', 'protocole
       payload =
         'titre': $scope.protocoleTitre
         'protocole': $scope.protocoleId
-# TODO : use coordonnee to center the map
-#        'coordonnee':
-#          'type': 'Point'
-#          'coordinates': [mapDump[0].lng, mapDump[0].lat]
         'commentaire': $scope.siteForm.commentaire.$modelValue
       grille_stoc = mapProtocole.getIdGrilleStoc()
       if grille_stoc != ''
@@ -233,7 +234,7 @@ angular.module('siteViews', ['ngRoute', 'textAngular', 'xin_backend', 'protocole
               -> console.log("ok")
               (error) -> throw "Error : "+error
             )
-#          $route.reload()
+          $route.reload()
         (error) -> throw "error " + error
       )
 
@@ -251,11 +252,8 @@ angular.module('siteViews', ['ngRoute', 'textAngular', 'xin_backend', 'protocole
         scope.protocoleId = protocoleId
       )
       $(elem).on('shown.bs.collapse', ->
-        randomSelection = false
-        if confirm("Voulez-vous un tirage aléatoire ?")
-          randomSelection = true
         scope.numero_grille_stoc = elem.find('.numero_grille_stoc')[0]
-        scope.loadMap(elem.find('.g-maps')[0], randomSelection)
+        scope.loadMap(elem.find('.g-maps')[0])
         return
       )
       attrs.$observe('protocoleAlgoSite', (value) ->

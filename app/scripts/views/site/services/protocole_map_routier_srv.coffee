@@ -27,18 +27,18 @@ angular.module('protocole_map_routier', [])
 
       getSteps: ->
         return [
-          "Positionner le point d'origine.",
-          "Tracer le parcours par plusieurs segments de 2 km (+/-10%). "+
-          "Les segments trop courts sont en violet et les trop longs en rouge.",
-          "Atteindre une longueur de tracé globale de 30 km ou plus. "+
-          "Longueur actuelle "+@_totalLength+" mètres"
+          "Tracer le trajet complet en un seul trait. Le tracé doit atteindre 30 km ou plus."+
+          "Longueur actuelle "+@_totalLength+" mètres",
+          "Sélectionner le point d'origine.",
+          "Tracer les segments de 2 km (+/-10%). "+
+          "Les segments trop courts sont en violet et les trop longs en rouge."
         ]
 
       mapsCallback: ->
         overlayCreated: (overlay) =>
           isModified = false
           if overlay.type == "Point"
-            nbPoints = @_googleMaps.getCountOverlays('Point')
+            nbPoints = @getCountOverlays('Point')
             if nbPoints <= 0
               @_step = 1
               isModified = true
@@ -48,7 +48,7 @@ angular.module('protocole_map_routier', [])
             # when use mouseup, overlay is still not changed.
             @_googleMaps.addListener(overlay, 'mouseout', (event) =>
               @checkLength(overlay)
-              @_totalLength = @_googleMaps.getTotalLength()
+              @_totalLength = @getTotalLength()
               @updateSite()
             )
           else
@@ -58,7 +58,7 @@ angular.module('protocole_map_routier', [])
             if @allowEdit
               @_googleMaps.addListener(overlay, 'rightclick', (event) =>
                 @_googleMaps.deleteOverlay(overlay)
-                @_totalLength = @_googleMaps.getTotalLength()
+                @_totalLength = @getTotalLength()
                 @updateSite()
               )
             else
@@ -68,3 +68,20 @@ angular.module('protocole_map_routier', [])
               )
             return true
           return false
+
+        saveOverlay: (overlay) =>
+          localite = {}
+          localite.overlay = overlay
+          localite.name = @setLocaliteName()
+          localite.representatif = false
+          @_localites.push(localite)
+
+        zoomChanged: => @mapsChanged()
+        mapsMoved: => @mapsChanged()
+
+      setLocaliteName: (name = 1) ->
+        used = false
+        for localite in @_localites
+          if parseInt(localite.name) == name
+            return @setLocaliteName(name + 1)
+        return name+''

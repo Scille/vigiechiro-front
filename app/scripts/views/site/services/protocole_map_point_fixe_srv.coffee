@@ -1,19 +1,24 @@
 'use strict'
 
-###*
- # args
- ## @div : element html (div) dans laquelle la map sera instanciée
-###
+
 angular.module('protocole_map_point_fixe', [])
   .factory 'ProtocoleMapPointFixe', ($rootScope, Backend, GoogleMaps, ProtocoleMap) ->
     class ProtocoleMapPointFixe extends ProtocoleMap
       constructor: (@site, mapDiv, @allowEdit, @siteCallback) ->
         super @site, mapDiv, @allowEdit, @siteCallback
         @_steps = [
+          "Positionner le point d'origine.",
           "Sélectionner un carré.",
-          "Définir les localités à l'intérieur du carré."
+          "Définir au moins 1 localité à l'intérieur du carré."
         ]
-        if (@_step < 1 or not @allowEdit)
+        @_googleMaps.setDrawingManagerOptions(
+          drawingControlOptions:
+            position: google.maps.ControlPosition.TOP_CENTER
+            drawingModes: [
+              google.maps.drawing.OverlayType.MARKER
+            ]
+        )
+        if (@_step < 2 or not @allowEdit)
           @_googleMaps.setDrawingManagerOptions(drawingControl: false)
         @loading = true
         @updateSite()
@@ -23,17 +28,16 @@ angular.module('protocole_map_point_fixe', [])
         overlayCreated: (overlay) =>
           isModified = false
           if overlay.type == "Point"
-            if google.maps.geometry.poly.containsLocation(overlay.getPosition(), @_grille[0].item)
+            if @_googleMaps.isPointInPolygon(overlay, @_grille[0].item)
               isModified = true
-          else if overlay.type == "Polygon" or overlay.type == "LineString"
-            if @_googleMaps.isPolyInPolygon(overlay, @_grille[0].item)
-              isModified = true
+          else
+            throw "Error : bad shape type " + overlay.type
           if isModified
             if @allowEdit
               @_googleMaps.addListener(overlay, 'rightclick', (event) =>
-                @_googleMaps.deleteOverlay(overlay)
-                if @_googleMaps.getCountOverlays() == 0
-                  @_step = 1
+                @deleteOverlay(overlay)
+                if @getCountOverlays() == 0
+                  @_step = 2
                 @updateSite()
               )
             else
@@ -41,9 +45,25 @@ angular.module('protocole_map_point_fixe', [])
                 draggable: false
                 editable: false
               )
+            # TODO : Check number of overlay
             @_step = 2
             @updateSite()
             return true
           return false
+
+        saveOverlay: (overlay) =>
+          localite = {}
+          localite.overlay = overlay
+          localite.name = @setLocaliteName()
+          localite.representatif = false
+          @_localites.push(localite)
+
         zoomChanged: => @mapsChanged()
         mapsMoved: => @mapsChanged()
+
+      setLocaliteName: (name = 1) ->
+        used = false
+        for localite in @_localites
+          if parseInt(localite.name) == name
+            return @setLocaliteName(name + 1)
+        return name+''
