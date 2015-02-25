@@ -5,11 +5,12 @@ BACKEND_DIR="vigiechiro-api"
 
 clone_repo() {
     BACKEND_REPO="Scille/vigiechiro-api.git"
+    BRANCH="master"
     if [ ! -z "$GITHUB_VIGIECHIRO_API_TOKEN" ]
     then
-        git clone https://$GITHUB_VIGIECHIRO_API_TOKEN@github.com/$BACKEND_REPO
+        git clone https://$GITHUB_VIGIECHIRO_API_TOKEN@github.com/$BACKEND_REPO -b $BRANCH
     else
-        git clone git@github.com:$BACKEND_REPO
+        git clone git@github.com:$BACKEND_REPO -b $BRANCH
     fi
 }
 
