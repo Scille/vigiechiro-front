@@ -1,0 +1,35 @@
+<span ng-if="actualite.action == 'INSCRIPTION_PROTOCOLE'">
+  L'utilisateur
+  <a href="#/utilisateurs/{{actualite.sujet._id}}">
+    {{ actualite.sujet.pseudo }}
+  </a>
+  s'est incrit au protocole
+  <a href="#/protocoles/{{actualite.protocole._id}}">
+    {{ actualite.protocole.titre }}
+  </a>
+  le {{actualite._created | xinDate: 'medium'}}
+</span>
+
+<span ng-if="actualite.action == 'NOUVEAU_SITE'">
+  L'utilisateur
+  <a href="#/utilisateurs/{{actualite.sujet._id}}">
+    {{ actualite.sujet.pseudo }}
+  </a>
+  a créé le site
+  <a href="#/sites/{{actualite.objet._id}}">
+    {{ actualite.objet._id }}
+  </a>
+  le {{actualite._created | xinDate: 'medium'}}
+</span>
+
+<span ng-if="actualite.action == 'NOUVELLE_PARTICIPATION'">
+  L'utilisateur
+  <a href="#/utilisateurs/{{actualite.sujet._id}}">
+    {{ actualite.sujet.pseudo }}
+  </a>
+  a créé la participation
+  <a href="#/participations/{{actualite.objet._id}}">
+    {{ actualite.objet._id }}
+  </a>
+  le {{actualite._created | xinDate: 'medium'}}
+</span>

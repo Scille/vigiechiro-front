@@ -27,12 +27,9 @@ angular.module('utilisateurViews', ['ngRoute', 'xin_listResource', 'xin_tools',
     $scope.$watch 'filterField', (filterValue) ->
       delayedFilter.triggerEvent ->
         if filterValue? and filterValue != ''
-          $scope.lookup.where = JSON.stringify(
-              $text:
-                $search: filterValue
-          )
-        else if $scope.lookup.where?
-          delete $scope.lookup.where
+          $scope.lookup.q = filterValue
+        else if $scope.lookup.q?
+          delete $scope.lookup.q
     $scope.resourceBackend = Backend.all('utilisateurs')
 
   .controller 'ShowUtilisateurCtrl', ($scope, $route, $routeParams, Backend, session) ->
@@ -42,7 +39,12 @@ angular.module('utilisateurViews', ['ngRoute', 'xin_listResource', 'xin_tools',
     $scope.isAdmin = false
     userResource = undefined
     origin_role = undefined
-    Backend.one('utilisateurs', $routeParams.userId).get().then (utilisateur) ->
+    userBackend = undefined
+    if $routeParams.userId == 'moi'
+      userBackend = Backend.one('moi')
+    else
+      userBackend = Backend.one('utilisateurs', $routeParams.userId)
+    userBackend.get().then (utilisateur) ->
       userResource = utilisateur
       $scope.utilisateur = utilisateur.plain()
       origin_role = $scope.utilisateur.role
@@ -50,6 +52,7 @@ angular.module('utilisateurViews', ['ngRoute', 'xin_listResource', 'xin_tools',
         $scope.isAdmin = user.role == 'Administrateur'
         $scope.readOnly = (not $scope.isAdmin and
                            user._id != utilisateur._id)
+
     $scope.saveUser = ->
       $scope.submitted = true
       if (not $scope.userForm.$valid or
@@ -67,7 +70,7 @@ angular.module('utilisateurViews', ['ngRoute', 'xin_listResource', 'xin_tools',
       # Special handling for select
       if $scope.utilisateur.role != origin_role
         payload.role = $scope.utilisateur.role
-      userResource.patch(payload).then(
+      userBackend.patch(payload).then(
         -> $route.reload()
-        ->
+        (error) -> throw "Error " + error
       )

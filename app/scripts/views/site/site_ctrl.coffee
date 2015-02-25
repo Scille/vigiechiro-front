@@ -21,19 +21,14 @@ angular.module('siteViews', ['ngRoute', 'textAngular', 'xin_backend', 'protocole
     $scope.$watch 'filterField', (filterValue) ->
       delayedFilter.triggerEvent ->
         if filterValue? and filterValue != ''
-          $scope.lookup.where = JSON.stringify(
-              $text:
-                $search: filterValue
-          )
-        else if $scope.lookup.where?
-          delete $scope.lookup.where
+          $scope.lookup.q = filterValue
+        else if $scope.lookup.q?
+          delete $scope.lookup.q
     $scope.resourceBackend = Backend.all('sites')
 
   .controller 'DisplaySiteCtrl', ($routeParams, $scope
                                   Backend, session) ->
-    params =
-      embedded: { "protocole": 1, "grille_stoc": 1 }
-    Backend.one('sites', $routeParams.siteId).get(params).then (site) ->
+    Backend.one('sites', $routeParams.siteId).get().then (site) ->
       $scope.site = site.plain()
       $scope.protocoleAlgoSite = $scope.site.protocole.algo_tirage_site
       session.getUserPromise().then (user) ->
@@ -102,6 +97,8 @@ angular.module('siteViews', ['ngRoute', 'textAngular', 'xin_backend', 'protocole
         mapProtocole = protocolesFactory($scope.site, $scope.protocoleAlgoSite,
                                          mapDiv, !$scope.site.verrouille,
                                          siteCallback)
+        mapProtocole.loadMap()
+
     siteCallback =
       updateForm: ->
         $scope.siteForm.$pristine = false
@@ -161,11 +158,10 @@ angular.module('siteViews', ['ngRoute', 'textAngular', 'xin_backend', 'protocole
     session.getIsAdminPromise().then (isAdmin) ->
       $scope.isAdmin = isAdmin
     $scope.site = {}
-    $scope.loadMap = (mapDiv) ->
-      if not mapLoaded
-        mapLoaded = true
-        mapProtocole = protocolesFactory($scope.site, $scope.protocoleAlgoSite,
-                                         mapDiv, true, siteCallback)
+    $scope.site.titre = "Nouveau site"
+    $scope.listGrilleStocOrigin = []
+    $scope.listNumberUsed = []
+
     siteCallback =
       updateForm: ->
         $scope.siteForm.$pristine = false
@@ -175,14 +171,47 @@ angular.module('siteViews', ['ngRoute', 'textAngular', 'xin_backend', 'protocole
         $scope.steps = steps.steps
         $scope.stepId = steps.step
         $timeout(-> $scope.$apply())
+
+    $scope.loadMap = (mapDiv, randomSelection) ->
+      if not mapLoaded
+        mapLoaded = true
+        mapProtocole = protocolesFactory($scope.site, $scope.protocoleAlgoSite,
+                                         mapDiv, true, siteCallback)
+        if randomSelection
+          mapProtocole.createOriginPoint()
+        else
+          mapProtocole.selectGrilleStoc()
+
+    $scope.validOrigin = ->
+      parameters =
+        lat: mapProtocole.getOrigin().getPosition().lat()
+        lng: mapProtocole.getOrigin().getPosition().lng()
+        r: 10000
+      Backend.all('grille_stoc/cercle').getList(parameters).then (grille_stoc) ->
+        $scope.listGrilleStocOrigin = grille_stoc.plain()
+        number = Math.floor(Math.random() * $scope.listGrilleStocOrigin.length)
+        $scope.listNumberUsed.push(number)
+        mapProtocole.validOrigin($scope.listGrilleStocOrigin[number])
+
+    $scope.newSelection = ->
+      if $scope.listNumberUsed.length == $scope.listGrilleStocOrigin.length
+        throw "Error: All cells picked"
+        return
+      mapProtocole.deleteValidCell()
+      number = Math.floor(Math.random() * $scope.listGrilleStocOrigin.length)
+      while (number in $scope.listNumberUsed)
+        number = Math.floor(Math.random() * $scope.listGrilleStocOrigin.length)
+      $scope.listNumberUsed.push(number)
+      mapProtocole.validOrigin($scope.listGrilleStocOrigin[number])
+
     $scope.saveSite = ->
       $scope.submitted = true
       if (not $scope.siteForm.$valid or
           not $scope.siteForm.$dirty)
         return
       payload =
+        'titre': $scope.protocoleTitre
         'protocole': $scope.protocoleId
-        'localites': mapProtocole.saveMap()
 # TODO : use coordonnee to center the map
 #        'coordonnee':
 #          'type': 'Point'
@@ -192,8 +221,20 @@ angular.module('siteViews', ['ngRoute', 'textAngular', 'xin_backend', 'protocole
       if grille_stoc != ''
         payload.grille_stoc = grille_stoc
       Backend.all('sites').post(payload).then(
-        -> $route.reload()
-        (error) -> console.log("error", error)
+        (site) ->
+          localites = mapProtocole.saveMap()
+          for localite in localites
+            payload =
+              nom: "nom"
+              coordonnee: localite.geometries.geometries[0].coordinates
+#              geometries:
+              representatif: false
+            site.customPUT(payload, "localite").then(
+              -> console.log("ok")
+              -> console.log("ko")
+            )
+#          $route.reload()
+        (error) -> throw "error " + error
       )
 
   .directive 'createSiteDirective', ->
@@ -210,8 +251,11 @@ angular.module('siteViews', ['ngRoute', 'textAngular', 'xin_backend', 'protocole
         scope.protocoleId = protocoleId
       )
       $(elem).on('shown.bs.collapse', ->
+        randomSelection = false
+        if confirm("Voulez-vous un tirage aléatoire ?")
+          randomSelection = true
         scope.numero_grille_stoc = elem.find('.numero_grille_stoc')[0]
-        scope.loadMap(elem.find('.g-maps')[0])
+        scope.loadMap(elem.find('.g-maps')[0], randomSelection)
         return
       )
       attrs.$observe('protocoleAlgoSite', (value) ->

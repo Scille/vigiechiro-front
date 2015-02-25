@@ -1,6 +1,6 @@
 <div class="container">
     <div ng-if="!loading">
-        <div ng-if="taxons.length != 0">
+        <div ng-if="sites.length != 0">
             <div class="page-header">
                 <h3>Mes sites</h3>
             </div>
@@ -11,7 +11,8 @@
                     </show-site-directive>
                 </li>
             </ul>
-        <div ng-show="taxons.length == 0" class="text-center">
+        </div>
+        <div ng-show="sites.length == 0" class="text-center">
             <h3><i>Vous n'avez pas de sites pour le moment</i></h3>
         </div>
     </div>

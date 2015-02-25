@@ -54,12 +54,9 @@ angular.module('protocoleViews', ['ngRoute', 'textAngular', 'xin_listResource',
     $scope.$watch 'filterField', (filterValue) ->
       delayedFilter.triggerEvent ->
         if filterValue? and filterValue != ''
-          $scope.lookup.where = JSON.stringify(
-              $text:
-                $search: filterValue
-          )
-        else if $scope.lookup.where?
-          delete $scope.lookup.where
+          $scope.lookup.q = filterValue
+        else if $scope.lookup.q?
+          delete $scope.lookup.q
         # TODO : fix reloadOnSearch: true
         # $location.search('where', $scope.lookup.where)
     $scope.resourceBackend = Backend.all('protocoles')
@@ -102,21 +99,12 @@ angular.module('protocoleViews', ['ngRoute', 'textAngular', 'xin_listResource',
     $scope.$watch 'filterField', (filterValue) ->
       delayedFilter.triggerEvent ->
         if filterValue? and filterValue != ''
-          console.log($scope.lookup.where)
-          $scope.lookup.where = JSON.stringify(
-            $text:
-              $search: filterValue
-            _id:
-              $in: $scope.userProtocolesArray
-          )
-        else
-          $scope.lookup.where = JSON.stringify(
-            _id:
-              $in: $scope.userProtocolesArray
-          )
+          $scope.lookup.q = filterValue
+        else if $scope.lookup.q?
+          delete $scope.lookup.q
         # TODO : fix reloadOnSearch: true
         # $location.search('where', $scope.lookup.where)
-    $scope.resourceBackend = Backend.all('protocoles')
+    $scope.resourceBackend = Backend.all('moi/protocoles')
     # Wrap protocole backend to check if the user is registered (see _status_*)
     resourceBackend_getList = $scope.resourceBackend.getList
     userProtocolesDictDefer = $q.defer()
@@ -148,14 +136,14 @@ angular.module('protocoleViews', ['ngRoute', 'textAngular', 'xin_listResource',
       session.getUserPromise().then (user) ->
         userRegistered = false
         for protocole in user.protocoles or []
-          if protocole.protocole == $scope.protocole._id
+          if protocole.protocole._id == $scope.protocole._id
             userRegistered = true
             break
         $scope.userRegistered = userRegistered
       Backend.one('taxons', $scope.protocole.taxon).get().then (taxon) ->
         $scope.taxon = taxon.plain()
     $scope.registerProtocole = ->
-      Backend.one('protocoles', $scope.protocole._id+"/action/join").post().then(
+      Backend.one('moi/protocoles/'+$scope.protocole._id).put().then(
         ->
           session.refreshPromise()
           $route.reload()

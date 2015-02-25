@@ -4,7 +4,7 @@
       <a data-toggle="collapse" data-target="#show-site-collapse-{{site._id}}"
          aria-expanded="false" aria-controls="show-site-collapse-{{site._id}}"
          ng-click="openCollapse('#show-site-collapse-' + site._id)">
-        {{title}}
+        {{site.titre}}
       </a>
     </h4>
   </div>
@@ -19,9 +19,19 @@
           </li>
         </ul>
 
+        <a class="btn btn-primary" ng-show="stepId == 0"
+                ng-click="validOrigin()">
+          Valider le point d'origine
+        </a>
+
+        <a class="btn btn-primary" ng-show="stepId == 2"
+                ng-click="newSelection()">
+          Refaire un tirage
+        </a>
+
         <div class="form-group">
-          <input type="text" class="numero_grille_stoc" value="numéro grille stoc"
-            ng-if="protocoleAlgoSite != 'ROUTIER'">
+          <!--<input type="text" class="numero_grille_stoc" value="numéro grille stoc"
+            ng-if="protocoleAlgoSite != 'ROUTIER'">-->
           <div class="g-maps"></div>
         </div>
 
