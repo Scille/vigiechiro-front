@@ -118,7 +118,8 @@
       </div>
     </div>
 
-    <div class="form-group" ng-class="{'has-error': participationForm.pieces_jointes.$invalid && !participationForm.$pristine}">
+    <div class="form-group"
+      ng-class="{'has-error': participationForm.pieces_jointes.$invalid && !participationForm.$pristine}">
       <div class="input-group">
         <span class="input-group-addon">Pièces jointes</span>
         <div style="padding-right: 1em; border-left: 1px solid #ccc">
@@ -126,24 +127,29 @@
           </upload-file-directive>
         </div>
       </div>
-      <span ng-show="submitted && participationForm.pieces_jointes.$error.required" class="help-block">
+      <span class="help-block"
+        ng-show="submitted && participationForm.pieces_jointes.$error.required">
         Champ requis
       </span>
     </div>
 
-
-    <div class="form-group" ng-class="{'has-error': participationForm.configuration.detecteur_enregistreur_numero_serie.$invalid && !participationForm.$pristine}">
+    <div class="form-group"
+      ng-class="{'has-error': participationForm.configuration.detecteur_enregistreur_numero_serie.$invalid && !participationForm.$pristine}"
+      ng-if="checkConfiguration('detecteur_enregistreur_numero_serie')">
       <div class="input-group">
         <label class="input-group-addon" for="configuration.detecteur_enregistreur_numero_serie">
           Numéro de série du détecteur enregistreur
         </label>
-        <input type="text" class="form-control" id="configuration.detecteur_enregistreur_numero_serie"
+        <input type="text" class="form-control"
+          id="configuration.detecteur_enregistreur_numero_serie"
           name="detecteur_enregistreur_numero_serie"
           ng-model="participation.configuration.detecteur_enregistreur_numero_serie" ng-disabled="readOnly">
       </div>
     </div>
 
-    <div class="input-group form-group" ng-class="{'has-error': participationForm.configuration.micro0_position.$invalid && !participationForm.$pristine}">
+    <div class="input-group form-group"
+         ng-class="{'has-error': participationForm.configuration.micro0_position.$invalid && !participationForm.$pristine}"
+         ng-if="checkConfiguration('micro0_position')">
       <span class="input-group-addon">Position micro 0</span>
       <select class="form-control" name="micro0_position"
         ng-model="participation.configuration.micro0_position"
@@ -153,7 +159,9 @@
       </select>
     </div>
 
-    <div class="form-group" ng-class="{'has-error': participationForm.configuration.micro0_numero_serie.$invalid && !participationForm.$pristine}">
+    <div class="form-group"
+      ng-class="{'has-error': participationForm.configuration.micro0_numero_serie.$invalid && !participationForm.$pristine}"
+      ng-if="checkConfiguration('micro0_numero_serie')">
       <div class="input-group">
         <label class="input-group-addon" for="configuration.micro0_numero_serie">
           Numéro de série du micro 0
@@ -164,7 +172,9 @@
       </div>
     </div>
 
-    <div class="form-group" ng-class="{'has-error': participationForm.configuration.micro0_hauteur.$invalid && !participationForm.$pristine}">
+    <div class="form-group"
+      ng-class="{'has-error': participationForm.configuration.micro0_hauteur.$invalid && !participationForm.$pristine}"
+      ng-if="checkConfiguration('micro0_hauteur')">
       <div class="input-group">
         <label class="input-group-addon" for="configuration.micro0_hauteur">
           Hauteur du micro 0
@@ -175,7 +185,9 @@
       </div>
     </div>
 
-    <div class="input-group form-group" ng-class="{'has-error': participationForm.configuration.micro1_position.$invalid && !participationForm.$pristine}">
+    <div class="input-group form-group"
+      ng-class="{'has-error': participationForm.configuration.micro1_position.$invalid && !participationForm.$pristine}"
+      ng-if="checkConfiguration('micro1_position')">
       <span class="input-group-addon">Position micro 1</span>
       <select class="form-control" name="micro1_position"
         ng-model="participation.configuration.micro1_position"
@@ -185,7 +197,9 @@
       </select>
     </div>
 
-    <div class="form-group" ng-class="{'has-error': participationForm.configuration.micro1_numero_serie.$invalid && !participationForm.$pristine}">
+    <div class="form-group"
+      ng-class="{'has-error': participationForm.configuration.micro1_numero_serie.$invalid && !participationForm.$pristine}"
+      ng-if="checkConfiguration('micro1_numero_serie')">
       <div class="input-group">
         <label class="input-group-addon" for="configuration.micro1_numero_serie">
           Numéro de série du micro 1
@@ -196,7 +210,9 @@
       </div>
     </div>
 
-    <div class="form-group" ng-class="{'has-error': participationForm.configuration.micro1_hauteur.$invalid && !participationForm.$pristine}">
+    <div class="form-group"
+      ng-class="{'has-error': participationForm.configuration.micro1_hauteur.$invalid && !participationForm.$pristine}"
+      ng-if="checkConfiguration('micro1_hauteur')">
       <div class="input-group">
         <label class="input-group-addon" for="configuration.micro1_hauteur">
           Hauteur du micro 1

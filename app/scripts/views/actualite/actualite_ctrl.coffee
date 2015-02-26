@@ -6,7 +6,7 @@ angular.module('actualiteViews', ['xin_backend', 'xin_session'])
 #    $routeProvider
 #      .when '/actualites',
 #        templateUrl: 'scripts/views/actualite/list_actualites.html'
-#        controller: 'ListActualitesCtrl'#
+#        controller: 'ListActualitesCtrl'
 
 #  .controller 'ListActualitesCtrl', ($scope, $q, Backend, DelayedEvent) ->
 #    $scope.lookup = {}
@@ -31,7 +31,7 @@ angular.module('actualiteViews', ['xin_backend', 'xin_session'])
     restrict: 'E'
     templateUrl: 'scripts/views/actualite/list_actualites_drt.html'
     scope:
-      isAdmin: '@'
+      isAdmin: '='
     link: (scope, elem, attrs) ->
       scope.loading = true
       scope.actualites = []
@@ -45,12 +45,7 @@ angular.module('actualiteViews', ['xin_backend', 'xin_session'])
     controller: 'DisplayActualiteDirectiveCtrl'
     scope:
       actualite: '='
-      isAdmin: '@'
-    link: (scope, elem, attrs) ->
-      attrs.$observe('isAdmin', (value) ->
-        scope.isAdmin = (value == 'true')
-      )
-
+      isAdmin: '='
 
   .controller 'DisplayActualiteDirectiveCtrl', ($scope, $q, $route, Backend) ->
     if $scope.actualite.action == 'INSCRIPTION_PROTOCOLE'

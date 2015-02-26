@@ -180,8 +180,9 @@ angular.module('xin_uploadFile', ['appSettings'])
         payload =
           mime: @file.type
           titre: @file.name
+          multipart: true
         # Create the file in the backend
-        Backend.one('fichiers').post('s3/multipart', payload).then(
+        Backend.all('fichiers').post(payload).then(
           (response) =>
             @id = response._id
             @_context =
@@ -230,6 +231,7 @@ angular.module('xin_uploadFile', ['appSettings'])
         payload =
           mime: @file.type
           titre: @file.name
+          multipart: false
         callbacks =
           onError: (error) => @_onError(error)
           onProgress: (percent) => @_onProgress(percent)
@@ -239,7 +241,7 @@ angular.module('xin_uploadFile', ['appSettings'])
                 =>  @_onFinished()
                 (error) -> throw error
               )
-        Backend.one('fichiers').post('s3', payload).then(
+        Backend.all('fichiers').post(payload).then(
           (response) =>
             etag = response._etag
             @id = response._id

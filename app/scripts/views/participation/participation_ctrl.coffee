@@ -31,10 +31,8 @@ angular.module('participationViews', ['ngRoute', 'textAngular', 'xin_listResourc
           delete $scope.lookup.q
     $scope.resourceBackend = Backend.all('participations')
 
-  .controller 'CreateParticipationCtrl', ($routeParams, $scope, Backend) ->
-    params =
-      embedded: { protocole: 1 }
-    Backend.one('sites', $routeParams.siteId).get(params).then (site) ->
+  .controller 'CreateParticipationCtrl', ($routeParams, $scope, $timeout, Backend) ->
+    Backend.one('sites', $routeParams.siteId).get().then (site) ->
       $scope.site = site
 
   .directive 'createParticipationDirective', ->
@@ -44,6 +42,7 @@ angular.module('participationViews', ['ngRoute', 'textAngular', 'xin_listResourc
     scope:
       siteId: '@'
       protocoleId: '@'
+      configuration: '='
 
   .controller 'CreateParticipationDirectiveCtrl', ($route, $scope,
                                                    session, Backend) ->
@@ -57,6 +56,14 @@ angular.module('participationViews', ['ngRoute', 'textAngular', 'xin_listResourc
       if newValue != oldValue
         $scope.participationForm.$setDirty()
 
+    $scope.checkConfiguration = (configuration) ->
+      if !$scope.configuration
+        return false
+      for key in $scope.configuration
+        if configuration == key
+          return true
+      return false
+
     $scope.saveParticipation = ->
       $scope.submitted = true
       if (not $scope.participationForm.$valid or
@@ -65,13 +72,10 @@ angular.module('participationViews', ['ngRoute', 'textAngular', 'xin_listResourc
       date_debut = new Date($scope.participation.date_debut)
       date_debut = date_debut.toGMTString()
       payload =
-        'observateur': $scope.observateurId
-        'protocole': $scope.protocoleId
-        'site': $scope.siteId
         'date_debut': date_debut
-        'pieces_jointes': []
-      for file in $scope.uploaders
-        payload.pieces_jointes.push(file.id)
+        'commentaire': $scope.participation.commentaire
+        'meteo': {}
+        'configuration': {}
       # Retrieve the modified fields from the form
       for key, value of $scope.participationForm
         if key.charAt(0) != '$' and value.$dirty
@@ -84,20 +88,37 @@ angular.module('participationViews', ['ngRoute', 'textAngular', 'xin_listResourc
           else if key == 'temperature_debut' or
              key == 'temperature_fin' or
              key == 'vent' or key == 'couverture'
-            if not payload.meteo
-              payload.meteo = {}
             payload.meteo[key] = $scope.participation.meteo[key]
-          else if key == 'detecteur_enregisteur_numero_serie' or
+          else if key == 'detecteur_enregistreur_numero_serie' or
              key == 'micro0_position' or key == 'micro0_numero_serie' or
              key == 'micro0_hauteur' or key == 'micro1_position' or
              key == 'micro1_numero_serie' or key == 'micro1_hauteur'
-            if not payload.configuration
-              payload.configuration = {}
             payload.configuration[key] = $scope.participation.configuration[key]
-          else
-            payload[key] = $scope.participation[key]
-      Backend.all('participations').post(payload).then(
-        -> window.location = '#/sites/'+$scope.siteId
+      Backend.all('sites/'+$scope.siteId+'/participations').post(payload).then(
+        (participation) ->
+          Backend.one('participations', participation._id).get().then (participation) ->
+            payload =
+              wav: []
+              ta: []
+              photos: []
+              # TODO : finish it
+            for file in $scope.uploaders
+              if file.file.type == 'sound/wav' or
+                 file.file.type == 'audio/x-wav'
+                console.log("wav")
+              else if file.file.type == 'application/ta' or
+                      file.file.type == 'application/tac'
+                console.log("ta")
+              else if file.file.type == 'image/bmp' or
+                      file.file.type == 'image/png' or
+                      file.file.type == 'image/jpeg'
+                console.log("image")
+              console.log(file.file)
+            participation.customPUT(payload, 'pieces_jointes').then(
+              -> console.log('ok')
+              -> throw "Error : PUT files"
+            )
+  #          window.location = '#/sites/'+$scope.siteId
         (error) -> throw "Error : participation save "+error
       )
 
