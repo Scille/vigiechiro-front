@@ -8,6 +8,10 @@
     {{ actualite.protocole.titre }}
   </a>
   le {{actualite._created | xinDate: 'medium'}}
+  <div ng-if="isAdmin && !validated">
+    <a class="btn btn-primary" ng-click="validInscription(true)">Valider</a>
+    <a class="btn btn-danger" ng-click="validInscription(false)">Refuser</a>
+  </div>
 </span>
 
 <span ng-if="actualite.action == 'NOUVEAU_SITE'">

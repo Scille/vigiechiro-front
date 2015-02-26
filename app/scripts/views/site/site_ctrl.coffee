@@ -7,11 +7,18 @@ angular.module('siteViews', ['ngRoute', 'textAngular', 'xin_backend', 'protocole
       .when '/sites',
         templateUrl: 'scripts/views/site/list_sites.html'
         controller: 'ListSitesCtrl'
+      .when '/sites/mes-sites',
+        templateUrl: 'scripts/views/site/list_sites.html'
+        controller: 'ListMesSitesCtrl'
       .when '/sites/:siteId',
         templateUrl: 'scripts/views/site/display_site.html'
         controller: 'DisplaySiteCtrl'
 
   .controller 'ListSitesCtrl', ($scope, Backend, session, DelayedEvent) ->
+    $scope.title = "Tous les sites"
+    $scope.swap =
+      title: "Voir mes sites"
+      value: "/mes-sites"
     session.getIsAdminPromise().then (isAdmin) ->
       $scope.isAdmin = isAdmin
     $scope.lookup = {}
@@ -26,6 +33,25 @@ angular.module('siteViews', ['ngRoute', 'textAngular', 'xin_backend', 'protocole
           delete $scope.lookup.q
     $scope.resourceBackend = Backend.all('sites')
 
+  .controller 'ListMesSitesCtrl', ($scope, Backend, session, DelayedEvent) ->
+    $scope.title = "Mes sites"
+    $scope.swap =
+      title: "Voir tous les sites"
+      value: ""
+    session.getIsAdminPromise().then (isAdmin) ->
+      $scope.isAdmin = isAdmin
+    $scope.lookup = {}
+    # Filter field is trigger after 500ms of inactivity
+    delayedFilter = new DelayedEvent(500)
+    $scope.filterField = ''
+    $scope.$watch 'filterField', (filterValue) ->
+      delayedFilter.triggerEvent ->
+        if filterValue? and filterValue != ''
+          $scope.lookup.q = filterValue
+        else if $scope.lookup.q?
+          delete $scope.lookup.q
+    $scope.resourceBackend = Backend.all('moi/sites')
+
   .controller 'DisplaySiteCtrl', ($routeParams, $scope
                                   Backend, session) ->
     Backend.one('sites', $routeParams.siteId).get().then (site) ->
@@ -33,7 +59,7 @@ angular.module('siteViews', ['ngRoute', 'textAngular', 'xin_backend', 'protocole
       $scope.protocoleAlgoSite = $scope.site.protocole.algo_tirage_site
       session.getUserPromise().then (user) ->
         for protocole in user.protocoles
-          if protocole.protocole == $scope.site.protocole._id
+          if protocole.protocole._id == $scope.site.protocole._id
             if protocole.valide?
               $scope.isProtocoleValid = true
             break
@@ -55,7 +81,6 @@ angular.module('siteViews', ['ngRoute', 'textAngular', 'xin_backend', 'protocole
 
   .controller 'DisplaySiteDirectiveCtrl', ($scope, Backend, protocolesFactory) ->
     $scope.loadMap = (mapDiv) ->
-      console.log("loadmap")
       mapProtocole = protocolesFactory($scope.site, $scope.protocoleAlgoSite,
                                        mapDiv, false)
       mapProtocole.loadMap()
@@ -70,13 +95,38 @@ angular.module('siteViews', ['ngRoute', 'textAngular', 'xin_backend', 'protocole
       scope.loading = true
       scope.sites = []
       scope.loadSites = ->
-        Backend.all('sites').getList().then (sites) ->
+        Backend.all('protocoles/'+scope.protocoleId+'/sites').getList().then (sites) ->
           scope.sites = sites.plain()
           scope.loading = false
       attrs.$observe 'protocoleId', (protocoleId) ->
         if protocoleId
           session.getUserPromise().then (user) ->
+            scope.userId = user._id
             scope.loadSites()
+
+  .directive 'showSiteDirective', ($timeout) ->
+    restrict: 'E'
+    templateUrl: 'scripts/views/site/show_site.html'
+    controller: 'ShowSiteCtrl'
+    scope:
+      site: '='
+      collapsed: '@'
+      protocoleAlgoSite: '@'
+      userId: '@'
+    link: (scope, elem, attrs) ->
+      scope.openCollapse = (id) ->
+        $timeout(-> scope.loadMap(elem.find('.g-maps')[0]))
+      # Wait for the collapse to be opened before load the google map
+#      if not attrs.collapsed?
+        # Use $timeout to load google map at the end of the stack
+        # to prevent display issues
+#        $timeout(-> scope.loadMap(elem.find('.g-maps')[0]))
+#      else
+#        $(elem).on('shown.bs.collapse', ->
+#          scope.numero_grille_stoc = elem.find('.numero_grille_stoc')[0]
+#          scope.loadMap(elem.find('.g-maps')[0])
+#          return
+#        )
 
   .controller 'ShowSiteCtrl', ($timeout, $route, $routeParams, $scope
                                session, Backend, protocolesFactory) ->
@@ -112,12 +162,8 @@ angular.module('siteViews', ['ngRoute', 'textAngular', 'xin_backend', 'protocole
           not $scope.siteForm.$dirty)
         return
       payload =
-        'protocole': $scope.protocoleId
-        'localites': mapProtocole.saveMap()
+#        'localites': mapProtocole.saveMap()
         'commentaire': $scope.siteForm.commentaire.$modelValue
-      grille_stoc = mapProtocole.getIdGrilleStoc()
-      if grille_stoc != ''
-        payload.grille_stoc = grille_stoc
       if $scope.isAdmin
         payload.verrouille = $scope.site.verrouille
       siteResource.patch(payload).then(
@@ -125,27 +171,28 @@ angular.module('siteViews', ['ngRoute', 'textAngular', 'xin_backend', 'protocole
         (error) -> console.log("error", error)
       )
 
-  .directive 'showSiteDirective', ($timeout) ->
+  .directive 'createSiteDirective', ->
     restrict: 'E'
     templateUrl: 'scripts/views/site/show_site.html'
-    controller: 'ShowSiteCtrl'
+    controller: 'CreateSiteCtrl'
     scope:
-      site: '='
-      title: '@'
-      collapsed: '@'
+      protocoleId: '@'
       protocoleAlgoSite: '@'
     link: (scope, elem, attrs) ->
-      # Wait for the collapse to be opened before load the google map
-      if not attrs.collapsed?
-        # Use $timeout to load google map at the end of the stack
-        # to prevent display issues
-        $timeout(-> scope.loadMap(elem.find('.g-maps')[0]))
-      else
-        $(elem).on('shown.bs.collapse', ->
-          scope.numero_grille_stoc = elem.find('.numero_grille_stoc')[0]
-          scope.loadMap(elem.find('.g-maps')[0])
-          return
-        )
+      scope.collapsed = true
+      scope.title = 'Nouveau site'
+      attrs.$observe('protocoleId', (protocoleId) ->
+        scope.protocoleId = protocoleId
+      )
+      $(elem).on('shown.bs.collapse', ->
+        scope.numero_grille_stoc = elem.find('.numero_grille_stoc')[0]
+        scope.loadMap(elem.find('.g-maps')[0])
+        return
+      )
+      attrs.$observe('protocoleAlgoSite', (value) ->
+        if value
+          scope.protocoleAlgoSite = value
+      )
 
   .controller 'CreateSiteCtrl', ($timeout, $route, $routeParams, $scope,
                                  session, Backend, protocolesFactory) ->
@@ -236,27 +283,4 @@ angular.module('siteViews', ['ngRoute', 'textAngular', 'xin_backend', 'protocole
             )
           $route.reload()
         (error) -> throw "error " + error
-      )
-
-  .directive 'createSiteDirective', ->
-    restrict: 'E'
-    templateUrl: 'scripts/views/site/show_site.html'
-    controller: 'CreateSiteCtrl'
-    scope:
-      protocoleId: '@'
-      protocoleAlgoSite: '@'
-    link: (scope, elem, attrs) ->
-      scope.collapsed = true
-      scope.title = 'Nouveau site'
-      attrs.$observe('protocoleId', (protocoleId) ->
-        scope.protocoleId = protocoleId
-      )
-      $(elem).on('shown.bs.collapse', ->
-        scope.numero_grille_stoc = elem.find('.numero_grille_stoc')[0]
-        scope.loadMap(elem.find('.g-maps')[0])
-        return
-      )
-      attrs.$observe('protocoleAlgoSite', (value) ->
-        if value
-          scope.protocoleAlgoSite = value
       )

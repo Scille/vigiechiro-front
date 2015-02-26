@@ -1,63 +1,104 @@
 <div class="container">
 
-    <form class="simple-form" novalidate name="protocoleForm" ng-submit="saveProtocole()">
+  <form class="simple-form" novalidate name="protocoleForm"
+        ng-submit="saveProtocole()">
 
-        <div class="input-group form-group">
-            <label class="input-group-addon" for="titre">Titre</label>
-            <input type="text" class="form-control" id="titre" name="titre"
-                   ng-model="protocole.titre" required>
-        </div>
-        <span ng-show="submitted && protocoleForm.titre.$error.required"
-              class="help-block">Champ requis</span>
+    <div class="input-group form-group">
+      <label class="input-group-addon" for="titre">Titre</label>
+      <input type="text" class="form-control" id="titre" name="titre"
+             ng-model="protocole.titre" required>
+    </div>
+    <span ng-show="submitted && protocoleForm.titre.$error.required"
+          class="help-block">
+      Champ requis
+    </span>
 
-        <div class="checkbox">
-          <label>
-            <input type="checkbox" ng-model="protocole.macro_protocole" ng-value="true"
-                   ng-checked="protocole.macro_protocole">
-            Macro protocole
-          </label>
-        </div>
+    <div class="checkbox">
+      <label>
+        <input type="checkbox" ng-model="protocole.macro_protocole" ng-value="true"
+               ng-checked="protocole.macro_protocole">
+        Macro protocole
+      </label>
+    </div>
 
-        <div class="input-group form-group">
-          <text-angular ng-model="protocole.description"></text-angular>
-        </div>
+    <div class="input-group form-group">
+      <text-angular ng-model="protocole.description"></text-angular>
+    </div>
 
-        <div class="input-group form-group">
-            <span class="input-group-addon">Type de site</span>
-                <select class="form-control" ng-model="protocole.type_site" required>
-                    <option value="LINEAIRE">Linéaire</option>
-                    <option value="POLYGONE">Polygone</option>
-                </select>
-            </span>
-        </div>
-        <span ng-show="submitted && !protocole.type_site"
-              class="help-block">Champ requis</span>
+    <div class="input-group form-group">
+      <span class="input-group-addon">Type de site</span>
+        <select class="form-control" ng-model="protocole.type_site" required>
+          <option value="LINEAIRE">Linéaire</option>
+          <option value="POLYGONE">Polygone</option>
+        </select>
+      </span>
+    </div>
+    <span ng-show="submitted && !protocole.type_site" class="help-block">
+      Champ requis
+    </span>
 
-        <div class="input-group form-group">
-            <span class="input-group-addon">Taxon</span>
-                <select class="form-control" ng-model="protocole.taxon" required
-                        ng-options="taxon._id as taxon.libelle_long for taxon in taxons">
-                </select>
-            </span>
-        </div>
-        <span ng-show="submitted && !protocole.taxon"
-              class="help-block">Champ requis</span>
+    <div class="input-group form-group">
+      <span class="input-group-addon">Taxon</span>
+        <select class="form-control" ng-model="protocole.taxon" required
+                ng-options="taxon._id as taxon.libelle_long for taxon in taxons">
+        </select>
+      </span>
+    </div>
+    <span ng-show="submitted && !protocole.taxon" class="help-block">
+      Champ requis
+    </span>
 
-        <div class="input-group form-group">
-            <span class="input-group-addon">Algo tirage site</span>
-                <select class="form-control" ng-model="protocole.algo_tirage_site" required>
-                    <option value="CARRE">Carré</option>
-                    <option value="ROUTIER">Routier</option>
-                    <option value="POINT_FIXE">Point fixe</option>
-                </select>
-            </span>
-        </div>
-        <span ng-show="submitted && !protocole.algo_tirage_site"
-              class="help-block">Champ requis</span>
+    <div class="input-group form-group">
+      <span class="input-group-addon">Algo tirage site</span>
+        <select class="form-control" ng-model="protocole.algo_tirage_site" required>
+          <option value="CARRE">Carré</option>
+          <option value="ROUTIER">Routier</option>
+          <option value="POINT_FIXE">Point fixe</option>
+        </select>
+      </span>
+    </div>
+    <span ng-show="submitted && !protocole.algo_tirage_site"
+          class="help-block">
+      Champ requis
+    </span>
 
-        <div class="input-group form-group">
-            <input class="save-protocole btn btn-primary" type="submit" value="Sauvegarder" ng-hide="protocoleForm.$pristine">
-        </div>
+    <div class="input-group form-group">
+      <span class="input-group-addon">Configuration<br>requise</span>
+      <span style="">
+        <input type="checkbox" name="detecteur_enregistreur_numero_serie"
+               ng-model="configuration_participation.detecteur_enregistreur_numero_serie">
+        Numéro de série détecteur enregistreur
+        <br>
+        <input type="checkbox" name="micro0_position"
+               ng-model="configuration_participation.micro0_position">
+        Position Micro 0
+        <br>
+        <input type="checkbox" name="micro0_numero_serie"
+               ng-model="configuration_participation.micro0_numero_serie">
+        Numéro de série micro 0
+        <br>
+        <input type="checkbox" name="micro0_hauteur"
+               ng-model="configuration_participation.micro0_hauteur">
+        Hauteur micro 0
+        <br>
+        <input type="checkbox" name="micro1_position"
+               ng-model="configuration_participation.micro1_position">
+        Position micro 1
+        <br>
+        <input type="checkbox" name="micro1_numero_serie"
+               ng-model="configuration_participation.micro1_numero_serie">
+        Numéro série micro 1
+        <br>
+        <input type="checkbox" name="micro1_hauteur"
+               ng-model="configuration_participation.micro1_hauteur">
+        Hauteur micro 1
+      </span>
+    </div>
 
-    </form>
+    <div class="input-group form-group">
+      <input class="save-protocole btn btn-primary" type="submit" value="Sauvegarder"
+             ng-hide="protocoleForm.$pristine">
+    </div>
+
+  </form>
 </div>

@@ -4,12 +4,16 @@
       <a data-toggle="collapse" data-target="#show-site-collapse-{{site._id}}"
          aria-expanded="false" aria-controls="show-site-collapse-{{site._id}}"
          ng-click="openCollapse('#show-site-collapse-' + site._id)">
-        {{site.titre}}
+        <span>{{site.titre}}</span>
+        <span class="label label-success pull-right"
+              ng-show="site.observateur = userId">
+          Propriétaire
+        </span>
       </a>
     </h4>
   </div>
 
-  <div class="collapse {{collapsed === undefined ? 'in' : ''}}" id="show-site-collapse-{{site._id}}">
+  <div class="collapse" id="show-site-collapse-{{site._id}}">
     <div class="panel-body">
       <form class="simple-form" novalidate name="siteForm" ng-submit="saveSite()">
         <ul class="list-group">

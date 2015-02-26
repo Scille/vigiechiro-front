@@ -1,6 +1,7 @@
 <div class="container">
   <div class="page-header">
-    <h3>Tous les sites</h3>
+    <h3>{{ title }}</h3>
+    <a href="#/sites{{ swap.value }}"><h5>{{ swap.title }}</h5></a>
   </div>
 
   <div class="list-group">
@@ -18,7 +19,7 @@
 
   <list-resource-directive resource-backend="resourceBackend" lookup="lookup">
     <a class="btn" ng-href='#/sites/{{resource._id}}'>
-      Site {{ $index+1 }}
+      {{ resource.titre }}
     </a>
   </list-resource-directive>
 </div>

@@ -9,7 +9,7 @@ make_payload = ($scope) ->
     'type_site': $scope.protocole.type_site
     'taxon': $scope.protocole.taxon
     'algo_tirage_site': $scope.protocole.algo_tirage_site
-
+    'configuration_participation': []
 
 angular.module('protocoleViews', ['ngRoute', 'textAngular', 'xin_listResource',
                                   'xin_backend', 'xin_session', 'xin_tools',
@@ -25,9 +25,6 @@ angular.module('protocoleViews', ['ngRoute', 'textAngular', 'xin_listResource',
       .when '/protocoles/nouveau',
         templateUrl: 'scripts/views/protocole/edit_protocole.html'
         controller: 'CreateProtocoleCtrl'
-      .when '/protocoles/validations',
-        templateUrl: 'scripts/views/protocole/validations_protocole.html'
-        controller: 'ValidationsProtocoleCtrl'
       .when '/protocoles/:protocoleId',
         templateUrl: 'scripts/views/protocole/display_protocole.html'
         controller: 'DisplayProtocoleCtrl'
@@ -165,6 +162,9 @@ angular.module('protocoleViews', ['ngRoute', 'textAngular', 'xin_listResource',
     ).then (protocole) ->
       protocoleResource = protocole
       $scope.protocole = protocole.plain()
+      $scope.configuration_participation = {}
+      for key in $scope.protocole.configuration_participation
+        $scope.configuration_participation[key] = true
     $scope.saveProtocole = ->
       $scope.submitted = true
       if (not $scope.protocoleForm.$valid or
@@ -172,6 +172,18 @@ angular.module('protocoleViews', ['ngRoute', 'textAngular', 'xin_listResource',
           not protocoleResource?)
         return
       payload = make_payload($scope)
+      # Retrieve the modified fields from the form
+      for key, value of $scope.protocoleForm
+        if key.charAt(0) != '$' and value.$dirty
+          if key == 'detecteur_enregistreur_numero_serie' or
+             key == 'micro0_position' or
+             key == 'micro0_numero_serie' or
+             key == 'micro0_hauteur' or
+             key == 'micro1_position' or
+             key == 'micro1_numero_serie' or
+             key == 'micro1_hauteur'
+            if $scope.configuration_participation[key]
+              payload.configuration_participation.push(key)
       # Finally refresh the page (needed for cache reasons)
       protocoleResource.patch(payload).then(
         -> $route.reload();
@@ -181,6 +193,7 @@ angular.module('protocoleViews', ['ngRoute', 'textAngular', 'xin_listResource',
   .controller 'CreateProtocoleCtrl', ($scope, Backend) ->
     $scope.submitted = false
     $scope.protocole = {}
+    $scope.configuration_participation = {}
     $scope.taxons = []
     Backend.all('taxons').getList().then (taxons) ->
       $scope.taxons = taxons.plain()
@@ -189,57 +202,19 @@ angular.module('protocoleViews', ['ngRoute', 'textAngular', 'xin_listResource',
       if not $scope.protocoleForm.$valid or not $scope.protocoleForm.$dirty
         return
       payload = make_payload($scope)
+      # Retrieve the modified fields from the form
+      for key, value of $scope.protocoleForm
+        if key.charAt(0) != '$' and value.$dirty
+          if key == 'detecteur_enregistreur_numero_serie' or
+             key == 'micro0_position' or
+             key == 'micro0_numero_serie' or
+             key == 'micro0_hauteur' or
+             key == 'micro1_position' or
+             key == 'micro1_numero_serie' or
+             key == 'micro1_hauteur'
+            if $scope.configuration_participation[key]
+              payload.configuration_participation.push(key)
       Backend.all('protocoles').post(payload).then(
         -> window.location = '#/protocoles'
         (error) -> throw error
       )
-
-  .controller 'ValidationsProtocoleCtrl', ($routeParams, $scope, $filter, Backend) ->
-    $scope.loading = true
-    $scope.inscriptions = []
-    where = JSON.stringify(
-      protocoles:
-        $elemMatch:
-          valide:
-            $ne: true
-    )
-    queryParams = {
-      where: where
-      sort: "-protocoles.date_inscription"
-     # projection:
-     #   "protocoles": 1
-     #   "pseudo": 1
-      embedded: { "protocoles.protocole": 1 }
-    }
-    Backend.all('utilisateurs').getList(queryParams).then (utilisateurs) ->
-      utilisateurs = utilisateurs.plain()
-      for utilisateur in utilisateurs
-        if not utilisateur.protocoles?
-          continue
-        for inscription in utilisateur.protocoles
-          if not inscription.valide?
-            date = new Date(inscription.protocole._updated)
-            $scope.inscriptions.push(
-              validated: false
-              utilisateur_id: utilisateur._id
-              utilisateur_pseudo: utilisateur.pseudo
-              protocole_id: inscription.protocole._id
-              protocole_titre: inscription.protocole.titre
-              date_inscription: inscription.date_inscription
-            )
-      $scope.loading = false
-
-    $scope.validate = (validateInscription) ->
-      Backend.one('utilisateurs', validateInscription.utilisateur_id).get().then (utilisateur) ->
-        patch = {}
-        patch.protocoles = utilisateur.protocoles
-        for inscription in patch.protocoles
-          if inscription.protocole == validateInscription.protocole_id
-            inscription.valide = true
-            utilisateur.patch(patch).then (
-              # TODO : fix patch return error on success...
-              (error) -> throw error
-              ->
-                validateInscription.validated = true
-            )
-            return
