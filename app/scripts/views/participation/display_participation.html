@@ -9,11 +9,10 @@
 </display-participation-directive>
 
 <div class="form-group input-group">
-  <input class="form-control" type="text"
-    ng-model="post">
-  <a class="input-group-addon" ng-click="addPost(post)">Ajouter un message</a>
+  <input class="form-control" type="text" ng-model="post">
+  <a class="input-group-addon" ng-click="addPost()">Ajouter un message</a>
 </div>
 
-<a class="btn btn-primary" href="#/participations/{{participation._id}}/edit">
+<a class="btn btn-primary" href="#/participations/{{participation._id}}/edition">
   Editer la participation
 </a>

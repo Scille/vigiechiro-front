@@ -16,6 +16,9 @@ angular.module('participationViews', ['ngRoute', 'textAngular', 'xin_listResourc
       .when '/participations/:participationId',
         templateUrl: 'scripts/views/participation/display_participation.html'
         controller: 'DisplayParticipationCtrl'
+      .when '/participations/:participationId/edition',
+        templateUrl: 'scripts/views/participation/create_participation.html'
+        controller: 'EditParticipationController'
 
   .controller 'ListParticipationsCtrl', ($scope, Backend, DelayedEvent) ->
     $scope.lookup =
@@ -82,7 +85,7 @@ angular.module('participationViews', ['ngRoute', 'textAngular', 'xin_listResourc
           if key == 'date_fin'
             if $scope.participation.date_fin
               date_fin = new Date($scope.participation.date_fin)
-              payload.date_fin = date_fin.toGMTString()
+              payload[key] = date_fin.toGMTString()
           else if key == 'date_debut'
             payload.date_debut = date_debut
           else if key == 'temperature_debut' or
@@ -94,33 +97,42 @@ angular.module('participationViews', ['ngRoute', 'textAngular', 'xin_listResourc
              key == 'micro0_hauteur' or key == 'micro1_position' or
              key == 'micro1_numero_serie' or key == 'micro1_hauteur'
             payload.configuration[key] = $scope.participation.configuration[key]
-      Backend.all('sites/'+$scope.siteId+'/participations').post(payload).then(
-        (participation) ->
-          Backend.one('participations', participation._id).get().then (participation) ->
-            payload =
-              wav: []
-              ta: []
-              photos: []
-              # TODO : finish it
-            for file in $scope.uploaders
-              if file.file.type == 'sound/wav' or
-                 file.file.type == 'audio/x-wav'
-                console.log("wav")
-              else if file.file.type == 'application/ta' or
-                      file.file.type == 'application/tac'
-                console.log("ta")
-              else if file.file.type == 'image/bmp' or
-                      file.file.type == 'image/png' or
-                      file.file.type == 'image/jpeg'
-                console.log("image")
-              console.log(file.file)
-            participation.customPUT(payload, 'pieces_jointes').then(
-              -> console.log('ok')
-              -> throw "Error : PUT files"
-            )
-  #          window.location = '#/sites/'+$scope.siteId
-        (error) -> throw "Error : participation save "+error
-      )
+      uploadingFiles = false
+      for file in $scope.uploaders
+        if file.status != 'done'
+          uploadingFiles = true
+      if uploadingFiles
+        throw "Error : Still files to upload."
+      else
+        console.log(payload)
+        Backend.all('sites/'+$scope.siteId+'/participations').post(payload).then(
+          (participation) ->
+            Backend.one('participations', participation._id).get().then (participation) ->
+              if $scope.uploaders.length == 0
+                window.location = '#/participations/'+participation._id
+                return
+              else
+              payload =
+                wav: []
+                ta: []
+                photos: []
+              for file in $scope.uploaders
+                if file.file.type == 'audio/wav' or
+                   file.file.type == 'audio/x-wav'
+                  payload.wav.push(file.id)
+                else if file.file.type == 'application/ta' or
+                        file.file.type == 'application/tac'
+                  payload.ta.push(file.id)
+                else if file.file.type == 'image/bmp' or
+                        file.file.type == 'image/png' or
+                        file.file.type == 'image/jpeg'
+                  payload.photos.push(file.id)
+              participation.customPUT(payload, 'pieces_jointes').then(
+                -> window.location = '#/participations/'+participation._id
+                -> throw "Error : PUT files"
+              )
+          (error) -> throw "Error : participation save "+error
+        )
 
   .directive 'listParticipationsDirective', (session, Backend) ->
     restrict: 'E'
@@ -139,37 +151,44 @@ angular.module('participationViews', ['ngRoute', 'textAngular', 'xin_listResourc
             scope.participations = participations.plain()
             scope.loading = false
 
-  .controller 'DisplayParticipationCtrl', ($scope, $route, $routeParams, session, Backend) ->
-    saveParticipation = undefined
+  .controller 'DisplayParticipationCtrl', ($scope, $route, $routeParams,
+                                           session, Backend) ->
     $scope.userId = undefined
     session.getUserPromise().then (user) ->
       $scope.userId = user._id
-    params =
-      embedded: {
-        protocole: 1
-        pieces_jointes: 1
-      }
-    Backend.one('participations', $routeParams.participationId).get(params).then (participation) ->
-      saveParticipation = participation
-      $scope.participation = participation.plain()
-    $scope.addPost = (post) ->
-      origPosts = $scope.participation.posts
-      if not origPosts?
-        origPosts = []
-      newPost =
-        auteur: $scope.userId
-        date: new Date().toGMTString()
-        message: post
-      origPosts.push(newPost)
+    Backend.one('participations', $routeParams.participationId).get()
+      .then (participation) ->
+        $scope.participation = participation
+        console.log(participation.plain())
+
+    $scope.addPost = ->
       payload =
-        posts: origPosts
-      saveParticipation.patch(payload).then (
+        message: $scope.post
+      $scope.participation.customPUT(payload, 'messages').then(
         -> $route.reload()
         (error) -> throw error
       )
 
-  .directive 'displayParticipationDirective', ->
+  .directive 'displayParticipationDirective', (Backend) ->
     restrict: 'E'
     templateUrl: 'scripts/views/participation/display_participation_drt.html'
     scope:
       participation: '='
+    link: (scope, elem, attrs) ->
+      scope.isObjectEmpty = (obj) ->
+        if !obj
+          return false
+        length = Object.keys(obj).length
+        if length
+          return false
+        return true
+      scope.displayFiles = ->
+        Backend.one('participations/'+scope.participation._id+'/pieces_jointes')
+          .get().then (pieces_jointes) ->
+            scope.pieces_jointes = pieces_jointes.plain()
+
+  .controller 'EditParticipationController', ($scope, $routeParams, Backend) ->
+    $scope.participation = {}
+    Backend.one('participations', $routeParams.participationId).get()
+      .then (participation) ->
+        $scope.participation = participation
