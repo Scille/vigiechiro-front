@@ -202,13 +202,15 @@ angular.module('xin_uploadFile', ['appSettings'])
           slice = @_context.file.slice(start, end)
           if slice.size == 0
             # No more elements to send, finalize the upload
-            fileBackend.one('multipart', 'terminer').customPUT({parts: @_context.parts}).then(
+            payload =
+              parts: @_context.parts
+            fileBackend.customPOST(payload).then(
               => @_onFinished()
               (e) => @_onError(e)
             )
             return
           # Call backend to get signed part request
-          fileBackend.oneUrl('multipart/continue').customPUT({part_number: @_context.part_number}).then(
+          fileBackend.oneUrl('multipart').customPUT({part_number: @_context.part_number}).then(
             (response) =>
               lastSlicePercent = 0
               callbacks =
@@ -224,7 +226,7 @@ angular.module('xin_uploadFile', ['appSettings'])
                   )
                   @_context.part_number += 1
                   @_continueMultiPartUpload(@_context)
-              uploadToS3(callbacks, 'PUT', slice, response.signed_request)
+              uploadToS3(callbacks, 'PUT', slice, response.s3_signed_url)
             (error) -> throw error
           )
       _startSingleUpload: () ->
@@ -237,7 +239,7 @@ angular.module('xin_uploadFile', ['appSettings'])
           onProgress: (percent) => @_onProgress(percent)
           onFinished: =>
             Backend.one('fichiers', @id).get().then (fileBackend) =>
-              fileBackend.patch({'S3_upload_realise': true}).then(
+              fileBackend.post().then(
                 =>  @_onFinished()
                 (error) -> throw error
               )
@@ -245,6 +247,6 @@ angular.module('xin_uploadFile', ['appSettings'])
           (response) =>
             etag = response._etag
             @id = response._id
-            uploadToS3(callbacks, 'PUT', @file, response.signed_request, {'Content-Type': @file.type})
+            uploadToS3(callbacks, 'PUT', @file, response.s3_signed_url, {'Content-Type': @file.type})
           (error) -> throw error
         )
