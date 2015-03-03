@@ -12,8 +12,8 @@
 
     <div ng-bind-html="participation.commentaire"></div>
 
-    <div>
-      Météo
+    <div class="panel panel-default panel-body">
+      <div><b>Météo</b></div>
       <div ng-if="isObjectEmpty(participation.meteo)">
         Aucune indication météorologique.
       </div>
@@ -31,8 +31,8 @@
       </div>
     </div>
 
-    <div>
-      Configuration
+    <div class="panel panel-default panel-body">
+      <div><b>Configuration</b></div>
       <div ng-if="isObjectEmpty(participation.configuration)">
         Aucune configuration.
       </div>
@@ -66,8 +66,8 @@
       </div>
     </div>
 
-    <div>
-      Pièces jointes
+    <div class="panel panel-default panel-body">
+      <div><b>Pièces jointes</b></div>
       <a class="btn btn-default" data-toggle="collapse"
          data-target="#display-files-collapse"
          aria-expanded="false" aria-controls="display-files-collapse"
@@ -75,25 +75,40 @@
         <div>Afficher les pièces jointes</div>
       </a>
       <div class="collapse" id="display-files-collapse">
-        <li class="list-group-item" ng-repeat="piece_jointe in pieces_jointes">
-          <span>{{ piece_jointe }}</span>
-          <access-file-directive file="piece_jointe"></access-file-directive>
-        </li>
+        <div ng-if="pieces_jointes.wav">
+          Fichiers sons
+          <li class="list-group-item" ng-repeat="piece_jointe in pieces_jointes.wav">
+            <access-file-directive file="piece_jointe"></access-file-directive>
+          </li>
+        </div>
+        <div ng-if="pieces_jointes.ta">
+        Fichiers Tadarida
+          <li class="list-group-item" ng-repeat="piece_jointe in pieces_jointes.ta">
+            <access-file-directive file="piece_jointe"></access-file-directive>
+          </li>
+        </div>
+        <div ng-if="pieces_jointes.photos">
+          Images
+          <li class="list-group-item"
+              ng-repeat="piece_jointe in pieces_jointes.photos">
+            <access-file-directive file="piece_jointe"></access-file-directive>
+          </li>
+        </div>
       </div>
     </div>
 
-    <div>
-      Posts
+    <div class="panel panel-default panel-body">
+      <div><b>Posts</b></div>
       <div ng-if="!participation.messages">
         Aucun post.
       </div>
-      <div ng-repeat="message in participation.messages">
+      <li class="list-group-item" ng-repeat="message in participation.messages">
         auteur : {{ message.auteur.pseudo }}
         <br>
         date : {{ message.date }}
         <br>
         message : {{ message.message }}
-      </div>
+      </li>
     </div>
   </div>
 </div>
