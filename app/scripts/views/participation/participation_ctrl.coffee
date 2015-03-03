@@ -10,6 +10,9 @@ angular.module('participationViews', ['ngRoute', 'textAngular', 'xin_listResourc
       .when '/participations',
         templateUrl: 'scripts/views/participation/list_participations.html'
         controller: 'ListParticipationsCtrl'
+      .when '/participations/mes-participations',
+        templateUrl: 'scripts/views/participation/list_participations.html'
+        controller: 'ListMesParticipationsCtrl'
       .when '/sites/:siteId/nouvelle-participation',
         templateUrl: 'scripts/views/participation/create_participation.html'
         controller: 'CreateParticipationCtrl'
@@ -20,7 +23,11 @@ angular.module('participationViews', ['ngRoute', 'textAngular', 'xin_listResourc
         templateUrl: 'scripts/views/participation/create_participation.html'
         controller: 'EditParticipationController'
 
-  .controller 'ListParticipationsCtrl', ($scope, Backend, DelayedEvent) ->
+  .controller 'ListParticipationsCtrl', ($scope, Backend, DelayedEvent, session) ->
+    $scope.title = "Toutes les participations"
+    $scope.swap =
+      title: "Voir mes participations"
+      value: "/mes-participations"
     $scope.lookup =
       sort: "-date_debut"
     # Filter field is trigger after 500ms of inactivity
@@ -33,6 +40,24 @@ angular.module('participationViews', ['ngRoute', 'textAngular', 'xin_listResourc
         else if $scope.lookup.q?
           delete $scope.lookup.q
     $scope.resourceBackend = Backend.all('participations')
+
+  .controller 'ListMesParticipationsCtrl', ($scope, Backend, DelayedEvent, session) ->
+    $scope.title = "Mes participations"
+    $scope.swap =
+      title: "Voir toutes les participations"
+      value: ""
+    $scope.lookup =
+      sort: "-date_debut"
+    # Filter field is trigger after 500ms of inactivity
+    delayedFilter = new DelayedEvent(500)
+    $scope.filterField = ''
+    $scope.$watch 'filterField', (filterValue) ->
+      delayedFilter.triggerEvent ->
+        if filterValue? and filterValue != ''
+          $scope.lookup.q = filterValue
+        else if $scope.lookup.q?
+          delete $scope.lookup.q
+    $scope.resourceBackend = Backend.all('moi/participations')
 
   .controller 'CreateParticipationCtrl', ($routeParams, $scope, $timeout, Backend) ->
     Backend.one('sites', $routeParams.siteId).get().then (site) ->

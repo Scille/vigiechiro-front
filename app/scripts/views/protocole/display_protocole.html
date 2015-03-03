@@ -9,37 +9,8 @@
   <div class="panel panel-body">
     <span ng-bind-html="protocole.description"></span>
 
-    <div>
-      <span ng-if="!protocole.configuration_participation || protocole.configuration_participation.length == 0">
-        <b>Aucune configuration requise</b>
-      </span>
-      <span ng-if="protocole.configuration_participation.length > 0">
-        <b>Configuration requise</b>
-        <span ng-repeat="key in protocole.configuration_participation">
-          <br>
-          <span ng-if="key == 'detecteur_enregistreur_numero_serie'">
-            Numéro de série du détecteur enregistreur
-          </span>
-          <span ng-if="key == 'micro0_position'">
-            Position du micro 0
-          </span>
-          <span ng-if="key == 'micro0_numero_serie'">
-            Numéro de série du micro 0
-          </span>
-          <span ng-if="key == 'micro0_hauteur'">
-            Hauteur du micro 0
-          </span>
-          <span ng-if="key == 'micro1_position'">
-            Position du micro 1
-          </span>
-          <span ng-if="key == 'micro1_numero_serie'">
-            Numéro de série du micro 1
-          </span>
-          <span ng-if="key == 'micro1_hauteur'">
-            Hauteur du micro 1
-          </span>
-        </span>
-      </span>
+    <div ng-if="protocole.type_site">
+      Type des sites : {{ protocole.type_site }}
     </div>
   </div>
 

@@ -1,6 +1,7 @@
 <div class="container">
   <div class="page-header">
-    <h3>Participations</h3>
+    <h3>{{ title }}</h3>
+    <a href="#/participations{{ swap.value }}"><h5>{{ swap.title }}</h5></a>
   </div>
 
   <div class="list-group">
@@ -17,9 +18,13 @@
   </div>
 
   <list-resource-directive resource-backend="resourceBackend" lookup="lookup">
-    <a class="btn" ng-href='#/participations/{{resource._id}}'>
+    <a ng-href='#/participations/{{resource._id}}'>
       Participation du {{ resource.date_debut | xinDate: 'medium' }}
     </a>
+    <span class="label label-success pull-right"
+          ng-show="resource.observateur._id == user._id">
+      Participant
+    </span>
   </list-resource-directive>
 
   <div class="text-center" ng-show="isAdmin">

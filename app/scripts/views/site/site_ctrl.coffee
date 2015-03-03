@@ -19,8 +19,6 @@ angular.module('siteViews', ['ngRoute', 'textAngular', 'xin_backend', 'protocole
     $scope.swap =
       title: "Voir mes sites"
       value: "/mes-sites"
-    session.getIsAdminPromise().then (isAdmin) ->
-      $scope.isAdmin = isAdmin
     $scope.lookup = {}
     # Filter field is trigger after 500ms of inactivity
     delayedFilter = new DelayedEvent(500)
@@ -38,8 +36,6 @@ angular.module('siteViews', ['ngRoute', 'textAngular', 'xin_backend', 'protocole
     $scope.swap =
       title: "Voir tous les sites"
       value: ""
-    session.getIsAdminPromise().then (isAdmin) ->
-      $scope.isAdmin = isAdmin
     $scope.lookup = {}
     # Filter field is trigger after 500ms of inactivity
     delayedFilter = new DelayedEvent(500)

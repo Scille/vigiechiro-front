@@ -31,9 +31,8 @@
   <a href="#/utilisateurs/{{actualite.sujet._id}}">
     {{ actualite.sujet.pseudo }}
   </a>
-  a créé la participation
+  a créé une
   <a href="#/participations/{{actualite.participation._id}}">
-    {{ actualite.participation._id }}
+    participation le {{actualite._created | xinDate: 'medium'}}
   </a>
-  le {{actualite._created | xinDate: 'medium'}}
 </span>

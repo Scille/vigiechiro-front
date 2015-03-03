@@ -18,7 +18,7 @@
   </div>
 
   <list-resource-directive resource-backend="resourceBackend" lookup="lookup">
-    <a class="btn" ng-href='#/protocoles/{{resource._id}}'>
+    <a href='#/protocoles/{{resource._id}}'>
       {{resource.titre}}
     </a>
     <span class="label label-success pull-right" ng-show="resource._status_registered">
@@ -30,6 +30,8 @@
   </list-resource-directive>
 
   <div class="text-center" ng-show="isAdmin">
-    <a name="create-protocole" class="btn btn-default" href="#/protocoles/nouveau">Nouveau protocole</a>
+    <a name="create-protocole" class="btn btn-default" href="#/protocoles/nouveau">
+      Nouveau protocole
+    </a>
   </div>
 </div>

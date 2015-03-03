@@ -8,8 +8,8 @@ make_payload = ($scope) ->
     'macro_protocole': $scope.protocole.macro_protocole
     'type_site': $scope.protocole.type_site
     'taxon': $scope.protocole.taxon
-    'algo_tirage_site': $scope.protocole.algo_tirage_site
-    'configuration_participation': []
+#    'algo_tirage_site': $scope.protocole.algo_tirage_site
+#    'configuration_participation': []
 
 angular.module('protocoleViews', ['ngRoute', 'textAngular', 'xin_listResource',
                                   'xin_backend', 'xin_session', 'xin_tools',
@@ -178,17 +178,17 @@ angular.module('protocoleViews', ['ngRoute', 'textAngular', 'xin_listResource',
         return
       payload = make_payload($scope)
       # Retrieve the modified fields from the form
-      for key, value of $scope.protocoleForm
-        if key.charAt(0) != '$' and value.$dirty
-          if key == 'detecteur_enregistreur_numero_serie' or
-             key == 'micro0_position' or
-             key == 'micro0_numero_serie' or
-             key == 'micro0_hauteur' or
-             key == 'micro1_position' or
-             key == 'micro1_numero_serie' or
-             key == 'micro1_hauteur'
-            if $scope.configuration_participation[key]
-              payload.configuration_participation.push(key)
+#      for key, value of $scope.protocoleForm
+#        if key.charAt(0) != '$' and value.$dirty
+#          if key == 'detecteur_enregistreur_numero_serie' or
+#             key == 'micro0_position' or
+#             key == 'micro0_numero_serie' or
+#             key == 'micro0_hauteur' or
+#             key == 'micro1_position' or
+#             key == 'micro1_numero_serie' or
+#             key == 'micro1_hauteur'
+#            if $scope.configuration_participation[key]
+#              payload.configuration_participation.push(key)
       # Finally refresh the page (needed for cache reasons)
       protocoleResource.patch(payload).then(
         -> $route.reload();
@@ -208,17 +208,17 @@ angular.module('protocoleViews', ['ngRoute', 'textAngular', 'xin_listResource',
         return
       payload = make_payload($scope)
       # Retrieve the modified fields from the form
-      for key, value of $scope.protocoleForm
-        if key.charAt(0) != '$' and value.$dirty
-          if key == 'detecteur_enregistreur_numero_serie' or
-             key == 'micro0_position' or
-             key == 'micro0_numero_serie' or
-             key == 'micro0_hauteur' or
-             key == 'micro1_position' or
-             key == 'micro1_numero_serie' or
-             key == 'micro1_hauteur'
-            if $scope.configuration_participation[key]
-              payload.configuration_participation.push(key)
+#      for key, value of $scope.protocoleForm
+#        if key.charAt(0) != '$' and value.$dirty
+#          if key == 'detecteur_enregistreur_numero_serie' or
+#             key == 'micro0_position' or
+#             key == 'micro0_numero_serie' or
+#             key == 'micro0_hauteur' or
+#             key == 'micro1_position' or
+#             key == 'micro1_numero_serie' or
+#             key == 'micro1_hauteur'
+#            if $scope.configuration_participation[key]
+#              payload.configuration_participation.push(key)
       Backend.all('protocoles').post(payload).then(
         -> window.location = '#/protocoles'
         (error) -> throw error
