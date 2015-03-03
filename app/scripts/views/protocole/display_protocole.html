@@ -1,5 +1,4 @@
 <div class="container">
-
   <div class="text-center">
     <div class="page-header text-center">
       <h1>{{protocole.titre}}</h1>
@@ -14,22 +13,24 @@
     </div>
   </div>
 
-  <button name="register-protocole" ng-click="registerProtocole()"
-          ng-show="!userRegistered && !protocole.macro_protocole"
-          class="btn btn-primary">
+  <button class="btn btn-primary"
+          name="register-protocole" ng-click="registerProtocole()"
+          ng-show="!userRegistered && !protocole.macro_protocole">
     S'inscrire
   </button>
-  <a name="edit-protocole" class="btn btn-primary" ng-show="isAdmin"
-     ng-href="#/protocoles/{{protocoleId}}/edition">Éditer</a>
+
+  <a class="btn btn-primary" name="edit-protocole"
+     ng-show="user.role == 'Administrateur'"
+     ng-href="#/protocoles/{{protocole._id}}/edition">
+     Éditer
+  </a>
 
   <list-sites-directive protocole-id="{{protocole._id}}"
-                        protocole-algo-site="{{protocole.algo_tirage_site}}"
                         ng-show="userRegistered">
   </list-sites-directive>
   <hr>
   <create-site-directive protocole-id="{{protocole._id}}"
-                         protocole-algo-site="{{protocole.algo_tirage_site}}"
+                         type-site="{{protocole.type_site}}"
                          ng-show="userRegistered">
   </create-site-directive>
-
 </div>

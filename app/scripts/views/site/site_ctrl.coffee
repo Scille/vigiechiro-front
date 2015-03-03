@@ -86,13 +86,13 @@ angular.module('siteViews', ['ngRoute', 'textAngular', 'xin_backend', 'protocole
     templateUrl: 'scripts/views/site/list_sites_drt.html'
     scope:
       protocoleId: '@'
-      protocoleAlgoSite: '@'
+      typeSite: '@'
     link: (scope, elem, attrs) ->
       scope.loading = true
       scope.sites = []
       scope.loadSites = ->
         Backend.all('protocoles/'+scope.protocoleId+'/sites').getList().then (sites) ->
-          scope.sites = sites.plain()
+          scope.sites = sites
           scope.loading = false
       attrs.$observe 'protocoleId', (protocoleId) ->
         if protocoleId
@@ -107,7 +107,6 @@ angular.module('siteViews', ['ngRoute', 'textAngular', 'xin_backend', 'protocole
     scope:
       site: '='
       collapsed: '@'
-      protocoleAlgoSite: '@'
       userId: '@'
     link: (scope, elem, attrs) ->
       scope.openCollapse = (id) ->
@@ -127,18 +126,15 @@ angular.module('siteViews', ['ngRoute', 'textAngular', 'xin_backend', 'protocole
   .controller 'ShowSiteCtrl', ($timeout, $route, $routeParams, $scope
                                session, Backend, protocolesFactory) ->
     mapProtocole = undefined
-    siteResource = undefined
     mapLoaded = false
     $scope.submitted = false
     $scope.isAdmin = false
     session.getIsAdminPromise().then (isAdmin) ->
       $scope.isAdmin = isAdmin
-    Backend.one('sites', $scope.site._id).get().then (site) ->
-      siteResource = site
     $scope.loadMap = (mapDiv) ->
       if not mapLoaded
         mapLoaded = true
-        mapProtocole = protocolesFactory($scope.site, $scope.protocoleAlgoSite,
+        mapProtocole = protocolesFactory($scope.site, $scope.site.protocole.type_site,
                                          mapDiv, !$scope.site.verrouille,
                                          siteCallback)
         mapProtocole.loadMap()
@@ -158,11 +154,10 @@ angular.module('siteViews', ['ngRoute', 'textAngular', 'xin_backend', 'protocole
           not $scope.siteForm.$dirty)
         return
       payload =
-#        'localites': mapProtocole.saveMap()
         'commentaire': $scope.siteForm.commentaire.$modelValue
       if $scope.isAdmin
         payload.verrouille = $scope.site.verrouille
-      siteResource.patch(payload).then(
+      $scope.site.patch(payload).then(
         -> $scope.siteForm.$setPristine()
         (error) -> console.log("error", error)
       )
@@ -173,7 +168,7 @@ angular.module('siteViews', ['ngRoute', 'textAngular', 'xin_backend', 'protocole
     controller: 'CreateSiteCtrl'
     scope:
       protocoleId: '@'
-      protocoleAlgoSite: '@'
+      typeSite: '@'
     link: (scope, elem, attrs) ->
       scope.collapsed = true
       scope.title = 'Nouveau site'
@@ -185,9 +180,9 @@ angular.module('siteViews', ['ngRoute', 'textAngular', 'xin_backend', 'protocole
         scope.loadMap(elem.find('.g-maps')[0])
         return
       )
-      attrs.$observe('protocoleAlgoSite', (value) ->
+      attrs.$observe('typeSite', (value) ->
         if value
-          scope.protocoleAlgoSite = value
+          scope.typeSite = value
       )
 
   .controller 'CreateSiteCtrl', ($timeout, $route, $routeParams, $scope,
@@ -217,17 +212,17 @@ angular.module('siteViews', ['ngRoute', 'textAngular', 'xin_backend', 'protocole
       if not mapLoaded
         mapLoaded = true
         randomSelection = false
-        if $scope.protocoleAlgoSite == 'CARRE' or
-           $scope.protocoleAlgoSite == 'POINT_FIXE'
+        if $scope.typeSite == 'CARRE' or
+           $scope.typeSite == 'POINT_FIXE'
           if confirm("Voulez-vous un tirage aléatoire ?")
             randomSelection = true
 
-        mapProtocole = protocolesFactory($scope.site, $scope.protocoleAlgoSite,
+        mapProtocole = protocolesFactory($scope.site, $scope.typeSite,
                                          mapDiv, true, siteCallback)
         if randomSelection
           mapProtocole.createOriginPoint()
-        else if $scope.protocoleAlgoSite == 'CARRE' or
-                $scope.protocoleAlgoSite == 'POINT_FIXE'
+        else if $scope.typeSite == 'CARRE' or
+                $scope.typeSite == 'POINT_FIXE'
           mapProtocole.selectGrilleStoc()
 
     $scope.validOrigin = ->

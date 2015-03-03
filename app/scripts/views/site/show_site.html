@@ -6,7 +6,7 @@
          ng-click="openCollapse('#show-site-collapse-' + site._id)">
         <span>{{site.titre}}</span>
         <span class="label label-success pull-right"
-              ng-show="site.observateur = userId">
+              ng-show="site.observateur && site.observateur._id == userId">
           Propriétaire
         </span>
       </a>

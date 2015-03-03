@@ -34,7 +34,7 @@
         </select>
       </span>
     </div>
-    <span ng-show="submitted && !protocole.algo_tirage_site"
+    <span ng-show="submitted && !protocole.type_site"
           class="help-block">
       Champ requis
     </span>
@@ -49,47 +49,6 @@
     <span ng-show="submitted && !protocole.taxon" class="help-block">
       Champ requis
     </span>
-
-    <div class="input-group form-group">
-      <span class="input-group-addon">Configuration<br>requise</span>
-      <span>
-        <div class="row">
-          <div class="col-xs-12">
-            <input type="checkbox" name="detecteur_enregistreur_numero_serie"
-                   ng-model="configuration_participation.detecteur_enregistreur_numero_serie">
-            Numéro de série détecteur enregistreur
-          </div>
-        </div>
-        <div class="row">
-          <div class="col-xs-12 col-sm-6">
-            <input type="checkbox" name="micro0_position"
-                   ng-model="configuration_participation.micro0_position">
-            Position Micro 0
-            <br>
-            <input type="checkbox" name="micro0_numero_serie"
-                   ng-model="configuration_participation.micro0_numero_serie">
-            Numéro de série micro 0
-            <br>
-            <input type="checkbox" name="micro0_hauteur"
-                   ng-model="configuration_participation.micro0_hauteur">
-            Hauteur micro 0
-          </div>
-          <div class="col-xs-12 col-sm-6">
-            <input type="checkbox" name="micro1_position"
-                   ng-model="configuration_participation.micro1_position">
-            Position micro 1
-            <br>
-            <input type="checkbox" name="micro1_numero_serie"
-                   ng-model="configuration_participation.micro1_numero_serie">
-            Numéro série micro 1
-            <br>
-            <input type="checkbox" name="micro1_hauteur"
-                   ng-model="configuration_participation.micro1_hauteur">
-            Hauteur micro 1
-          </div>
-        </div>
-      </span>
-    </div>
 
     <div class="input-group form-group">
       <input class="save-protocole btn btn-primary" type="submit" value="Sauvegarder"
