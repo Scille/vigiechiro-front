@@ -13,13 +13,13 @@
     </div>
   </div>
 
-  <button class="btn btn-primary"
-          name="register-protocole" ng-click="registerProtocole()"
+  <a class="btn btn-primary" id="register-protocole"
+          ng-click="registerProtocole()"
           ng-show="!userRegistered && !protocole.macro_protocole">
     S'inscrire
-  </button>
+  </a>
 
-  <a class="btn btn-primary" name="edit-protocole"
+  <a class="btn btn-primary" id="edit-protocole"
      ng-show="user.role == 'Administrateur'"
      ng-href="#/protocoles/{{protocole._id}}/edition">
      Éditer

@@ -24,7 +24,7 @@ describe 'Test taxon for observateur', ->
           expect(value).toBe('Chauves-souris')
 
 
-describe 'Test taxon for adminstrateur', ->
+describe 'Test taxon for administrateur', ->
 
   beforeEach ->
     helper.login('Administrateur')
@@ -34,7 +34,7 @@ describe 'Test taxon for adminstrateur', ->
 
   it 'Test get taxon list', ->
     browser.setLocation('taxons').then ->
-      expect($('.create-taxon').isDisplayed()).toBe(true)
+      expect(element(By.id('create-taxon')).isDisplayed()).toBe(true)
 
   it 'Test edit taxon', ->
     browser.setLocation('taxons').then ->

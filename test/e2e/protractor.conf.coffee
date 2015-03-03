@@ -5,6 +5,9 @@ exports.config =
   specs: [
     'spec/login.coffee'
     'spec/taxon.coffee'
+    'spec/protocole.coffee'
+    'spec/site.coffee'
+    'spec/participation.coffee'
     'spec/utilisateur.coffee'
   ]
   capabilities:
