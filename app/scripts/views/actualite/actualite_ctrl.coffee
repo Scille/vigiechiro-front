@@ -47,7 +47,8 @@ angular.module('actualiteViews', ['xin_backend', 'xin_session'])
       actualite: '='
       isAdmin: '='
 
-  .controller 'DisplayActualiteDirectiveCtrl', ($scope, $q, $route, Backend) ->
+  .controller 'DisplayActualiteDirectiveCtrl', ($scope, $q, $route,
+                                                Backend, session) ->
     if $scope.actualite.action == 'INSCRIPTION_PROTOCOLE'
       $scope.validated = false
       protocolFound = false
@@ -66,12 +67,16 @@ angular.module('actualiteViews', ['xin_backend', 'xin_session'])
           if valid
             protocole.customPUT(null, 'observateurs/' + $scope.actualite.sujet._id)
               .then(
-                -> $route.reload()
+                ->
+                  session.refreshPromise()
+                  $route.reload()
                 -> throw "Error validation inscription"
               )
           else
             protocole.customDELETE('observateurs/' + $scope.actualite.sujet._id)
               .then(
-                -> $route.reload()
+                ->
+                  session.refreshPromise()
+                  $route.reload()
                 -> throw "Error validation inscription"
               )

@@ -124,23 +124,31 @@ angular.module('protocoleViews', ['ngRoute', 'textAngular', 'xin_listResource',
 
   .controller 'DisplayProtocoleCtrl', ($route, $routeParams, $scope, Backend, session) ->
     $scope.protocole = {}
-    $scope.userRegistered = true
-    Backend.one('protocoles', $routeParams.protocoleId).get().then (protocole) ->
-      $scope.protocole = protocole.plain()
-      session.getUserPromise().then (user) ->
-        userRegistered = false
-        for protocole in user.protocoles or []
+    $scope.userRegistered = false
+    session.getUserPromise().then (user) ->
+      $scope.user = user.plain()
+      Backend.one('protocoles', $routeParams.protocoleId).get().then (protocole) ->
+        $scope.protocole = protocole
+        for protocole in $scope.user.protocoles or []
           if protocole.protocole._id == $scope.protocole._id
-            userRegistered = true
+            $scope.userRegistered = true
             break
-        $scope.userRegistered = userRegistered
-      Backend.one('taxons', $scope.protocole.taxon).get().then (taxon) ->
-        $scope.taxon = taxon.plain()
+        Backend.one('taxons', $scope.protocole.taxon).get().then (taxon) ->
+          $scope.taxon = taxon.plain()
     $scope.registerProtocole = ->
       Backend.one('moi/protocoles/'+$scope.protocole._id).put().then(
-        ->
-          session.refreshPromise()
-          $route.reload()
+        (response) ->
+          if $scope.user.role == "Administrateur"
+            $scope.protocole.customPUT(null, 'observateurs/' + $scope.user._id)
+              .then(
+                ->
+                  session.refreshPromise()
+                  $route.reload()
+                -> throw "Error validation inscription"
+              )
+          else
+            session.refreshPromise()
+            $route.reload()
         (error) -> throw error
       )
 
