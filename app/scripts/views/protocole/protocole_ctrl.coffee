@@ -63,7 +63,7 @@ angular.module('protocoleViews', ['ngRoute', 'textAngular', 'xin_listResource',
     session.getUserPromise().then (user) ->
       userProtocolesDict = {}
       for userProtocole in user.protocoles or []
-        userProtocolesDict[userProtocole.protocole] = userProtocole
+        userProtocolesDict[userProtocole.protocole._id] = userProtocole
       userProtocolesDictDefer.resolve(userProtocolesDict)
     $scope.resourceBackend.getList = (lookup) ->
       deferred = $q.defer()
@@ -85,7 +85,6 @@ angular.module('protocoleViews', ['ngRoute', 'textAngular', 'xin_listResource',
     $scope.swap =
       title: "Voir tous les protocoles"
       value: ''
-    $scope.userProtocolesArray = []
     # Filter field is trigger after 500ms of inactivity
     delayedFilter = new DelayedEvent(500)
     # params = $location.search()
@@ -107,10 +106,8 @@ angular.module('protocoleViews', ['ngRoute', 'textAngular', 'xin_listResource',
     userProtocolesDictDefer = $q.defer()
     session.getUserPromise().then (user) ->
       userProtocolesDict = {}
-      userProtocolesArray = []
       for userProtocole in user.protocoles or []
-        userProtocolesDict[userProtocole.protocole] = userProtocole
-        $scope.userProtocolesArray.push(userProtocole.protocole)
+        userProtocolesDict[userProtocole.protocole._id] = userProtocole
       userProtocolesDictDefer.resolve(userProtocolesDict)
     $scope.resourceBackend.getList = (lookup) ->
       deferred = $q.defer()
