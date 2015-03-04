@@ -10,8 +10,8 @@
         </display-actualite-directive>
     </li>
 
-    <li ng-if="!actualites || actualites.length == 0" class="list-group-item">
-      Pas d'actualité pour le moment
+    <li ng-if="!loading && (!actualites || actualites.length == 0)" class="list-group-item">
+      Vous n'avez pas d'actualité.
     </li>
 
     <li class="list-group-item" ng-show="loading">
