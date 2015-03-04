@@ -26,11 +26,13 @@
   </a>
 
   <list-sites-directive protocole-id="{{protocole._id}}"
+                        user-registered="userRegistered"
                         ng-show="userRegistered">
   </list-sites-directive>
   <hr>
   <create-site-directive protocole-id="{{protocole._id}}"
                          type-site="{{protocole.type_site}}"
+                         user-registered="userRegistered"
                          ng-show="userRegistered">
   </create-site-directive>
 </div>

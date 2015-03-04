@@ -36,8 +36,10 @@ angular.module('protocole_map_carre', [])
             if @allowEdit
               @_googleMaps.addListener(overlay, 'rightclick', (event) =>
                 @deleteOverlay(overlay)
-                if @getCountOverlays() == 0
+                if @getCountOverlays() < 5
                   @_step = 2
+                else
+                  @_step = 3
                 @updateSite()
               )
             else
@@ -45,21 +47,27 @@ angular.module('protocole_map_carre', [])
                 draggable: false
                 editable: false
               )
-            # TODO : Check number of overlay
-            @_step = 2
+            if @getCountOverlays() >= 4
+              @_step = 3
+            else
+              @_step = 2
             @updateSite()
             return true
           return false
-
         saveOverlay: (overlay) =>
           localite = {}
           localite.overlay = overlay
           localite.name = @setLocaliteName()
           localite.representatif = false
           @_localites.push(localite)
-
         zoomChanged: => @mapsChanged()
         mapsMoved: => @mapsChanged()
+
+      mapValidated: ->
+        if @_localites.length >= 5
+          return true
+        else
+          return false
 
       setLocaliteName: (name = 1) ->
         used = false

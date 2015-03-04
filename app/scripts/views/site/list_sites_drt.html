@@ -5,7 +5,8 @@
           <h3>Les sites</h3>
       </div>
       <div ng-repeat="site in sites">
-        <show-site-directive site="site" user-id="{{userId}}">
+        <show-site-directive site="site" user-id="{{userId}}"
+                             protocole-registered="protocoleRegistered">
         </show-site-directive>
       </div>
     </div>

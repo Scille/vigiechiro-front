@@ -38,7 +38,10 @@ describe 'Test protocole for observateur', ->
     browser.setLocation('protocoles').then ->
       protocoles = $$('.list-group-item')
       protocoles.get(1).element(`by`.css('a')).click().then ->
-        expect(element(By.id('register-protocole')).isDisplayed()).toBe(true)
+        register = element(By.id('register-protocole'))
+        expect(register.isDisplayed()).toBe(true)
+        register.click().then ->
+          expect(element(By.id('register-protocole')).isDisplayed()).toBe(false)
 
 #describe 'Test protocole for administrateur', ->#
 

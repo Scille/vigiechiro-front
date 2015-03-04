@@ -25,6 +25,9 @@ angular.module('protocole_map', ['protocole_map_carre', 'protocole_map_point_fix
         @_steps = []
         @_googleMaps = new GoogleMaps(mapDiv, @mapsCallback())
 
+      mapValidated: ->
+        return false
+
       selectGrilleStoc: ->
         @_step = 1
         @updateSite()
@@ -231,15 +234,6 @@ angular.module('protocole_map', ['protocole_map_carre', 'protocole_map_point_fix
         )
         return item
 
-      displayNumeroGrille: (cell) ->
-        for stoc in @_grille
-          if stoc.item == cell
-            newString = "n° grille stoc : " + stoc.numero
-            #TODO afficher numero_grille_stoc quelque part
-#            if @scope.numero_grille_stoc
-#              @scope.numero_grille_stoc.value = newString
-            return
-
       validNumeroGrille: (cell, numero, id) =>
         nbStoc = @_grille.length
         if nbStoc
@@ -282,9 +276,9 @@ angular.module('protocole_map', ['protocole_map_carre', 'protocole_map_point_fix
         return @_steps
 
       emptyMap: ->
-        for overlay in @_overlay
-          overlay.setMap(null)
-        @_overlay = []
+        for localite in @_localites
+          localite.overlay.setMap(null)
+        @_localites = []
 
       deleteOverlay: (overlay) ->
         for localite, key in @_localites

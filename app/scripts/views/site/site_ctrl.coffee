@@ -52,7 +52,7 @@ angular.module('siteViews', ['ngRoute', 'textAngular', 'xin_backend', 'protocole
                                   Backend, session) ->
     Backend.one('sites', $routeParams.siteId).get().then (site) ->
       $scope.site = site.plain()
-      $scope.protocoleAlgoSite = $scope.site.protocole.algo_tirage_site
+      $scope.typeSite = site.protocole.type_site
       session.getUserPromise().then (user) ->
         for protocole in user.protocoles
           if protocole.protocole._id == $scope.site.protocole._id
@@ -68,16 +68,16 @@ angular.module('siteViews', ['ngRoute', 'textAngular', 'xin_backend', 'protocole
     controller: 'DisplaySiteDirectiveCtrl'
     scope:
       site: '='
-      protocoleAlgoSite: '@'
+      typeSite: '@'
       isAdmin: '@'
     link: (scope, elem, attrs) ->
-      attrs.$observe 'protocoleAlgoSite', (protocoleAlgoSite) ->
-        if protocoleAlgoSite
+      attrs.$observe 'typeSite', (typeSite) ->
+        if typeSite
           scope.loadMap(elem.find('.g-maps')[0])
 
   .controller 'DisplaySiteDirectiveCtrl', ($scope, Backend, protocolesFactory) ->
     $scope.loadMap = (mapDiv) ->
-      mapProtocole = protocolesFactory($scope.site, $scope.protocoleAlgoSite,
+      mapProtocole = protocolesFactory($scope.site, $scope.typeSite,
                                        mapDiv, false)
       mapProtocole.loadMap()
 
@@ -169,6 +169,7 @@ angular.module('siteViews', ['ngRoute', 'textAngular', 'xin_backend', 'protocole
     scope:
       protocoleId: '@'
       typeSite: '@'
+      userRegistered: '@'
     link: (scope, elem, attrs) ->
       scope.collapsed = true
       scope.title = 'Nouveau site'
@@ -176,27 +177,47 @@ angular.module('siteViews', ['ngRoute', 'textAngular', 'xin_backend', 'protocole
         scope.protocoleId = protocoleId
       )
       $(elem).on('shown.bs.collapse', ->
-        scope.numero_grille_stoc = elem.find('.numero_grille_stoc')[0]
+#        scope.numero_grille_stoc = elem.find('.numero_grille_stoc')[0]
         scope.loadMap(elem.find('.g-maps')[0])
         return
       )
       attrs.$observe('typeSite', (value) ->
         if value
           scope.typeSite = value
+          scope.initSiteCreation()
       )
 
   .controller 'CreateSiteCtrl', ($timeout, $route, $routeParams, $scope,
                                  session, Backend, protocolesFactory) ->
+    # map variables
     mapProtocole = undefined
     mapLoaded = false
+    # random selection buttons and steps
+    $scope.randomSelectionAllowed = false
+    $scope.validOriginAllowed = false
+    $scope.retrySelectionAllowed = false
+    $scope.displaySteps = false
+    # random selection
+    $scope.listGrilleStocOrigin = []
+    $scope.listNumberUsed = []
+    #
     $scope.submitted = false
     $scope.isAdmin = false
     session.getIsAdminPromise().then (isAdmin) ->
       $scope.isAdmin = isAdmin
+    # site
     $scope.site = {}
     $scope.site.titre = "Nouveau site"
-    $scope.listGrilleStocOrigin = []
-    $scope.listNumberUsed = []
+
+    $scope.$watch('siteForm.$pristine', (value) ->
+      valid = siteValidated()
+      if valid
+        $scope.retrySelectionAllowed = false
+      if !value && !valid
+        $scope.siteForm.$pristine = true
+        $scope.siteForm.$dirty = false
+        $timeout(-> $scope.$apply())
+    )
 
     siteCallback =
       updateForm: ->
@@ -208,24 +229,35 @@ angular.module('siteViews', ['ngRoute', 'textAngular', 'xin_backend', 'protocole
         $scope.stepId = steps.step
         $timeout(-> $scope.$apply())
 
+    siteValidated = ->
+      if !mapProtocole
+        return
+      return mapProtocole.mapValidated()
+
+    $scope.initSiteCreation = ->
+      if $scope.typeSite in ['CARRE', 'POINT_FIXE']
+        $scope.randomSelectionAllowed = true
+      else
+        $scope.displaySteps = true
+
     $scope.loadMap = (mapDiv) ->
       if not mapLoaded
         mapLoaded = true
-        randomSelection = false
-        if $scope.typeSite == 'CARRE' or
-           $scope.typeSite == 'POINT_FIXE'
-          if confirm("Voulez-vous un tirage aléatoire ?")
-            randomSelection = true
-
         mapProtocole = protocolesFactory($scope.site, $scope.typeSite,
                                          mapDiv, true, siteCallback)
-        if randomSelection
-          mapProtocole.createOriginPoint()
-        else if $scope.typeSite == 'CARRE' or
-                $scope.typeSite == 'POINT_FIXE'
-          mapProtocole.selectGrilleStoc()
+
+    $scope.randomSelection = (random) ->
+      $scope.displaySteps = true
+      $scope.randomSelectionAllowed = false
+      if random
+        mapProtocole.createOriginPoint()
+        $scope.validOriginAllowed = true
+      else
+        mapProtocole.selectGrilleStoc()
 
     $scope.validOrigin = ->
+      $scope.validOriginAllowed = false
+      $scope.retrySelectionAllowed = true
       parameters =
         lat: mapProtocole.getOrigin().getPosition().lat()
         lng: mapProtocole.getOrigin().getPosition().lng()
@@ -236,10 +268,11 @@ angular.module('siteViews', ['ngRoute', 'textAngular', 'xin_backend', 'protocole
         $scope.listNumberUsed.push(number)
         mapProtocole.validOrigin($scope.listGrilleStocOrigin[number])
 
-    $scope.newSelection = ->
+    $scope.retrySelection = ->
       if $scope.listNumberUsed.length == $scope.listGrilleStocOrigin.length
         throw "Error: All cells picked"
         return
+      mapProtocole.emptyMap()
       mapProtocole.deleteValidCell()
       number = Math.floor(Math.random() * $scope.listGrilleStocOrigin.length)
       while (number in $scope.listNumberUsed)
@@ -269,8 +302,13 @@ angular.module('siteViews', ['ngRoute', 'textAngular', 'xin_backend', 'protocole
               geometries: localite.geometries
               representatif: false
             site.customPUT(payload, "localites").then(
-              -> console.log("ok")
-              (error) -> throw "Error : "+error
+              ->
+              (error) -> throw error
+            )
+          if $scope.site.verrouille
+            site.patch({'verrouille': true}).then(
+              ->
+              (error) -> throw error
             )
           $route.reload()
         (error) -> throw "error " + error
