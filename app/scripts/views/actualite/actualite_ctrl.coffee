@@ -39,44 +39,31 @@ angular.module('actualiteViews', ['xin_backend', 'xin_session'])
         scope.actualites = actualites.plain()
         scope.loading = false
 
-  .directive 'displayActualiteDirective', ->
+  .directive 'displayActualiteDirective', ($route, Backend, session) ->
     restrict: 'E'
     templateUrl: 'scripts/views/actualite/display_actualite_drt.html'
-    controller: 'DisplayActualiteDirectiveCtrl'
     scope:
       actualite: '='
       isAdmin: '='
-
-  .controller 'DisplayActualiteDirectiveCtrl', ($scope, $q, $route,
-                                                Backend, session) ->
-    if $scope.actualite.action == 'INSCRIPTION_PROTOCOLE'
-      $scope.validated = false
-      protocolFound = false
-      for protocole in $scope.actualite.sujet.protocoles
-        if protocole.protocole == $scope.actualite.protocole._id
-          protocolFound = true
-          if protocole.valide
-            $scope.validated = true
-          break
-      if !protocolFound
-        $scope.validated = true
-
-    $scope.validInscription = (valid) ->
-      Backend.one('protocoles', $scope.actualite.protocole._id).get()
-        .then (protocole) ->
-          if valid
-            protocole.customPUT(null, 'observateurs/' + $scope.actualite.sujet._id)
-              .then(
-                ->
-                  session.refreshPromise()
-                  $route.reload()
-                -> throw "Error validation inscription"
-              )
-          else
-            protocole.customDELETE('observateurs/' + $scope.actualite.sujet._id)
-              .then(
-                ->
-                  session.refreshPromise()
-                  $route.reload()
-                -> throw "Error validation inscription"
-              )
+    link: (scope, elem, attrs) ->
+      session.getUserPromise().then (user) ->
+        scope.user = user.plain()
+      scope.validInscription = (valid) ->
+        Backend.one('protocoles', scope.actualite.protocole._id).get()
+          .then (protocole) ->
+            if valid
+              protocole.customPUT(null, 'observateurs/' + scope.actualite.sujet._id)
+                .then(
+                  ->
+                    session.refreshPromise()
+                    $route.reload()
+                  -> throw "Error validation inscription"
+                )
+            else
+              protocole.customDELETE('observateurs/' + scope.actualite.sujet._id)
+                .then(
+                  ->
+                    session.refreshPromise()
+                    $route.reload()
+                  -> throw "Error validation inscription"
+                )

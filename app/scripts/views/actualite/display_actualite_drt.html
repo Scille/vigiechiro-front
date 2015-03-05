@@ -1,38 +1,100 @@
-<span ng-if="actualite.action == 'INSCRIPTION_PROTOCOLE'">
-  L'utilisateur
-  <a href="#/utilisateurs/{{actualite.sujet._id}}">
-    {{ actualite.sujet.pseudo }}
-  </a>
-  s'est incrit au protocole
-  <a href="#/protocoles/{{actualite.protocole._id}}">
-    {{ actualite.protocole.titre }}
-  </a>
-  le {{actualite._created | xinDate: 'medium'}}
-  <div ng-if="isAdmin && !validated">
-    <a class="btn btn-primary" ng-click="validInscription(true)">Valider</a>
-    <a class="btn btn-danger" ng-click="validInscription(false)">Refuser</a>
+<div ng-if="actualite.action == 'INSCRIPTION_PROTOCOLE'">
+  {{actualite._updated | xinDate: 'medium'}} :
+
+  <div ng-if="!actualite.date_validation && !actualite.date_refus">
+    <span ng-if="actualite.sujet._id == user._id">
+      Vous vous êtes
+    </span>
+    <span ng-if="actualite.sujet._id != user._id">
+      L'utilisateur
+      <a href="#/utilisateurs/{{actualite.sujet._id}}">
+        {{ actualite.sujet.pseudo }}
+      </a>
+      s'est
+    </span>
+    incrit au protocole
+    <a href="#/protocoles/{{actualite.protocole._id}}">
+      {{ actualite.protocole.titre }}.
+    </a>
+    <div ng-if="isAdmin">
+      <a class="btn btn-primary" ng-click="validInscription(true)">Valider</a>
+      <a class="btn btn-danger" ng-click="validInscription(false)">Refuser</a>
+    </div>
   </div>
-</span>
 
-<span ng-if="actualite.action == 'NOUVEAU_SITE'">
-  L'utilisateur
-  <a href="#/utilisateurs/{{actualite.sujet._id}}">
-    {{ actualite.sujet.pseudo }}
-  </a>
-  a créé le site
-  <a href="#/sites/{{actualite.site._id}}">
-    {{ actualite.site.titre }}
-  </a>
-  le {{actualite._created | xinDate: 'medium'}}
-</span>
+  <div ng-if="actualite.date_validation">
+    <span ng-if="actualite.sujet._id == user._id">
+      Votre inscription
+    </span>
+    <span ng-if="actualite.sujet._id != user._id">
+      L'inscription de l'utilisateur
+      <a href="#/utilisateurs/{{actualite.sujet._id}}">
+        {{ actualite.sujet.pseudo }}
+      </a>
+    </span>
+    au protocole
+    <a href="#/protocoles/{{actualite.protocole._id}}">
+      {{ actualite.protocole.titre }}
+    </a>
+    a été validée.
+  </div>
 
-<span ng-if="actualite.action == 'NOUVELLE_PARTICIPATION'">
-  L'utilisateur
-  <a href="#/utilisateurs/{{actualite.sujet._id}}">
-    {{ actualite.sujet.pseudo }}
-  </a>
-  a créé une
-  <a href="#/participations/{{actualite.participation._id}}">
-    participation le {{actualite._created | xinDate: 'medium'}}
-  </a>
-</span>
+  <div ng-if="actualite.date_refus">
+    <span ng-if="actualite.sujet._id == user._id">
+      Votre inscription
+    </span>
+    <span ng-if="actualite.sujet._id != user._id">
+      L'inscription de l'utilisateur
+      <a href="#/utilisateurs/{{actualite.sujet._id}}">
+        {{ actualite.sujet.pseudo }}
+      </a>
+    </span>
+    au protocole
+    <a href="#/protocoles/{{actualite.protocole._id}}">
+      {{ actualite.protocole.titre }}
+    </a>
+    a été refusée.
+  </div>
+</div>
+
+
+<div ng-if="actualite.action == 'NOUVEAU_SITE'">
+  {{actualite._updated | xinDate: 'medium'}} :
+  <div>
+    <span ng-if="actualite.sujet._id == user._id">
+      Vous avez
+    </span>
+    <span ng-if="actualite.sujet._id != user._id">
+      L'utilisateur
+      <a href="#/utilisateurs/{{actualite.sujet._id}}">
+        {{ actualite.sujet.pseudo }}
+      </a>
+      a
+    </span>
+    créé le site
+    <a href="#/sites/{{actualite.site._id}}">
+      {{ actualite.site.titre }}.
+    </a>
+  </div>
+</div>
+
+
+<div ng-if="actualite.action == 'NOUVELLE_PARTICIPATION'">
+  {{actualite._updated | xinDate: 'medium'}} :
+  <div>
+    <span ng-if="actualite.sujet._id == user._id">
+      Vous avez
+    </span>
+    <span ng-if="actualite.sujet._id != user._id">
+      L'utilisateur
+      <a href="#/utilisateurs/{{actualite.sujet._id}}">
+        {{ actualite.sujet.pseudo }}
+      </a>
+      a
+    </span>
+    créé une
+    <a href="#/participations/{{actualite.participation._id}}">
+      participation.
+    </a>
+  </div>
+</div>
