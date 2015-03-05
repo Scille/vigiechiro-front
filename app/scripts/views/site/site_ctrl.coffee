@@ -6,15 +6,18 @@ angular.module('siteViews', ['ngRoute', 'textAngular', 'xin_backend', 'protocole
     $routeProvider
       .when '/sites',
         templateUrl: 'scripts/views/site/list_sites.html'
-        controller: 'ListSitesCtrl'
+        controller: 'ListSitesController'
       .when '/sites/mes-sites',
         templateUrl: 'scripts/views/site/list_sites.html'
-        controller: 'ListMesSitesCtrl'
+        controller: 'ListMesSitesController'
       .when '/sites/:siteId',
         templateUrl: 'scripts/views/site/display_site.html'
-        controller: 'DisplaySiteCtrl'
+        controller: 'DisplaySiteController'
+      .when '/sites/:siteId/edition',
+        templateUrl: 'scripts/views/site/edit_site.html'
+        controller: 'EditSiteController'
 
-  .controller 'ListSitesCtrl', ($scope, Backend, session, DelayedEvent) ->
+  .controller 'ListSitesController', ($scope, Backend, session, DelayedEvent) ->
     $scope.title = "Tous les sites"
     $scope.swap =
       title: "Voir mes sites"
@@ -31,7 +34,7 @@ angular.module('siteViews', ['ngRoute', 'textAngular', 'xin_backend', 'protocole
           delete $scope.lookup.q
     $scope.resourceBackend = Backend.all('sites')
 
-  .controller 'ListMesSitesCtrl', ($scope, Backend, session, DelayedEvent) ->
+  .controller 'ListMesSitesController', ($scope, Backend, session, DelayedEvent) ->
     $scope.title = "Mes sites"
     $scope.swap =
       title: "Voir tous les sites"
@@ -48,8 +51,8 @@ angular.module('siteViews', ['ngRoute', 'textAngular', 'xin_backend', 'protocole
           delete $scope.lookup.q
     $scope.resourceBackend = Backend.all('moi/sites')
 
-  .controller 'DisplaySiteCtrl', ($routeParams, $scope
-                                  Backend, session) ->
+  .controller 'DisplaySiteController', ($routeParams, $scope
+                                        Backend, session) ->
     Backend.one('sites', $routeParams.siteId).get().then (site) ->
       $scope.site = site.plain()
       $scope.typeSite = site.protocole.type_site
@@ -62,10 +65,9 @@ angular.module('siteViews', ['ngRoute', 'textAngular', 'xin_backend', 'protocole
     session.getIsAdminPromise().then (isAdmin) ->
       $scope.isAdmin = isAdmin
 
-  .directive 'displaySiteDirective', ->
+  .directive 'displaySiteDirective', (protocolesFactory) ->
     restrict: 'E'
     templateUrl: 'scripts/views/site/display_site_drt.html'
-    controller: 'DisplaySiteDirectiveCtrl'
     scope:
       site: '='
       typeSite: '@'
@@ -73,99 +75,30 @@ angular.module('siteViews', ['ngRoute', 'textAngular', 'xin_backend', 'protocole
     link: (scope, elem, attrs) ->
       attrs.$observe 'typeSite', (typeSite) ->
         if typeSite
-          scope.loadMap(elem.find('.g-maps')[0])
-
-  .controller 'DisplaySiteDirectiveCtrl', ($scope, Backend, protocolesFactory) ->
-    $scope.loadMap = (mapDiv) ->
-      mapProtocole = protocolesFactory($scope.site, $scope.typeSite,
-                                       mapDiv, false)
-      mapProtocole.loadMap()
+          mapDiv = elem.find('.g-maps')[0]
+          mapProtocole = protocolesFactory(scope.site, scope.typeSite,
+                                           mapDiv, false)
+          mapProtocole.loadMap()
 
   .directive 'listSitesDirective', (session, Backend) ->
     restrict: 'E'
     templateUrl: 'scripts/views/site/list_sites_drt.html'
     scope:
       protocoleId: '@'
-      typeSite: '@'
     link: (scope, elem, attrs) ->
       scope.loading = true
-      scope.sites = []
-      scope.loadSites = ->
-        Backend.all('protocoles/'+scope.protocoleId+'/sites').getList().then (sites) ->
-          scope.sites = sites
-          scope.loading = false
+      session.getUserPromise().then (user) ->
+        scope.userId = user._id
       attrs.$observe 'protocoleId', (protocoleId) ->
         if protocoleId
-          session.getUserPromise().then (user) ->
-            scope.userId = user._id
-            scope.loadSites()
-
-  .directive 'showSiteDirective', ($timeout) ->
-    restrict: 'E'
-    templateUrl: 'scripts/views/site/show_site.html'
-    controller: 'ShowSiteCtrl'
-    scope:
-      site: '='
-      collapsed: '@'
-      userId: '@'
-    link: (scope, elem, attrs) ->
-      scope.openCollapse = (id) ->
-        $timeout(-> scope.loadMap(elem.find('.g-maps')[0]))
-      # Wait for the collapse to be opened before load the google map
-#      if not attrs.collapsed?
-        # Use $timeout to load google map at the end of the stack
-        # to prevent display issues
-#        $timeout(-> scope.loadMap(elem.find('.g-maps')[0]))
-#      else
-#        $(elem).on('shown.bs.collapse', ->
-#          scope.numero_grille_stoc = elem.find('.numero_grille_stoc')[0]
-#          scope.loadMap(elem.find('.g-maps')[0])
-#          return
-#        )
-
-  .controller 'ShowSiteCtrl', ($timeout, $route, $routeParams, $scope
-                               session, Backend, protocolesFactory) ->
-    mapProtocole = undefined
-    mapLoaded = false
-    $scope.submitted = false
-    $scope.isAdmin = false
-    session.getIsAdminPromise().then (isAdmin) ->
-      $scope.isAdmin = isAdmin
-    $scope.loadMap = (mapDiv) ->
-      if not mapLoaded
-        mapLoaded = true
-        mapProtocole = protocolesFactory($scope.site, $scope.site.protocole.type_site,
-                                         mapDiv, !$scope.site.verrouille,
-                                         siteCallback)
-        mapProtocole.loadMap()
-
-    siteCallback =
-      updateForm: ->
-        $scope.siteForm.$pristine = false
-        $scope.siteForm.$dirty = true
-        $timeout(-> $scope.$apply())
-      updateSteps: (steps) ->
-        $scope.steps = steps.steps
-        $scope.stepId = steps.step
-        $timeout(-> $scope.$apply())
-    $scope.saveSite = ->
-      $scope.submitted = true
-      if (not $scope.siteForm.$valid or
-          not $scope.siteForm.$dirty)
-        return
-      payload =
-        'commentaire': $scope.siteForm.commentaire.$modelValue
-      if $scope.isAdmin
-        payload.verrouille = $scope.site.verrouille
-      $scope.site.patch(payload).then(
-        -> $scope.siteForm.$setPristine()
-        (error) -> console.log("error", error)
-      )
+          Backend.all('protocoles/'+scope.protocoleId+'/sites').getList().then (sites) ->
+            scope.sites = sites.plain()
+            scope.loading = false
 
   .directive 'createSiteDirective', ->
     restrict: 'E'
-    templateUrl: 'scripts/views/site/show_site.html'
-    controller: 'CreateSiteCtrl'
+    templateUrl: 'scripts/views/site/new_site.html'
+    controller: 'CreateSiteController'
     scope:
       protocoleId: '@'
       typeSite: '@'
@@ -177,7 +110,6 @@ angular.module('siteViews', ['ngRoute', 'textAngular', 'xin_backend', 'protocole
         scope.protocoleId = protocoleId
       )
       $(elem).on('shown.bs.collapse', ->
-#        scope.numero_grille_stoc = elem.find('.numero_grille_stoc')[0]
         scope.loadMap(elem.find('.g-maps')[0])
         return
       )
@@ -187,8 +119,8 @@ angular.module('siteViews', ['ngRoute', 'textAngular', 'xin_backend', 'protocole
           scope.initSiteCreation()
       )
 
-  .controller 'CreateSiteCtrl', ($timeout, $route, $routeParams, $scope,
-                                 session, Backend, protocolesFactory) ->
+  .controller 'CreateSiteController', ($timeout, $route, $scope, session,
+                                       Backend, protocolesFactory) ->
     # map variables
     mapProtocole = undefined
     mapLoaded = false
@@ -245,6 +177,162 @@ angular.module('siteViews', ['ngRoute', 'textAngular', 'xin_backend', 'protocole
         mapLoaded = true
         mapProtocole = protocolesFactory($scope.site, $scope.typeSite,
                                          mapDiv, true, siteCallback)
+
+    $scope.randomSelection = (random) ->
+      $scope.displaySteps = true
+      $scope.randomSelectionAllowed = false
+      if random
+        mapProtocole.createOriginPoint()
+        $scope.validOriginAllowed = true
+      else
+        mapProtocole.selectGrilleStoc()
+
+    $scope.validOrigin = ->
+      $scope.validOriginAllowed = false
+      $scope.retrySelectionAllowed = true
+      parameters =
+        lat: mapProtocole.getOrigin().getPosition().lat()
+        lng: mapProtocole.getOrigin().getPosition().lng()
+        r: 10000
+      Backend.all('grille_stoc/cercle').getList(parameters).then (grille_stoc) ->
+        $scope.listGrilleStocOrigin = grille_stoc.plain()
+        number = Math.floor(Math.random() * $scope.listGrilleStocOrigin.length)
+        $scope.listNumberUsed.push(number)
+        mapProtocole.validOrigin($scope.listGrilleStocOrigin[number])
+
+    $scope.retrySelection = ->
+      if $scope.listNumberUsed.length == $scope.listGrilleStocOrigin.length
+        throw "Error: All cells picked"
+        return
+      mapProtocole.emptyMap()
+      mapProtocole.deleteValidCell()
+      number = Math.floor(Math.random() * $scope.listGrilleStocOrigin.length)
+      while (number in $scope.listNumberUsed)
+        number = Math.floor(Math.random() * $scope.listGrilleStocOrigin.length)
+      $scope.listNumberUsed.push(number)
+      mapProtocole.validOrigin($scope.listGrilleStocOrigin[number])
+
+    $scope.saveSite = ->
+      $scope.submitted = true
+      if (not $scope.siteForm.$valid or
+          not $scope.siteForm.$dirty)
+        return
+      payload =
+        'titre': $scope.protocoleTitre
+        'protocole': $scope.protocoleId
+        'commentaire': $scope.siteForm.commentaire.$modelValue
+      grille_stoc = mapProtocole.getIdGrilleStoc()
+      if grille_stoc != ''
+        payload.grille_stoc = grille_stoc
+      Backend.all('sites').post(payload).then(
+        (site) ->
+          localites = mapProtocole.saveMap()
+          for localite in localites
+            payload =
+              nom: localite.name
+#              coordonnee: localite.geometries.geometries[0]
+              geometries: localite.geometries
+              representatif: false
+            site.customPUT(payload, "localites").then(
+              ->
+              (error) -> throw error
+            )
+          if $scope.site.verrouille
+            site.patch({'verrouille': true}).then(
+              ->
+              (error) -> throw error
+            )
+          $route.reload()
+        (error) -> throw "error " + error
+      )
+
+
+  .controller 'EditSiteController', ($timeout, $route, $routeParams, $scope,
+                                     session, Backend, protocolesFactory) ->
+    # map variables
+    mapProtocole = undefined
+    mapLoaded = false
+    # random selection buttons and steps
+    $scope.randomSelectionAllowed = false
+    $scope.validOriginAllowed = false
+    $scope.retrySelectionAllowed = false
+    $scope.displaySteps = false
+    # random selection
+    $scope.listGrilleStocOrigin = []
+    $scope.listNumberUsed = []
+    #
+    $scope.submitted = false
+    $scope.isAdmin = false
+    session.getIsAdminPromise().then (isAdmin) ->
+      $scope.isAdmin = isAdmin
+    # user select in field observateur
+    $scope.observateur = {}
+    # site
+    Backend.one('sites', $routeParams.siteId).get().then (site) ->
+      $scope.site = site
+      loadMap(angular.element($('.g-maps'))[0])
+      $scope.observateur._id = site.observateur._id
+      $scope.observateur.pseudo = site.observateur.pseudo
+    # users list
+    $scope.users = []
+    Backend.all('utilisateurs').getList().then (users) ->
+      $scope.users = users.plain()
+      refreshObservateur($scope.siteForm.observateur.$modelValue)
+
+    $scope.$watch('siteForm.observateur.$modelValue', (id) -> refreshObservateur(id))
+
+    $scope.$watch('siteForm.$pristine', (value) ->
+      valid = siteValidated()
+      if valid
+        $scope.retrySelectionAllowed = false
+      if !value && !valid
+        $scope.siteForm.$pristine = true
+        $scope.siteForm.$dirty = false
+        $timeout(-> $scope.$apply())
+    )
+
+    refreshObservateur = (id) ->
+      if !id
+        return
+      for user in $scope.users or []
+        if user._id == id
+          $scope.observateur.pseudo = user.pseudo
+          for protocole in user.protocoles or []
+            if protocole.protocole._id == $scope.site.protocole._id
+              if protocole.valide
+                $scope.observateur.registered = true
+                return
+              else
+                break
+          $scope.observateur.registered = false
+          return
+
+    siteCallback =
+      updateForm: ->
+        $scope.siteForm.$pristine = false
+        $scope.siteForm.$dirty = true
+        $timeout(-> $scope.$apply())
+      updateSteps: (steps) ->
+        $scope.steps = steps.steps
+        $scope.stepId = steps.step
+        $timeout(-> $scope.$apply())
+
+    siteValidated = ->
+      if !mapProtocole
+        return
+      return mapProtocole.mapValidated()
+
+    $scope.initSiteCreation = ->
+      if $scope.typeSite in ['CARRE', 'POINT_FIXE']
+        $scope.randomSelectionAllowed = true
+      else
+        $scope.displaySteps = true
+
+    loadMap = (mapDiv) ->
+      mapProtocole = protocolesFactory($scope.site,
+                                       $scope.site.protocole.type_site,
+                                       mapDiv, true, siteCallback)
+      mapProtocole.loadMap()
 
     $scope.randomSelection = (random) ->
       $scope.displaySteps = true

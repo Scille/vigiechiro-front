@@ -1,0 +1,57 @@
+<div class="container">
+  <div class="text-center">
+    <div class="page-header text-center">
+      <h3>Edition du site {{site.titre}}</h3>
+    </div>
+  </div>
+
+
+  <div class="panel panel-default">
+    <div class="panel-body">
+      <form class="simple-form" novalidate name="siteForm" ng-submit="saveSite()">
+        <div class="form-group input-group" ng-show="isAdmin">
+          <span class="input-group-addon">Observateur</span>
+          <select class="form-control" name="observateur"
+                  ng-model="observateur._id"
+                  ng-options="user._id as user.pseudo for user in users">
+          </select>
+        </div>
+
+        <ul class="list-group" ng-show="displaySteps">
+          <li class="list-group-item" ng-repeat="step in steps">
+            <span ng-show="$index < stepId">✓&nbsp;<strike>{{step}}</strike></span>
+            <span ng-hide="$index < stepId">{{step}}</span>
+          </li>
+        </ul>
+
+        <div class="form-group">
+          <!--<input type="text" class="numero_grille_stoc" value="numéro grille stoc"
+            ng-if="protocoleAlgoSite != 'ROUTIER'">-->
+          <div class="g-maps"></div>
+        </div>
+
+        <div class="form-group">
+          <textarea rows="3" class="form-control" name="commentaire"
+                    ng-model="site.commentaire" ng-disabled="readOnly"
+                    placeholder="Commentaire"></textarea>
+        </div>
+
+        <div class="checkbox" ng-show="isAdmin && observateur.registered">
+          <label>
+            <input type="checkbox" name="verrouille" ng-model="site.verrouille"
+                   ng-true-value="true" ng-false-value="false">
+              Verrouillé
+          </label>
+        </div>
+        <div ng-show="!observateur.registered">
+          Le site ne peut pas être verrouillé car l'observateur {{observateur.pseudo}} n'est pas inscrit au protocole.
+        </div>
+
+        <div class="form-group">
+          <input class="save-user btn btn-primary" type="submit" value="Sauvegarder"
+                 ng-hide="siteForm.$pristine">
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
