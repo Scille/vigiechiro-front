@@ -197,8 +197,6 @@ angular.module('protocole_map', ['protocole_map_carre', 'protocole_map_point_fix
       createGrille: (grille_stoc) =>
         validNumeroGrille = (cell) =>
           (event) => @validNumeroGrille(cell)
-        displayNumeroGrille = (cell) =>
-          (event) => @displayNumeroGrille(cell)
         grille_stoc = grille_stoc.plain()
         for cell in grille_stoc
           exist = false
@@ -210,7 +208,6 @@ angular.module('protocole_map', ['protocole_map_carre', 'protocole_map_point_fix
             continue
           newCell = @createCell(cell.centre.coordinates[1], cell.centre.coordinates[0])
           @_googleMaps.addListener(newCell, 'click', validNumeroGrille(newCell))
-          @_googleMaps.addListener(newCell, 'mouseover', displayNumeroGrille(newCell))
           @_grille.push({"item": newCell, "numero": cell.numero, 'id': cell._id})
 
       createCell: (lat, lng) ->

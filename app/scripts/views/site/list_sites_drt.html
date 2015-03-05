@@ -4,19 +4,32 @@
       <div class="page-header">
           <h3>Les sites</h3>
       </div>
-      <div ng-repeat="site in sites">
-        <show-site-directive site="site" user-id="{{userId}}"
-                             protocole-registered="protocoleRegistered">
-        </show-site-directive>
-      </div>
+
+      <ul class="list-group">
+        <li class="list-group-item" ng-repeat="site in sites">
+          <a href="#/sites/{{site._id}}">
+            <span>{{site.titre}}</span>
+            <span class="pull-right" style="white-space: nowrap">
+              <span class="label label-success"
+                    ng-show="site.observateur._id == userId">
+                Propriétaire
+              </span>
+              <span class="label label-default" ng-show="site.verrouille">
+                Verrouillé
+              </span>
+            </span>
+          </a>
+        </li>
+      </ul>
     </div>
-    <div ng-show="sites.length == 0" class="text-center">
+
+    <div ng-show="!loading && sites.length == 0" class="text-center">
       <h3><i>Vous n'avez pas de sites pour le moment</i></h3>
     </div>
   </div>
 
   <div ng-if="loading">
     <center><img src="images/spinner.gif"></img></center>
-    <center>Changement de la liste des Sites...</center>
+    <center>Changement de la liste des sites...</center>
   </div>
 </div>

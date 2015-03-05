@@ -1,22 +1,34 @@
-<a class="btn btn-primary" href="#/protocoles/{{site.protocole._id}}">
-  Voir le protocole {{ site.protocole.titre }}
-</a>
+<div class="container">
+  <div class="text-center">
+    <div class="page-header text-center">
+      <h3>{{site.titre}}</h3>
+    </div>
+  </div>
 
-<div class="panel-body">
-  <display-site-directive site="site" type-site="{{typeSite}}"
-                          is-admin="{{isAdmin}}">
-  </display-site-directive>
-</div>
+  <a class="btn btn-default" href="#/protocoles/{{site.protocole._id}}">
+    Voir le protocole {{ site.protocole.titre }}
+  </a>
 
-<div class="panel-body">
-  <list-participations-directive site-id="{{site._id}}">
-  </list-participations-directive>
-</div>
+  <div class="panel-body">
+    <display-site-directive site="site" type-site="{{typeSite}}"
+                            is-admin="{{isAdmin}}">
+    </display-site-directive>
+  </div>
 
-<a class="btn btn-primary" href="#/sites/{{site._id}}/nouvelle-participation"
-   ng-disabled="!site.verrouille || !isProtocoleValid">
-  Nouvelle participation
-</a>
-<div ng-if="!site.verrouille || !isProtocoleValid">
-  Le protocole et/ou le site ne sont pas encore validés.
+  <div class="form-group" ng-if="isAdmin || !site.verrouille">
+    <a class="btn btn-primary" href="#/sites/{{site._id}}/edition">Editer</a>
+  </div>
+
+  <div class="panel-body">
+    <list-participations-directive site-id="{{site._id}}">
+    </list-participations-directive>
+  </div>
+
+  <a class="btn btn-primary" href="#/sites/{{site._id}}/nouvelle-participation"
+     ng-disabled="!site.verrouille || !isProtocoleValid">
+    Nouvelle participation
+  </a>
+  <div ng-if="!site.verrouille || !isProtocoleValid">
+    Le protocole et/ou le site ne sont pas encore validés.
+  </div>
 </div>

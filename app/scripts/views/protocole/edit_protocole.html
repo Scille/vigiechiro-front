@@ -27,12 +27,11 @@
 
     <div class="input-group form-group">
       <span class="input-group-addon">Type de site</span>
-        <select class="form-control" ng-model="protocole.type_site">
-          <option value="CARRE">Pédestre</option>
-          <option value="ROUTIER">Routier</option>
-          <option value="POINT_FIXE">Point fixe</option>
-        </select>
-      </span>
+      <select class="form-control" ng-model="protocole.type_site">
+        <option value="CARRE">Pédestre</option>
+        <option value="ROUTIER">Routier</option>
+        <option value="POINT_FIXE">Point fixe</option>
+      </select>
     </div>
     <span ng-show="submitted && !protocole.type_site"
           class="help-block">
@@ -41,10 +40,9 @@
 
     <div class="input-group form-group">
       <span class="input-group-addon">Taxon</span>
-        <select class="form-control" ng-model="protocole.taxon"
-                ng-options="taxon._id as taxon.libelle_long for taxon in taxons">
-        </select>
-      </span>
+      <select class="form-control" ng-model="protocole.taxon"
+              ng-options="taxon._id as taxon.libelle_long for taxon in taxons">
+      </select>
     </div>
     <span ng-show="submitted && !protocole.taxon" class="help-block">
       Champ requis
