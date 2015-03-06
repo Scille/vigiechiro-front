@@ -77,7 +77,8 @@ angular.module('xin_uploadFile', ['appSettings'])
       else
         scope.multipleSelect = false
       scope.clickFileInput = ->
-        _.defer(-> input.click())
+        input.click()
+#        _.defer(-> input.click())
         return
       cancel = (e) ->
         e.stopPropagation()
