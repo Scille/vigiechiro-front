@@ -5,7 +5,7 @@
     <div class="form-group" ng-class="{'has-error': participationForm.date_debut.$invalid && !participationForm.$pristine}">
       <div class="dropdown">
         <a class="dropdown-toggle" id="start-toggle-select"
-           role="button" data-toggle="dropdown" data-target="#" href="">
+           data-toggle="dropdown">
           <div class="input-group">
             <label class="input-group-addon" for="date_debut">
               Date de début
@@ -18,7 +18,7 @@
             </span>
           </div>
         </a>
-        <ul class="dropdown-menu" role="menu">
+        <ul class="dropdown-menu">
           <datetimepicker
             data-ng-model="participation.date_debut"
             data-datetimepicker-config="{ dropdownSelector: '#start-toggle-select' }">
@@ -34,7 +34,7 @@
     <div class="form-group" ng-class="{'has-error': participationForm.date_fin.$invalid && !participationForm.$pristine}">
       <div class="dropdown">
         <a class="dropdown-toggle" id="stop-toggle-select"
-           role="button" data-toggle="dropdown" data-target="#" href="">
+           data-toggle="dropdown">
           <div class="input-group">
             <label class="input-group-addon" for="date_fin">
               Date de fin
@@ -48,7 +48,7 @@
             </span>
           </div>
         </a>
-        <ul class="dropdown-menu" role="menu">
+        <ul class="dropdown-menu">
           <datetimepicker
             data-ng-model="participation.date_fin"
             data-datetimepicker-config="{ dropdownSelector: '#stop-toggle-select' }">

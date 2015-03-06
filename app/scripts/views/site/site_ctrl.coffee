@@ -338,30 +338,22 @@ angular.module('siteViews', ['ngRoute', 'textAngular', 'xin_backend', 'protocole
           not $scope.siteForm.$dirty)
         return
       payload =
-        'titre': $scope.protocoleTitre
-        'protocole': $scope.protocoleId
+        'observateur': $scope.observateur._id
         'commentaire': $scope.siteForm.commentaire.$modelValue
-      grille_stoc = mapProtocole.getIdGrilleStoc()
-      if grille_stoc != ''
-        payload.grille_stoc = grille_stoc
-      Backend.all('sites').post(payload).then(
+        'verrouille': $scope.site.verrouille
+      $scope.site.patch(payload).then(
         (site) ->
-          localites = mapProtocole.saveMap()
-          for localite in localites
-            payload =
-              nom: localite.name
-#              coordonnee: localite.geometries.geometries[0]
-              geometries: localite.geometries
-              representatif: false
-            site.customPUT(payload, "localites").then(
-              ->
-              (error) -> throw error
-            )
-          if $scope.site.verrouille
-            site.patch({'verrouille': true}).then(
-              ->
-              (error) -> throw error
-            )
+#          localites = mapProtocole.saveMap()
+#          for localite in localites
+#            payload =
+#              nom: localite.name
+##              coordonnee: localite.geometries.geometries[0]
+#              geometries: localite.geometries
+#              representatif: false
+#            site.customPUT(payload, "localites").then(
+#              ->
+#              (error) -> throw error
+#            )
           $route.reload()
         (error) -> throw "error " + error
       )

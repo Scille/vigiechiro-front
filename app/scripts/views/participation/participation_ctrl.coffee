@@ -104,16 +104,13 @@ angular.module('participationViews', ['ngRoute', 'textAngular', 'xin_listResourc
         'commentaire': $scope.participation.commentaire
         'meteo': {}
         'configuration': {}
+      if $scope.participation.date_fin != 'Invalid Date'
+        date_fin = new Date($scope.participation.date_fin)
+        payload.date_fin = date_fin.toGMTString()
       # Retrieve the modified fields from the form
       for key, value of $scope.participationForm
         if key.charAt(0) != '$' and value.$dirty
-          if key == 'date_fin'
-            if $scope.participation.date_fin
-              date_fin = new Date($scope.participation.date_fin)
-              payload[key] = date_fin.toGMTString()
-          else if key == 'date_debut'
-            payload.date_debut = date_debut
-          else if key == 'temperature_debut' or
+          if key == 'temperature_debut' or
              key == 'temperature_fin' or
              key == 'vent' or key == 'couverture'
             payload.meteo[key] = $scope.participation.meteo[key]
@@ -129,7 +126,6 @@ angular.module('participationViews', ['ngRoute', 'textAngular', 'xin_listResourc
       if uploadingFiles
         throw "Error : Still files to upload."
       else
-        console.log(payload)
         Backend.all('sites/'+$scope.siteId+'/participations').post(payload).then(
           (participation) ->
             Backend.one('participations', participation._id).get().then (participation) ->
@@ -184,7 +180,6 @@ angular.module('participationViews', ['ngRoute', 'textAngular', 'xin_listResourc
     Backend.one('participations', $routeParams.participationId).get()
       .then (participation) ->
         $scope.participation = participation
-        console.log(participation.plain())
 
     $scope.addPost = ->
       payload =
