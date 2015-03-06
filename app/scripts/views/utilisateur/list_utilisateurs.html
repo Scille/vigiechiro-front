@@ -17,15 +17,15 @@
   </div>
 
   <list-resource-directive resource-backend="resourceBackend" lookup="lookup">
-    <a class="btn" ng-href='#/utilisateurs/{{resource._id}}'>
+    <a ng-href='#/utilisateurs/{{resource._id}}'>
       {{resource.pseudo}}
+      <span class="label label-primary pull-right" ng-show="resource.role == 'Administrateur'">
+        Administrateur
+      </span>
+      <span class="label label-info pull-right"
+            ng-show="resource.role == 'Validateur'">
+        Validateur
+      </span>
     </a>
-    <span class="label label-primary pull-right" ng-show="resource.role == 'Administrateur'">
-      Administrateur
-    </span>
-    <span class="label label-info pull-right" ng-show="resource.role == 'Validateur'">
-      Validateur
-    </span>
   </list-resource-directive>
-
 </div>

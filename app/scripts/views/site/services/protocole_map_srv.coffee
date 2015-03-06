@@ -17,7 +17,6 @@ angular.module('protocole_map', ['protocole_map_carre', 'protocole_map_point_fix
     class ProtocoleMap
       constructor: (@site, mapDiv, @allowEdit, @siteCallback) ->
         @_localites = []
-        @_origin = undefined
         @_circleLimit = undefined
         @_newSelection = false
         @_grille = []
@@ -40,33 +39,24 @@ angular.module('protocole_map', ['protocole_map_carre', 'protocole_map_point_fix
         @updateSite()
 
       createOriginPoint: ->
-        @_origin = new google.maps.Marker(
-          map: @_googleMaps.getMap()
-          title: "Point d'origine du tirage"
-          position: @_googleMaps.getCenter()
-          draggable: true
-        )
         @_circleLimit = new google.maps.Circle(
           map: @_googleMaps.getMap()
           center: @_googleMaps.getCenter()
           radius: 10000
-        )
-        @_googleMaps.addListener(@_origin, 'drag', (event) =>
-          @_circleLimit.setCenter(event.latLng)
+          draggable: true
         )
 
       removeOrigin: ->
         @_newSelection = true
-        @_origin.setDraggable(false)
-        @_origin.setMap(null)
         @_circleLimit.setMap(null)
+        @_circleLimit.setDraggable(false)
 
       deleteValidCell: ->
         @_grille[0].item.setMap(null)
         @_grille = []
 
       getOrigin: ->
-        return @_origin
+        return @_circleLimit
 
       allowMapChanged: ->
         if not @site.verrouille?
@@ -172,11 +162,6 @@ angular.module('protocole_map', ['protocole_map_carre', 'protocole_map_point_fix
         return @_grille[0].id
 
       mapsChanged: ->
-        if (@_step == 0)
-          if @_origin && !@_newSelection
-            @_origin.setPosition(@_googleMaps.getCenter())
-            @_circleLimit.setCenter(@_googleMaps.getCenter())
-          return
         if @_step != 1
           return
         zoomLevel = @_googleMaps.getZoom()

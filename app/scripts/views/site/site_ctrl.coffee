@@ -190,10 +190,11 @@ angular.module('siteViews', ['ngRoute', 'textAngular', 'xin_backend', 'protocole
     $scope.validOrigin = ->
       $scope.validOriginAllowed = false
       $scope.retrySelectionAllowed = true
+      origin = mapProtocole.getOrigin()
       parameters =
-        lat: mapProtocole.getOrigin().getPosition().lat()
-        lng: mapProtocole.getOrigin().getPosition().lng()
-        r: 10000
+        lat: origin.getCenter().lat()
+        lng: origin.getCenter().lng()
+        r: origin.getRadius()
       Backend.all('grille_stoc/cercle').getList(parameters).then (grille_stoc) ->
         $scope.listGrilleStocOrigin = grille_stoc.plain()
         number = Math.floor(Math.random() * $scope.listGrilleStocOrigin.length)
@@ -323,50 +324,13 @@ angular.module('siteViews', ['ngRoute', 'textAngular', 'xin_backend', 'protocole
       return mapProtocole.mapValidated()
 
     $scope.initSiteCreation = ->
-      if $scope.typeSite in ['CARRE', 'POINT_FIXE']
-        $scope.randomSelectionAllowed = true
-      else
-        $scope.displaySteps = true
+      $scope.displaySteps = true
 
     loadMap = (mapDiv) ->
       mapProtocole = protocolesFactory($scope.site,
                                        $scope.site.protocole.type_site,
                                        mapDiv, true, siteCallback)
       mapProtocole.loadMap()
-
-    $scope.randomSelection = (random) ->
-      $scope.displaySteps = true
-      $scope.randomSelectionAllowed = false
-      if random
-        mapProtocole.createOriginPoint()
-        $scope.validOriginAllowed = true
-      else
-        mapProtocole.selectGrilleStoc()
-
-    $scope.validOrigin = ->
-      $scope.validOriginAllowed = false
-      $scope.retrySelectionAllowed = true
-      parameters =
-        lat: mapProtocole.getOrigin().getPosition().lat()
-        lng: mapProtocole.getOrigin().getPosition().lng()
-        r: 10000
-      Backend.all('grille_stoc/cercle').getList(parameters).then (grille_stoc) ->
-        $scope.listGrilleStocOrigin = grille_stoc.plain()
-        number = Math.floor(Math.random() * $scope.listGrilleStocOrigin.length)
-        $scope.listNumberUsed.push(number)
-        mapProtocole.validOrigin($scope.listGrilleStocOrigin[number])
-
-    $scope.retrySelection = ->
-      if $scope.listNumberUsed.length == $scope.listGrilleStocOrigin.length
-        throw "Error: All cells picked"
-        return
-      mapProtocole.emptyMap()
-      mapProtocole.deleteValidCell()
-      number = Math.floor(Math.random() * $scope.listGrilleStocOrigin.length)
-      while (number in $scope.listNumberUsed)
-        number = Math.floor(Math.random() * $scope.listGrilleStocOrigin.length)
-      $scope.listNumberUsed.push(number)
-      mapProtocole.validOrigin($scope.listGrilleStocOrigin[number])
 
     $scope.saveSite = ->
       $scope.submitted = true
