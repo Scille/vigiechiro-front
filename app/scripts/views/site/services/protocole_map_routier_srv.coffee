@@ -8,14 +8,12 @@ angular.module('protocole_map_routier', [])
   .factory 'ProtocoleMapRoutier', ($rootScope, Backend, GoogleMaps, ProtocoleMap) ->
     class ProtocoleMapRoutier extends ProtocoleMap
       constructor: (@site, mapDiv, @allowEdit, @siteCallback) ->
-        @_totalLength = 0
         super @site, mapDiv, @allowEdit, @siteCallback
         if @allowEdit
           @_googleMaps.setDrawingManagerOptions(
             drawingControlOptions:
               position: google.maps.ControlPosition.TOP_CENTER
               drawingModes: [
-                google.maps.drawing.OverlayType.MARKER
                 google.maps.drawing.OverlayType.POLYLINE
               ]
           )
@@ -28,56 +26,70 @@ angular.module('protocole_map_routier', [])
       getSteps: ->
         return [
           "Tracer le trajet complet en un seul trait. Le tracé doit atteindre 30 km ou plus."+
-          "Longueur actuelle "+@_totalLength+" mètres",
+          "Longueur actuelle "+(@_tracet.length/1000).toFixed(1)+" kilomètres",
           "Sélectionner le point d'origine.",
-          "Tracer les segments de 2 km (+/-10%). "+
-          "Les segments trop courts sont en violet et les trop longs en rouge."
+          "Placer les limites des segments de 2 km (+/-20%) sur le tracet en partant du point d'origine. ",
+          "Valider les segments."
         ]
 
       mapsCallback: ->
         overlayCreated: (overlay) =>
           isModified = false
-          if overlay.type == "Point"
-            nbPoints = @getCountOverlays('Point')
-            if nbPoints <= 0
-              @_step = 1
-              isModified = true
-          else if overlay.type == "LineString"
-            @_totalLength += @checkLength(overlay)
-            isModified = true
-            # when use mouseup, overlay is still not changed.
-            @_googleMaps.addListener(overlay, 'mouseout', (event) =>
-              @checkLength(overlay)
-              @_totalLength = @getTotalLength()
-              @updateSite()
-            )
-          else
-            console.log("Error : géométrie non autorisée "+overlay.type)
-          if isModified
-            @updateSite()
-            if @allowEdit
-              @_googleMaps.addListener(overlay, 'rightclick', (event) =>
-                @_googleMaps.deleteOverlay(overlay)
-                @_totalLength = @getTotalLength()
+          if @_step == 0
+            if overlay.type != "LineString"
+              console.log("Error : géométrie non autorisée "+overlay.type)
+            else if @getCountOverlays()
+              console.log("Error : LineString déjà présente")
+            else
+              # when use mouseup, overlay is still not changed.
+              @_googleMaps.addListener(overlay, 'mouseout', (event) =>
+                @_tracet.length = @checkTotalLength()
                 @updateSite()
               )
-            else
-              overlay.setOptions(
-                draggable: false
-                editable: false
+              @_googleMaps.setDrawingManagerOptions(
+                drawingControlOptions:
+                  position: google.maps.ControlPosition.TOP_CENTER
+                  drawingModes: []
+                drawingMode: ''
               )
+              @_totalLength += @checkLength(overlay)
+              if @allowEdit
+                @_googleMaps.addListener(overlay, 'rightclick', (event) =>
+                  @_googleMaps.deleteOverlay(overlay)
+                  @_tracet.overlay = undefined
+                  @_tracet.length = 0
+                  @_googleMaps.setDrawingManagerOptions(
+                    drawingControlOptions:
+                      position: google.maps.ControlPosition.TOP_CENTER
+                      drawingModes: [
+                        google.maps.drawing.OverlayType.POLYLINE
+                      ]
+                  )
+                  @updateSite()
+                )
+              else
+                overlay.setOptions(
+                  draggable: false
+                  editable: false
+                )
+              isModified = true
+          if isModified
+            @updateSite()
             return true
           return false
 
         saveOverlay: (overlay) =>
-          localite = {}
-          localite.overlay = overlay
-          localite.name = @setLocaliteName()
-          localite.representatif = false
-          @_localites.push(localite)
+          @_tracet.overlay = overlay
 
-        zoomChanged: => @mapsChanged()
-        mapsMoved: => @mapsChanged()
+        zoomChanged: ->
+        mapsMoved: ->
+
+      mapValidated: ->
+#        if @_step == 2
+#          console.log("ok")
+#        if @_step < 3
+#          return false
+        return true
 
       setLocaliteName: (name = 1) ->
         used = false

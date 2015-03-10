@@ -49,6 +49,19 @@
           <input type="text" id="motif" ng-model="retryMotif">
         </div>
 
+        <a class="btn btn-default" id="valid-tracet"
+           ng-click="validTracet()" ng-show="validTracetAllowed">
+          Valider le tracet
+        </a>
+
+        <a class="btn btn-default" id="valid-segments"
+           ng-click="validSegments()" ng-show="validSegmentsAllowed">
+          Valider les segments
+        </a>
+
+        <div class="help-block has-error" ng-show="false">
+        </div>
+
         <div class="form-group">
           <!--<input type="text" class="numero_grille_stoc" value="numéro grille stoc"
             ng-if="protocoleAlgoSite != 'ROUTIER'">-->

@@ -129,6 +129,8 @@ angular.module('siteViews', ['ngRoute', 'textAngular', 'xin_backend', 'protocole
     $scope.validOriginAllowed = false
     $scope.retrySelectionAllowed = false
     $scope.displaySteps = false
+    $scope.validTracetAllowed = false
+    $scope.validSegmentsAllowed = false
     # random selection
     $scope.listGrilleStocOrigin = []
     $scope.listNumberUsed = []
@@ -159,6 +161,9 @@ angular.module('siteViews', ['ngRoute', 'textAngular', 'xin_backend', 'protocole
       updateSteps: (steps) ->
         $scope.steps = steps.steps
         $scope.stepId = steps.step
+        if $scope.typeSite == 'ROUTIER'
+          if $scope.stepId == 2
+            $scope.validSegmentsAllowed = true
         $timeout(-> $scope.$apply())
 
     siteValidated = ->
@@ -170,6 +175,7 @@ angular.module('siteViews', ['ngRoute', 'textAngular', 'xin_backend', 'protocole
       if $scope.typeSite in ['CARRE', 'POINT_FIXE']
         $scope.randomSelectionAllowed = true
       else
+        $scope.validTracetAllowed = true
         $scope.displaySteps = true
 
     $scope.loadMap = (mapDiv) ->
@@ -177,6 +183,15 @@ angular.module('siteViews', ['ngRoute', 'textAngular', 'xin_backend', 'protocole
         mapLoaded = true
         mapProtocole = protocolesFactory($scope.site, $scope.typeSite,
                                          mapDiv, true, siteCallback)
+
+    $scope.validTracet = ->
+      if mapProtocole.validTracet()
+        $scope.validTracetAllowed = false
+      else
+        throw "Error : tracet can not be validated"
+
+    $scope.validSegments = ->
+      console.log("validSegment")
 
     $scope.randomSelection = (random) ->
       $scope.displaySteps = true

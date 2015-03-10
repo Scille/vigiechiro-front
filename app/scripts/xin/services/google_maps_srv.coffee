@@ -63,6 +63,8 @@ angular.module('xin_google_maps', [])
 
       addListener: google.maps.event.addListener
 
+      clearListeners: google.maps.event.clearListeners
+
       deleteOverlay: (overlay) ->
         overlay.setMap(null)
 
@@ -129,6 +131,8 @@ angular.module('xin_google_maps', [])
         return polygon
 
       createLineString: (latlngs, draggable = false, editable = false) ->
+        if !latlngs
+          return null
         path = []
         for latlng in latlngs
           point = new google.maps.LatLng(latlng[0], latlng[1])
@@ -153,4 +157,33 @@ angular.module('xin_google_maps', [])
         return latlngs
 
       computeLength: (overlay) ->
+        if !overlay?
+          return 0
         return google.maps.geometry.spherical.computeLength(overlay.getPath())
+
+      computeDistanceBetween: (from, to) ->
+        return google.maps.geometry.spherical
+            .computeDistanceBetween(from, to)
+
+      # tolerance min to works fine 10e-6 degres
+      isLocationOnEdge: (point, latlngs, tolerance = 10e-6) ->
+        poly = new google.maps.Polyline(
+          path: latlngs
+        )
+        return google.maps.geometry.poly.isLocationOnEdge(point, poly, tolerance)
+
+      findClosestPointOnPath: (drop_pt, path_pts) ->
+        # Stores the distances of each pt on the path from the marker point
+        distances = []
+        # Stores the key of point on the path that corresponds to a distance
+        distance_keys = []
+        # For each point on the path
+        for key in [0..path_pts.length-1]
+          # Find the distance in a linear crows-flight line between the marker point and the current path point
+          d = google.maps.geometry.spherical
+            .computeDistanceBetween(drop_pt, path_pts[key])
+          # Store the distances and the key of the pt that matches that distance
+          distances[key] = d
+          distance_keys[d] = key
+        # Return the latLng obj of the closest point to the markers drag origin.
+        return path_pts[distance_keys[_.min(distances)]]
