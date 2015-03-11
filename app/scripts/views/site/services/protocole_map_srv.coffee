@@ -394,6 +394,7 @@ angular.module('protocole_map', ['protocole_map_carre', 'protocole_map_point_fix
         @_googleMaps.addListener(point, 'dragend', (e) =>
           point.setPosition(@_googleMaps
             .findClosestPointOnPath(e.latLng, @_padded_points))
+          @updatePointPosition(point)
           @generateSegments()
         )
         @_googleMaps.addListener(point, 'drag', (e) =>
@@ -486,3 +487,10 @@ angular.module('protocole_map', ['protocole_map_carre', 'protocole_map_point_fix
             path.push([pt.lat(), pt.lng()])
         path.push([stop.getPosition().lat(), stop.getPosition().lng()])
         return @_googleMaps.createLineString(path)
+
+      updatePointPosition: (point) ->
+        path = @_tracet.overlay.getPath()
+        for key in [0..path.getLength()-2]
+          vertex = [path.getAt(key), path.getAt(key+1)]
+          if @_googleMaps.isLocationOnEdge(point.getPosition(), vertex)
+            point.edge = key
