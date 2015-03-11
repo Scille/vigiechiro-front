@@ -42,7 +42,7 @@ angular
         templateUrl: 'scripts/views/utilisateur/show_utilisateur.html'
         controller: 'ShowUtilisateurCtrl'
         resolve: {$routeParams: -> return {'userId': 'moi'}}
-        breadcrumbs: ($q, session) ->
+        breadcrumbs: ngInject ($q, session) ->
           defer = $q.defer()
           session.getUserPromise().then (user) ->
             defer.resolve(user.pseudo)
