@@ -1,39 +1,19 @@
+
 <div class="col-md-8">
   <list-mes-actualites-directive is-admin="isAdmin">
   </list-mes-actualites-directive>
 </div>
 
-<div class="col-md-8">
-  <div>
-    <a href="#/protocoles/mes-protocoles"><h2>Protocoles</h2></a>
-    <span>Rejoindre/lister les protocoles</span>
+<div class="col-md-4">
+  <div "panel panel-default">
+    <ul class="list-group">
+      <li class="list-group-item"><b>Mes sites</b></li>
+      <li ng-repeat="site in userSites" class="list-group-item">
+        <a href="#/sites/{{site._id}}">{{site.titre}}</a>
+      </li>
+      <li ng-if="!userSites || userSites.length == 0" class="list-group-item">
+        Pas de sites pour le moment, rejoignez un <a ng-href="#/protocoles">protocole</a> pour commencer
+      </li>
+    </ul>
   </div>
-
-  <div>
-    <a href="#/sites/mes-sites"><h2>Sites</h2></a>
-    <span>Parcourir les sites existants</span>
-  </div>
-
-  <div>
-    <a href="#/taxons"><h2>Taxons</h2></a>
-    <span>Parcourir les taxons existants</span>
-  </div>
-
-  <div>
-    <a href="#/participations/mes-participations"><h2>Participations</h2></a>
-    <span>Parcourir les participations existantes</span>
-  </div>
-
-</div>
-
- <div class="col-md-4 panel panel-default">
-  <ul class="list-group">
-    <li class="list-group-item"><b>Mes sites</b></li>
-    <li ng-repeat="site in userSites" class="list-group-item">
-      <a href="#/sites/{{site._id}}">{{site.titre}}</a>
-    </li>
-    <li ng-if="!userSites || userSites.length == 0" class="list-group-item">
-      Pas de sites pour le moment
-    </li>
-  </ul>
 </div>
