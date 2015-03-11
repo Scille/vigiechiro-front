@@ -347,29 +347,40 @@ angular.module('protocole_map', ['protocole_map_carre', 'protocole_map_point_fix
             for i in [0..nbSections-1]
               new_pt = new google.maps.LatLng(current_point.lat() + (i * lat_incr), current_point.lng() + (i * lng_incr))
               if !(key == 0 && i == 0)
-                @_padded_points.push(new_pt)
+                if @_googleMaps.isLocationOnEdge(new_pt, [current_point, next_point])
+                  @_padded_points.push(new_pt)
+                else
+                  console.log("Error : some points not on path")
         return true
 
       # Used for ROUTIER protocole
-      validOriginPoint: (event) =>
+      validOriginPoint: (e) =>
+        # Up to date step
         @_step = 2
+        # If click on first point
+        if e.latLng.lat() == @_firstPoint.getPosition().lat() &&
+           e.latLng.lng() == @_firstPoint.getPosition().lng()
+          @_points.push(@_firstPoint)
+          @_points.push(@_lastPoint)
+        # If click on last point
+        else
+          @_points.push(@_lastPoint)
+          @_points.push(@_firstPoint)
+          path = @_tracet.overlay.getPath()
+          new_path = []
+          for i in [0..path.getLength()-1]
+            new_path.push(path.pop())
+          @_tracet.overlay.setPath(new_path)
+        # Set titles and edge
+        @_points[0].setTitle("Départ")
+        @_points[1].setTitle("Arrivée")
+        @_points[0].edge = 0
+        @_points[1].edge = @_tracet.overlay.getPath().getLength()-2
+        # Events
         @_googleMaps.addListener(@_tracet.overlay, 'click', @addSegmentPoint)
         @_googleMaps.clearListeners(@_firstPoint, 'click')
         @_googleMaps.clearListeners(@_lastPoint, 'click')
-        if event.latLng.lat() == @_firstPoint.getPosition().lat() &&
-           event.latLng.lng() == @_firstPoint.getPosition().lng()
-          @_firstPoint.setTitle("Départ")
-          @_lastPoint.setTitle("Arrivée")
-          @_points.push(@_firstPoint)
-          @_points.push(@_lastPoint)
-        else if event.latLng.lat() == @_lastPoint.getPosition().lat() &&
-                event.latLng.lng() == @_lastPoint.getPosition().lng()
-          @_firstPoint.setTitle("Arrivée")
-          @_lastPoint.setTitle("Origine")
-          @_points.push(@_lastPoint)
-          @_points.push(@_firstPoint)
-        else
-          throw "Error : undefined origin point"
+        # Others
         @generateSegments()
         @updateSite()
 
@@ -383,6 +394,7 @@ angular.module('protocole_map', ['protocole_map_carre', 'protocole_map_point_fix
         @_googleMaps.addListener(point, 'dragend', (e) =>
           point.setPosition(@_googleMaps
             .findClosestPointOnPath(e.latLng, @_padded_points))
+          @generateSegments()
         )
         @_googleMaps.addListener(point, 'drag', (e) =>
           point.setPosition(@_googleMaps
@@ -392,16 +404,39 @@ angular.module('protocole_map', ['protocole_map_carre', 'protocole_map_point_fix
         path = @_tracet.overlay.getPath()
         nbPoints = path.getLength()
         index = undefined
+        vertex = []
         for key in [0..nbPoints-2]
-          vertex = [path.getAt(key), path.getAt(key+1)]
-          if @_googleMaps.isLocationOnEdge(point.getPosition(), vertex)
+          currVertex = [path.getAt(key), path.getAt(key+1)]
+          vertex.push(currVertex)
+          if @_googleMaps.isLocationOnEdge(point.getPosition(), currVertex)
             index = key
-            break
+            point.edge = key
         if !index?
+          @_googleMaps.deleteOverlay(point)
           throw "Error : Can not find Edge of new point"
+        stop = false
         for pt, key in @_points
-          console.log(key)
-#        @_points.push(point)
+          for currVertex, keyVertex in vertex
+            if @_googleMaps.isLocationOnEdge(pt.getPosition(), currVertex)
+              if keyVertex < index
+                break
+              else if keyVertex > index
+                stop = true
+                @_points.splice(key, 0, point)
+                break
+              else
+                d1 = @_googleMaps.computeDistanceBetween(currVertex[0], point.getPosition())
+                d2 = @_googleMaps.computeDistanceBetween(currVertex[0], pt.getPosition())
+                if d1 < d2
+                  stop = true
+                  @_points.splice(key, 0, point)
+                  break
+                else
+                  break
+            else
+              continue
+          if stop
+            break
         @generateSegments()
 
       deletePoint: (overlay) ->
@@ -413,13 +448,41 @@ angular.module('protocole_map', ['protocole_map_carre', 'protocole_map_point_fix
             return
 
       generateSegments: ->
+        colors = [
+          '#FF8000'
+          '#FFFF00'
+          '#80FF00'
+          '#00FF00'
+          '#00FF80'
+          '#00FFFF'
+          '#0080FF'
+          '#0000FF'
+          '#8000FF'
+          '#FF00FF'
+          '#FF0080'
+        ]
         for segment in @_segments
           @_googleMaps.deleteOverlay(segment)
         @_segments = []
         nbPoints = @_points.length
         key = 0
-        while (key < nbPoints-2)
-          start = @_points[index]
-          stop = @_points[index+1]
+        while (key < nbPoints-1)
+          segment = @generateSegment(key)
+          segment.setOptions({ strokeColor: colors[(key/2)%11], zIndex: 10 })
+          @_googleMaps.addListener(segment, 'click', @addSegmentPoint)
+          @_segments.push(segment)
           key +=2
-        @_googleMaps.createLineString()
+
+      # generate the segment between @_points[key] and @_points[key+1] points
+      generateSegment: (key) ->
+        tracet = @_tracet.overlay.getPath()
+        path = []
+        start = @_points[key]
+        stop = @_points[key+1]
+        path.push([start.getPosition().lat(), start.getPosition().lng()])
+        if start.edge < stop.edge
+          for corner in [start.edge+1..stop.edge]
+            pt = tracet.getAt(corner)
+            path.push([pt.lat(), pt.lng()])
+        path.push([stop.getPosition().lat(), stop.getPosition().lng()])
+        return @_googleMaps.createLineString(path)

@@ -165,8 +165,8 @@ angular.module('xin_google_maps', [])
         return google.maps.geometry.spherical
             .computeDistanceBetween(from, to)
 
-      # tolerance min to works fine 10e-6 degres
-      isLocationOnEdge: (point, latlngs, tolerance = 10e-6) ->
+      # tolerance min to works fine 10e-4 degres
+      isLocationOnEdge: (point, latlngs, tolerance = 10e-4) ->
         poly = new google.maps.Polyline(
           path: latlngs
         )
