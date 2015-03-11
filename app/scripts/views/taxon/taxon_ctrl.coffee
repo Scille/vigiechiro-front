@@ -1,5 +1,7 @@
 'use strict'
 
+breadcrumbsGetTaxonDefer = undefined
+
 
 class TaxonsParents
   constructor: (Backend, currentTaxonId) ->
@@ -43,15 +45,36 @@ angular.module('taxonViews', ['ngRoute', 'ngSanitize', 'textAngular',
       .when '/taxons',
         templateUrl: 'scripts/views/taxon/list_taxons.html'
         controller: 'ListTaxonsCtrl'
+        breadcrumbs: 'Taxons'
       .when '/taxons/nouveau',
         templateUrl: 'scripts/views/taxon/edit_taxon.html'
         controller: 'CreateTaxonCtrl'
+        breadcrumbs: 'Nouveau Taxon'
       .when '/taxons/:taxonId',
         templateUrl: 'scripts/views/taxon/display_taxon.html'
         controller: 'DisplayTaxonCtrl'
+        breadcrumbs: ($q) ->
+          breadcrumbsDefer = $q.defer()
+          breadcrumbsGetTaxonDefer = $q.defer()
+          breadcrumbsGetTaxonDefer.promise.then (taxon) ->
+            breadcrumbsDefer.resolve([
+              ['Taxons', '#/taxons']
+              [taxon.libelle_long, '#/taxons/' + taxon._id]
+            ])
+          return breadcrumbsDefer.promise
       .when '/taxons/:taxonId/edition',
         templateUrl: 'scripts/views/taxon/edit_taxon.html'
         controller: 'EditTaxonCtrl'
+        breadcrumbs: ($q) ->
+          breadcrumbsDefer = $q.defer()
+          breadcrumbsGetTaxonDefer = $q.defer()
+          breadcrumbsGetTaxonDefer.promise.then (taxon) ->
+            breadcrumbsDefer.resolve([
+              ['Taxons', '#/taxons']
+              [taxon.libelle_long, '#/taxons/' + taxon._id]
+              ['Édition', '#/taxons/' + taxon._id + '/edition']
+            ])
+          return breadcrumbsDefer.promise
 
   .controller 'ListTaxonsCtrl', ($scope, Backend, session, DelayedEvent) ->
     session.getIsAdminPromise().then (isAdmin) ->
@@ -97,6 +120,9 @@ angular.module('taxonViews', ['ngRoute', 'ngSanitize', 'textAngular',
     session.getIsAdminPromise().then (isAdmin) ->
       $scope.isAdmin = isAdmin
     Backend.one('taxons', $routeParams.taxonId).get().then (taxon) ->
+      if breadcrumbsGetTaxonDefer?
+        breadcrumbsGetTaxonDefer.resolve(taxon)
+        breadcrumbsGetTaxonDefer = undefined
       $scope.taxon = taxon.plain()
 
   .controller 'EditTaxonCtrl', ($route, $routeParams, $scope, Backend) ->
@@ -111,6 +137,9 @@ angular.module('taxonViews', ['ngRoute', 'ngSanitize', 'textAngular',
         {}
         {'Cache-Control': 'no-cache'}
       ).then (taxon) ->
+        if breadcrumbsGetTaxonDefer?
+          breadcrumbsGetTaxonDefer.resolve(taxon)
+          breadcrumbsGetTaxonDefer = undefined
         taxonResource = taxon
         $scope.taxon = taxon.plain()
         $scope.taxon.parents = $scope.taxonsParents.idToData($scope.taxon.parents)

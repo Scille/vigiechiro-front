@@ -1,5 +1,6 @@
 'use strict'
 
+breadcrumbsGetParticipationDefer = undefined
 
 angular.module('participationViews', ['ngRoute', 'textAngular', 'xin_listResource',
                                       'xin_backend', 'xin_session', 'xin_uploadFile',
@@ -10,18 +11,40 @@ angular.module('participationViews', ['ngRoute', 'textAngular', 'xin_listResourc
       .when '/participations',
         templateUrl: 'scripts/views/participation/list_participations.html'
         controller: 'ListParticipationsCtrl'
+        breadcrumbs: 'Participations'
       .when '/participations/mes-participations',
         templateUrl: 'scripts/views/participation/list_participations.html'
         controller: 'ListMesParticipationsCtrl'
+        breadcrumbs: 'Mes Participations'
       .when '/sites/:siteId/nouvelle-participation',
         templateUrl: 'scripts/views/participation/create_participation.html'
         controller: 'CreateParticipationCtrl'
+        breadcrumbs: 'Nouvelle Participation'
       .when '/participations/:participationId',
         templateUrl: 'scripts/views/participation/display_participation.html'
         controller: 'DisplayParticipationCtrl'
+        breadcrumbs: ($q, $filter) ->
+          breadcrumbsDefer = $q.defer()
+          breadcrumbsGetParticipationDefer = $q.defer()
+          breadcrumbsGetParticipationDefer.promise.then (participation) ->
+            breadcrumbsDefer.resolve([
+              ['Participations', '#/participations']
+              ['Participation du ' + $filter('date')(participation.date_debut, 'medium'), '#/participations/' + participation._id]
+            ])
+          return breadcrumbsDefer.promise
       .when '/participations/:participationId/edition',
         templateUrl: 'scripts/views/participation/create_participation.html'
         controller: 'EditParticipationController'
+        breadcrumbs: ($q, $filter) ->
+          breadcrumbsDefer = $q.defer()
+          breadcrumbsGetParticipationDefer = $q.defer()
+          breadcrumbsGetParticipationDefer.promise.then (participation) ->
+            breadcrumbsDefer.resolve([
+              ['Participations', '#/participations']
+              ['Participation du ' + $filter('date')(participation.date_debut, 'medium'), '#/participations/' + participation._id]
+              ['Édition', '#/participations/' + participation._id + '/edition']
+            ])
+          return breadcrumbsDefer.promise
 
   .controller 'ListParticipationsCtrl', ($scope, Backend, DelayedEvent, session) ->
     $scope.title = "Toutes les participations"
@@ -179,6 +202,9 @@ angular.module('participationViews', ['ngRoute', 'textAngular', 'xin_listResourc
       $scope.userId = user._id
     Backend.one('participations', $routeParams.participationId).get()
       .then (participation) ->
+        if breadcrumbsGetParticipationDefer?
+          breadcrumbsGetParticipationDefer.resolve(participation)
+          breadcrumbsGetParticipationDefer = undefined
         $scope.participation = participation
 
     $scope.addPost = ->
@@ -211,4 +237,7 @@ angular.module('participationViews', ['ngRoute', 'textAngular', 'xin_listResourc
     $scope.participation = {}
     Backend.one('participations', $routeParams.participationId).get()
       .then (participation) ->
+        if breadcrumbsGetParticipationDefer?
+          breadcrumbsGetParticipationDefer.resolve(participation)
+          breadcrumbsGetParticipationDefer = undefined
         $scope.participation = participation

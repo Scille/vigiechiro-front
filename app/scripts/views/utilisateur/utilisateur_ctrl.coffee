@@ -1,5 +1,7 @@
 'use strict'
 
+breadcrumbsGetUtilisateurDefer = undefined
+
 
 ###*
  # @ngdoc function
@@ -15,9 +17,19 @@ angular.module('utilisateurViews', ['ngRoute', 'xin_listResource', 'xin_tools',
       .when '/utilisateurs',
         templateUrl: 'scripts/views/utilisateur/list_utilisateurs.html'
         controller: 'ListUtilisateursCtrl'
+        breadcrumbs: 'Utilisateurs'
       .when '/utilisateurs/:userId',
         templateUrl: 'scripts/views/utilisateur/show_utilisateur.html'
         controller: 'ShowUtilisateurCtrl'
+        breadcrumbs: ($q) ->
+          breadcrumbsDefer = $q.defer()
+          breadcrumbsGetUtilisateurDefer = $q.defer()
+          breadcrumbsGetUtilisateurDefer.promise.then (utilisateur) ->
+            breadcrumbsDefer.resolve([
+              ['Utilisateurs', '#/utilisateurs']
+              [utilisateur.pseudo, '#/utilisateurs/' + utilisateur._id]
+            ])
+          return breadcrumbsDefer.promise
 
   .controller 'ListUtilisateursCtrl', ($scope, Backend, DelayedEvent) ->
     $scope.lookup = {}
@@ -45,6 +57,9 @@ angular.module('utilisateurViews', ['ngRoute', 'xin_listResource', 'xin_tools',
     else
       userBackend = Backend.one('utilisateurs', $routeParams.userId)
     userBackend.get().then (utilisateur) ->
+      if breadcrumbsGetUtilisateurDefer?
+        breadcrumbsGetUtilisateurDefer.resolve(utilisateur)
+        breadcrumbsGetUtilisateurDefer = undefined
       userResource = utilisateur
       $scope.utilisateur = utilisateur.plain()
       origin_role = $scope.utilisateur.role

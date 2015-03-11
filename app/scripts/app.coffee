@@ -18,6 +18,7 @@ angular
     'flow',
     'appSettings',
     'xin_login',
+    'xin_tools',
     'xin_content',
     'xin_session',
     'xin_backend',
@@ -40,7 +41,12 @@ angular
       .when '/profil',
         templateUrl: 'scripts/views/utilisateur/show_utilisateur.html'
         controller: 'ShowUtilisateurCtrl'
-        resolve: {$routeParams: (session) -> return {'userId': 'moi'}}
+        resolve: {$routeParams: -> return {'userId': 'moi'}}
+        breadcrumbs: ($q, session) ->
+          defer = $q.defer()
+          session.getUserPromise().then (user) ->
+            defer.resolve(user.pseudo)
+          return defer.promise
       .when '/403',
         templateUrl: '403.html'
       .when '/404',
@@ -48,11 +54,27 @@ angular
       .otherwise
         redirectTo: '/404'
 
-  .directive 'navbarDirective', (session)->
+  .directive 'navbarDirective', (evalCallDefered, $window, $rootScope, $route, SETTINGS, session)->
     restrict: 'E'
     templateUrl: 'navbar.html'
     scope: {}
     link: ($scope, elem, attrs) ->
+      # Handle breadcrumbs when the route change
+      loadBreadcrumbs = (currentRoute) ->
+        if currentRoute.breadcrumbs?
+          breadcrumbsDefer = evalCallDefered(currentRoute.breadcrumbs)
+          breadcrumbsDefer.then (breadcrumbs) ->
+            # As shorthand, breadcrumbs can be a single string
+            if typeof(breadcrumbs) == "string"
+              $scope.breadcrumbs = [[breadcrumbs, '']]
+            else
+              $scope.breadcrumbs = breadcrumbs
+        else
+          $scope.breadcrumbs = []
+      $rootScope.$on '$routeChangeSuccess', (currentRoute, previousRoute) ->
+        loadBreadcrumbs($route.current.$$route)
+        return
+      loadBreadcrumbs($route.current.$$route)
       $scope.isAdmin = false
       $scope.user = {}
       session.getIsAdminPromise().then (isAdmin) ->

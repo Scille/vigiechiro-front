@@ -29,6 +29,16 @@
           </ul>
         </li>
       </ul>
+
+       <p class="navbar-text">
+        <!-- a glyphicon as homepage -->
+        <a class="navbar-link" href="#/" title="homepage"><span class="glyphicon glyphicon-home icons-padding"></span></a>
+        <x ng-repeat="breadcrumb in breadcrumbs">
+          &nbsp;>&nbsp;&nbsp;
+          <a ng-if="!$last" ng-href="{{breadcrumb[1]}}" class="navbar-link">{{breadcrumb[0]}}</a>
+          <t ng-if="$last">{{breadcrumb[0]}}</t>
+        </x>
+      </p>
       <ul class="nav navbar-nav navbar-right">
         <li class="dropdown">
             <a class="user-status dropdown-toggle" data-toggle="dropdown"

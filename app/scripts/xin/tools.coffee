@@ -21,3 +21,17 @@ angular.module('xin_tools', [])
     dateFilter = $filter('date')
     (input, format, timezone) ->
       dateFilter(Date.parse(input), format, timezone)
+
+  .service 'evalCallDefered', ($q, $injector) ->
+    (elem) ->
+      if typeof(elem) is 'function'
+        result = $injector.invoke(elem)
+        if result.then?
+          return result
+        else
+          defer = $q.defer()
+          defer.resolve(result)
+      else
+        defer = $q.defer()
+        defer.resolve(elem)
+      return defer.promise

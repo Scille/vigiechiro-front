@@ -1,5 +1,6 @@
 'use strict'
 
+breadcrumbsGetProtocoleDefer = undefined
 
 make_payload = ($scope) ->
   payload =
@@ -19,18 +20,40 @@ angular.module('protocoleViews', ['ngRoute', 'textAngular', 'xin_listResource',
       .when '/protocoles',
         templateUrl: 'scripts/views/protocole/list_protocoles.html'
         controller: 'ListProtocolesCtrl'
+        breadcrumbs: 'Protocoles'
       .when '/protocoles/mes-protocoles',
         templateUrl: 'scripts/views/protocole/list_protocoles.html'
         controller: 'ListMesProtocolesCtrl'
+        breadcrumbs: 'Mes Protocoles'
       .when '/protocoles/nouveau',
         templateUrl: 'scripts/views/protocole/edit_protocole.html'
         controller: 'CreateProtocoleCtrl'
+        breadcrumbs: 'Nouveau Protocole'
       .when '/protocoles/:protocoleId',
         templateUrl: 'scripts/views/protocole/display_protocole.html'
         controller: 'DisplayProtocoleCtrl'
+        breadcrumbs: ($q) ->
+          breadcrumbsDefer = $q.defer()
+          breadcrumbsGetProtocoleDefer = $q.defer()
+          breadcrumbsGetProtocoleDefer.promise.then (protocole) ->
+            breadcrumbsDefer.resolve([
+              ['Protocoles', '#/protocoles']
+              [protocole.titre, '#/protocoles/' + protocole._id]
+            ])
+          return breadcrumbsDefer.promise
       .when '/protocoles/:protocoleId/edition',
         templateUrl: 'scripts/views/protocole/edit_protocole.html'
         controller: 'EditProtocoleCtrl'
+        breadcrumbs: ($q) ->
+          breadcrumbsDefer = $q.defer()
+          breadcrumbsGetProtocoleDefer = $q.defer()
+          breadcrumbsGetProtocoleDefer.promise.then (protocole) ->
+            breadcrumbsDefer.resolve([
+              ['Protocoles', '#/protocoles']
+              [protocole.titre, '#/protocoles/' + protocole._id]
+              ['Édition', '#/protocoles/' + protocole._id + '/edition']
+            ])
+          return breadcrumbsDefer.promise
 
   .controller 'ListProtocolesCtrl', ($scope, $q, $location, Backend,
                                      session, DelayedEvent) ->
@@ -128,6 +151,9 @@ angular.module('protocoleViews', ['ngRoute', 'textAngular', 'xin_listResource',
     session.getUserPromise().then (user) ->
       $scope.user = user.plain()
       Backend.one('protocoles', $routeParams.protocoleId).get().then (protocole) ->
+        if breadcrumbsGetProtocoleDefer?
+          breadcrumbsGetProtocoleDefer.resolve(protocole)
+          breadcrumbsGetProtocoleDefer = undefined
         $scope.protocole = protocole
         for protocole in $scope.user.protocoles or []
           if protocole.protocole._id == $scope.protocole._id
@@ -165,6 +191,9 @@ angular.module('protocoleViews', ['ngRoute', 'textAngular', 'xin_listResource',
       {}
       {'Cache-Control': 'no-cache'}
     ).then (protocole) ->
+      if breadcrumbsGetProtocoleDefer?
+        breadcrumbsGetProtocoleDefer.resolve(protocole)
+        breadcrumbsGetProtocoleDefer = undefined
       protocoleResource = protocole
       $scope.protocole = protocole.plain()
       $scope.configuration_participation = {}

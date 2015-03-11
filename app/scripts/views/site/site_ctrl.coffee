@@ -1,5 +1,7 @@
 'use strict'
 
+breadcrumbsGetSiteDefer = undefined
+
 
 angular.module('siteViews', ['ngRoute', 'textAngular', 'xin_backend', 'protocole_map'])
   .config ($routeProvider) ->
@@ -7,15 +9,36 @@ angular.module('siteViews', ['ngRoute', 'textAngular', 'xin_backend', 'protocole
       .when '/sites',
         templateUrl: 'scripts/views/site/list_sites.html'
         controller: 'ListSitesController'
+        breadcrumbs: 'Sites'
       .when '/sites/mes-sites',
         templateUrl: 'scripts/views/site/list_sites.html'
         controller: 'ListMesSitesController'
+        breadcrumbs: 'Mes Sites'
       .when '/sites/:siteId',
         templateUrl: 'scripts/views/site/display_site.html'
         controller: 'DisplaySiteController'
+        breadcrumbs: ($q) ->
+          breadcrumbsDefer = $q.defer()
+          breadcrumbsGetSiteDefer = $q.defer()
+          breadcrumbsGetSiteDefer.promise.then (site) ->
+            breadcrumbsDefer.resolve([
+              ['Sites', '#/sites']
+              [site.titre, '#/sites/' + site._id]
+            ])
+          return breadcrumbsDefer.promise
       .when '/sites/:siteId/edition',
         templateUrl: 'scripts/views/site/edit_site.html'
         controller: 'EditSiteController'
+        breadcrumbs: ($q) ->
+          breadcrumbsDefer = $q.defer()
+          breadcrumbsGetSiteDefer = $q.defer()
+          breadcrumbsGetSiteDefer.promise.then (site) ->
+            breadcrumbsDefer.resolve([
+              ['Sites', '#/sites']
+              [site.titre, '#/sites/' + site._id]
+              ['Édition', '#/sites/' + site._id + '/edition']
+            ])
+          return breadcrumbsDefer.promise
 
   .controller 'ListSitesController', ($scope, Backend, session, DelayedEvent) ->
     $scope.title = "Tous les sites"
@@ -54,6 +77,9 @@ angular.module('siteViews', ['ngRoute', 'textAngular', 'xin_backend', 'protocole
   .controller 'DisplaySiteController', ($routeParams, $scope
                                         Backend, session) ->
     Backend.one('sites', $routeParams.siteId).get().then (site) ->
+      if breadcrumbsGetSiteDefer?
+        breadcrumbsGetSiteDefer.resolve(site)
+        breadcrumbsGetSiteDefer = undefined
       $scope.site = site.plain()
       $scope.typeSite = site.protocole.type_site
       session.getUserPromise().then (user) ->
@@ -285,6 +311,9 @@ angular.module('siteViews', ['ngRoute', 'textAngular', 'xin_backend', 'protocole
     $scope.observateur = {}
     # site
     Backend.one('sites', $routeParams.siteId).get().then (site) ->
+      if breadcrumbsGetSiteDefer?
+        breadcrumbsGetSiteDefer.resolve(site)
+        breadcrumbsGetSiteDefer = undefined
       $scope.site = site
       loadMap(angular.element($('.g-maps'))[0])
       $scope.observateur._id = site.observateur._id
