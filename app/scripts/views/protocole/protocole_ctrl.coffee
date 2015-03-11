@@ -32,7 +32,7 @@ angular.module('protocoleViews', ['ngRoute', 'textAngular', 'xin_listResource',
       .when '/protocoles/:protocoleId',
         templateUrl: 'scripts/views/protocole/display_protocole.html'
         controller: 'DisplayProtocoleCtrl'
-        breadcrumbs: ($q) ->
+        breadcrumbs: ngInject ($q) ->
           breadcrumbsDefer = $q.defer()
           breadcrumbsGetProtocoleDefer = $q.defer()
           breadcrumbsGetProtocoleDefer.promise.then (protocole) ->
@@ -44,7 +44,7 @@ angular.module('protocoleViews', ['ngRoute', 'textAngular', 'xin_listResource',
       .when '/protocoles/:protocoleId/edition',
         templateUrl: 'scripts/views/protocole/edit_protocole.html'
         controller: 'EditProtocoleCtrl'
-        breadcrumbs: ($q) ->
+        breadcrumbs: ngInject ($q) ->
           breadcrumbsDefer = $q.defer()
           breadcrumbsGetProtocoleDefer = $q.defer()
           breadcrumbsGetProtocoleDefer.promise.then (protocole) ->

@@ -17,7 +17,7 @@ angular.module('siteViews', ['ngRoute', 'textAngular', 'xin_backend', 'protocole
       .when '/sites/:siteId',
         templateUrl: 'scripts/views/site/display_site.html'
         controller: 'DisplaySiteController'
-        breadcrumbs: ($q) ->
+        breadcrumbs: ngInject ($q) ->
           breadcrumbsDefer = $q.defer()
           breadcrumbsGetSiteDefer = $q.defer()
           breadcrumbsGetSiteDefer.promise.then (site) ->
@@ -29,7 +29,7 @@ angular.module('siteViews', ['ngRoute', 'textAngular', 'xin_backend', 'protocole
       .when '/sites/:siteId/edition',
         templateUrl: 'scripts/views/site/edit_site.html'
         controller: 'EditSiteController'
-        breadcrumbs: ($q) ->
+        breadcrumbs: ngInject ($q) ->
           breadcrumbsDefer = $q.defer()
           breadcrumbsGetSiteDefer = $q.defer()
           breadcrumbsGetSiteDefer.promise.then (site) ->

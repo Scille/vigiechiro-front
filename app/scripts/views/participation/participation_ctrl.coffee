@@ -23,7 +23,7 @@ angular.module('participationViews', ['ngRoute', 'textAngular', 'xin_listResourc
       .when '/participations/:participationId',
         templateUrl: 'scripts/views/participation/display_participation.html'
         controller: 'DisplayParticipationCtrl'
-        breadcrumbs: ($q, $filter) ->
+        breadcrumbs: ngInject ($q, $filter) ->
           breadcrumbsDefer = $q.defer()
           breadcrumbsGetParticipationDefer = $q.defer()
           breadcrumbsGetParticipationDefer.promise.then (participation) ->
@@ -35,7 +35,7 @@ angular.module('participationViews', ['ngRoute', 'textAngular', 'xin_listResourc
       .when '/participations/:participationId/edition',
         templateUrl: 'scripts/views/participation/create_participation.html'
         controller: 'EditParticipationController'
-        breadcrumbs: ($q, $filter) ->
+        breadcrumbs: ngInject ($q, $filter) ->
           breadcrumbsDefer = $q.defer()
           breadcrumbsGetParticipationDefer = $q.defer()
           breadcrumbsGetParticipationDefer.promise.then (participation) ->

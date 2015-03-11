@@ -53,19 +53,19 @@ angular.module('taxonViews', ['ngRoute', 'ngSanitize', 'textAngular',
       .when '/taxons/:taxonId',
         templateUrl: 'scripts/views/taxon/display_taxon.html'
         controller: 'DisplayTaxonCtrl'
-        breadcrumbs: ($q) ->
-          breadcrumbsDefer = $q.defer()
-          breadcrumbsGetTaxonDefer = $q.defer()
-          breadcrumbsGetTaxonDefer.promise.then (taxon) ->
-            breadcrumbsDefer.resolve([
-              ['Taxons', '#/taxons']
-              [taxon.libelle_long, '#/taxons/' + taxon._id]
-            ])
-          return breadcrumbsDefer.promise
+        breadcrumbs: ngInject ($q) ->
+            breadcrumbsDefer = $q.defer()
+            breadcrumbsGetTaxonDefer = $q.defer()
+            breadcrumbsGetTaxonDefer.promise.then (taxon) ->
+              breadcrumbsDefer.resolve([
+                ['Taxons', '#/taxons']
+                [taxon.libelle_long, '#/taxons/' + taxon._id]
+              ])
+            return breadcrumbsDefer.promise
       .when '/taxons/:taxonId/edition',
         templateUrl: 'scripts/views/taxon/edit_taxon.html'
         controller: 'EditTaxonCtrl'
-        breadcrumbs: ($q) ->
+        breadcrumbs: ngInject ($q) ->
           breadcrumbsDefer = $q.defer()
           breadcrumbsGetTaxonDefer = $q.defer()
           breadcrumbsGetTaxonDefer.promise.then (taxon) ->

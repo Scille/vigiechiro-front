@@ -21,15 +21,15 @@ angular.module('utilisateurViews', ['ngRoute', 'xin_listResource', 'xin_tools',
       .when '/utilisateurs/:userId',
         templateUrl: 'scripts/views/utilisateur/show_utilisateur.html'
         controller: 'ShowUtilisateurCtrl'
-        breadcrumbs: ($q) ->
-          breadcrumbsDefer = $q.defer()
-          breadcrumbsGetUtilisateurDefer = $q.defer()
-          breadcrumbsGetUtilisateurDefer.promise.then (utilisateur) ->
-            breadcrumbsDefer.resolve([
-              ['Utilisateurs', '#/utilisateurs']
-              [utilisateur.pseudo, '#/utilisateurs/' + utilisateur._id]
-            ])
-          return breadcrumbsDefer.promise
+        breadcrumbs: ngInject ($q) ->
+            breadcrumbsDefer = $q.defer()
+            breadcrumbsGetUtilisateurDefer = $q.defer()
+            breadcrumbsGetUtilisateurDefer.promise.then (utilisateur) ->
+              breadcrumbsDefer.resolve([
+                ['Utilisateurs', '#/utilisateurs']
+                [utilisateur.pseudo, '#/utilisateurs/' + utilisateur._id]
+              ])
+            return breadcrumbsDefer.promise
 
   .controller 'ListUtilisateursCtrl', ($scope, Backend, DelayedEvent) ->
     $scope.lookup = {}
