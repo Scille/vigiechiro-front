@@ -49,10 +49,15 @@
           <input type="text" id="motif" ng-model="retryMotif">
         </div>
 
-        <a class="btn btn-default" id="valid-tracet"
-           ng-click="validTracet()" ng-show="validTracetAllowed">
-          Valider le tracet
-        </a>
+        <div ng-show="validTracetAllowed">
+          <a class="btn btn-default" id="valid-tracet"
+             ng-click="validTracet()">
+            Valider le tracet
+          </a>
+          <span>
+            Longueur actuelle : <b>{{ tracetLength }}</b> kilomètres.
+          </span>
+        </div>
 
         <a class="btn btn-default" id="valid-segments"
            ng-click="validSegments()" ng-show="validSegmentsAllowed">

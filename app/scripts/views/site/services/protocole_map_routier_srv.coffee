@@ -25,8 +25,7 @@ angular.module('protocole_map_routier', [])
 
       getSteps: ->
         return [
-          "Tracer le trajet complet en un seul trait. Le tracé doit atteindre 30 km ou plus."+
-          "Longueur actuelle "+(@_tracet.length/1000).toFixed(1)+" kilomètres",
+          "Tracer le trajet complet en un seul trait. Le tracé doit atteindre 30 km ou plus.",
           "Sélectionner le point d'origine.",
           "Placer les limites des segments de 2 km (+/-20%) sur le tracet en partant du point d'origine. ",
           "Valider les segments."
@@ -43,7 +42,7 @@ angular.module('protocole_map_routier', [])
             else
               # when use mouseup, overlay is still not changed.
               @_googleMaps.addListener(overlay, 'mouseout', (event) =>
-                @_tracet.length = @checkTotalLength()
+                @_tracet.length = (@checkTotalLength()/1000).toFixed(1)
                 @updateSite()
               )
               @_googleMaps.setDrawingManagerOptions(
@@ -85,15 +84,6 @@ angular.module('protocole_map_routier', [])
         mapsMoved: ->
 
       mapValidated: ->
-#        if @_step == 2
-#          console.log("ok")
-#        if @_step < 3
-#          return false
+        if @_step < 3
+          return false
         return true
-
-      setLocaliteName: (name = 1) ->
-        used = false
-        for localite in @_localites
-          if parseInt(localite.name) == name
-            return @setLocaliteName(name + 1)
-        return name+''

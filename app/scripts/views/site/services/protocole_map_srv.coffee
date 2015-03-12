@@ -495,6 +495,8 @@ angular.module('protocole_map', ['protocole_map_carre', 'protocole_map_point_fix
             point.edge = key
 
       validSegments: ->
+        if !@_segments.length
+          return false
         colors = [
           '#FF8000'
           '#80FF00'
@@ -513,7 +515,7 @@ angular.module('protocole_map', ['protocole_map_carre', 'protocole_map_point_fix
         # generation of sites
         locBySegment = 5
         localites = []
-        for segment, key in @_segments or []
+        for segment, key in @_segments
           delta = @_googleMaps.computeLength(segment) / locBySegment
           path = segment.getPath()
           # For each site
@@ -526,12 +528,10 @@ angular.module('protocole_map', ['protocole_map_carre', 'protocole_map_point_fix
             while path.getLength() > 1 && !end
               d = @_googleMaps.computeDistanceBetween(path.getAt(0), path.getAt(1))
               if (d + currLength < delta) && (secteur < 5)
-                console.log(localite.name+": Longeur du segment trop petit")
                 currLength += d
                 secteurPath.push(path.getAt(1))
                 path.removeAt(0)
               else
-                console.log(localite.name+": On va pouvoir finir")
                 end = true
                 # Compute where is the cut point
                 rest = delta - currLength

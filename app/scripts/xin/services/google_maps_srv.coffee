@@ -164,7 +164,7 @@ angular.module('xin_google_maps', [])
         latlngs = []
         for i in [1..vertices.getLength()]
           vertice = vertices.getAt(i-1)
-          latlngs.push([xy.lat(), xy.lng()])
+          latlngs.push([vertice.lat(), vertice.lng()])
         return latlngs
 
       computeLength: (overlay) ->

@@ -188,6 +188,8 @@ angular.module('siteViews', ['ngRoute', 'textAngular', 'xin_backend', 'protocole
         $scope.steps = steps.steps
         $scope.stepId = steps.step
         if $scope.typeSite == 'ROUTIER'
+          if mapProtocole?
+            $scope.tracetLength = mapProtocole.getTracetLength()
           if $scope.stepId == 2
             $scope.validSegmentsAllowed = true
         $timeout(-> $scope.$apply())
@@ -266,9 +268,10 @@ angular.module('siteViews', ['ngRoute', 'textAngular', 'xin_backend', 'protocole
         'titre': $scope.protocoleTitre
         'protocole': $scope.protocoleId
         'commentaire': $scope.siteForm.commentaire.$modelValue
-      grille_stoc = mapProtocole.getIdGrilleStoc()
-      if grille_stoc != ''
-        payload.grille_stoc = grille_stoc
+      if $scope.typeSite == 'POINT_FIXE' || $scope.typeSite == 'CARRE'
+        grille_stoc = mapProtocole.getIdGrilleStoc()
+        if grille_stoc != ''
+          payload.grille_stoc = grille_stoc
       Backend.all('sites').post(payload).then(
         (site) ->
           localites = mapProtocole.saveMap()
