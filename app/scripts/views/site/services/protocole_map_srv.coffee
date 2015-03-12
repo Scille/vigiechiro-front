@@ -381,7 +381,6 @@ angular.module('protocole_map', ['protocole_map_carre', 'protocole_map_point_fix
         @_googleMaps.clearListeners(@_firstPoint, 'click')
         @_googleMaps.clearListeners(@_lastPoint, 'click')
         # Others
-        @generateSegments()
         @updateSite()
 
       addSegmentPoint: (e) =>
@@ -494,3 +493,62 @@ angular.module('protocole_map', ['protocole_map_carre', 'protocole_map_point_fix
           vertex = [path.getAt(key), path.getAt(key+1)]
           if @_googleMaps.isLocationOnEdge(point.getPosition(), vertex)
             point.edge = key
+
+      validSegments: ->
+        colors = [
+          '#FF8000'
+          '#80FF00'
+          '#00FF80'
+          '#0080FF'
+          '#FF0080'
+        ]
+        # Events
+        @_googleMaps.clearListeners(@_tracet.overlay, 'click')
+        for segment in @_segments or []
+          @_googleMaps.clearListeners(segment, 'click')
+        for point in @_points or []
+          @_googleMaps.clearListeners(point, 'drag')
+          @_googleMaps.clearListeners(point, 'dragend')
+          point.setMap(null)
+        # generation of sites
+        locBySegment = 5
+        localites = []
+        for segment, key in @_segments or []
+          delta = @_googleMaps.computeLength(segment) / locBySegment
+          path = segment.getPath()
+          # For each site
+          for secteur in [1..5]
+            localite = {}
+            localite.name = 'T '+(key+1)+' '+secteur
+            currLength = 0
+            secteurPath = [segment.getPath().getAt(0)]
+            end = false
+            while path.getLength() > 1 && !end
+              d = @_googleMaps.computeDistanceBetween(path.getAt(0), path.getAt(1))
+              if (d + currLength < delta) && (secteur < 5)
+                console.log(localite.name+": Longeur du segment trop petit")
+                currLength += d
+                secteurPath.push(path.getAt(1))
+                path.removeAt(0)
+              else
+                console.log(localite.name+": On va pouvoir finir")
+                end = true
+                # Compute where is the cut point
+                rest = delta - currLength
+                ratio = d / rest
+                lat_incr = (path.getAt(1).lat() - path.getAt(0).lat()) / ratio
+                lng_incr = (path.getAt(1).lng() - path.getAt(0).lng()) / ratio
+                cut_point = new google.maps.LatLng(path.getAt(0).lat() + lat_incr, path.getAt(0).lng() + lng_incr)
+                # finish secteur and cut segment
+                secteurPath.push(cut_point)
+                path.setAt(0, cut_point)
+            secteurLineString = @_googleMaps.createLineStringWithPath(secteurPath)
+            secteurLineString.setOptions({'strokeColor': colors[secteur]})
+            secteurLineString.setOptions({'zIndex': 20})
+            localite.overlay = secteurLineString
+            localite.overlay.type = 'LineString'
+            localite.representatif = false
+            @_localites.push(localite)
+        @_step = 4
+        @updateSite()
+        return true

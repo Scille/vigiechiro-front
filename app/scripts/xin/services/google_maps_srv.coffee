@@ -145,6 +145,17 @@ angular.module('xin_google_maps', [])
         )
         return lineString
 
+      createLineStringWithPath: (path, draggable = false, editable = false) ->
+        if !path
+          return null
+        lineString = new google.maps.Polyline(
+          path: path
+          map: @_map
+          draggable: draggable
+          editable: editable
+        )
+        return lineString
+
       getPosition: (overlay) ->
         return [overlay.getPosition().lat(), overlay.getPosition().lng()]
 

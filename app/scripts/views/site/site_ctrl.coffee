@@ -217,7 +217,10 @@ angular.module('siteViews', ['ngRoute', 'textAngular', 'xin_backend', 'protocole
         throw "Error : tracet can not be validated"
 
     $scope.validSegments = ->
-      console.log("validSegment")
+      if mapProtocole.validSegments()
+        $scope.validSegmentsAllowed = false
+      else
+        throw "Error : tracet can not be validated"
 
     $scope.randomSelection = (random) ->
       $scope.displaySteps = true
