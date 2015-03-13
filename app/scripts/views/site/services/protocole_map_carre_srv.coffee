@@ -7,7 +7,7 @@ angular.module('protocole_map_carre', [])
       constructor: (@site, mapDiv, @allowEdit, @siteCallback) ->
         super @site, mapDiv, @allowEdit, @siteCallback
         @_steps = [
-          "Positionner le point d'origine.",
+          "Positionner la zone de sélection aléatoire.",
           "Sélectionner un carré.",
           "Définir entre 5 et 13 localités à l'intérieur du carré."
         ]
@@ -60,8 +60,6 @@ angular.module('protocole_map_carre', [])
           localite.name = @setLocaliteName()
           localite.representatif = false
           @_localites.push(localite)
-        zoomChanged: => @mapsChanged()
-        mapsMoved: => @mapsChanged()
 
       mapValidated: ->
         if @_localites.length >= 5

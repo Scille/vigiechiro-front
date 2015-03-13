@@ -4,10 +4,10 @@
 angular.module('protocole_map_point_fixe', [])
   .factory 'ProtocoleMapPointFixe', ($rootScope, Backend, GoogleMaps, ProtocoleMap) ->
     class ProtocoleMapPointFixe extends ProtocoleMap
-      constructor: (@site, mapDiv, @allowEdit, @siteCallback) ->
-        super @site, mapDiv, @allowEdit, @siteCallback
+      constructor: (@site, mapDiv, @siteCallback) ->
+        super @site, mapDiv, @siteCallback
         @_steps = [
-          "Positionner le point d'origine.",
+          "Positionner la zone de sélection aléatoire.",
           "Sélectionner un carré.",
           "Définir au moins 1 localité à l'intérieur du carré."
         ]
@@ -33,20 +33,20 @@ angular.module('protocole_map_point_fixe', [])
           else
             throw "Error : bad shape type " + overlay.type
           if isModified
-            if @allowEdit
-              @_googleMaps.addListener(overlay, 'rightclick', (event) =>
-                @deleteOverlay(overlay)
-                if @getCountOverlays() < 1
-                  @_step = 2
-                else
-                  @_step = 3
-                @updateSite()
-              )
-            else
-              overlay.setOptions(
-                draggable: false
-                editable: false
-              )
+#            if @allowEdit
+#              @_googleMaps.addListener(overlay, 'rightclick', (event) =>
+#                @deleteOverlay(overlay)
+#                if @getCountOverlays() < 1
+#                  @_step = 2
+#                else
+#                  @_step = 3
+#                @updateSite()
+#              )
+#            else
+#              overlay.setOptions(
+#                draggable: false
+#                editable: false
+#              )
             @_step = 3
             @updateSite()
             return true

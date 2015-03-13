@@ -45,20 +45,18 @@ angular.module('xin_google_maps', [])
           google.maps.event.addListener(@_map, 'dragend', @callbackDict.mapsMoved)
         google.maps.event.addListener(@_drawingManager, 'overlaycomplete', @overlayCreated)
 
-      overlayCreated: (event) =>
-        new_overlay = event.overlay
+      overlayCreated: (e) =>
+        new_overlay = e.overlay
         # Converting into mongo geoJSON type
-        if (event.type == google.maps.drawing.OverlayType.MARKER)
+        if (e.type == google.maps.drawing.OverlayType.MARKER)
           new_overlay.type = "Point"
-        else if (event.type == google.maps.drawing.OverlayType.POLYGON)
+        else if (e.type == google.maps.drawing.OverlayType.POLYGON)
           new_overlay.type = "Polygon"
-        else if (event.type == google.maps.drawing.OverlayType.POLYLINE)
+        else if (e.type == google.maps.drawing.OverlayType.POLYLINE)
           new_overlay.type = "LineString"
         else
           return
-        if @callbackDict.overlayCreated?(new_overlay)
-          @callbackDict.saveOverlay?(new_overlay)
-        else
+        if !@callbackDict.overlayCreated?(new_overlay)
           new_overlay.setMap(null)
 
       addListener: google.maps.event.addListener
@@ -86,6 +84,9 @@ angular.module('xin_google_maps', [])
         @_isMapCenteredOnSite = true
         @_map.setCenter(new google.maps.LatLng(lat, lng))
 
+      fitBounds: (latLngBounds) ->
+        @_map.fitBounds(latLngBounds)
+
       getBounds: ->
         @_map.getBounds()
 
@@ -108,20 +109,39 @@ angular.module('xin_google_maps', [])
             return false
         return true
 
-      createPoint: (lat, lng, draggable = false) ->
+      createPoint: (lat, lng, draggable = false, title = '') ->
         latlng = new google.maps.LatLng(lat, lng)
+        return @createPointWithLatLng(latlng, draggable, title)
+
+      createPointWithLatLng: (latlng, draggable = false, title = '') ->
         point = new google.maps.Marker(
           position: latlng
           map: @_map
           draggable: draggable
+          title: title
         )
         return point
+
+      createBounds: (sw = null, ne = null) ->
+        bounds = new google.maps.LatLngBounds()
+        if sw
+          bounds.extend(sw)
+        if ne
+          bounds.extend(ne)
+        return bounds
+
+      extendBounds: (bounds, latlng) ->
+        point = new google.maps.LatLng(latlng[0], latlng[1])
+        bounds.extend(point)
 
       createPolygon: (latlngs, draggable = false, editable = false) ->
         paths = []
         for latlng in latlngs
           point = new google.maps.LatLng(latlng[0], latlng[1])
           paths.push(point)
+        return @createPolygonWithPaths(paths, draggable, editable)
+
+      createPolygonWithPaths: (paths, draggable = false, editable = false) ->
         polygon = new google.maps.Polygon(
           paths: paths
           map: @_map
@@ -131,23 +151,13 @@ angular.module('xin_google_maps', [])
         return polygon
 
       createLineString: (latlngs, draggable = false, editable = false) ->
-        if !latlngs
-          return null
         path = []
         for latlng in latlngs
           point = new google.maps.LatLng(latlng[0], latlng[1])
           path.push(point)
-        lineString = new google.maps.Polyline(
-          path: path
-          map: @_map
-          draggable: draggable
-          editable: editable
-        )
-        return lineString
+        return @createLineStringWithPath(path, draggable, editable)
 
       createLineStringWithPath: (path, draggable = false, editable = false) ->
-        if !path
-          return null
         lineString = new google.maps.Polyline(
           path: path
           map: @_map
@@ -172,12 +182,10 @@ angular.module('xin_google_maps', [])
           return 0
         return google.maps.geometry.spherical.computeLength(overlay.getPath())
 
-      computeDistanceBetween: (from, to) ->
-        return google.maps.geometry.spherical
-            .computeDistanceBetween(from, to)
+      computeDistanceBetween: google.maps.geometry.spherical
+            .computeDistanceBetween
 
-      # tolerance min to works fine 10e-4 degres
-      isLocationOnEdge: (point, latlngs, tolerance = 10e-4) ->
+      isLocationOnEdge: (point, latlngs, tolerance = 10e-9) ->
         poly = new google.maps.Polyline(
           path: latlngs
         )
@@ -198,3 +206,23 @@ angular.module('xin_google_maps', [])
           distance_keys[d] = key
         # Return the latLng obj of the closest point to the markers drag origin.
         return path_pts[distance_keys[_.min(distances)]]
+
+      interpolate: (from, to, fraction) ->
+        projection = @_map.getProjection()
+        pointFrom = projection.fromLatLngToPoint(from)
+        pointTo = projection.fromLatLngToPoint(to)
+        # Adjust for lines that cross the 180 meridian
+        if (Math.abs(pointTo.x-pointFrom.x) > 128)
+          if( pointTo.x > pointFrom.x )
+            pointTo.x -= 256
+          else
+            pointTo.x += 256
+        # Calculate point between
+        x = pointFrom.x + (pointTo.x - pointFrom.x) * fraction
+        y = pointFrom.y + (pointTo.y - pointFrom.y) * fraction
+        pointBetween = new google.maps.Point(x, y)
+        # Project back to lat/lng
+        latLngBetween = projection.fromPointToLatLng(pointBetween)
+        return latLngBetween
+
+      trigger: google.maps.event.trigger

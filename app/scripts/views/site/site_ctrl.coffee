@@ -103,7 +103,7 @@ angular.module('siteViews', ['ngRoute', 'textAngular', 'xin_backend', 'protocole
         if typeSite
           mapDiv = elem.find('.g-maps')[0]
           mapProtocole = protocolesFactory(scope.site, scope.typeSite,
-                                           mapDiv, false)
+                                           mapDiv)
           mapProtocole.loadMap()
 
   .directive 'listSitesDirective', (session, Backend) ->
@@ -157,6 +157,7 @@ angular.module('siteViews', ['ngRoute', 'textAngular', 'xin_backend', 'protocole
     $scope.displaySteps = false
     $scope.validTracetAllowed = false
     $scope.validSegmentsAllowed = false
+    $scope.editSegmentsAllowed = false
     # random selection
     $scope.listGrilleStocOrigin = []
     $scope.listNumberUsed = []
@@ -210,7 +211,7 @@ angular.module('siteViews', ['ngRoute', 'textAngular', 'xin_backend', 'protocole
       if not mapLoaded
         mapLoaded = true
         mapProtocole = protocolesFactory($scope.site, $scope.typeSite,
-                                         mapDiv, true, siteCallback)
+                                         mapDiv, siteCallback)
 
     $scope.validTracet = ->
       if mapProtocole.validTracet()
@@ -221,8 +222,17 @@ angular.module('siteViews', ['ngRoute', 'textAngular', 'xin_backend', 'protocole
     $scope.validSegments = ->
       if mapProtocole.validSegments()
         $scope.validSegmentsAllowed = false
+        $scope.editSegmentsAllowed = true
       else
-        throw "Error : tracet can not be validated"
+        throw "Error : segments can not be validated"
+
+    $scope.editSegments = ->
+      mapProtocole.editSegments()
+      $scope.validSegmentsAllowed = true
+      $scope.editSegmentsAllowed = false
+      $scope.siteForm.$pristine = true
+      $scope.siteForm.$dirty = false
+      $timeout(-> $scope.$apply())
 
     $scope.randomSelection = (random) ->
       $scope.displaySteps = true
@@ -301,13 +311,10 @@ angular.module('siteViews', ['ngRoute', 'textAngular', 'xin_backend', 'protocole
     mapProtocole = undefined
     mapLoaded = false
     # random selection buttons and steps
-    $scope.randomSelectionAllowed = false
-    $scope.validOriginAllowed = false
-    $scope.retrySelectionAllowed = false
     $scope.displaySteps = false
-    # random selection
-    $scope.listGrilleStocOrigin = []
-    $scope.listNumberUsed = []
+    $scope.validTracetAllowed = false
+    $scope.validSegmentsAllowed = false
+    $scope.editSegmentsAllowed = false
     #
     $scope.submitted = false
     $scope.isAdmin = false
@@ -315,6 +322,7 @@ angular.module('siteViews', ['ngRoute', 'textAngular', 'xin_backend', 'protocole
       $scope.isAdmin = isAdmin
     # user select in field observateur
     $scope.observateur = {}
+
     # site
     Backend.one('sites', $routeParams.siteId).get().then (site) ->
       if breadcrumbsGetSiteDefer?
@@ -330,12 +338,15 @@ angular.module('siteViews', ['ngRoute', 'textAngular', 'xin_backend', 'protocole
       $scope.users = users.plain()
       refreshObservateur($scope.siteForm.observateur.$modelValue)
 
+    siteValidated = ->
+      if !mapProtocole
+        return
+      return mapProtocole.mapValidated()
+
     $scope.$watch('siteForm.observateur.$modelValue', (id) -> refreshObservateur(id))
 
     $scope.$watch('siteForm.$pristine', (value) ->
       valid = siteValidated()
-      if valid
-        $scope.retrySelectionAllowed = false
       if !value && !valid
         $scope.siteForm.$pristine = true
         $scope.siteForm.$dirty = false
@@ -366,6 +377,15 @@ angular.module('siteViews', ['ngRoute', 'textAngular', 'xin_backend', 'protocole
       updateSteps: (steps) ->
         $scope.steps = steps.steps
         $scope.stepId = steps.step
+        if $scope.site.protocole.type_site == 'ROUTIER'
+          $scope.displaySteps = true
+          if mapProtocole?
+            $scope.tracetLength = mapProtocole.getTracetLength()
+          if $scope.stepId == 2
+            $scope.validSegmentsAllowed = true
+          if $scope.stepId == 4
+            $scope.validSegmentsAllowed = false
+            $scope.editSegmentsAllowed = true
         $timeout(-> $scope.$apply())
 
     siteValidated = ->
@@ -379,8 +399,29 @@ angular.module('siteViews', ['ngRoute', 'textAngular', 'xin_backend', 'protocole
     loadMap = (mapDiv) ->
       mapProtocole = protocolesFactory($scope.site,
                                        $scope.site.protocole.type_site,
-                                       mapDiv, true, siteCallback)
+                                       mapDiv, siteCallback)
       mapProtocole.loadMap()
+
+    $scope.validTracet = ->
+      if mapProtocole.validTracet()
+        $scope.validTracetAllowed = false
+      else
+        throw "Error : tracet can not be validated"
+
+    $scope.validSegments = ->
+      if mapProtocole.validSegments()
+        $scope.validSegmentsAllowed = false
+        $scope.editSegmentsAllowed = true
+      else
+        throw "Error : segments can not be validated"
+
+    $scope.editSegments = ->
+      mapProtocole.editSegments()
+      $scope.validSegmentsAllowed = true
+      $scope.editSegmentsAllowed = false
+      $scope.siteForm.$pristine = true
+      $scope.siteForm.$dirty = false
+      $timeout(-> $scope.$apply())
 
     $scope.saveSite = ->
       $scope.submitted = true
@@ -393,13 +434,13 @@ angular.module('siteViews', ['ngRoute', 'textAngular', 'xin_backend', 'protocole
         'verrouille': $scope.site.verrouille
       $scope.site.patch(payload).then(
         (site) ->
-#          localites = mapProtocole.saveMap()
-#          for localite in localites
-#            payload =
-#              nom: localite.name
-##              coordonnee: localite.geometries.geometries[0]
-#              geometries: localite.geometries
-#              representatif: false
+          localites = mapProtocole.saveMap()
+          for localite in localites
+            payload =
+              nom: localite.name
+#              coordonnee: localite.geometries.geometries[0]
+              geometries: localite.geometries
+              representatif: false
 #            site.customPUT(payload, "localites").then(
 #              ->
 #              (error) -> throw error

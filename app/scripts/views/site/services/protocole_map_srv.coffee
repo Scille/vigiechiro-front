@@ -1,21 +1,29 @@
 'use strict'
 
+localite_colors = [
+  '#FF8000'
+  '#80FF00'
+  '#00FF80'
+  '#0080FF'
+  '#FF0080'
+]
+locBySegment = 5
 
 angular.module('protocole_map', ['protocole_map_carre', 'protocole_map_point_fixe', 'protocole_map_routier'])
   .factory 'protocolesFactory', (ProtocoleMapCarre, ProtocoleMapRoutier, ProtocoleMapPointFixe) ->
-    (site, protocoleAlgoSite, mapDiv, allowEdit = true, siteCallback = {}) ->
+    (site, protocoleAlgoSite, mapDiv, siteCallback = {}) ->
       if protocoleAlgoSite == 'ROUTIER'
-        return new ProtocoleMapRoutier(site, mapDiv, allowEdit, siteCallback)
+        return new ProtocoleMapRoutier(site, mapDiv, siteCallback)
       else if protocoleAlgoSite == 'CARRE'
-        return new ProtocoleMapCarre(site, mapDiv, allowEdit, siteCallback)
+        return new ProtocoleMapCarre(site, mapDiv, siteCallback)
       else if protocoleAlgoSite == 'POINT_FIXE'
-        return new ProtocoleMapPointFixe(site, mapDiv, allowEdit, siteCallback)
+        return new ProtocoleMapPointFixe(site, mapDiv, siteCallback)
       else
         throw "Error : unknown protocole #{protocoleAlgoSite}"
 
-  .factory 'ProtocoleMap', ($rootScope, Backend, GoogleMaps) ->
+  .factory 'ProtocoleMap', ($timeout, $rootScope, Backend, GoogleMaps) ->
     class ProtocoleMap
-      constructor: (@site, mapDiv, @allowEdit, @siteCallback) ->
+      constructor: (@site, mapDiv, @siteCallback) ->
         @_localites = []
         @_step = 0
         @_steps = []
@@ -66,6 +74,21 @@ angular.module('protocole_map', ['protocole_map_carre', 'protocole_map_point_fix
 
       getOrigin: ->
         return @_circleLimit
+
+      getStartPoint: ->
+        localite = @loadGeoJson(@site.localites[0].geometries)
+        point = localite.getPath().getAt(0)
+        @_googleMaps.deleteOverlay(localite)
+        return point
+
+      getStopPoint: ->
+        nb_localites = @site.localites.length
+        localite = @loadGeoJson(@site.localites[nb_localites-1].geometries)
+        path = localite.getPath()
+        nb_points = path.getLength()
+        point = path.getAt(nb_points-1)
+        @_googleMaps.deleteOverlay(localite)
+        return point
 
       allowMapChanged: ->
         if not @site.verrouille?
@@ -122,7 +145,7 @@ angular.module('protocole_map', ['protocole_map_carre', 'protocole_map_point_fix
       loadMap: ->
         # start loading
         @loading = true
-        # generate grille_stoc
+        # generate grille_stoc for CARRE and POINT_FIXE type site
         if @site.grille_stoc?
           @_step = 2
           @_googleMaps.setCenter(
@@ -135,17 +158,56 @@ angular.module('protocole_map', ['protocole_map_carre', 'protocole_map_point_fix
             @site.grille_stoc.centre.coordinates[0]
           )
           @validNumeroGrille(newCell, @site.grille_stoc.numero, @site.grille_stoc._id)
+        # ROUTIER type site
+        else
+          # rescue start and stop points
+          start = @getStartPoint()
+          stop = @getStopPoint()
+          # set @_tracet and bounds
+          bounds = @_googleMaps.createBounds()
+          tracet_latlngs = []
+          for localite in @site.localites
+            coordinates = localite.geometries.geometries[0].coordinates
+            for point in coordinates
+              tracet_latlngs.push(point)
+              @_googleMaps.extendBounds(bounds, point)
+          @_tracet.overlay = @_googleMaps.createLineString(tracet_latlngs)
+          @_tracet.overlay.setOptions({zIndex: 1})
+          # set view
+          @_googleMaps.setCenter(
+            start.lat(),
+            start.lng()
+          )
+          @_googleMaps.fitBounds(bounds)
+          #
+          continueLoading = =>
+            @validTracet()
+            if start.equals(@_firstPoint.getPosition())
+              @_googleMaps.trigger(@_firstPoint, 'click', {latLng: start})
+            else
+              @_googleMaps.trigger(@_lastPoint, 'click', {latLng: start})
+            @_googleMaps.clearListeners(@_tracet.overlay, 'click')
+            @_step = 4
+            @updateSite()
+          $timeout(continueLoading, 1000)
         # load localites
         for localite in @site.localites or []
           newLocalite =
             name: localite.nom
             representatif: localite.representatif
           newLocalite.overlay = @loadGeoJson(localite.geometries)
+          if localite.nom[0] == 'T'
+            num_secteur = parseInt(localite.nom[localite.nom.length-1])-1
+            newLocalite.overlay.setOptions(
+              strokeColor: localite_colors[num_secteur]
+              zIndex: 2
+            )
           @_localites.push(newLocalite)
         # end loading
         @loading = false
+        @updateSite()
 
-      loadGeoJson: (geoJson, callback=@mapsCallback.overlayCreated) ->
+      loadGeoJson: (geoJson) ->
         overlay = undefined
         if not geoJson
           return
@@ -154,39 +216,20 @@ angular.module('protocole_map', ['protocole_map_carre', 'protocole_map_point_fix
             return @loadGeoJson(geometry)
         if geoJson.type == 'Point'
           overlay = @_googleMaps.createPoint(geoJson.coordinates[0],
-                                            geoJson.coordinates[1],
-                                            true)
+                                            geoJson.coordinates[1])
         else if geoJson.type == 'Polygon'
-          overlay = @_googleMaps.createPolygon(geoJson.coordinates[0], true, true)
+          overlay = @_googleMaps.createPolygon(geoJson.coordinates[0])
         else if geoJson.type == 'LineString'
-          overlay = @_googleMaps.createLineString(geoJson.coordinates, true, true)
+          overlay = @_googleMaps.createLineString(geoJson.coordinates)
         else
           throw "Error: Bad GeoJSON object #{geoJson}"
         overlay.type = geoJson.type
-        if !@mapsCallback().overlayCreated(overlay)
-          @_googleMaps.deleteOverlay(overlay)
+#        if !@mapsCallback().overlayCreated(overlay)
+#          @_googleMaps.deleteOverlay(overlay)
         return overlay
 
       getIdGrilleStoc: ->
         return @_grille[0].id
-
-      mapsChanged: ->
-        if @_step != 1
-          return
-        zoomLevel = @_googleMaps.getZoom()
-        bounds = @_googleMaps.getBounds()
-        if not bounds?
-          return
-        southWest = bounds.getSouthWest()
-        northEast = bounds.getNorthEast()
-        if zoomLevel > 11
-          parameters =
-            sw_lat: southWest.lat()
-            sw_lng: southWest.lng()
-            ne_lat: northEast.lat()
-            ne_lng: northEast.lng()
-          Backend.all('grille_stoc/rectangle').getList(parameters)
-            .then (@createGrille)
 
       createGrille: (grille_stoc) =>
         validNumeroGrille = (cell) =>
@@ -239,19 +282,21 @@ angular.module('protocole_map', ['protocole_map_carre', 'protocole_map_point_fix
           strokeOpacity: 1
           strokeWeight: 2
         )
+        path = @_grille[0].item.getPath()
+        lat = (path.getAt(0).lat() + path.getAt(2).lat()) / 2
+        lng = (path.getAt(0).lng() + path.getAt(2).lng()) / 2
+        @_googleMaps.setCenter(lat, lng)
+        @_googleMaps.setZoom(12)
         @_step = 2
         @updateSite()
-        if @allowEdit
-          @_googleMaps.addListener(@_grille[0].item, 'rightclick', (event) =>
-            if confirm("Etes vous sûre de vouloir supprimer ce carré ainsi que toutes les localités qu'il contient ?")
-              @_step = 0
-              @_grille[0].item.setMap(null)
-              @_grille = []
-              @_googleMaps.emptyMap()
-              @updateSite()
-              @mapsChanged()
-          )
-          @_googleMaps.setDrawingManagerOptions(drawingControl: true)
+        @_googleMaps.addListener(@_grille[0].item, 'rightclick', (e) =>
+          @_step = 0
+          @_grille[0].item.setMap(null)
+          @_grille = []
+          @_googleMaps.setDrawingManagerOptions(drawingControl: false)
+          @updateSite()
+        )
+        @_googleMaps.setDrawingManagerOptions(drawingControl: true)
 
       checkLength: (overlay) ->
         length = @_googleMaps.computeLength(overlay)
@@ -331,26 +376,18 @@ angular.module('protocole_map', ['protocole_map_carre', 'protocole_map_point_fix
         @_googleMaps.addListener(@_lastPoint, 'click', @validOriginPoint)
         # Pad the points array
         interval = 10
-        for key in [0..path.getLength()-1]
+        for key in [0..path.getLength()-2]
           current_point = path.getAt(key)
           next_point = path.getAt(key+1)
-          # Check if we're on the last point
-          if (typeof next_point != 'undefined')
-            distance = @_googleMaps.computeDistanceBetween(current_point, next_point)
-            nbSections = Math.floor(distance/interval)+1
-            # Get a 10th of the difference in latitude
-            lat_incr = (next_point.lat() - current_point.lat()) / nbSections
-            # Get a 10th of the difference in longitude
-            lng_incr = (next_point.lng() - current_point.lng()) / nbSections
-            # Now add interval points at lat_incr & lng_incr intervals between current and next points
-            # We add this to the new padded_points array
-            for i in [0..nbSections-1]
-              new_pt = new google.maps.LatLng(current_point.lat() + (i * lat_incr), current_point.lng() + (i * lng_incr))
-              if !(key == 0 && i == 0)
-                if @_googleMaps.isLocationOnEdge(new_pt, [current_point, next_point])
-                  @_padded_points.push(new_pt)
-                else
-                  console.log("Error : some points not on path")
+          distance = @_googleMaps.computeDistanceBetween(current_point, next_point)
+          nbSections = Math.floor(distance/interval)+1
+          for i in [0..nbSections-1]
+            new_pt = @_googleMaps.interpolate(current_point, next_point, i/nbSections)
+            if !(key == 0 && i == 0)
+              if @_googleMaps.isLocationOnEdge(new_pt, [current_point, next_point])
+                @_padded_points.push(new_pt)
+              else
+                console.log("Error : some points not on path")
         return true
 
       # Used for ROUTIER protocole
@@ -433,8 +470,6 @@ angular.module('protocole_map', ['protocole_map_carre', 'protocole_map_point_fix
                   break
                 else
                   break
-            else
-              continue
           if stop
             break
         @generateSegments()
@@ -497,25 +532,23 @@ angular.module('protocole_map', ['protocole_map_carre', 'protocole_map_point_fix
       validSegments: ->
         if !@_segments.length
           return false
-        colors = [
-          '#FF8000'
-          '#80FF00'
-          '#00FF80'
-          '#0080FF'
-          '#FF0080'
-        ]
-        # Events
+        if @_points.length % 2
+          throw "Error : odd number of points"
+        # Events and points
         @_googleMaps.clearListeners(@_tracet.overlay, 'click')
         for segment in @_segments or []
           @_googleMaps.clearListeners(segment, 'click')
-        for point in @_points or []
-          @_googleMaps.clearListeners(point, 'drag')
-          @_googleMaps.clearListeners(point, 'dragend')
-          point.setMap(null)
+        max_key = @_points.length-1
+        for key in [max_key..0]
+          @_googleMaps.clearListeners(@_points[key], 'drag')
+          @_googleMaps.clearListeners(@_points[key], 'dragend')
+          if (key != 0 && key != max_key)
+            @_points[key].setMap(null)
+            @_points.splice(key, 1)
         # generation of sites
-        locBySegment = 5
         localites = []
         for segment, key in @_segments
+          @_googleMaps.deleteOverlay(segment)
           delta = @_googleMaps.computeLength(segment) / locBySegment
           path = segment.getPath()
           # For each site
@@ -527,7 +560,7 @@ angular.module('protocole_map', ['protocole_map_carre', 'protocole_map_point_fix
             end = false
             while path.getLength() > 1 && !end
               d = @_googleMaps.computeDistanceBetween(path.getAt(0), path.getAt(1))
-              if (d + currLength < delta) && (secteur < 5)
+              if (d + currLength < delta)
                 currLength += d
                 secteurPath.push(path.getAt(1))
                 path.removeAt(0)
@@ -535,20 +568,47 @@ angular.module('protocole_map', ['protocole_map_carre', 'protocole_map_point_fix
                 end = true
                 # Compute where is the cut point
                 rest = delta - currLength
-                ratio = d / rest
-                lat_incr = (path.getAt(1).lat() - path.getAt(0).lat()) / ratio
-                lng_incr = (path.getAt(1).lng() - path.getAt(0).lng()) / ratio
-                cut_point = new google.maps.LatLng(path.getAt(0).lat() + lat_incr, path.getAt(0).lng() + lng_incr)
+                ratio = rest / d
+                cut_point = @_googleMaps.interpolate(path.getAt(0), path.getAt(1), ratio)
                 # finish secteur and cut segment
                 secteurPath.push(cut_point)
                 path.setAt(0, cut_point)
             secteurLineString = @_googleMaps.createLineStringWithPath(secteurPath)
-            secteurLineString.setOptions({'strokeColor': colors[secteur]})
-            secteurLineString.setOptions({'zIndex': 20})
+            secteurLineString.setOptions({'strokeColor': localite_colors[secteur-1]})
+            secteurLineString.setOptions({'zIndex': 11})
             localite.overlay = secteurLineString
             localite.overlay.type = 'LineString'
             localite.representatif = false
             @_localites.push(localite)
+        @_segments = []
         @_step = 4
         @updateSite()
         return true
+
+      editSegments: ->
+        @_step = 2
+        @_googleMaps.addListener(@_tracet.overlay, 'click', @addSegmentPoint)
+        nb_segments = @_localites.length / locBySegment
+        # rescue all points to click on
+        points = []
+        for i in [1..nb_segments]
+          # click on first point of segment if not start point
+          if i > 1
+            point = @_localites[(i-1)*locBySegment].overlay.getPath().getAt(0)
+            points.push(point)
+          # click on last point of segment if not arrival point
+          if i < nb_segments
+            path = @_localites[(i-1)*locBySegment+4].overlay.getPath()
+            path_length = path.getLength()
+            point = path.getAt(path_length-1)
+            points.push(point)
+        # delete localites
+        for localite in @_localites
+          @_googleMaps.deleteOverlay(localite.overlay)
+        @_localites = []
+        # Click on points
+        for point in points
+          var_args =
+            latLng: point
+          @_googleMaps.trigger(@_tracet.overlay, 'click', var_args)
+        @updateSite()

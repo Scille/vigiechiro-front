@@ -17,12 +17,12 @@
     <div class="panel-body">
       <form class="simple-form" novalidate name="siteForm" ng-submit="saveSite()">
         <div ng-show="randomSelectionAllowed">
-          Faire un tirage aléatoire
-          <a class="btn btn-default" id="random-selection-true"
+          <b>Faire un tirage aléatoire</b>
+          <a class="btn btn-primary" id="random-selection-true"
              ng-click="randomSelection(true)">
             Oui
           </a>
-          <a class="btn btn-default" id="random-selection-false"
+          <a class="btn btn-warning" id="random-selection-false"
              ng-click="randomSelection(false)">
             Non
           </a>
@@ -37,7 +37,7 @@
 
         <a class="btn btn-default" id="valid-origin"
            ng-click="validOrigin()" ng-show="validOriginAllowed">
-          Valider le point d'origine
+          Valider la zone
         </a>
 
         <div ng-show="retrySelectionAllowed">
@@ -62,6 +62,11 @@
         <a class="btn btn-default" id="valid-segments"
            ng-click="validSegments()" ng-show="validSegmentsAllowed">
           Valider les tronçons
+        </a>
+
+        <a class="btn btn-default" id="edit-segments"
+           ng-click="editSegments()" ng-show="editSegmentsAllowed">
+          Modifier les tronçons
         </a>
 
         <div class="help-block has-error" ng-show="false">

@@ -24,6 +24,28 @@
           </li>
         </ul>
 
+        <div ng-show="!site.verrouille">
+          <div ng-show="validTracetAllowed">
+            <a class="btn btn-default" id="valid-tracet"
+               ng-click="validTracet()">
+              Valider le tracet
+            </a>
+            <span>
+              Longueur actuelle : <b>{{ tracetLength }}</b> kilomètres.
+            </span>
+          </div>
+
+          <a class="btn btn-default" id="valid-segments"
+             ng-click="validSegments()" ng-show="validSegmentsAllowed">
+            Valider les tronçons
+          </a>
+
+          <a class="btn btn-default" id="edit-segments"
+             ng-click="editSegments()" ng-show="editSegmentsAllowed">
+            Modifier les tronçons
+          </a>
+        </div>
+
         <div class="form-group">
           <!--<input type="text" class="numero_grille_stoc" value="numéro grille stoc"
             ng-if="protocoleAlgoSite != 'ROUTIER'">-->
