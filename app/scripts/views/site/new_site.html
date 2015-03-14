@@ -32,22 +32,34 @@
           <li class="list-group-item" ng-repeat="step in steps">
             <span ng-show="$index < stepId">✓&nbsp;<strike>{{step}}</strike></span>
             <span ng-hide="$index < stepId">{{step}}</span>
+            <a class="btn btn-primary" id="valid-origin"
+               ng-click="validOrigin()" ng-show="validOriginAllowed && $index == 0">
+              Valider la zone
+            </a>
+            <span ng-show="$index == 3">
+              <a class="btn btn-primary" id="valid-localites"
+                 ng-click="validLocalites()"
+                 ng-show="validLocalitesAllowed">
+                Valider les localités
+              </a>
+              <a class="btn btn-warning" id="edit-localites"
+                 ng-click="editLocalites()"
+                 ng-show="editLocalitesAllowed">
+                Modifier les localités
+              </a>
+            </span>
           </li>
         </ul>
 
-        <a class="btn btn-default" id="valid-origin"
-           ng-click="validOrigin()" ng-show="validOriginAllowed">
-          Valider la zone
-        </a>
-
         <div ng-show="retrySelectionAllowed">
-          <a class="btn btn-default" id="retry-selection"
+          <a class="btn btn-warning" id="retry-selection"
              ng-click="retrySelection()">
             Refaire un tirage
           </a>
           <label for="motif">Motif :</label>
           <input type="text" id="motif" ng-model="retryMotif">
         </div>
+
 
         <div ng-show="validTracetAllowed">
           <a class="btn btn-default" id="valid-tracet"

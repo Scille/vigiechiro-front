@@ -8,8 +8,9 @@ angular.module('protocole_map_point_fixe', [])
         super @site, mapDiv, @siteCallback
         @_steps = [
           "Positionner la zone de sélection aléatoire.",
-          "Sélectionner un carré.",
+          "Cliquer sur la carte pour sélection la grille stoc correspondante.",
           "Définir au moins 1 localité à l'intérieur du carré."
+          "Valider les localités."
         ]
         @_googleMaps.setDrawingManagerOptions(
           drawingControlOptions:
@@ -33,35 +34,33 @@ angular.module('protocole_map_point_fixe', [])
           else
             throw "Error : bad shape type " + overlay.type
           if isModified
-#            if @allowEdit
-#              @_googleMaps.addListener(overlay, 'rightclick', (event) =>
-#                @deleteOverlay(overlay)
-#                if @getCountOverlays() < 1
-#                  @_step = 2
-#                else
-#                  @_step = 3
-#                @updateSite()
-#              )
-#            else
-#              overlay.setOptions(
-#                draggable: false
-#                editable: false
-#              )
-            @_step = 3
+            @saveOverlay(overlay)
+            @_googleMaps.addListener(overlay, 'rightclick', (e) =>
+              @deleteOverlay(overlay)
+              if @getCountOverlays() < 1
+                @_step = 2
+              else
+                @_step = 3
+              @updateSite()
+            )
+            if @getCountOverlays() >= 1
+              @_step = 3
+            else
+              @_step = 2
             @updateSite()
             return true
           return false
-        saveOverlay: (overlay) =>
-          localite = {}
-          localite.overlay = overlay
-          localite.name = @setLocaliteName()
-          localite.representatif = false
-          @_localites.push(localite)
-        zoomChanged: => @mapsChanged()
-        mapsMoved: => @mapsChanged()
+
+      saveOverlay: (overlay) =>
+        localite = {}
+        localite.overlay = overlay
+        localite.name = @setLocaliteName()
+        localite.overlay.setOptions({ title: localite.name })
+        localite.representatif = false
+        @_localites.push(localite)
 
       mapValidated: ->
-        if @_localites.length >= 1
+        if @_step == 4
           return true
         else
           return false

@@ -45,8 +45,22 @@ angular.module('protocole_map', ['protocole_map_carre', 'protocole_map_point_fix
         return false
 
       selectGrilleStoc: ->
-        @_step = 1
-        @updateSite()
+        @_googleMaps.addListener(@_googleMaps.getMap(), 'click', (e) =>
+          payload =
+            lng: e.latLng.lng()
+            lat: e.latLng.lat()
+            r: 1500
+          Backend.one('grille_stoc/cercle').get(payload).then(
+            (grille_stoc) =>
+              cells = grille_stoc.plain()._items
+              if !cells.length
+                throw "Error : no grille stoc found for "+e.latLng.toString()
+              cell = cells[0]
+              overlay = @createCell(cell.centre.coordinates[1],
+                                    cell.centre.coordinates[0])
+              @validNumeroGrille(overlay, cell.numero, cell._id, true)
+          )
+        )
 
       validOrigin: (grille_stoc) ->
         cell = @createCell(grille_stoc.centre.coordinates[1],
@@ -107,8 +121,6 @@ angular.module('protocole_map', ['protocole_map_carre', 'protocole_map_point_fix
           loading: @loading
         if @siteCallback.updateSteps?
           @siteCallback.updateSteps(steps)
-        if not @loading and @siteCallback.updateForm?
-          @siteCallback.updateForm()
 
       saveMap: ->
         result = []
@@ -145,21 +157,8 @@ angular.module('protocole_map', ['protocole_map_carre', 'protocole_map_point_fix
       loadMap: ->
         # start loading
         @loading = true
-        # generate grille_stoc for CARRE and POINT_FIXE type site
-        if @site.grille_stoc?
-          @_step = 2
-          @_googleMaps.setCenter(
-            @site.grille_stoc.centre.coordinates[1],
-            @site.grille_stoc.centre.coordinates[0]
-          )
-          @_googleMaps.setZoom(14)
-          newCell = @createCell(
-            @site.grille_stoc.centre.coordinates[1],
-            @site.grille_stoc.centre.coordinates[0]
-          )
-          @validNumeroGrille(newCell, @site.grille_stoc.numero, @site.grille_stoc._id)
-        # ROUTIER type site
-        else
+        # ROUTIER type site create @_tracet and center on it
+        if !@site.grille_stoc?
           # rescue start and stop points
           start = @getStartPoint()
           stop = @getStopPoint()
@@ -202,7 +201,17 @@ angular.module('protocole_map', ['protocole_map_carre', 'protocole_map_point_fix
               strokeColor: localite_colors[num_secteur]
               zIndex: 2
             )
+          else
+            newLocalite.overlay.setOptions({ title: localite.nom })
           @_localites.push(newLocalite)
+        # generate grille_stoc for CARRE and POINT_FIXE type site
+        if @site.grille_stoc?
+          newCell = @createCell(
+            @site.grille_stoc.centre.coordinates[1],
+            @site.grille_stoc.centre.coordinates[0]
+          )
+          @validNumeroGrille(newCell, @site.grille_stoc.numero, @site.grille_stoc._id)
+          @validLocalites()
         # end loading
         @loading = false
         @updateSite()
@@ -224,28 +233,10 @@ angular.module('protocole_map', ['protocole_map_carre', 'protocole_map_point_fix
         else
           throw "Error: Bad GeoJSON object #{geoJson}"
         overlay.type = geoJson.type
-#        if !@mapsCallback().overlayCreated(overlay)
-#          @_googleMaps.deleteOverlay(overlay)
         return overlay
 
       getIdGrilleStoc: ->
         return @_grille[0].id
-
-      createGrille: (grille_stoc) =>
-        validNumeroGrille = (cell) =>
-          (event) => @validNumeroGrille(cell)
-        grille_stoc = grille_stoc.plain()
-        for cell in grille_stoc
-          exist = false
-          for item in @_grille
-            if item.numero == cell.numero
-              exist = true
-              break
-          if exist
-            continue
-          newCell = @createCell(cell.centre.coordinates[1], cell.centre.coordinates[0])
-          @_googleMaps.addListener(newCell, 'click', validNumeroGrille(newCell))
-          @_grille.push({"item": newCell, "numero": cell.numero, 'id': cell._id})
 
       createCell: (lat, lng) ->
         # 1000*racine(2)
@@ -268,7 +259,8 @@ angular.module('protocole_map', ['protocole_map_carre', 'protocole_map_point_fix
         )
         return item
 
-      validNumeroGrille: (cell, numero, id) =>
+      validNumeroGrille: (cell, numero, id, editable = false) =>
+        @_googleMaps.clearListeners(@_googleMaps.getMap(), 'click')
         nbStoc = @_grille.length
         if nbStoc
           for index in [nbStoc-1..0]
@@ -286,17 +278,23 @@ angular.module('protocole_map', ['protocole_map_carre', 'protocole_map_point_fix
         lat = (path.getAt(0).lat() + path.getAt(2).lat()) / 2
         lng = (path.getAt(0).lng() + path.getAt(2).lng()) / 2
         @_googleMaps.setCenter(lat, lng)
-        @_googleMaps.setZoom(12)
+        @_googleMaps.setZoom(13)
         @_step = 2
         @updateSite()
-        @_googleMaps.addListener(@_grille[0].item, 'rightclick', (e) =>
-          @_step = 0
-          @_grille[0].item.setMap(null)
-          @_grille = []
-          @_googleMaps.setDrawingManagerOptions(drawingControl: false)
-          @updateSite()
-        )
         @_googleMaps.setDrawingManagerOptions(drawingControl: true)
+        if editable
+          @_googleMaps.addListener(@_grille[0].item, 'rightclick', (e) =>
+            if confirm("Cette opération supprimera toutes les localités.")
+              @_step = 0
+              @_grille[0].item.setMap(null)
+              @_grille = []
+              for localite in @_localites or []
+                @_googleMaps.deleteOverlay(localite.overlay)
+              @_localites = []
+              @_googleMaps.setDrawingManagerOptions(drawingControl: false)
+              @selectGrilleStoc()
+              @updateSite()
+          )
 
       checkLength: (overlay) ->
         length = @_googleMaps.computeLength(overlay)
@@ -344,12 +342,35 @@ angular.module('protocole_map', ['protocole_map_carre', 'protocole_map_point_fix
               result++
           return result
 
-      getTotalLength: ->
-        result = 0
+      validLocalites: ->
+        @_step = 4
+        @_googleMaps.clearListeners(@_grille[0].item, 'rightclick')
+        @_googleMaps.setDrawingManagerOptions(
+          drawingControl: false
+          drawingMode: ''
+        )
         for localite in @_localites
-          if localite.overlay.type == 'LineString'
-            result += @_googleMaps.computeLength(localite.overlay)
-        return result
+          localite.overlay.setOptions({ draggable: false })
+          @_googleMaps.clearListeners(localite.overlay, 'rightclick')
+        @updateSite()
+
+      editLocalites: ->
+        @_step = 3
+        @_googleMaps.setDrawingManagerOptions(drawingControl: true)
+        for localite, key in @_localites
+          localite.overlay.setOptions({ draggable: true })
+          @addEventRightClick(localite.overlay)
+        @updateSite()
+
+      addEventRightClick: (overlay) ->
+        @_googleMaps.addListener(overlay, 'rightclick', (e) =>
+          @deleteOverlay(overlay)
+          if @getCountOverlays() < 5
+            @_step = 2
+          else
+            @_step = 3
+          @updateSite()
+        )
 
       getTracetLength: ->
         return @_tracet.length
@@ -357,7 +378,7 @@ angular.module('protocole_map', ['protocole_map_carre', 'protocole_map_point_fix
       validTracet: ->
         if !@_tracet.overlay?
           return false
-        # Fix tracet
+        # @_tracet becomes uneditable
         @_googleMaps.clearListeners(@_tracet.overlay, 'rightclick')
         @_tracet.overlay.setOptions(
           draggable: false

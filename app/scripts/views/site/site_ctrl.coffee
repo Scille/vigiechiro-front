@@ -151,10 +151,12 @@ angular.module('siteViews', ['ngRoute', 'textAngular', 'xin_backend', 'protocole
     mapProtocole = undefined
     mapLoaded = false
     # random selection buttons and steps
+    $scope.displaySteps = false
     $scope.randomSelectionAllowed = false
     $scope.validOriginAllowed = false
     $scope.retrySelectionAllowed = false
-    $scope.displaySteps = false
+    $scope.validLocalitesAllowed = false
+    $scope.editLocalitesAllowed = false
     $scope.validTracetAllowed = false
     $scope.validSegmentsAllowed = false
     $scope.editSegmentsAllowed = false
@@ -169,6 +171,7 @@ angular.module('siteViews', ['ngRoute', 'textAngular', 'xin_backend', 'protocole
     # site
     $scope.site = {}
     $scope.site.titre = "Nouveau site"
+    $scope.site.justification_non_aleatoire = ''
 
     $scope.$watch('siteForm.$pristine', (value) ->
       valid = siteValidated()
@@ -181,14 +184,22 @@ angular.module('siteViews', ['ngRoute', 'textAngular', 'xin_backend', 'protocole
     )
 
     siteCallback =
-      updateForm: ->
-        $scope.siteForm.$pristine = false
-        $scope.siteForm.$dirty = true
-        $timeout(-> $scope.$apply())
       updateSteps: (steps) ->
         $scope.steps = steps.steps
         $scope.stepId = steps.step
-        if $scope.typeSite == 'ROUTIER'
+        if $scope.typeSite in ['CARRE', 'POINT_FIXE']
+          if $scope.stepId == 0
+            $scope.validLocalitesAllowed = false
+          if $scope.stepId == 2
+            $scope.validLocalitesAllowed = false
+          if $scope.stepId == 3
+            $scope.retrySelectionAllowed = false
+            $scope.validLocalitesAllowed = true
+            $scope.editLocalitesAllowed = false
+          else if $scope.stepId == 4
+            $scope.validLocalitesAllowed = false
+            $scope.editLocalitesAllowed = true
+        else if $scope.typeSite == 'ROUTIER'
           if mapProtocole?
             $scope.tracetLength = mapProtocole.getTracetLength()
           if $scope.stepId == 2
@@ -213,6 +224,16 @@ angular.module('siteViews', ['ngRoute', 'textAngular', 'xin_backend', 'protocole
         mapProtocole = protocolesFactory($scope.site, $scope.typeSite,
                                          mapDiv, siteCallback)
 
+    $scope.validLocalites = ->
+      mapProtocole.validLocalites()
+      $scope.siteForm.$pristine = false
+      $scope.siteForm.$dirty = true
+
+    $scope.editLocalites = ->
+      mapProtocole.editLocalites()
+      $scope.siteForm.$pristine = true
+      $scope.siteForm.$dirty = false
+
     $scope.validTracet = ->
       if mapProtocole.validTracet()
         $scope.validTracetAllowed = false
@@ -223,6 +244,8 @@ angular.module('siteViews', ['ngRoute', 'textAngular', 'xin_backend', 'protocole
       if mapProtocole.validSegments()
         $scope.validSegmentsAllowed = false
         $scope.editSegmentsAllowed = true
+        $scope.siteForm.$pristine = false
+        $scope.siteForm.$dirty = true
       else
         throw "Error : segments can not be validated"
 
@@ -258,9 +281,14 @@ angular.module('siteViews', ['ngRoute', 'textAngular', 'xin_backend', 'protocole
         mapProtocole.validOrigin($scope.listGrilleStocOrigin[number])
 
     $scope.retrySelection = ->
+      if !$scope.retryMotif? || $scope.retryMotif == ''
+        throw "Error: No motif"
+        return
       if $scope.listNumberUsed.length == $scope.listGrilleStocOrigin.length
         throw "Error: All cells picked"
         return
+      $scope.justification_non_aleatoire += $scope.retryMotif + '\n'
+      $scope.retryMotif = ''
       mapProtocole.emptyMap()
       mapProtocole.deleteValidCell()
       number = Math.floor(Math.random() * $scope.listGrilleStocOrigin.length)
@@ -278,6 +306,8 @@ angular.module('siteViews', ['ngRoute', 'textAngular', 'xin_backend', 'protocole
         'titre': $scope.protocoleTitre
         'protocole': $scope.protocoleId
         'commentaire': $scope.siteForm.commentaire.$modelValue
+      if $scope.site.justification_non_aleatoire != ''
+        payload.justification_non_aleatoire = $scope.site.justification_non_aleatoire
       if $scope.typeSite == 'POINT_FIXE' || $scope.typeSite == 'CARRE'
         grille_stoc = mapProtocole.getIdGrilleStoc()
         if grille_stoc != ''
@@ -312,6 +342,8 @@ angular.module('siteViews', ['ngRoute', 'textAngular', 'xin_backend', 'protocole
     mapLoaded = false
     # random selection buttons and steps
     $scope.displaySteps = false
+    $scope.validLocalitesAllowed = false
+    $scope.editLocalitesAllowed = false
     $scope.validTracetAllowed = false
     $scope.validSegmentsAllowed = false
     $scope.editSegmentsAllowed = false
@@ -337,11 +369,6 @@ angular.module('siteViews', ['ngRoute', 'textAngular', 'xin_backend', 'protocole
     Backend.all('utilisateurs').getList().then (users) ->
       $scope.users = users.plain()
       refreshObservateur($scope.siteForm.observateur.$modelValue)
-
-    siteValidated = ->
-      if !mapProtocole
-        return
-      return mapProtocole.mapValidated()
 
     $scope.$watch('siteForm.observateur.$modelValue', (id) -> refreshObservateur(id))
 
@@ -370,15 +397,21 @@ angular.module('siteViews', ['ngRoute', 'textAngular', 'xin_backend', 'protocole
           return
 
     siteCallback =
-      updateForm: ->
-        $scope.siteForm.$pristine = false
-        $scope.siteForm.$dirty = true
-        $timeout(-> $scope.$apply())
       updateSteps: (steps) ->
         $scope.steps = steps.steps
         $scope.stepId = steps.step
-        if $scope.site.protocole.type_site == 'ROUTIER'
-          $scope.displaySteps = true
+        $scope.displaySteps = true
+        if $scope.site.protocole.type_site in ['CARRE', 'POINT_FIXE']
+          if $scope.stepId == 2
+            $scope.validLocalitesAllowed = false
+          if $scope.stepId == 3
+            $scope.retrySelectionAllowed = false
+            $scope.validLocalitesAllowed = true
+            $scope.editLocalitesAllowed = false
+          else if $scope.stepId == 4
+            $scope.validLocalitesAllowed = false
+            $scope.editLocalitesAllowed = true
+        else if $scope.site.protocole.type_site == 'ROUTIER'
           if mapProtocole?
             $scope.tracetLength = mapProtocole.getTracetLength()
           if $scope.stepId == 2
@@ -402,6 +435,16 @@ angular.module('siteViews', ['ngRoute', 'textAngular', 'xin_backend', 'protocole
                                        mapDiv, siteCallback)
       mapProtocole.loadMap()
 
+    $scope.validLocalites = ->
+      mapProtocole.validLocalites()
+      $scope.siteForm.$pristine = false
+      $scope.siteForm.$dirty = true
+
+    $scope.editLocalites = ->
+      mapProtocole.editLocalites()
+      $scope.siteForm.$pristine = true
+      $scope.siteForm.$dirty = false
+
     $scope.validTracet = ->
       if mapProtocole.validTracet()
         $scope.validTracetAllowed = false
@@ -412,6 +455,8 @@ angular.module('siteViews', ['ngRoute', 'textAngular', 'xin_backend', 'protocole
       if mapProtocole.validSegments()
         $scope.validSegmentsAllowed = false
         $scope.editSegmentsAllowed = true
+        $scope.siteForm.$pristine = false
+        $scope.siteForm.$dirty = true
       else
         throw "Error : segments can not be validated"
 

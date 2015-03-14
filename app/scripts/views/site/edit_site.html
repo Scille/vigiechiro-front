@@ -21,6 +21,18 @@
           <li class="list-group-item" ng-repeat="step in steps">
             <span ng-show="$index < stepId">✓&nbsp;<strike>{{step}}</strike></span>
             <span ng-hide="$index < stepId">{{step}}</span>
+            <span ng-show="$index == 3">
+              <a class="btn btn-primary" id="valid-localites"
+                 ng-click="validLocalites()"
+                 ng-show="validLocalitesAllowed">
+                Valider les localités
+              </a>
+              <a class="btn btn-warning" id="edit-localites"
+                 ng-click="editLocalites()"
+                 ng-show="editLocalitesAllowed">
+                Modifier les localités
+              </a>
+            </span>
           </li>
         </ul>
 
