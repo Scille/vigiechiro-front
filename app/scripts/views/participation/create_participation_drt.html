@@ -59,6 +59,10 @@
             class="help-block has-error">
         Date invalide
       </span>
+      <span ng-show="submitted && participationForm.date_fin.$error.younger_than_date_debut"
+            class="help-block has-error">
+        La date de fin ne peut pas être plus récente que celle de début
+      </span>
     </div>
 
     <div class="form-group" ng-class="{'has-error': participationForm.temperature_debut.$invalid && !participationForm.$pristine}">
@@ -110,12 +114,9 @@
     </div>
 
     <div class="form-group" ng-class="{'has-error': participationForm.commentaire.$invalid && !participationForm.$pristine}">
-      <div class="input-group">
-        <label class="input-group-addon" for="commentaire">Commentaire</label>
-        <input type="text" class="form-control" id="commentaire"
-          name="commentaire"
-          ng-model="participation.commentaire" ng-disabled="readOnly">
-      </div>
+      <textarea rows="3" class="form-control" id="commentaire" name="commentaire"
+                ng-model="participation.commentaire" ng-disabled="readOnly"
+                placeholder="Commentaire"></textarea>
     </div>
 
     <div class="form-group"
@@ -130,6 +131,10 @@
       <span class="help-block"
         ng-show="submitted && participationForm.pieces_jointes.$error.required">
         Champ requis
+      </span>
+      <span class="help-block"
+        ng-show="submitted && participationForm.pieces_jointes.$error.uploading">
+        Le transfert des pièces jointes n'est pas terminé
       </span>
     </div>
 

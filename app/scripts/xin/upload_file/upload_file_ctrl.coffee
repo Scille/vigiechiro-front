@@ -38,11 +38,11 @@ angular.module('xin_uploadFile', ['appSettings'])
     scope:
       file: '='
     link: (scope, elem, attrs) ->
-      if scope.file.S3_upload_realise? and scope.file.S3_id?
-        scope.fileLink = "#{SETTINGS.API_DOMAIN}/fichiers/#{scope.file._id}/action/acces"
+      if scope.file.disponible? and scope.file.s3_id?
+        scope.fileLink = "#{SETTINGS.API_DOMAIN}/fichiers/#{scope.file._id}/acces"
         scope.accessFile = () ->
-          Backend.all('fichiers').one(scope.file._id).customGET('action/acces').then(
-            (response) -> window.open(response.signed_request)
+          Backend.all('fichiers').one(scope.file._id).customGET('acces').then(
+            (response) -> window.open(response.s3_signed_url)
             (error) ->
               if error.status == 410
               else

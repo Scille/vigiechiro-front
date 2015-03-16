@@ -127,8 +127,14 @@ angular.module('participationViews', ['ngRoute', 'textAngular', 'xin_listResourc
         'commentaire': $scope.participation.commentaire
         'meteo': {}
         'configuration': {}
-      if $scope.participation.date_fin != 'Invalid Date'
+      if $scope.participation.date_fin?
         date_fin = new Date($scope.participation.date_fin)
+        if date_fin == 'Invalid Date'
+          $scope.participationForm.date_fin.$error.$invalid = true
+          return
+        if date_fin < date_debut
+          $scope.participationForm.date_fin.$error.younger_than_date_debut = true
+          return
         payload.date_fin = date_fin.toGMTString()
       # Retrieve the modified fields from the form
       for key, value of $scope.participationForm
@@ -136,47 +142,46 @@ angular.module('participationViews', ['ngRoute', 'textAngular', 'xin_listResourc
           if key == 'temperature_debut' or
              key == 'temperature_fin' or
              key == 'vent' or key == 'couverture'
-            payload.meteo[key] = $scope.participation.meteo[key]
+            if $scope.participation.meteo[key]?
+              payload.meteo[key] = $scope.participation.meteo[key]
           else if key == 'detecteur_enregistreur_numero_serie' or
              key == 'micro0_position' or key == 'micro0_numero_serie' or
              key == 'micro0_hauteur' or key == 'micro1_position' or
              key == 'micro1_numero_serie' or key == 'micro1_hauteur'
-            payload.configuration[key] = $scope.participation.configuration[key]
-      uploadingFiles = false
+            if $scope.participation.configuration[key]?
+              payload.configuration[key] = $scope.participation.configuration[key]
       for file in $scope.uploaders
         if file.status != 'done'
-          uploadingFiles = true
-      if uploadingFiles
-        throw "Error : Still files to upload."
-      else
-        Backend.all('sites/'+$scope.siteId+'/participations').post(payload).then(
-          (participation) ->
-            Backend.one('participations', participation._id).get().then (participation) ->
-              if $scope.uploaders.length == 0
-                window.location = '#/participations/'+participation._id
-                return
-              else
-              payload =
-                wav: []
-                ta: []
-                photos: []
-              for file in $scope.uploaders
-                if file.file.type == 'audio/wav' or
-                   file.file.type == 'audio/x-wav'
-                  payload.wav.push(file.id)
-                else if file.file.type == 'application/ta' or
-                        file.file.type == 'application/tac'
-                  payload.ta.push(file.id)
-                else if file.file.type == 'image/bmp' or
-                        file.file.type == 'image/png' or
-                        file.file.type == 'image/jpeg'
-                  payload.photos.push(file.id)
-              participation.customPUT(payload, 'pieces_jointes').then(
-                -> window.location = '#/participations/'+participation._id
-                -> throw "Error : PUT files"
-              )
-          (error) -> throw "Error : participation save "+error
-        )
+          $scope.participationForm.pieces_jointes = {$error: {uploading: true}}
+          return
+      Backend.all('sites/'+$scope.siteId+'/participations').post(payload).then(
+        (participation) ->
+          Backend.one('participations', participation._id).get().then (participation) ->
+            if $scope.uploaders.length == 0
+              window.location = '#/participations/'+participation._id
+              return
+            else
+            payload =
+              wav: []
+              ta: []
+              photos: []
+            for file in $scope.uploaders
+              if file.file.type == 'audio/wav' or
+                 file.file.type == 'audio/x-wav'
+                payload.wav.push(file.id)
+              else if file.file.type == 'application/ta' or
+                      file.file.type == 'application/tac'
+                payload.ta.push(file.id)
+              else if file.file.type == 'image/bmp' or
+                      file.file.type == 'image/png' or
+                      file.file.type == 'image/jpeg'
+                payload.photos.push(file.id)
+            participation.customPUT(payload, 'pieces_jointes').then(
+              -> window.location = '#/participations/'+participation._id
+              -> throw "Error : PUT files"
+            )
+        (error) -> throw "Error : participation save "+error
+      )
 
   .directive 'listParticipationsDirective', (session, Backend) ->
     restrict: 'E'
