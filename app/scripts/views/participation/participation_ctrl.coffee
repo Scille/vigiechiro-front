@@ -191,13 +191,10 @@ angular.module('participationViews', ['ngRoute', 'textAngular', 'xin_listResourc
       scope.loading = true
       attrs.$observe 'siteId', (siteId) ->
         if siteId
-          params =
-            where:
-              site: siteId
-            sort: '-date_debut'
-          Backend.all('participations').getList(params).then (participations) ->
-            scope.participations = participations.plain()
-            scope.loading = false
+          Backend.all('sites/'+siteId+'/participations').getList()
+            .then (participations) ->
+              scope.participations = participations.plain()
+              scope.loading = false
 
   .controller 'DisplayParticipationCtrl', ($scope, $route, $routeParams,
                                            session, Backend) ->
