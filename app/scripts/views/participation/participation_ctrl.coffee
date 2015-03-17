@@ -33,7 +33,7 @@ angular.module('participationViews', ['ngRoute', 'textAngular', 'xin_listResourc
             ])
           return breadcrumbsDefer.promise
       .when '/participations/:participationId/edition',
-        templateUrl: 'scripts/views/participation/create_participation.html'
+        templateUrl: 'scripts/views/participation/edit_participation.html'
         controller: 'EditParticipationController'
         breadcrumbs: ngInject ($q, $filter) ->
           breadcrumbsDefer = $q.defer()
@@ -100,20 +100,19 @@ angular.module('participationViews', ['ngRoute', 'textAngular', 'xin_listResourc
     $scope.participation =
       date_debut: new Date()
     $scope.uploaders = []
-    session.getUserPromise().then (user) ->
-      $scope.observateurId = user._id
 
     $scope.$watchCollection 'uploaders', (newValue, oldValue) ->
       if newValue != oldValue
         $scope.participationForm.$setDirty()
 
-    $scope.checkConfiguration = (configuration) ->
-      if !$scope.configuration
-        return false
-      for key in $scope.configuration
-        if configuration == key
-          return true
-      return false
+# TODO
+#    $scope.checkConfiguration = (configuration) ->
+#      if !$scope.configuration
+#        return false
+#      for key in $scope.configuration
+#        if configuration == key
+#          return true
+#      return false
 
     $scope.saveParticipation = ->
       $scope.submitted = true
@@ -246,3 +245,96 @@ angular.module('participationViews', ['ngRoute', 'textAngular', 'xin_listResourc
           breadcrumbsGetParticipationDefer.resolve(participation)
           breadcrumbsGetParticipationDefer = undefined
         $scope.participation = participation
+        Backend.one('protocoles', participation.site.protocole).get()
+          .then (protocole) ->
+            $scope.participation.site.protocole = protocole.plain()
+
+  .directive 'editParticipationDirective', ->
+    restrict: 'E'
+    templateUrl: 'scripts/views/participation/create_participation_drt.html'
+    controller: 'EditParticipationDirectiveCtrl'
+    scope:
+      participation: '='
+
+  .controller 'EditParticipationDirectiveCtrl', ($route, $scope,
+                                                 session, Backend) ->
+    $scope.uploaders = []
+
+    $scope.$watchCollection 'uploaders', (newValue, oldValue) ->
+      if newValue != oldValue
+        $scope.participationForm.$setDirty()
+
+# TODO
+#    $scope.checkConfiguration = (configuration) ->
+#      if !$scope.configuration
+#        return false
+#      for key in $scope.configuration
+#        if configuration == key
+#          return true
+#      return false
+
+    $scope.saveParticipation = ->
+      $scope.submitted = true
+      if (not $scope.participationForm.$valid or
+          not $scope.participationForm.$dirty)
+        return
+      date_debut = new Date($scope.participation.date_debut)
+      date_debut = date_debut.toGMTString()
+      payload =
+        'date_debut': date_debut
+        'commentaire': $scope.participation.commentaire
+        'meteo': {}
+        'configuration': {}
+      if $scope.participation.date_fin? &&
+         $scope.participation.date_fin != 'Invalid Date'
+        date_fin = new Date($scope.participation.date_fin)
+        payload.date_fin = date_fin.toGMTString()
+      # Retrieve the modified fields from the form
+      for key, value of $scope.participationForm
+        if key.charAt(0) != '$' and value.$dirty
+          if key == 'temperature_debut' or
+             key == 'temperature_fin' or
+             key == 'vent' or key == 'couverture'
+            payload.meteo[key] = $scope.participation.meteo[key]
+          else if key == 'detecteur_enregistreur_numero_serie' or
+             key == 'micro0_position' or key == 'micro0_numero_serie' or
+             key == 'micro0_hauteur' or key == 'micro1_position' or
+             key == 'micro1_numero_serie' or key == 'micro1_hauteur'
+            payload.configuration[key] = $scope.participation.configuration[key]
+      if Object.keys(payload.configuration).length == 0
+        delete payload.configuration
+      uploadingFiles = false
+      for file in $scope.uploaders
+        if file.status != 'done'
+          uploadingFiles = true
+      if uploadingFiles
+        throw "Error : Still files to upload."
+      else
+        $scope.participation.patch(payload).then(
+          (participation) ->
+            Backend.one('participations', participation._id).get().then (participation) ->
+              if $scope.uploaders.length == 0
+                window.location = '#/participations/'+participation._id
+                return
+              else
+              payload =
+                wav: []
+                ta: []
+                photos: []
+              for file in $scope.uploaders
+                if file.file.type == 'audio/wav' or
+                   file.file.type == 'audio/x-wav'
+                  payload.wav.push(file.id)
+                else if file.file.type == 'application/ta' or
+                        file.file.type == 'application/tac'
+                  payload.ta.push(file.id)
+                else if file.file.type == 'image/bmp' or
+                        file.file.type == 'image/png' or
+                        file.file.type == 'image/jpeg'
+                  payload.photos.push(file.id)
+              participation.customPUT(payload, 'pieces_jointes').then(
+                -> window.location = '#/participations/'+participation._id
+                -> throw "Error : PUT files"
+              )
+          (error) -> throw "Error : participation save "+error
+        )
