@@ -91,9 +91,7 @@ angular.module('participationViews', ['ngRoute', 'textAngular', 'xin_listResourc
     templateUrl: 'scripts/views/participation/create_participation_drt.html'
     controller: 'CreateParticipationDirectiveCtrl'
     scope:
-      siteId: '@'
-      protocoleId: '@'
-      configuration: '='
+      site: '='
 
   .controller 'CreateParticipationDirectiveCtrl', ($route, $scope,
                                                    session, Backend) ->
@@ -104,15 +102,17 @@ angular.module('participationViews', ['ngRoute', 'textAngular', 'xin_listResourc
     $scope.$watchCollection 'uploaders', (newValue, oldValue) ->
       if newValue != oldValue
         $scope.participationForm.$setDirty()
+        for i in [oldValue.length..newValue.length-1]
+          $scope.checkFileName(newValue[i])
 
-# TODO
-#    $scope.checkConfiguration = (configuration) ->
-#      if !$scope.configuration
-#        return false
-#      for key in $scope.configuration
-#        if configuration == key
-#          return true
-#      return false
+    $scope.checkFileName = (file) ->
+      patt =
+        'CARRE': /^Cir\d+-\d+-Pass\d+-Tron\d+-Chiro_[0-1]_\d+_000.(wav|ta|tac)$/
+        'POINT_FIXE': /^Car\d\d\d\d\d-\d\d\d\d-Pass\d+-([A-H][1-2]|Z[1-9])-DDDDD_[0-1]_AAMMJJ_HHMMSS_MMM.(wav|ta|tac)$/
+        'ROUTIER': /^Cir\d+-\d+-Pass\d+-Tron\d+-Chiro_[0-1]_\d+_000.(wav|ta|tac)$/
+      res = patt[$scope.site.protocole.type_site].test(file.file.name)
+      if !res
+        throw "Error : bad file name format "+file.file.name
 
     $scope.saveParticipation = ->
       $scope.submitted = true
@@ -138,22 +138,20 @@ angular.module('participationViews', ['ngRoute', 'textAngular', 'xin_listResourc
       # Retrieve the modified fields from the form
       for key, value of $scope.participationForm
         if key.charAt(0) != '$' and value.$dirty
-          if key == 'temperature_debut' or
-             key == 'temperature_fin' or
-             key == 'vent' or key == 'couverture'
+          if key in ['temperature_debut', 'temperature_fin', 'vent', 'couverture']
             if $scope.participation.meteo[key]?
               payload.meteo[key] = $scope.participation.meteo[key]
-          else if key == 'detecteur_enregistreur_numero_serie' or
-             key == 'micro0_position' or key == 'micro0_numero_serie' or
-             key == 'micro0_hauteur' or key == 'micro1_position' or
-             key == 'micro1_numero_serie' or key == 'micro1_hauteur'
+          else if key in ['detecteur_enregistreur_numero_serie',
+                          'micro0_position','micro0_numero_serie',
+                          'micro0_hauteur', 'micro1_position',
+                          'micro1_numero_serie', 'micro1_hauteur']
             if $scope.participation.configuration[key]?
               payload.configuration[key] = $scope.participation.configuration[key]
       for file in $scope.uploaders
         if file.status != 'done'
           $scope.participationForm.pieces_jointes = {$error: {uploading: true}}
           return
-      Backend.all('sites/'+$scope.siteId+'/participations').post(payload).then(
+      Backend.all('sites/'+$scope.site._id+'/participations').post(payload).then(
         (participation) ->
           Backend.one('participations', participation._id).get().then (participation) ->
             if $scope.uploaders.length == 0
@@ -165,15 +163,11 @@ angular.module('participationViews', ['ngRoute', 'textAngular', 'xin_listResourc
               ta: []
               photos: []
             for file in $scope.uploaders
-              if file.file.type == 'audio/wav' or
-                 file.file.type == 'audio/x-wav'
+              if file.file.type in ['audio/wav', 'audio/x-wav']
                 payload.wav.push(file.id)
-              else if file.file.type == 'application/ta' or
-                      file.file.type == 'application/tac'
+              else if file.file.type in ['application/ta', 'application/tac']
                 payload.ta.push(file.id)
-              else if file.file.type == 'image/bmp' or
-                      file.file.type == 'image/png' or
-                      file.file.type == 'image/jpeg'
+              else if file.file.type in ['image/bmp', 'image/png', 'image/jpeg']
                 payload.photos.push(file.id)
             participation.customPUT(payload, 'pieces_jointes').then(
               -> window.location = '#/participations/'+participation._id
@@ -260,15 +254,6 @@ angular.module('participationViews', ['ngRoute', 'textAngular', 'xin_listResourc
     $scope.$watchCollection 'uploaders', (newValue, oldValue) ->
       if newValue != oldValue
         $scope.participationForm.$setDirty()
-
-# TODO
-#    $scope.checkConfiguration = (configuration) ->
-#      if !$scope.configuration
-#        return false
-#      for key in $scope.configuration
-#        if configuration == key
-#          return true
-#      return false
 
     $scope.saveParticipation = ->
       $scope.submitted = true
