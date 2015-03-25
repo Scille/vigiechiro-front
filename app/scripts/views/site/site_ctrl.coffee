@@ -74,15 +74,17 @@ angular.module('siteViews', ['ngRoute', 'textAngular', 'xin_backend', 'protocole
           delete $scope.lookup.q
     $scope.resourceBackend = Backend.all('moi/sites')
 
+
   .controller 'DisplaySiteController', ($routeParams, $scope
                                         Backend, session) ->
     Backend.one('sites', $routeParams.siteId).get().then (site) ->
       if breadcrumbsGetSiteDefer?
         breadcrumbsGetSiteDefer.resolve(site)
         breadcrumbsGetSiteDefer = undefined
-      $scope.site = site.plain()
+      $scope.site = site
       $scope.typeSite = site.protocole.type_site
       session.getUserPromise().then (user) ->
+        $scope.userId = user._id
         for protocole in user.protocoles
           if protocole.protocole._id == $scope.site.protocole._id
             if protocole.valide?
@@ -91,7 +93,8 @@ angular.module('siteViews', ['ngRoute', 'textAngular', 'xin_backend', 'protocole
     session.getIsAdminPromise().then (isAdmin) ->
       $scope.isAdmin = isAdmin
 
-  .directive 'displaySiteDirective', (protocolesFactory) ->
+
+  .directive 'displaySiteDirective', ($route, protocolesFactory) ->
     restrict: 'E'
     templateUrl: 'scripts/views/site/display_site_drt.html'
     scope:
@@ -105,6 +108,14 @@ angular.module('siteViews', ['ngRoute', 'textAngular', 'xin_backend', 'protocole
           mapProtocole = protocolesFactory(scope.site, scope.typeSite,
                                            mapDiv)
           mapProtocole.loadMap()
+
+      scope.lockSite = (lock) ->
+        scope.site.patch({'verrouille': lock}).then(
+          ->
+          (error) -> throw error
+        )
+        $route.reload()
+
 
   .directive 'listSitesDirective', (session, Backend) ->
     restrict: 'E'

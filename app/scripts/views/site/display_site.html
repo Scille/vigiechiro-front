@@ -26,9 +26,12 @@
 
   <a class="btn btn-primary" href="#/sites/{{site._id}}/nouvelle-participation"
      ng-disabled="!site.verrouille || !isProtocoleValid">
-    Nouvelle participation
+    Nouvelle participation <span ng-if="site.observateur._id != userId">opportuniste</span>
   </a>
-  <div ng-if="!site.verrouille || !isProtocoleValid">
-    Le protocole et/ou le site ne sont pas encore validés.
+  <div ng-if="!site.verrouille">
+    Le site n'est pas encore verrouillé.
+  </div>
+  <div ng-if="!isProtocoleValid">
+    Le protocole n'est pas encore validé.
   </div>
 </div>

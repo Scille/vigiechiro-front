@@ -7,11 +7,23 @@
     {{ site.commentaire }}
   </div>
 
-  <div class="checkbox">
-    <label>
-      <input type="checkbox" ng-model="site.verrouille" ng-value="true"
-             ng-checked="site.verrouille" disabled>
-        Verrouillé
-    </label>
+  <div ng-if="site.verrouille">
+    <span class="label label-success">
+      Site verrouillé
+    </span>
+    &nbsp;
+    <a class="btn btn-warning" ng-click="lockSite(false)" ng-if="isAdmin">
+      Déverrouiller
+    </a>
+  </div>
+
+  <div ng-if="!site.verrouille">
+    <span class="label label-danger">
+      Site non verrouillé
+    </span>
+    &nbsp;
+    <a class="btn btn-primary" ng-click="lockSite(true)" ng-if="isAdmin">
+      Verrouiller
+    </a>
   </div>
 </div>
