@@ -117,6 +117,26 @@ angular.module('siteViews', ['ngRoute', 'textAngular', 'xin_backend', 'protocole
         $route.reload()
 
 
+  .directive 'displaySitesDirective', (session, Backend) ->
+    restrict: 'E'
+    templateUrl: 'scripts/views/site/display_sites_drt.html'
+    scope:
+      protocoleId: '@'
+    link: (scope, elem, attrs) ->
+      scope.loading = true
+      session.getUserPromise().then (user) ->
+        scope.userId = user._id
+      attrs.$observe 'protocoleId', (protocoleId) ->
+        if protocoleId
+          Backend.all('protocoles/'+scope.protocoleId+'/sites').getList().then (sites) ->
+            scope.sites = sites.plain()
+            mapDiv = elem.find('.g-maps')[0]
+            mapProtocole = protocolesFactory(scope.site, scope.typeSite,
+                                             mapDiv)
+            mapProtocole.loadMap()
+            scope.loading = false
+
+
   .directive 'listSitesDirective', (session, Backend) ->
     restrict: 'E'
     templateUrl: 'scripts/views/site/list_sites_drt.html'
@@ -131,6 +151,7 @@ angular.module('siteViews', ['ngRoute', 'textAngular', 'xin_backend', 'protocole
           Backend.all('protocoles/'+scope.protocoleId+'/sites').getList().then (sites) ->
             scope.sites = sites.plain()
             scope.loading = false
+
 
   .directive 'createSiteDirective', ->
     restrict: 'E'
