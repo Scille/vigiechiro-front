@@ -117,21 +117,22 @@ angular.module('siteViews', ['ngRoute', 'textAngular', 'xin_backend', 'protocole
         $route.reload()
 
 
-  .directive 'displaySitesDirective', (session, Backend) ->
+  .directive 'displaySitesDirective', (session, Backend, protocolesFactory) ->
     restrict: 'E'
     templateUrl: 'scripts/views/site/display_sites_drt.html'
     scope:
       protocoleId: '@'
+      typeSite: '@'
     link: (scope, elem, attrs) ->
       scope.loading = true
       session.getUserPromise().then (user) ->
         scope.userId = user._id
-      attrs.$observe 'protocoleId', (protocoleId) ->
-        if protocoleId
+      attrs.$observe 'typeSite', (typeSite) ->
+        if typeSite
           Backend.all('protocoles/'+scope.protocoleId+'/sites').getList().then (sites) ->
             scope.sites = sites.plain()
             mapDiv = elem.find('.g-maps')[0]
-            mapProtocole = protocolesFactory(scope.site, scope.typeSite,
+            mapProtocole = protocolesFactory(scope.sites, "ALL_"+scope.typeSite,
                                              mapDiv)
             mapProtocole.loadMap()
             scope.loading = false
@@ -347,16 +348,19 @@ angular.module('siteViews', ['ngRoute', 'textAngular', 'xin_backend', 'protocole
       Backend.all('sites').post(payload).then(
         (site) ->
           localites = mapProtocole.saveMap()
+          payload =
+            localites: []
           for localite in localites
-            payload =
+            tmp =
               nom: localite.name
 #              coordonnee: localite.geometries.geometries[0]
               geometries: localite.geometries
               representatif: false
-            site.customPUT(payload, "localites").then(
-              ->
-              (error) -> throw error
-            )
+            payload.localites.push(tmp)
+          site.customPUT(payload, "localites").then(
+            ->
+            (error) -> throw error
+          )
           if $scope.site.verrouille
             site.patch({'verrouille': true}).then(
               ->
@@ -511,17 +515,24 @@ angular.module('siteViews', ['ngRoute', 'textAngular', 'xin_backend', 'protocole
         'verrouille': $scope.site.verrouille
       $scope.site.patch(payload).then(
         (site) ->
-          localites = mapProtocole.saveMap()
-          for localite in localites
-            payload =
-              nom: localite.name
-#              coordonnee: localite.geometries.geometries[0]
-              geometries: localite.geometries
-              representatif: false
-#            site.customPUT(payload, "localites").then(
-#              ->
-#              (error) -> throw error
-#            )
-          $route.reload()
+          site.customDELETE('localites').then(
+            ->
+              localites = mapProtocole.saveMap()
+              payload =
+                localites: []
+              for localite in localites
+                tmp =
+                  nom: localite.name
+    #              coordonnee: localite.geometries.geometries[0]
+                  geometries: localite.geometries
+                  representatif: false
+                payload.localites.push(tmp)
+                site.customPUT(payload, "localites").then(
+                  ->
+                  (error) -> throw error
+                )
+              $route.reload()
+            (error) -> throw "Error " + error
+          )
         (error) -> throw "error " + error
       )

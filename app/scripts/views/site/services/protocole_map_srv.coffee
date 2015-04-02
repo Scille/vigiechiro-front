@@ -9,8 +9,16 @@ localite_colors = [
 ]
 locBySegment = 5
 
-angular.module('protocole_map', ['protocole_map_carre', 'protocole_map_point_fixe', 'protocole_map_routier'])
-  .factory 'protocolesFactory', (ProtocoleMapCarre, ProtocoleMapRoutier, ProtocoleMapPointFixe) ->
+angular.module('protocole_map', ['protocole_map_carre',
+                                 'protocole_map_point_fixe',
+                                 'protocole_map_routier',
+                                 'protocole_map_display_all'])
+  .factory 'protocolesFactory', (ProtocoleMapCarre,
+                                 ProtocoleMapRoutier,
+                                 ProtocoleMapPointFixe,
+                                 ProtocoleMapDisplayCarre,
+                                 ProtocoleMapDisplayRoutier,
+                                 ProtocoleMapDisplayPointFixe) ->
     (site, protocoleAlgoSite, mapDiv, siteCallback = {}) ->
       if protocoleAlgoSite == 'ROUTIER'
         return new ProtocoleMapRoutier(site, mapDiv, siteCallback)
@@ -18,6 +26,12 @@ angular.module('protocole_map', ['protocole_map_carre', 'protocole_map_point_fix
         return new ProtocoleMapCarre(site, mapDiv, siteCallback)
       else if protocoleAlgoSite == 'POINT_FIXE'
         return new ProtocoleMapPointFixe(site, mapDiv, siteCallback)
+      else if protocoleAlgoSite == 'ALL_ROUTIER'
+        return new ProtocoleMapDisplayRoutier(site, mapDiv)
+      else if protocoleAlgoSite == 'ALL_CARRE'
+        return new ProtocoleMapDisplayCarre(site, mapDiv)
+      else if protocoleAlgoSite == 'ALL_POINT_FIXE'
+        return new ProtocoleMapDisplayPointFixe(site, mapDiv)
       else
         throw "Error : unknown protocole #{protocoleAlgoSite}"
 
