@@ -1,12 +1,12 @@
 <div dropzone class="drop row" ng-class="dragOverClass" ng-click="clickFileInput()">
   <input type="file" class="btn hidden files-input"
-         custom-on-change="fileInputUploadFiles">
-  <center>Cliquez ou déposez vos fichiers ici</center>
+         custom-on-change="fileInputUploadFiles" directory webkitdirectory mozdirectory>
+  <center>Cliquez ou déposez votre dossier ici</center>
 </div>
 
 <div ng-repeat="uploader in uploaders" class="form-group">
   <div>
-    {{uploader.file.name}}
+    {{uploader.name}} {{uploader.filesUploaded}}/{{uploader.length}}
     <div class="progress">
       <div class="progress-bar" role="progressbar"
            aria-valuenow="{{uploader.progress}}"

@@ -3,26 +3,26 @@
 breadcrumbsGetParticipationDefer = undefined
 
 angular.module('participationViews', ['ngRoute', 'textAngular', 'xin_listResource',
-                                      'xin_backend', 'xin_session', 'xin_uploadFile',
-                                      'xin_tools',
+                                      'xin_backend', 'xin_session', 'xin_tools',
+                                      'xin_uploadFile', 'xin_uploadFolder',
                                       'siteViews', 'ui.bootstrap.datetimepicker'])
   .config ($routeProvider) ->
     $routeProvider
       .when '/participations',
         templateUrl: 'scripts/views/participation/list_participations.html'
-        controller: 'ListParticipationsCtrl'
+        controller: 'ListParticipationsController'
         breadcrumbs: 'Participations'
       .when '/participations/mes-participations',
         templateUrl: 'scripts/views/participation/list_participations.html'
-        controller: 'ListMesParticipationsCtrl'
+        controller: 'ListMesParticipationsController'
         breadcrumbs: 'Mes Participations'
       .when '/sites/:siteId/nouvelle-participation',
         templateUrl: 'scripts/views/participation/create_participation.html'
-        controller: 'CreateParticipationCtrl'
+        controller: 'CreateParticipationController'
         breadcrumbs: 'Nouvelle Participation'
       .when '/participations/:participationId',
         templateUrl: 'scripts/views/participation/display_participation.html'
-        controller: 'DisplayParticipationCtrl'
+        controller: 'DisplayParticipationController'
         breadcrumbs: ngInject ($q, $filter) ->
           breadcrumbsDefer = $q.defer()
           breadcrumbsGetParticipationDefer = $q.defer()
@@ -46,7 +46,7 @@ angular.module('participationViews', ['ngRoute', 'textAngular', 'xin_listResourc
             ])
           return breadcrumbsDefer.promise
 
-  .controller 'ListParticipationsCtrl', ($scope, Backend, DelayedEvent, session) ->
+  .controller 'ListParticipationsController', ($scope, Backend, DelayedEvent, session) ->
     $scope.title = "Toutes les participations"
     $scope.swap =
       title: "Voir mes participations"
@@ -64,7 +64,7 @@ angular.module('participationViews', ['ngRoute', 'textAngular', 'xin_listResourc
           delete $scope.lookup.q
     $scope.resourceBackend = Backend.all('participations')
 
-  .controller 'ListMesParticipationsCtrl', ($scope, Backend, DelayedEvent, session) ->
+  .controller 'ListMesParticipationsController', ($scope, Backend, DelayedEvent, session) ->
     $scope.title = "Mes participations"
     $scope.swap =
       title: "Voir toutes les participations"
@@ -82,30 +82,39 @@ angular.module('participationViews', ['ngRoute', 'textAngular', 'xin_listResourc
           delete $scope.lookup.q
     $scope.resourceBackend = Backend.all('moi/participations')
 
-  .controller 'CreateParticipationCtrl', ($routeParams, $scope, $timeout, Backend) ->
+  .controller 'CreateParticipationController', ($routeParams, $scope, $timeout, Backend) ->
     Backend.one('sites', $routeParams.siteId).get().then (site) ->
       $scope.site = site
 
   .directive 'createParticipationDirective', ->
     restrict: 'E'
     templateUrl: 'scripts/views/participation/create_participation_drt.html'
-    controller: 'CreateParticipationDirectiveCtrl'
+    controller: 'CreateParticipationDirectiveController'
     scope:
       site: '='
 
-  .controller 'CreateParticipationDirectiveCtrl', ($route, $scope,
-                                                   session, Backend) ->
+  .controller 'CreateParticipationDirectiveController', ($route, $scope,
+                                                         session, Backend) ->
     $scope.participation =
       date_debut: new Date()
-    $scope.uploaders = []
+    $scope.fileUploader = []
+    $scope.folderUploader = []
 
-    $scope.$watchCollection 'uploaders', (newValue, oldValue) ->
+    $scope.$watchCollection 'fileUploader', (newValue, oldValue) ->
       if newValue != oldValue
         $scope.participationForm.$setDirty()
         for i in [oldValue.length..newValue.length-1]
           $scope.checkFileName(newValue[i])
+    $scope.$watchCollection 'folderUploader', (newValue, oldValue) ->
+      if newValue != oldValue
+        $scope.participationForm.$setDirty()
+        for i in [oldValue.length..newValue.length-1]
+          for file in newValue[i].uploaders
+            $scope.checkFileName(file)
 
     $scope.checkFileName = (file) ->
+      if file.file.type in ['image/png', 'image/png', 'image/jpeg']
+        return
       patt =
         'CARRE': /^Cir\d+-\d+-Pass\d+-Tron\d+-Chiro_[0-1]_\d+_000.(wav|ta|tac)$/
         'POINT_FIXE': /^Car\d\d\d\d\d-\d\d\d\d-Pass\d+-([A-H][1-2]|Z[1-9])-DDDDD_[0-1]_AAMMJJ_HHMMSS_MMM.(wav|ta|tac)$/
@@ -147,14 +156,21 @@ angular.module('participationViews', ['ngRoute', 'textAngular', 'xin_listResourc
                           'micro1_numero_serie', 'micro1_hauteur']
             if $scope.participation.configuration[key]?
               payload.configuration[key] = $scope.participation.configuration[key]
-      for file in $scope.uploaders
+      # Check files
+      for file in $scope.fileUploader or []
         if file.status != 'done'
           $scope.participationForm.pieces_jointes = {$error: {uploading: true}}
           return
+      for folder in $scope.folderUploader
+        for file in folder.uploaders
+          if file.status != 'done'
+            $scope.participationForm.pieces_jointes = {$error: {uploading: true}}
+            return
+      # Post
       Backend.all('sites/'+$scope.site._id+'/participations').post(payload).then(
         (participation) ->
           Backend.one('participations', participation._id).get().then (participation) ->
-            if $scope.uploaders.length == 0
+            if $scope.fileUploader.length == 0 && $scope.folderUploader.length == 0
               window.location = '#/participations/'+participation._id
               return
             else
@@ -162,19 +178,28 @@ angular.module('participationViews', ['ngRoute', 'textAngular', 'xin_listResourc
               wav: []
               ta: []
               photos: []
-            for file in $scope.uploaders
+            for file in $scope.fileUploader
               if file.file.type in ['audio/wav', 'audio/x-wav']
                 payload.wav.push(file.id)
               else if file.file.type in ['application/ta', 'application/tac']
                 payload.ta.push(file.id)
               else if file.file.type in ['image/bmp', 'image/png', 'image/jpeg']
                 payload.photos.push(file.id)
+            for folder in $scope.folderUploader
+              for file in folder.uploaders
+                if file.file.type in ['audio/wav', 'audio/x-wav']
+                  payload.wav.push(file.id)
+                else if file.file.type in ['application/ta', 'application/tac']
+                  payload.ta.push(file.id)
+                else if file.file.type in ['image/bmp', 'image/png', 'image/jpeg']
+                  payload.photos.push(file.id)
             participation.customPUT(payload, 'pieces_jointes').then(
               -> window.location = '#/participations/'+participation._id
               -> throw "Error : PUT files"
             )
         (error) -> throw "Error : participation save "+error
       )
+
 
   .directive 'listParticipationsDirective', (session, Backend) ->
     restrict: 'E'
@@ -190,7 +215,7 @@ angular.module('participationViews', ['ngRoute', 'textAngular', 'xin_listResourc
               scope.participations = participations.plain()
               scope.loading = false
 
-  .controller 'DisplayParticipationCtrl', ($scope, $route, $routeParams,
+  .controller 'DisplayParticipationController', ($scope, $route, $routeParams,
                                            session, Backend) ->
     $scope.userId = undefined
     session.getUserPromise().then (user) ->
@@ -243,12 +268,12 @@ angular.module('participationViews', ['ngRoute', 'textAngular', 'xin_listResourc
   .directive 'editParticipationDirective', ->
     restrict: 'E'
     templateUrl: 'scripts/views/participation/create_participation_drt.html'
-    controller: 'EditParticipationDirectiveCtrl'
+    controller: 'EditParticipationDirectiveController'
     scope:
       participation: '='
 
-  .controller 'EditParticipationDirectiveCtrl', ($route, $scope,
-                                                 session, Backend) ->
+  .controller 'EditParticipationDirectiveController', ($route, $scope,
+                                                       session, Backend) ->
     $scope.uploaders = []
 
     $scope.$watchCollection 'uploaders', (newValue, oldValue) ->

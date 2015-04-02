@@ -122,9 +122,9 @@
     <div class="form-group"
       ng-class="{'has-error': participationForm.pieces_jointes.$invalid && !participationForm.$pristine}">
       <div class="input-group">
-        <span class="input-group-addon">Pièces jointes</span>
+        <span class="input-group-addon">Fichiers joints</span>
         <div style="padding-right: 1em; border-left: 1px solid #ccc">
-          <upload-file-directive multiple uploaders="uploaders">
+          <upload-file-directive uploaders="fileUploader" multiple>
           </upload-file-directive>
         </div>
       </div>
@@ -134,6 +134,25 @@
       </span>
       <span class="help-block"
         ng-show="submitted && participationForm.pieces_jointes.$error.uploading">
+        Le transfert des pièces jointes n'est pas terminé
+      </span>
+    </div>
+
+    <div class="form-group"
+      ng-class="{'has-error': participationForm.folder.$invalid && !participationForm.$pristine}">
+      <div class="input-group">
+        <span class="input-group-addon">Dossier joint</span>
+        <div style="padding-right: 1em; border-left: 1px solid #ccc">
+          <upload-folder-directive uploaders="folderUploader" >
+          </upload-folder-directive>
+        </div>
+      </div>
+      <span class="help-block"
+        ng-show="submitted && participationForm.folder.$error.required">
+        Champ requis
+      </span>
+      <span class="help-block"
+        ng-show="submitted && participationForm.folder.$error.uploading">
         Le transfert des pièces jointes n'est pas terminé
       </span>
     </div>
