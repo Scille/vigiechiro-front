@@ -14,7 +14,7 @@ describe 'Test taxon for observateur', ->
   it 'Test get taxon list', ->
     browser.setLocation('taxons').then ->
       taxons = $$('.list-group-item')
-      expect(taxons.count()).toEqual(4)
+      expect(taxons.count()).toEqual(20)
 
   it 'Test view taxon', ->
     browser.setLocation('taxons').then ->
