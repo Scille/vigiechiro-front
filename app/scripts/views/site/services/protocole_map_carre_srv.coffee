@@ -4,8 +4,8 @@
 angular.module('protocole_map_carre', [])
   .factory 'ProtocoleMapCarre', ($rootScope, Backend, GoogleMaps, ProtocoleMap) ->
     class ProtocoleMapCarre extends ProtocoleMap
-      constructor: (@site, mapDiv, @allowEdit, @siteCallback) ->
-        super @site, mapDiv, @allowEdit, @siteCallback
+      constructor: (@site, mapDiv, @siteCallback) ->
+        super @site, mapDiv, @siteCallback
         @_steps = [
           "Positionner la zone de sélection aléatoire.",
           "Cliquer sur la carte pour sélection la grille stoc correspondante.",
@@ -19,37 +19,58 @@ angular.module('protocole_map_carre', [])
               google.maps.drawing.OverlayType.MARKER
             ]
         )
-        if (@_step < 2 or not @allowEdit)
-          @_googleMaps.setDrawingManagerOptions(drawingControl: false)
+        @_googleMaps.setDrawingManagerOptions(drawingControl: false)
         @loading = true
         @updateSite()
         @loading = false
 
+      clearMap: ->
+        @_googleMaps.setDrawingManagerOptions(
+          drawingControl: false
+          drawingMode: ''
+        )
+        for localite in @_localites
+          localite.overlay.setMap(null)
+        @_localites = []
+        @_step = 0
+        if @_circleLimit?
+          @_circleLimit.setMap(null)
+          @_circleLimit = null
+        @_newSelection = false
+        if Object.keys(@_grilleStoc).length
+          @_grilleStoc.item.setMap(null)
+          @_grilleStoc = {}
+        @updateSite()
+
       mapsCallback: ->
         overlayCreated: (overlay) =>
           isModified = false
-          if overlay.type == "Point"
-            if @_googleMaps.isPointInPolygon(overlay, @_grille[0].item)
-              isModified = true
+          if @_step == 1
+            @getGrilleStoc(overlay)
+            return false
           else
-            throw "Error : bad shape type " + overlay.type
-          if isModified
-            @saveOverlay(overlay)
-            @_googleMaps.addListener(overlay, 'rightclick', (e) =>
-              @deleteOverlay(overlay)
-              if @getCountOverlays() < 5
-                @_step = 2
-              else
-                @_step = 3
-              @updateSite()
-            )
-            if @getCountOverlays() >= 5
-              @_step = 3
+            if overlay.type == "Point"
+              if @_googleMaps.isPointInPolygon(overlay, @_grille[0].item)
+                isModified = true
             else
-              @_step = 2
-            @updateSite()
-            return true
-          return false
+              throw "Error : bad shape type " + overlay.type
+            if isModified
+              @saveOverlay(overlay)
+              @_googleMaps.addListener(overlay, 'rightclick', (e) =>
+                @deleteOverlay(overlay)
+                if @getCountOverlays() < 5
+                  @_step = 2
+                else
+                  @_step = 3
+                @updateSite()
+              )
+              if @getCountOverlays() >= 5
+                @_step = 3
+              else
+                @_step = 2
+              @updateSite()
+              return true
+            return false
 
       saveOverlay: (overlay) =>
         localite = {}

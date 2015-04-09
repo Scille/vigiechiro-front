@@ -5,7 +5,7 @@ breadcrumbsGetParticipationDefer = undefined
 angular.module('participationViews', ['ngRoute', 'textAngular', 'xin_listResource',
                                       'xin_backend', 'xin_session', 'xin_tools',
                                       'xin_uploadFile', 'xin_uploadFolder',
-                                      'siteViews', 'ui.bootstrap.datetimepicker'])
+                                      'ui.bootstrap.datetimepicker'])
   .config ($routeProvider) ->
     $routeProvider
       .when '/participations',

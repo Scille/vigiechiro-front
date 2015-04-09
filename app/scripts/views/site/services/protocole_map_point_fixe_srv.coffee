@@ -19,11 +19,28 @@ angular.module('protocole_map_point_fixe', [])
               google.maps.drawing.OverlayType.MARKER
             ]
         )
-        if (@_step < 2 or not @allowEdit)
-          @_googleMaps.setDrawingManagerOptions(drawingControl: false)
+        @_googleMaps.setDrawingManagerOptions(drawingControl: false)
         @loading = true
         @updateSite()
         @loading = false
+
+      clearMap: ->
+        @_googleMaps.setDrawingManagerOptions(
+          drawingControl: false
+          drawingMode: ''
+        )
+        for localite in @_localites
+          localite.overlay.setMap(null)
+        @_localites = []
+        @_step = 0
+        if @_circleLimit?
+          @_circleLimit.setMap(null)
+          @_circleLimit = null
+        @_newSelection = false
+        if Object.keys(@_grilleStoc).length
+          @_grilleStoc.item.setMap(null)
+          @_grilleStoc = {}
+        @updateSite()
 
       mapsCallback: ->
         overlayCreated: (overlay) =>

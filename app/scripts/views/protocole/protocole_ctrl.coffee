@@ -14,7 +14,7 @@ make_payload = ($scope) ->
 
 angular.module('protocoleViews', ['ngRoute', 'textAngular', 'xin_listResource',
                                   'xin_backend', 'xin_session', 'xin_tools',
-                                  'siteViews'])
+                                  'displaySiteViews', 'createSiteViews'])
   .config ($routeProvider) ->
     $routeProvider
       .when '/protocoles',
