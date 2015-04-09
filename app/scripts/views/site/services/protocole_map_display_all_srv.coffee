@@ -52,7 +52,13 @@ angular.module('protocole_map_display_all', [])
         # start loading
         @loading = true
         for site in @sites or []
-          console.log(site)
+          nbLocalites = site.localites.length
+          if nbLocalites > 0
+            start = site.localites[0].geometries.geometries[0].coordinates[0]
+            stop = site.localites[nbLocalites-1].geometries.geometries[0].coordinates[1]
+            @_googleMaps.createPoint(start[0], start[1], false, "Départ")
+            @_googleMaps.createPoint(stop[0], stop[1], false, "Arrivée")
+            @_googleMaps.createLineString([start, stop])
         # end loading
         @loading = false
 
