@@ -45,28 +45,32 @@ angular.module('protocole_map_point_fixe', [])
       mapsCallback: ->
         overlayCreated: (overlay) =>
           isModified = false
-          if overlay.type == "Point"
-            if @_googleMaps.isPointInPolygon(overlay, @_grille[0].item)
-              isModified = true
+          if @_step == 1
+            @getGrilleStoc(overlay)
+            return false
           else
-            throw "Error : bad shape type " + overlay.type
-          if isModified
-            @saveOverlay(overlay)
-            @_googleMaps.addListener(overlay, 'rightclick', (e) =>
-              @deleteOverlay(overlay)
-              if @getCountOverlays() < 1
-                @_step = 2
-              else
-                @_step = 3
-              @updateSite()
-            )
-            if @getCountOverlays() >= 1
-              @_step = 3
+            if overlay.type == "Point"
+              if @_googleMaps.isPointInPolygon(overlay, @_grilleStoc.item)
+                isModified = true
             else
-              @_step = 2
-            @updateSite()
-            return true
-          return false
+              throw "Error : bad shape type " + overlay.type
+            if isModified
+              @saveOverlay(overlay)
+              @_googleMaps.addListener(overlay, 'rightclick', (e) =>
+                @deleteOverlay(overlay)
+                if @getCountOverlays() < 1
+                  @_step = 2
+                else
+                  @_step = 3
+                @updateSite()
+              )
+              if @getCountOverlays() >= 1
+                @_step = 3
+              else
+                @_step = 2
+              @updateSite()
+              return true
+            return false
 
       saveOverlay: (overlay) =>
         localite = {}

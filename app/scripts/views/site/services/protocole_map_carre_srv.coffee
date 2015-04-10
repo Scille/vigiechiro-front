@@ -50,7 +50,7 @@ angular.module('protocole_map_carre', [])
             return false
           else
             if overlay.type == "Point"
-              if @_googleMaps.isPointInPolygon(overlay, @_grille[0].item)
+              if @_googleMaps.isPointInPolygon(overlay, @_grilleStoc.item)
                 isModified = true
             else
               throw "Error : bad shape type " + overlay.type

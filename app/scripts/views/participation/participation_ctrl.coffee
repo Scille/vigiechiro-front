@@ -46,6 +46,7 @@ angular.module('participationViews', ['ngRoute', 'textAngular', 'xin_listResourc
             ])
           return breadcrumbsDefer.promise
 
+
   .controller 'ListParticipationsController', ($scope, Backend, DelayedEvent, session) ->
     $scope.title = "Toutes les participations"
     $scope.swap =
@@ -63,6 +64,7 @@ angular.module('participationViews', ['ngRoute', 'textAngular', 'xin_listResourc
         else if $scope.lookup.q?
           delete $scope.lookup.q
     $scope.resourceBackend = Backend.all('participations')
+
 
   .controller 'ListMesParticipationsController', ($scope, Backend, DelayedEvent, session) ->
     $scope.title = "Mes participations"
@@ -82,9 +84,11 @@ angular.module('participationViews', ['ngRoute', 'textAngular', 'xin_listResourc
           delete $scope.lookup.q
     $scope.resourceBackend = Backend.all('moi/participations')
 
+
   .controller 'CreateParticipationController', ($routeParams, $scope, $timeout, Backend) ->
     Backend.one('sites', $routeParams.siteId).get().then (site) ->
       $scope.site = site
+
 
   .directive 'createParticipationDirective', ->
     restrict: 'E'
@@ -92,6 +96,7 @@ angular.module('participationViews', ['ngRoute', 'textAngular', 'xin_listResourc
     controller: 'CreateParticipationDirectiveController'
     scope:
       site: '='
+
 
   .controller 'CreateParticipationDirectiveController', ($route, $scope,
                                                          session, Backend) ->
@@ -113,12 +118,14 @@ angular.module('participationViews', ['ngRoute', 'textAngular', 'xin_listResourc
             $scope.checkFileName(file)
 
     $scope.checkFileName = (file) ->
+      if not file?
+        return
       if file.file.type in ['image/png', 'image/png', 'image/jpeg']
         return
       patt =
-        'CARRE': /^Cir\d+-\d+-Pass\d+-Tron\d+-Chiro_[0-1]_\d+_000.(wav|ta|tac)$/
-        'POINT_FIXE': /^Car\d\d\d\d\d-\d\d\d\d-Pass\d+-([A-H][1-2]|Z[1-9])-DDDDD_[0-1]_AAMMJJ_HHMMSS_MMM.(wav|ta|tac)$/
-        'ROUTIER': /^Cir\d+-\d+-Pass\d+-Tron\d+-Chiro_[0-1]_\d+_000.(wav|ta|tac)$/
+        'CARRE': /^Cir\d+-\d+-Pass\d+-Tron\d+-Chiro_[01]_\d+_000.(wav|ta|tac)$/
+        'POINT_FIXE': /^Car\d+-\d\d\d\d-Pass\d+-([A-H][12]|Z[1-9])_[01]_\d+_\d+_\d+.(wav|ta|tac)$/
+        'ROUTIER': /^Cir\d+-\d+-Pass\d+-Tron\d+-Chiro_[01]_\d+_000.(wav|ta|tac)$/
       res = patt[$scope.site.protocole.type_site].test(file.file.name)
       if !res
         throw "Error : bad file name format "+file.file.name
@@ -175,24 +182,22 @@ angular.module('participationViews', ['ngRoute', 'textAngular', 'xin_listResourc
               return
             else
             payload =
-              wav: []
-              ta: []
-              photos: []
+              pieces_jointes: []
             for file in $scope.fileUploader
               if file.file.type in ['audio/wav', 'audio/x-wav']
-                payload.wav.push(file.id)
+                payload.pieces_jointes.push(file.id)
               else if file.file.type in ['application/ta', 'application/tac']
-                payload.ta.push(file.id)
+                payload.pieces_jointes.push(file.id)
               else if file.file.type in ['image/bmp', 'image/png', 'image/jpeg']
-                payload.photos.push(file.id)
+                payload.pieces_jointes.push(file.id)
             for folder in $scope.folderUploader
               for file in folder.uploaders
                 if file.file.type in ['audio/wav', 'audio/x-wav']
-                  payload.wav.push(file.id)
+                  payload.pieces_jointes.push(file.id)
                 else if file.file.type in ['application/ta', 'application/tac']
-                  payload.ta.push(file.id)
+                  payload.pieces_jointes.push(file.id)
                 else if file.file.type in ['image/bmp', 'image/png', 'image/jpeg']
-                  payload.photos.push(file.id)
+                  payload.pieces_jointes.push(file.id)
             participation.customPUT(payload, 'pieces_jointes').then(
               -> window.location = '#/participations/'+participation._id
               -> throw "Error : PUT files"
@@ -215,6 +220,7 @@ angular.module('participationViews', ['ngRoute', 'textAngular', 'xin_listResourc
               scope.participations = participations.plain()
               scope.loading = false
 
+
   .controller 'DisplayParticipationController', ($scope, $route, $routeParams,
                                            session, Backend) ->
     $scope.userId = undefined
@@ -235,6 +241,7 @@ angular.module('participationViews', ['ngRoute', 'textAngular', 'xin_listResourc
         (error) -> throw error
       )
 
+
   .directive 'displayParticipationDirective', (Backend) ->
     restrict: 'E'
     templateUrl: 'scripts/views/participation/display_participation_drt.html'
@@ -251,7 +258,8 @@ angular.module('participationViews', ['ngRoute', 'textAngular', 'xin_listResourc
       scope.displayFiles = ->
         Backend.one('participations/'+scope.participation._id+'/pieces_jointes')
           .get().then (pieces_jointes) ->
-            scope.pieces_jointes = pieces_jointes.plain()
+            scope.pieces_jointes = pieces_jointes.plain().pieces_jointes
+
 
   .controller 'EditParticipationController', ($scope, $routeParams, Backend) ->
     $scope.participation = {}
@@ -265,12 +273,14 @@ angular.module('participationViews', ['ngRoute', 'textAngular', 'xin_listResourc
           .then (protocole) ->
             $scope.participation.site.protocole = protocole.plain()
 
+
   .directive 'editParticipationDirective', ->
     restrict: 'E'
     templateUrl: 'scripts/views/participation/create_participation_drt.html'
     controller: 'EditParticipationDirectiveController'
     scope:
       participation: '='
+
 
   .controller 'EditParticipationDirectiveController', ($route, $scope,
                                                        session, Backend) ->

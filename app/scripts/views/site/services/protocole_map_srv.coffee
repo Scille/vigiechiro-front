@@ -284,7 +284,7 @@ angular.module('protocole_map', ['protocole_map_carre',
         return overlay
 
       getIdGrilleStoc: ->
-        return @_grille[0].id
+        return @_grilleStoc.id
 
       createCell: (lat, lng) ->
         # 1000*racine(2)
@@ -392,7 +392,7 @@ angular.module('protocole_map', ['protocole_map_carre',
 
       validLocalites: ->
         @_step = 4
-        @_googleMaps.clearListeners(@_grille[0].item, 'rightclick')
+        @_googleMaps.clearListeners(@_grilleStoc.item, 'rightclick')
         @_googleMaps.setDrawingManagerOptions(
           drawingControl: false
           drawingMode: ''

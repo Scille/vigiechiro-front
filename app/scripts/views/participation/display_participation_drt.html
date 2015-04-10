@@ -75,6 +75,9 @@
         <div>Afficher les pièces jointes</div>
       </a>
       <div class="collapse" id="display-files-collapse">
+        <li class="list-group-item" ng-repeat="piece_jointe in pieces_jointes">
+          <access-file-directive file="piece_jointe"></access-file-directive>
+        </li>
         <div ng-show="pieces_jointes.wav">
           Fichiers sons
           <li class="list-group-item" ng-repeat="piece_jointe in pieces_jointes.wav">
