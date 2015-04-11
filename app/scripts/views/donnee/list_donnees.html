@@ -1,0 +1,54 @@
+Liste des données
+
+<div ng-repeat="donne in donnees">
+    Commentaire : {{ donnee.commentaire }}
+    Participation : {{ donnee.participation }}
+    Publique : {{ donnee.publique }}
+    Fichier : {{ donnee.fichier }}
+    Date Fichier : {{ donnee.date_fichier }}
+    Probleme : {{ donnee.probleme }}
+    Sous Probleme : {{ donnee.sous_probleme }}
+    Taux échantilonnage : {{ donnee.taux_echantillonnage }}
+    Durée : {{ donnee.duree }}
+    Détection : {{ donnee.detection }}
+      version
+      origine
+    Observations : {{ donnee.observations }}
+            'type': 'list',
+            'schema': {
+                'type': 'dict',
+                'schema': {
+                    'temps_debut': {'type': 'integer', 'required': True},
+                    'temps_fin': {'type': 'integer', 'required': True},
+                    'frequence_mediane': {'type': 'integer', 'required': True},
+                    'tadarida_taxon': relation('taxons', required=True),
+                    'tadarida_probabilite': {'type': 'integer', 'required': True},
+                    'tadarida_taxon_autre': {
+                        'type': 'list',
+                        'schema': {
+                            'type': 'dict',
+                            'schema': {
+                                'taxon': relation('taxons', required=True),
+                                'probabilite': {'type': 'integer', 'required': True}
+                            }
+                        }
+                    },
+                    'observateur_taxon': relation('taxons'),
+                    'observateur_probabilite': choice(['SUR', 'PROBABLE', 'POSSIBLE']),
+                    'validateur_taxon': relation('utilisateurs'),
+                    'validateur_probabilite': choice(['SUR', 'PROBABLE', 'POSSIBLE']),
+                    'messages': {
+                        'type': 'list',
+                        'schema': {
+                            'type': 'dict',
+                            'schema': {
+                                'message': {'type': 'string', 'required': True},
+                                'auteur': relation('utilisateurs', required=True),
+                                'date': {'type': 'datetime', 'required': True}
+                            }
+                        }
+                    }
+                }
+            }
+        }    
+</div>
