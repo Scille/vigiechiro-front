@@ -95,13 +95,12 @@ angular.module('displaySiteViews', ['ngRoute', 'textAngular', 'xin_backend',
       $scope.isAdmin = isAdmin
 
 
-  .directive 'displaySiteDirective', ($route, protocolesFactory) ->
+  .directive 'displaySiteDirective', ($route, session, protocolesFactory) ->
     restrict: 'E'
     templateUrl: 'scripts/views/site/display_site_drt.html'
     scope:
       site: '='
       typeSite: '@'
-      isAdmin: '@'
     link: (scope, elem, attrs) ->
       attrs.$observe 'typeSite', (typeSite) ->
         if typeSite
@@ -109,13 +108,14 @@ angular.module('displaySiteViews', ['ngRoute', 'textAngular', 'xin_backend',
           mapProtocole = protocolesFactory(scope.site, scope.typeSite,
                                            mapDiv)
           mapProtocole.loadMap()
-
       scope.lockSite = (lock) ->
         scope.site.patch({'verrouille': lock}).then(
           ->
           (error) -> throw error
         )
         $route.reload()
+      session.getIsAdminPromise().then (isAdmin) ->
+        scope.isAdmin = isAdmin
 
 
   .directive 'displaySitesDirective', (session, Backend, protocolesFactory) ->
