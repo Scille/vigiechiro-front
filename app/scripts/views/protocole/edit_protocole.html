@@ -17,7 +17,7 @@
       <label>
         <input type="checkbox" ng-model="protocole.macro_protocole" ng-value="true"
                ng-checked="protocole.macro_protocole">
-        Macro protocole
+        Programme
       </label>
     </div>
 
@@ -25,28 +25,30 @@
       <text-angular ng-model="protocole.description"></text-angular>
     </div>
 
-    <div class="input-group form-group">
-      <span class="input-group-addon">Type de site</span>
-      <select class="form-control" ng-model="protocole.type_site">
-        <option value="CARRE">Pédestre</option>
-        <option value="ROUTIER">Routier</option>
-        <option value="POINT_FIXE">Point fixe</option>
-      </select>
-    </div>
-    <span ng-show="submitted && !protocole.type_site"
-          class="help-block">
-      Champ requis
-    </span>
+    <div ng-show="!protocole.macro_protocole">
+      <div class="input-group form-group">
+        <span class="input-group-addon">Type de site</span>
+        <select class="form-control" ng-model="protocole.type_site">
+          <option value="CARRE">Pédestre</option>
+          <option value="ROUTIER">Routier</option>
+          <option value="POINT_FIXE">Point fixe</option>
+        </select>
+      </div>
+      <span ng-show="submitted && !protocole.type_site"
+            class="help-block">
+        Champ requis
+      </span>
 
-    <div class="input-group form-group">
-      <span class="input-group-addon">Taxon</span>
-      <select class="form-control" ng-model="protocole.taxon"
-              ng-options="taxon._id as taxon.libelle_long for taxon in taxons">
-      </select>
+      <div class="input-group form-group">
+        <span class="input-group-addon">Taxon</span>
+        <select class="form-control" ng-model="protocole.taxon"
+                ng-options="taxon._id as taxon.libelle_long for taxon in taxons">
+        </select>
+      </div>
+      <span ng-show="submitted && !protocole.taxon" class="help-block">
+        Champ requis
+      </span>
     </div>
-    <span ng-show="submitted && !protocole.taxon" class="help-block">
-      Champ requis
-    </span>
 
     <div class="input-group form-group">
       <input class="save-protocole btn btn-primary" type="submit" value="Sauvegarder"

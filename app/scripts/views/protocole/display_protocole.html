@@ -8,7 +8,9 @@
   <div class="panel panel-body">
     <span ng-bind-html="protocole.description"></span>
 
-    <div ng-if="protocole.type_site">
+    <div ng-if="!protocole.macro_protocole">
+      Taxon : {{ protocole.taxon.libelle_long }}
+      <br>
       Type des sites : {{ protocole.type_site }}
     </div>
   </div>
@@ -25,14 +27,16 @@
      Éditer
   </a>
 
-  <display-sites-directive protocole-id="{{protocole._id}}" type-site="{{protocole.type_site}}">
-  </display-sites-directive>
-  <list-sites-directive protocole-id="{{protocole._id}}">
-  </list-sites-directive>
-  <hr>
-  <create-site-directive protocole-id="{{protocole._id}}"
-                         type-site="{{protocole.type_site}}"
-                         user-registered="userRegistered"
-                         ng-show="userRegistered">
-  </create-site-directive>
+  <div ng-if="!protocole.macro_protocole">
+    <display-sites-directive protocole-id="{{protocole._id}}" type-site="{{protocole.type_site}}">
+    </display-sites-directive>
+    <list-sites-directive protocole-id="{{protocole._id}}">
+    </list-sites-directive>
+    <hr>
+    <create-site-directive protocole-id="{{protocole._id}}"
+                           type-site="{{protocole.type_site}}"
+                           user-registered="userRegistered"
+                           ng-show="userRegistered">
+    </create-site-directive>
+  </div>
 </div>

@@ -2,15 +2,18 @@
 
 breadcrumbsGetProtocoleDefer = undefined
 
-make_payload = ($scope) ->
+make_payload_macro = ($scope) ->
   payload =
     'titre': $scope.protocoleForm.titre.$modelValue
     'description': $scope.protocole.description
     'macro_protocole': $scope.protocole.macro_protocole
-    'type_site': $scope.protocole.type_site
-    'taxon': $scope.protocole.taxon
-#    'algo_tirage_site': $scope.protocole.algo_tirage_site
-#    'configuration_participation': []
+
+make_payload = ($scope) ->
+  payload = make_payload_macro($scope)
+  payload.type_site = $scope.protocole.type_site
+  payload.taxon = $scope.protocole.taxon
+  return payload
+
 
 angular.module('protocoleViews', ['ngRoute', 'textAngular', 'xin_listResource',
                                   'xin_backend', 'xin_session', 'xin_tools',
@@ -159,8 +162,6 @@ angular.module('protocoleViews', ['ngRoute', 'textAngular', 'xin_listResource',
           if protocole.protocole._id == $scope.protocole._id
             $scope.userRegistered = true
             break
-        Backend.one('taxons', $scope.protocole.taxon).get().then (taxon) ->
-          $scope.taxon = taxon.plain()
     $scope.registerProtocole = ->
       Backend.one('moi/protocoles/'+$scope.protocole._id).put().then(
         (response) ->
@@ -205,7 +206,11 @@ angular.module('protocoleViews', ['ngRoute', 'textAngular', 'xin_listResource',
           not $scope.protocoleForm.$dirty or
           not protocoleResource?)
         return
-      payload = make_payload($scope)
+      payload = null
+      if $scope.protocole.macro_protocole
+        payload = make_payload_macro($scope)
+      else
+        payload = make_payload($scope)
       # Finally refresh the page (needed for cache reasons)
       protocoleResource.patch(payload).then(
         -> $route.reload()
@@ -223,7 +228,11 @@ angular.module('protocoleViews', ['ngRoute', 'textAngular', 'xin_listResource',
       $scope.submitted = true
       if not $scope.protocoleForm.$valid or not $scope.protocoleForm.$dirty
         return
-      payload = make_payload($scope)
+      payload = null
+      if $scope.protocole.macro_protocole
+        payload = make_payload_macro($scope)
+      else
+        payload = make_payload($scope)
       Backend.all('protocoles').post(payload).then(
         (protocole) ->
           Backend.one('moi/protocoles/'+protocole._id).customPUT().then(
