@@ -3,7 +3,7 @@
 
     <div class="form-group" ng-class="{'has-error': taxonForm.libelle_long.$invalid && !taxonForm.$pristine}">
       <div class="input-group">
-        <label class="input-group-addon" for="libelle_long">Libellé long</label>
+        <label class="input-group-addon" for="libelle_long">Nom français (latin)</label>
         <input type="text" class="form-control" id="libelle_long" name="libelle_long"
                ng-model="taxon.libelle_long" ng-disabled="readOnly" required>
       </div>
@@ -13,7 +13,7 @@
 
     <div class="form-group" ng-class="{'has-error': taxonForm.libelle_court.$invalid && !taxonForm.$pristine}">
       <div class="input-group">
-        <label class="input-group-addon" for="libelle_court">Libellé court</label>
+        <label class="input-group-addon" for="libelle_court">Code</label>
         <input type="text" class="form-control" id="libelle_court" name="libelle_court"
                ng-model="taxon.libelle_court" ng-disabled="readOnly" required>
       </div>
