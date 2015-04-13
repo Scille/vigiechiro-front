@@ -117,7 +117,7 @@ describe 'Test list utilisateurs', ->
     browser.executeScript("window.localStorage.clear()")
 
   it 'Test list count', ->
-    expect($$('.list-group-item').count()).toEqual(4)
+    expect($$('.list-group-item').count()).toEqual(5)
 
   it 'Test filter', ->
     $(".search-field").sendKeys('observateur')

@@ -184,20 +184,10 @@ angular.module('participationViews', ['ngRoute', 'textAngular', 'xin_listResourc
             payload =
               pieces_jointes: []
             for file in $scope.fileUploader
-              if file.file.type in ['audio/wav', 'audio/x-wav']
-                payload.pieces_jointes.push(file.id)
-              else if file.file.type in ['application/ta', 'application/tac']
-                payload.pieces_jointes.push(file.id)
-              else if file.file.type in ['image/bmp', 'image/png', 'image/jpeg']
-                payload.pieces_jointes.push(file.id)
+              payload.pieces_jointes.push(file.id)
             for folder in $scope.folderUploader
               for file in folder.uploaders
-                if file.file.type in ['audio/wav', 'audio/x-wav']
-                  payload.pieces_jointes.push(file.id)
-                else if file.file.type in ['application/ta', 'application/tac']
-                  payload.pieces_jointes.push(file.id)
-                else if file.file.type in ['image/bmp', 'image/png', 'image/jpeg']
-                  payload.pieces_jointes.push(file.id)
+                payload.pieces_jointes.push(file.id)
             participation.customPUT(payload, 'pieces_jointes').then(
               -> window.location = '#/participations/'+participation._id
               -> throw "Error : PUT files"
