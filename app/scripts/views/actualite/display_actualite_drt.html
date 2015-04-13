@@ -60,7 +60,8 @@
 
 <div ng-if="actualite.action == 'NOUVEAU_SITE'">
   {{actualite._updated | xinDate: 'medium'}} :
-  <div>
+
+  <div ng-if="!actualite.date_validation">
     <span ng-if="actualite.sujet._id == user._id">
       Vous avez
     </span>
@@ -75,6 +76,26 @@
     <a href="#/sites/{{actualite.site._id}}">
       {{ actualite.site.titre }}.
     </a>
+  </div>
+
+  <div ng-if="actualite.date_validation">
+    <span ng-if="actualite.sujet._id == user._id">
+      Votre site
+      <a href="#/sites/{{actualite.site._id}}">
+        {{ actualite.site.titre }}
+      </a>
+    </span>
+    <span ng-if="actualite.sujet._id != user._id">
+      Le site
+      <a href="#/sites/{{actualite.site._id}}">
+        {{ actualite.site.titre }}
+      </a>
+      de l'utilisateur
+      <a href="#/utilisateurs/{{actualite.sujet._id}}">
+        {{ actualite.sujet.pseudo }}
+      </a>
+    </span>
+    a été verrouillé.
   </div>
 </div>
 

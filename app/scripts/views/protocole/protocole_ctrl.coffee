@@ -165,17 +165,8 @@ angular.module('protocoleViews', ['ngRoute', 'textAngular', 'xin_listResource',
     $scope.registerProtocole = ->
       Backend.one('moi/protocoles/'+$scope.protocole._id).put().then(
         (response) ->
-          if $scope.user.role == "Administrateur"
-            $scope.protocole.customPUT(null, 'observateurs/' + $scope.user._id)
-              .then(
-                ->
-                  session.refreshPromise()
-                  $route.reload()
-                -> throw "Error validation inscription"
-              )
-          else
-            session.refreshPromise()
-            $route.reload()
+          session.refreshPromise()
+          $route.reload()
         (error) -> throw error
       )
 
