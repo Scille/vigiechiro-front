@@ -1,0 +1,83 @@
+<div class="modal-content">
+  <div class="modal-header">
+    <h4 class="modal-title">
+      Donnée {{ donnee.titre }}
+    </h4>
+  </div>
+
+  <form class="simple-form" name="donneeForm"
+        ng-submit="saveDonnee()" novalidate>
+    <div class="modal-body">
+
+      <div class="form-group"
+           ng-class="{'has-error': donneeForm.commentaire.$invalid && !donneeForm.$pristine}">
+        <div class="input-group">
+          <label class="input-group-addon" for="commentaire">Commentaire</label>
+          <input type="text" class="form-control" id="commentaire" name="commentaire"
+                 ng-model="donnee.commentaire" ng-disabled="readOnly">
+        </div>
+      </div>
+
+      <div class="form-group"
+           ng-class="{'has-error': donneeForm.probleme.$invalid && !donneeForm.$pristine}">
+        <div class="input-group">
+          <label class="input-group-addon" for="probleme">Problème</label>
+          <select class="form-control" id="probleme" name="probleme"
+                 ng-model="donnee.probleme" ng-disabled="readOnly">
+            <option value=""></option>
+            <option value="Enregistrement saturé d'orthoptères">
+              Enregistrement saturé d'orthoptères
+            </option>
+            <option value="Enregistrement saturé de bruits">
+              Enregistrement saturé de bruits
+              </option>
+            <option value="Fort parasitage électronique">
+              Fort parasitage électronique
+            </option>
+            <option value="Localisation douteuse">
+              Localisation douteuse
+            </option>
+            <option value="Heure douteuse">
+              Heure douteuse
+            </option>
+            <option value="Date douteuse">
+              Date douteuse
+            </option>
+            <option value="Gain trop fort">
+              Gain trop fort
+            </option>
+            <option value="Gain trop faible">
+              Gain trop faible
+            </option>
+            <option value="Fenêtre de déclenchement mal réglée">
+              Fenêtre de déclenchement mal réglée
+            </option>
+            <option value="Signaux brouillés par leurs échos">
+              Signaux brouillés par leurs échos
+            </option>
+            <!-- ROUTIER PEDESTRE -->
+            <option value="Expansion de temps manquante">
+              Expansion de temps manquante
+            </option>
+            <option value="Enregistrement direct manquant">
+              Enregistrement direct manquant
+            </option>
+            <option value="Expansion de temps et enregistrement direct fondus">
+              Expansion de temps et enregistrement direct fondus
+            </option>
+            <!-- POINT FIXE -->
+            <option value="Filtre passe-haut mal réglé">
+              Filtre passe-haut mal réglé
+            </option>
+          </select>
+        </div>
+      </div>
+
+    </div>
+
+    <div class="modal-footer">
+      <button class="btn btn-primary" ng-click="done(true)">Valider</button>
+      <button class="btn btn-danger" ng-click="done(false)">Annuler</button>
+    </div>
+  </form>
+</div>

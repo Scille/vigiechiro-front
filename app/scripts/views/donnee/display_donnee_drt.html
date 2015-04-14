@@ -1,5 +1,8 @@
 <div>
-  <p><b>{{ donnee.titre }}</b></p>
+  <p>
+    <b>{{ donnee.titre }}</b>
+    <a class="btn btn-primary" ng-click="editDonnee()">Modifier</a>
+    </p>
   <p>
     <span ng-show="donnee.commentaire">{{ donnee.commentaire }}</span>
     <span ng-show="!donnee.commentaire">Aucun commentaire</span>
