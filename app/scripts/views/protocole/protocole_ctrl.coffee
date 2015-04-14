@@ -22,19 +22,19 @@ angular.module('protocoleViews', ['ngRoute', 'textAngular', 'xin_listResource',
     $routeProvider
       .when '/protocoles',
         templateUrl: 'scripts/views/protocole/list_protocoles.html'
-        controller: 'ListProtocolesCtrl'
+        controller: 'ListProtocolesController'
         breadcrumbs: 'Protocoles'
       .when '/protocoles/mes-protocoles',
         templateUrl: 'scripts/views/protocole/list_protocoles.html'
-        controller: 'ListMesProtocolesCtrl'
+        controller: 'ListMesProtocolesController'
         breadcrumbs: 'Mes Protocoles'
       .when '/protocoles/nouveau',
         templateUrl: 'scripts/views/protocole/edit_protocole.html'
-        controller: 'CreateProtocoleCtrl'
+        controller: 'CreateProtocoleController'
         breadcrumbs: 'Nouveau Protocole'
       .when '/protocoles/:protocoleId',
         templateUrl: 'scripts/views/protocole/display_protocole.html'
-        controller: 'DisplayProtocoleCtrl'
+        controller: 'DisplayProtocoleController'
         breadcrumbs: ngInject ($q) ->
           breadcrumbsDefer = $q.defer()
           breadcrumbsGetProtocoleDefer = $q.defer()
@@ -46,7 +46,7 @@ angular.module('protocoleViews', ['ngRoute', 'textAngular', 'xin_listResource',
           return breadcrumbsDefer.promise
       .when '/protocoles/:protocoleId/edition',
         templateUrl: 'scripts/views/protocole/edit_protocole.html'
-        controller: 'EditProtocoleCtrl'
+        controller: 'EditProtocoleController'
         breadcrumbs: ngInject ($q) ->
           breadcrumbsDefer = $q.defer()
           breadcrumbsGetProtocoleDefer = $q.defer()
@@ -58,8 +58,8 @@ angular.module('protocoleViews', ['ngRoute', 'textAngular', 'xin_listResource',
             ])
           return breadcrumbsDefer.promise
 
-  .controller 'ListProtocolesCtrl', ($scope, $q, $location, Backend,
-                                     session, DelayedEvent) ->
+  .controller 'ListProtocolesController', ($scope, $q, $location, Backend,
+                                           session, DelayedEvent) ->
     $scope.lookup = {}
     $scope.title = "Tous les protocoles"
     $scope.swap =
@@ -104,7 +104,7 @@ angular.module('protocoleViews', ['ngRoute', 'textAngular', 'xin_listResource',
           deferred.resolve(protocoles)
       return deferred.promise
 
-  .controller 'ListMesProtocolesCtrl', ($scope, $q, $location, Backend,
+  .controller 'ListMesProtocolesController', ($scope, $q, $location, Backend,
                                      session, DelayedEvent) ->
     $scope.lookup = {}
     $scope.title = "Mes protocoles"
@@ -148,7 +148,7 @@ angular.module('protocoleViews', ['ngRoute', 'textAngular', 'xin_listResource',
           deferred.resolve(protocoles)
       return deferred.promise
 
-  .controller 'DisplayProtocoleCtrl', ($route, $routeParams, $scope, Backend, session) ->
+  .controller 'DisplayProtocoleController', ($route, $routeParams, $scope, Backend, session) ->
     $scope.protocole = {}
     $scope.userRegistered = false
     session.getUserPromise().then (user) ->
@@ -170,7 +170,7 @@ angular.module('protocoleViews', ['ngRoute', 'textAngular', 'xin_listResource',
         (error) -> throw error
       )
 
-  .controller 'EditProtocoleCtrl', ($route, $routeParams, $scope, Backend) ->
+  .controller 'EditProtocoleController', ($route, $routeParams, $scope, Backend) ->
     $scope.submitted = false
     $scope.protocole = {}
     $scope.taxons = []
@@ -208,7 +208,7 @@ angular.module('protocoleViews', ['ngRoute', 'textAngular', 'xin_listResource',
         (error) -> throw error
       )
 
-  .controller 'CreateProtocoleCtrl', ($scope, session, Backend) ->
+  .controller 'CreateProtocoleController', ($scope, session, Backend) ->
     $scope.submitted = false
     $scope.protocole = {}
     $scope.configuration_participation = {}

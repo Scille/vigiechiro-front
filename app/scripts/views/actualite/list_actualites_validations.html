@@ -1,0 +1,21 @@
+<ul class="list-group">
+  <li class="list-group-item">
+    <b>Utilisateurs à valider</b>
+  </li>
+
+  <li class="list-group-item" ng-repeat="actualite in actualites">
+      <display-actualite-directive actualite="actualite"
+                                   is-admin="isAdmin">
+      </display-actualite-directive>
+  </li>
+
+  <li class="list-group-item"
+      ng-if="!loading && (!actualites || actualites.length == 0)">
+    Pas de validations pour le moment
+  </li>
+
+  <li class="list-group-item" ng-show="loading">
+      <center><img src="images/spinner.gif"></img></center>
+      <center>Changement de la liste des validations...</center>
+  </li>
+</ul>
