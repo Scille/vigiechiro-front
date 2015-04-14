@@ -16,7 +16,7 @@ angular.module('xin_listResource', ['ngRoute', 'angularUtils.directives.dirPagin
             $compile(element.contents())(scope)
         )
 
-  .controller 'ListResourceCtrl', ($scope, $timeout, $location, session) ->
+  .controller 'ListResourceController', ($scope, $timeout, $location, session) ->
     # Load lookup pagination from $location
     # params = $location.search()
     # if params.page?
@@ -52,7 +52,7 @@ angular.module('xin_listResource', ['ngRoute', 'angularUtils.directives.dirPagin
     restrict: 'E'
     transclude: true
     templateUrl: 'scripts/xin/list_resource_drt/list_resource.html'
-    controller: 'ListResourceCtrl'
+    controller: 'ListResourceController'
     scope:
       resourceBackend: '='
       lookup: '=?'

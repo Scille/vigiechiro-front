@@ -213,10 +213,7 @@ angular.module('participationViews', ['ngRoute', 'textAngular', 'xin_listResourc
 
 
   .controller 'DisplayParticipationController', ($scope, $route, $routeParams,
-                                           session, Backend) ->
-    $scope.userId = undefined
-    session.getUserPromise().then (user) ->
-      $scope.userId = user._id
+                                                 Backend) ->
     Backend.one('participations', $routeParams.participationId).get()
       .then (participation) ->
         if breadcrumbsGetParticipationDefer?
@@ -235,10 +232,12 @@ angular.module('participationViews', ['ngRoute', 'textAngular', 'xin_listResourc
 
   .directive 'displayParticipationDirective', (Backend) ->
     restrict: 'E'
+    controller: 'displayParticipationDrtController'
     templateUrl: 'scripts/views/participation/display_participation_drt.html'
     scope:
       participation: '='
     link: (scope, elem, attrs) ->
+      # test if an object is empty
       scope.isObjectEmpty = (obj) ->
         if !obj
           return false
@@ -246,10 +245,34 @@ angular.module('participationViews', ['ngRoute', 'textAngular', 'xin_listResourc
         if length
           return false
         return true
-      scope.displayFiles = ->
-        Backend.one('participations/'+scope.participation._id+'/pieces_jointes')
-          .get().then (pieces_jointes) ->
-            scope.pieces_jointes = pieces_jointes.plain().pieces_jointes
+
+  .controller 'displayParticipationDrtController', ($scope, Backend) ->
+    $scope.wav_lookup =
+      wav: true
+    $scope.ta_lookup =
+      ta: true
+    $scope.tc_lookup =
+      tc: true
+    $scope.$watch(
+      'participation'
+      (participation) ->
+        if participation?
+          # display images
+          Backend.all('participations/'+$scope.participation._id+'/pieces_jointes')
+            .getList({photos: true}).then (photos) ->
+              $scope.photos = photos.plain()
+          #
+          $scope.resourceBackend = Backend.all('participations/'+$scope.participation._id+'/pieces_jointes')
+    )
+    $scope.displayWavFiles = ->
+      $scope.wav_lookup =
+        wav: true
+    $scope.displayTaFiles = ->
+      $scope.ta_lookup =
+        ta: true
+    $scope.displayTcFiles = ->
+      $scope.tc_lookup =
+        tc: true
 
 
   .controller 'EditParticipationController', ($scope, $routeParams, Backend) ->

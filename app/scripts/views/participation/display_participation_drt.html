@@ -67,46 +67,62 @@
     </div>
 
     <div class="panel panel-default panel-body">
-      <div><b>Pièces jointes</b></div>
-      <a class="btn btn-default" data-toggle="collapse"
-         data-target="#display-files-collapse"
-         aria-expanded="false" aria-controls="display-files-collapse"
-         ng-click="displayFiles()">
-        <div>Afficher les pièces jointes</div>
-      </a>
-      <div class="collapse" id="display-files-collapse">
-        <li class="list-group-item" ng-repeat="piece_jointe in pieces_jointes">
-          <access-file-directive file="piece_jointe"></access-file-directive>
-        </li>
-        <div ng-show="pieces_jointes.wav">
-          Fichiers sons
-          <li class="list-group-item" ng-repeat="piece_jointe in pieces_jointes.wav">
-            <access-file-directive file="piece_jointe"></access-file-directive>
-          </li>
-        </div>
-        <div ng-show="!pieces_jointes.wav">
-          Pas de fichier son.
-        </div>
-        <div ng-show="pieces_jointes.ta">
-          Fichiers Tadarida
-          <li class="list-group-item" ng-repeat="piece_jointe in pieces_jointes.ta">
-            <access-file-directive file="piece_jointe"></access-file-directive>
-          </li>
-        </div>
-        <div ng-show="!pieces_jointes.ta">
-          Pas de fichier tadarida.
-        </div>
-        <div ng-show="pieces_jointes.photos">
-          Images
-          <li class="list-group-item"
-              ng-repeat="piece_jointe in pieces_jointes.photos">
-            <access-file-directive file="piece_jointe"></access-file-directive>
-          </li>
-        </div>
-        <div ng-show="!pieces_jointes.photos">
-          Pas d'image.
+      <p><b>Pièces jointes</b></p>
+      <div>
+        <span ng-repeat="photo in photos">
+          <access-photo-directive file="photo"></access-photo-directive>
+        </span>
+      </div>
+
+      <!-- WAV -->
+      <div>
+        <a class="btn btn-primary" data-toggle="collapse"
+           data-target="#display-wav-files-collapse"
+           aria-expanded="false" aria-controls="display-wav-files-collapse"
+           ng-click="displayWavFiles()">
+          <span ng-show="true">Afficher les fichiers son Tadarida</span>
+          <span ng-show="false">Cacher les fichiers son</span>
+        </a>
+        <div class="container collapse" id="display-wav-files-collapse">
+          <list-resource-directive resource-backend="resourceBackend"
+                                   lookup="wav_lookup">
+            <access-file-directive file="resource"></access-file-directive>
+          </list-resource-directive>
         </div>
       </div>
+
+      <!-- TA -->
+      <div>
+        <a class="btn btn-primary" data-toggle="collapse"
+           data-target="#display-ta-files-collapse"
+           aria-expanded="false" aria-controls="display-ta-files-collapse"
+           ng-click="displayTaFiles()">
+          Afficher les fichiers Tadarida D
+        </a>
+        <div class="container collapse" id="display-ta-files-collapse">
+          <list-resource-directive resource-backend="resourceBackend"
+                                   lookup="ta_lookup">
+            <access-file-directive file="resource"></access-file-directive>
+          </list-resource-directive>
+        </div>
+      </div>
+
+      <!-- TC -->
+      <div>
+        <a class="btn btn-primary" data-toggle="collapse"
+           data-target="#display-tc-files-collapse"
+           aria-expanded="false" aria-controls="display-tc-files-collapse"
+           ng-click="displayTcFiles()">
+          Afficher les fichiers Tadarida C
+        </a>
+        <div class="container collapse" id="display-tc-files-collapse">
+          <list-resource-directive resource-backend="resourceBackend"
+                                   lookup="tc_lookup">
+            <access-file-directive file="resource"></access-file-directive>
+          </list-resource-directive>
+        </div>
+      </div>
+
     </div>
 
     <div class="panel panel-default panel-body">
