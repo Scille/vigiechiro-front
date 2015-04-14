@@ -124,7 +124,8 @@ angular.module('participationViews', ['ngRoute', 'textAngular', 'xin_listResourc
         return
       patt =
         'CARRE': /^Cir\d+-\d+-Pass\d+-Tron\d+-Chiro_[01]_\d+_000.(wav|ta|tac)$/
-        'POINT_FIXE': /^Car\d+-\d\d\d\d-Pass\d+-([A-H][12]|Z[1-9])_[01]_\d+_\d+_\d+.(wav|ta|tac)$/
+#        'POINT_FIXE': /^Car\d+-\d\d\d\d-Pass\d+-([A-H][12]|Z[1-9])_[01]_\d+_\d+_\d+.(wav|ta|tac)$/
+        'POINT_FIXE': /^Car\d+-\d\d\d\d-Pass\d+-.+_\d+_\d+_\d+.(wav|ta|tac)$/
         'ROUTIER': /^Cir\d+-\d+-Pass\d+-Tron\d+-Chiro_[01]_\d+_000.(wav|ta|tac)$/
       res = patt[$scope.site.protocole.type_site].test(file.file.name)
       if !res

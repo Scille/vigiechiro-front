@@ -76,6 +76,7 @@ angular.module('xin_s3uploadFile', ['appSettings'])
         @_pause = $q.defer()
         @_bootstraped = false
         @_context = undefined
+
       _onFinished: () ->
         @progress = 100
         @status = 'done'
@@ -115,6 +116,13 @@ angular.module('xin_s3uploadFile', ['appSettings'])
           mime: @file.type
           titre: @file.name
           multipart: true
+        if payload.mime == ''
+          ta = /\.ta$/
+          tac = /\.tac$/
+          if ta.test(payload.titre)
+            payload.mime = 'application/ta'
+          else if tac.test(payload.titre)
+            payload.mime = 'application/tac'
         # Create the file in the backend
         Backend.all('fichiers').post(payload).then(
           (response) =>
@@ -170,6 +178,13 @@ angular.module('xin_s3uploadFile', ['appSettings'])
           mime: @file.type
           titre: @file.name
           multipart: false
+        if payload.mime == ''
+          ta = /\.ta$/
+          tac = /\.tac$/
+          if ta.test(payload.titre)
+            payload.mime = 'application/ta'
+          else if tac.test(payload.titre)
+            payload.mime = 'application/tac'
         callbacks =
           onError: (error) => @_onError(error)
           onProgress: (percent) => @_onProgress(percent)
@@ -183,6 +198,15 @@ angular.module('xin_s3uploadFile', ['appSettings'])
           (response) =>
             etag = response._etag
             @id = response._id
-            uploadToS3(callbacks, 'PUT', @file, response.s3_signed_url, {'Content-Type': @file.type})
+            contentType = @file.type
+            if contentType == ''
+              ta = /\.ta$/
+              tac = /\.tac$/
+              if ta.test(@file.name)
+                contentType = 'application/ta'
+              else if tac.test(@file.name)
+                contentType = 'application/tac'
+            uploadToS3(callbacks, 'PUT', @file, response.s3_signed_url,
+              {'Content-Type': contentType})
           (error) -> throw error
         )
