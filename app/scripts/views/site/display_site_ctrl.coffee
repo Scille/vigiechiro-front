@@ -142,14 +142,17 @@ angular.module('displaySiteViews', ['ngRoute', 'textAngular', 'xin_backend',
   .directive 'listSitesDirective', (session, Backend) ->
     restrict: 'E'
     templateUrl: 'scripts/views/site/list_sites_drt.html'
+    controller: 'listSitesDrtController'
     scope:
       protocoleId: '@'
     link: (scope, elem, attrs) ->
-      scope.loading = true
       session.getUserPromise().then (user) ->
         scope.userId = user._id
-      attrs.$observe 'protocoleId', (protocoleId) ->
-        if protocoleId
-          Backend.all('protocoles/'+scope.protocoleId+'/sites').getList().then (sites) ->
-            scope.sites = sites.plain()
-            scope.loading = false
+
+  .controller 'listSitesDrtController', ($scope, Backend) ->
+    $scope.$watch(
+      'protocoleId'
+      (value) ->
+        if value? and value != ''
+          $scope.resourceBackend = Backend.all('protocoles/'+value+'/sites')
+    )

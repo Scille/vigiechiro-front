@@ -44,6 +44,18 @@ angular.module('xin_listResource', ['ngRoute', 'angularUtils.directives.dirPagin
         #   $location.search('page', $scope.lookup.page)
       true
     )
+    $scope.$watch(
+      'resourceBackend'
+      ->
+        updateResourcesList()
+        # Save pagination in $location
+        # params = $location.search()
+        # if $scope.lookup.max_results != params.max_results
+        #   $location.search('items', $scope.lookup.max_results)
+        # if $scope.lookup.page != params.page
+        #   $location.search('page', $scope.lookup.page)
+      true
+    )
     $scope.pageChange = (newPage) ->
       $scope.lookup.page = newPage
       updateResourcesList()

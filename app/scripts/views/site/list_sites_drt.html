@@ -1,36 +1,29 @@
 <div class="container">
-  <div ng-if="!loading">
-    <div ng-if="sites.length != 0">
-      <div class="page-header">
-          <h3>Les sites</h3>
-      </div>
+  <div ng-if="sites.length != 0">
 
-      <ul class="list-group">
-        <li class="list-group-item" ng-repeat="site in sites">
-          <a href="#/sites/{{site._id}}">
-            <span>{{site.titre}}</span>
-            <span class="pull-right" style="white-space: nowrap">
-              <span class="label label-success"
-                    ng-show="site.observateur._id == userId">
-                Propriétaire
-              </span>
-              &nbsp;
-              <span class="label label-default" ng-show="site.verrouille">
-                Verrouillé
-              </span>
-            </span>
-          </a>
-        </li>
-      </ul>
+    <div class="page-header">
+        <h3>Les sites</h3>
     </div>
 
-    <div ng-show="!loading && sites.length == 0" class="text-center">
-      <h3><i>Vous n'avez pas de sites pour le moment</i></h3>
-    </div>
-  </div>
+    <list-resource-directive resource-backend="resourceBackend">
+      <a href="#/sites/{{resource._id}}">
+        <span>{{resource.titre}}</span>
+        <span class="pull-right" style="white-space: nowrap">
+          <span class="label label-success"
+                ng-show="resource.observateur._id == user._id">
+            Propriétaire
+          </span>
+          <span class="label label-primary"
+                ng-show="resource.observateur._id != user._id">
+            {{ resource.observateur.pseudo }}
+          </span>
+          &nbsp;
+          <span class="label label-default" ng-show="resource.verrouille">
+            Verrouillé
+          </span>
+        </span>
+      </a>
+    </list-resource-directive>
 
-  <div ng-if="loading">
-    <center><img src="images/spinner.gif"></img></center>
-    <center>Changement de la liste des sites...</center>
   </div>
 </div>
