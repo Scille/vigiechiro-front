@@ -1,0 +1,65 @@
+<div>
+  <p><b>{{ donnee.titre }}</b></p>
+  <p>
+    <span ng-show="donnee.commentaire">{{ donnee.commentaire }}</span>
+    <span ng-show="!donnee.commentaire">Aucun commentaire</span>
+  </p>
+  Fichier : {{ donnee.fichier }}
+  <br>
+  Date Fichier : {{ donnee.date_fichier }}
+  <br>
+  Probleme : {{ donnee.probleme }}
+  <br>
+  Sous Probleme : {{ donnee.sous_probleme }}
+  <br>
+  Taux échantilonnage : {{ donnee.taux_echantillonnage }}
+  <br>
+  Durée : {{ donnee.duree }}
+  <br>
+  Détection : {{ donnee.detection }}
+  <br>
+  Version : {{ donnee.detection.version }}
+  <br>
+  Origine : {{ donnee.detection.origine }}
+  <br>
+  <b>Observations</b>
+  <div ng-repeat="observation in donnee.observations">
+    Temps début : {{ observation.temps_debut }}
+    <br>
+    Temps fin : {{observation.temps_fin}}
+    <br>
+    Fréquence médiane : {{ observation.frequence_mediane }}
+    <br>
+    Tadarida taxon : {{ observation.tadarida_taxon }}
+    <br>
+    Tadarida probabilité : {{ observation.tadarida_probabilite }}
+    <br>
+    Tadarida taxon autre :
+    <div ng-repeat="autre in observation.tadarida_taxon_autre">
+      Autre taxon : {{ autre.taxon }}
+      <br>
+      Autre probabilité : {{autre.probabilite }}
+    </div>
+    Observateur taxon : {{ observation.observateur_taxon }}
+    <br>
+    Observateur probabilité : {{ observation_probabilite }}
+    <br>
+    Validateur taxon : {{ observation.validateur_taxon }}
+    <br>
+    Validateur probabilité : {{ observation.validateur_probabilite }}
+    <br>
+    Messages :
+    <div ng-repeat="message in observation.messages">
+      Message : {{ message.message }}
+      <br>
+      Auteur : {{ message.auteur }}
+      <br>
+      Date : {{ message.date }}
+    </div>
+  </div>
+</div>
+
+<div class="form-group input-group">
+  <input class="form-control" type="text" ng-model="post">
+  <a class="input-group-addon" ng-click="addPost()">Ajouter un message</a>
+</div>
