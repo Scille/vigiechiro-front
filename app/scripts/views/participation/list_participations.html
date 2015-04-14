@@ -26,6 +26,10 @@
           ng-show="resource.observateur._id == user._id">
       Participant
     </span>
+    <span class="label label-primary pull-right"
+          ng-show="resource.observateur._id != user._id">
+      {{ resource.observateur.pseudo }}
+    </span>
   </list-resource-directive>
 
   <div class="text-center" ng-show="isAdmin">

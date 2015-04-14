@@ -25,6 +25,10 @@
               ng-show="resource.observateur._id == user._id">
           Propriétaire
         </span>
+        <span class="label label-primary"
+              ng-show="resource.observateur._id != user._id">
+          {{ resource.observateur.pseudo }}
+        </span>
         &nbsp;
         <span class="label label-default" ng-show="resource.verrouille">
           Verrouillé
