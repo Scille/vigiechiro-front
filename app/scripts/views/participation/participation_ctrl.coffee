@@ -2,6 +2,21 @@
 
 breadcrumbsGetParticipationDefer = undefined
 
+checkFileName = (file, type_site) ->
+  if not file?
+    return
+  if file.file.type in ['image/png', 'image/png', 'image/jpeg']
+    return
+  patt =
+    'CARRE': /^Cir\d+-\d+-Pass\d+-Tron\d+-Chiro_[01]_\d+_000.(wav|ta|tac)$/
+#    'POINT_FIXE': /^Car\d+-\d\d\d\d-Pass\d+-([A-H][12]|Z[1-9])_[01]_\d+_\d+_\d+.(wav|ta|tac)$/
+    'POINT_FIXE': /^Car\d+-\d\d\d\d-Pass\d+-.+_\d+_\d+_\d+.(wav|ta|tac)$/
+    'ROUTIER': /^Cir\d+-\d+-Pass\d+-Tron\d+-Chiro_[01]_\d+_000.(wav|ta|tac)$/
+  res = patt[type_site].test(file.file.name)
+  if !res
+    throw "Error : bad file name format "+file.file.name
+
+
 angular.module('participationViews', ['ngRoute', 'textAngular', 'xin_listResource',
                                       'xin_backend', 'xin_session', 'xin_tools',
                                       'xin_uploadFile', 'xin_uploadFolder',
@@ -85,118 +100,6 @@ angular.module('participationViews', ['ngRoute', 'textAngular', 'xin_listResourc
     $scope.resourceBackend = Backend.all('moi/participations')
 
 
-  .controller 'CreateParticipationController', ($routeParams, $scope, $timeout, Backend) ->
-    Backend.one('sites', $routeParams.siteId).get().then (site) ->
-      $scope.site = site
-
-
-  .directive 'createParticipationDirective', ->
-    restrict: 'E'
-    templateUrl: 'scripts/views/participation/create_participation_drt.html'
-    controller: 'CreateParticipationDirectiveController'
-    scope:
-      site: '='
-
-
-  .controller 'CreateParticipationDirectiveController', ($route, $scope,
-                                                         session, Backend) ->
-    $scope.participation =
-      date_debut: new Date()
-    $scope.fileUploader = []
-    $scope.folderUploader = []
-
-    $scope.$watchCollection 'fileUploader', (newValue, oldValue) ->
-      if newValue != oldValue
-        $scope.participationForm.$setDirty()
-        for i in [oldValue.length..newValue.length-1]
-          $scope.checkFileName(newValue[i])
-    $scope.$watchCollection 'folderUploader', (newValue, oldValue) ->
-      if newValue != oldValue
-        $scope.participationForm.$setDirty()
-        for i in [oldValue.length..newValue.length-1]
-          for file in newValue[i].uploaders
-            $scope.checkFileName(file)
-
-    $scope.checkFileName = (file) ->
-      if not file?
-        return
-      if file.file.type in ['image/png', 'image/png', 'image/jpeg']
-        return
-      patt =
-        'CARRE': /^Cir\d+-\d+-Pass\d+-Tron\d+-Chiro_[01]_\d+_000.(wav|ta|tac)$/
-#        'POINT_FIXE': /^Car\d+-\d\d\d\d-Pass\d+-([A-H][12]|Z[1-9])_[01]_\d+_\d+_\d+.(wav|ta|tac)$/
-        'POINT_FIXE': /^Car\d+-\d\d\d\d-Pass\d+-.+_\d+_\d+_\d+.(wav|ta|tac)$/
-        'ROUTIER': /^Cir\d+-\d+-Pass\d+-Tron\d+-Chiro_[01]_\d+_000.(wav|ta|tac)$/
-      res = patt[$scope.site.protocole.type_site].test(file.file.name)
-      if !res
-        throw "Error : bad file name format "+file.file.name
-
-    $scope.saveParticipation = ->
-      $scope.submitted = true
-      if (not $scope.participationForm.$valid or
-          not $scope.participationForm.$dirty)
-        return
-      date_debut = new Date($scope.participation.date_debut)
-      date_debut = date_debut.toGMTString()
-      payload =
-        'date_debut': date_debut
-        'commentaire': $scope.participation.commentaire
-        'meteo': {}
-        'configuration': {}
-      if $scope.participation.date_fin?
-        date_fin = new Date($scope.participation.date_fin)
-        if date_fin == 'Invalid Date'
-          $scope.participationForm.date_fin.$error.$invalid = true
-          return
-        if date_fin < date_debut
-          $scope.participationForm.date_fin.$error.younger_than_date_debut = true
-          return
-        payload.date_fin = date_fin.toGMTString()
-      # Retrieve the modified fields from the form
-      for key, value of $scope.participationForm
-        if key.charAt(0) != '$' and value.$dirty
-          if key in ['temperature_debut', 'temperature_fin', 'vent', 'couverture']
-            if $scope.participation.meteo[key]?
-              payload.meteo[key] = $scope.participation.meteo[key]
-          else if key in ['detecteur_enregistreur_numero_serie',
-                          'micro0_position','micro0_numero_serie',
-                          'micro0_hauteur', 'micro1_position',
-                          'micro1_numero_serie', 'micro1_hauteur']
-            if $scope.participation.configuration[key]?
-              payload.configuration[key] = $scope.participation.configuration[key]
-      # Check files
-      for file in $scope.fileUploader or []
-        if file.status != 'done'
-          $scope.participationForm.pieces_jointes = {$error: {uploading: true}}
-          return
-      for folder in $scope.folderUploader
-        for file in folder.uploaders
-          if file.status != 'done'
-            $scope.participationForm.pieces_jointes = {$error: {uploading: true}}
-            return
-      # Post
-      Backend.all('sites/'+$scope.site._id+'/participations').post(payload).then(
-        (participation) ->
-          Backend.one('participations', participation._id).get().then (participation) ->
-            if $scope.fileUploader.length == 0 && $scope.folderUploader.length == 0
-              window.location = '#/participations/'+participation._id
-              return
-            else
-            payload =
-              pieces_jointes: []
-            for file in $scope.fileUploader
-              payload.pieces_jointes.push(file.id)
-            for folder in $scope.folderUploader
-              for file in folder.uploaders
-                payload.pieces_jointes.push(file.id)
-            participation.customPUT(payload, 'pieces_jointes').then(
-              -> window.location = '#/participations/'+participation._id
-              -> throw "Error : PUT files"
-            )
-        (error) -> throw "Error : participation save "+error
-      )
-
-
   .directive 'listParticipationsDirective', (session, Backend) ->
     restrict: 'E'
     templateUrl: 'scripts/views/participation/list_participations_drt.html'
@@ -275,6 +178,104 @@ angular.module('participationViews', ['ngRoute', 'textAngular', 'xin_listResourc
         tc: true
 
 
+  .controller 'CreateParticipationController', ($routeParams, $scope, $timeout, Backend) ->
+    Backend.one('sites', $routeParams.siteId).get().then (site) ->
+      $scope.site = site
+
+
+  .directive 'createParticipationDirective', ->
+    restrict: 'E'
+    templateUrl: 'scripts/views/participation/create_participation_drt.html'
+    controller: 'CreateParticipationDirectiveController'
+    scope:
+      site: '='
+
+
+  .controller 'CreateParticipationDirectiveController', ($route, $scope,
+                                                         session, Backend) ->
+    $scope.participation =
+      date_debut: new Date()
+    $scope.fileUploader = []
+    $scope.folderUploader = []
+
+    $scope.$watchCollection 'fileUploader', (newValue, oldValue) ->
+      if newValue != oldValue
+        $scope.participationForm.$setDirty()
+        for i in [oldValue.length..newValue.length-1]
+          checkFileName(newValue[i], $scope.site.protocole.type_site)
+    $scope.$watchCollection 'folderUploader', (newValue, oldValue) ->
+      if newValue != oldValue
+        $scope.participationForm.$setDirty()
+        for i in [oldValue.length..newValue.length-1]
+          for file in newValue[i].uploaders
+            checkFileName(file, $scope.site.protocole.type_site)
+
+    $scope.saveParticipation = ->
+      $scope.submitted = true
+      if (not $scope.participationForm.$valid or
+          not $scope.participationForm.$dirty)
+        return
+      date_debut = new Date($scope.participation.date_debut)
+      date_debut = date_debut.toGMTString()
+      payload =
+        'date_debut': date_debut
+        'commentaire': $scope.participation.commentaire
+        'meteo': {}
+        'configuration': {}
+      if $scope.participation.date_fin?
+        date_fin = new Date($scope.participation.date_fin)
+        if date_fin == 'Invalid Date'
+          $scope.participationForm.date_fin.$error.$invalid = true
+          return
+        if date_fin < date_debut
+          $scope.participationForm.date_fin.$error.younger_than_date_debut = true
+          return
+        payload.date_fin = date_fin.toGMTString()
+      # Retrieve the modified fields from the form
+      for key, value of $scope.participationForm
+        if key.charAt(0) != '$' and value.$dirty
+          if key in ['temperature_debut', 'temperature_fin', 'vent', 'couverture']
+            if $scope.participation.meteo[key]?
+              payload.meteo[key] = $scope.participation.meteo[key]
+          else if key in ['detecteur_enregistreur_numero_serie',
+                          'micro0_position','micro0_numero_serie',
+                          'micro0_hauteur', 'micro1_position',
+                          'micro1_numero_serie', 'micro1_hauteur']
+            if $scope.participation.configuration[key]?
+              payload.configuration[key] = $scope.participation.configuration[key]
+      # Check files
+      for file in $scope.fileUploader or []
+        if file.status != 'done'
+          $scope.participationForm.pieces_jointes = {$error: {uploading: true}}
+          return
+      for folder in $scope.folderUploader
+        for file in folder.uploaders
+          if file.status != 'done'
+            $scope.participationForm.pieces_jointes = {$error: {uploading: true}}
+            return
+      # Post
+      Backend.all('sites/'+$scope.site._id+'/participations').post(payload).then(
+        (participation) ->
+          Backend.one('participations', participation._id).get().then (participation) ->
+            if $scope.fileUploader.length == 0 && $scope.folderUploader.length == 0
+              window.location = '#/participations/'+participation._id
+              return
+            else
+            payload =
+              pieces_jointes: []
+            for file in $scope.fileUploader
+              payload.pieces_jointes.push(file.id)
+            for folder in $scope.folderUploader
+              for file in folder.uploaders
+                payload.pieces_jointes.push(file.id)
+            participation.customPUT(payload, 'pieces_jointes').then(
+              -> window.location = '#/participations/'+participation._id
+              -> throw "Error : PUT files"
+            )
+        (error) -> throw "Error : participation save "+error
+      )
+
+
   .controller 'EditParticipationController', ($scope, $routeParams, Backend) ->
     $scope.participation = {}
     Backend.one('participations', $routeParams.participationId).get()
@@ -298,11 +299,21 @@ angular.module('participationViews', ['ngRoute', 'textAngular', 'xin_listResourc
 
   .controller 'EditParticipationDirectiveController', ($route, $scope,
                                                        session, Backend) ->
-    $scope.uploaders = []
+    $scope.fileUploader = []
+    $scope.folderUploader = []
 
-    $scope.$watchCollection 'uploaders', (newValue, oldValue) ->
+    $scope.$watchCollection 'fileUploader', (newValue, oldValue) ->
       if newValue != oldValue
         $scope.participationForm.$setDirty()
+        for i in [oldValue.length..newValue.length-1]
+          checkFileName(newValue[i],
+                        $scope.participation.site.protocole.type_site)
+    $scope.$watchCollection 'folderUploader', (newValue, oldValue) ->
+      if newValue != oldValue
+        $scope.participationForm.$setDirty()
+        for i in [oldValue.length..newValue.length-1]
+          for file in newValue[i].uploaders
+            checkFileName(file, $scope.participation.site.protocole.type_site)
 
     $scope.saveParticipation = ->
       $scope.submitted = true
@@ -343,33 +354,31 @@ angular.module('participationViews', ['ngRoute', 'textAngular', 'xin_listResourc
       if Object.keys(payload.configuration).length == 0
         delete payload.configuration
       uploadingFiles = false
-      # files
-      for file in $scope.uploaders
+      # Check files
+      for file in $scope.fileUploader or []
         if file.status != 'done'
           $scope.participationForm.pieces_jointes = {$error: {uploading: true}}
           return
+      for folder in $scope.folderUploader
+        for file in folder.uploaders
+          if file.status != 'done'
+            $scope.participationForm.pieces_jointes = {$error: {uploading: true}}
+            return
+      # Patch
       $scope.participation.patch(payload).then(
         (participation) ->
           Backend.one('participations', participation._id).get().then (participation) ->
-            if $scope.uploaders.length == 0
+            if $scope.fileUploader.length == 0 && $scope.folderUploader.length == 0
               window.location = '#/participations/'+participation._id
               return
             else
             payload =
-              wav: []
-              ta: []
-              photos: []
-            for file in $scope.uploaders
-              if file.file.type == 'audio/wav' or
-                 file.file.type == 'audio/x-wav'
-                payload.wav.push(file.id)
-              else if file.file.type == 'application/ta' or
-                      file.file.type == 'application/tac'
-                payload.ta.push(file.id)
-              else if file.file.type == 'image/bmp' or
-                      file.file.type == 'image/png' or
-                      file.file.type == 'image/jpeg'
-                payload.photos.push(file.id)
+              pieces_jointes: []
+            for file in $scope.fileUploader
+              payload.pieces_jointes.push(file.id)
+            for folder in $scope.folderUploader
+              for file in folder.uploaders
+                payload.pieces_jointes.push(file.id)
             participation.customPUT(payload, 'pieces_jointes').then(
               -> window.location = '#/participations/'+participation._id
               -> throw "Error : PUT files"
