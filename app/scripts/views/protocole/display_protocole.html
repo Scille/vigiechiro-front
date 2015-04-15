@@ -34,11 +34,15 @@
       <list-sites-directive protocole-id="{{protocole._id}}">
       </list-sites-directive>
       <hr>
-      <create-site-directive protocole-id="{{protocole._id}}"
-                             type-site="{{protocole.type_site}}"
-                             user-registered="userRegistered"
-                             ng-show="userRegistered">
-      </create-site-directive>
+      <div class="panel panel-default" ng-show="userRegistered">
+        <div class="panel-heading" role="tab" id="headingOne">
+          <h4 class="panel-title">
+            <a href="#/protocoles/{{protocole._id}}/nouveau-site">
+              Nouveau Site
+            </a>
+          </h4>
+        </div>
+      </div>
     </div>
   </div>
 

@@ -1,91 +1,71 @@
 'use strict'
 
+breadcrumbsGetProtocoleDefer = undefined
+
 
 angular.module('createSiteViews', ['ngRoute', 'textAngular', 'ui.bootstrap',
                                    'dialogs.main', 'xin_backend', 'protocole_map'])
-  .config((dialogsProvider) ->
-    # this provider is only available in the 4.0.0+ versions of angular-dialog-service
-     dialogsProvider.useBackdrop(false)
-     dialogsProvider.useEscClose(false)
-     dialogsProvider.useCopy(false)
-     dialogsProvider.setSize('sm')
-   )
+  .config ($routeProvider) ->
+    $routeProvider
+      .when '/protocoles/:protocoleId/nouveau-site',
+        templateUrl: 'scripts/views/site/new_site.html'
+        controller: 'CreateSiteController'
+        breadcrumbs: ngInject ($q) ->
+          breadcrumbsDefer = $q.defer()
+          breadcrumbsGetProtocoleDefer = $q.defer()
+          breadcrumbsGetProtocoleDefer.promise.then (protocole) ->
+            breadcrumbsDefer.resolve([
+              ['Protocoles', '#/protocoles']
+              [protocole.titre, '#/protocoles/' + protocole._id]
+              ['Nouveau Site', '#/protocoles/' + protocole._id + '/nouveau-site']
+            ])
+          return breadcrumbsDefer.promise
 
-  .run(($templateCache) ->
-    html = '<div class="modal-header">'+
-      '<h4 class="modal-title">Motif</h4>'+
-      '</div>'+
-      '<div class="modal-body">'+
-      '<p>Motifs précédents :</p>'+
-      '<div ng-repeat="motif in motifs">'+
-      '<div>{{motif}}</div>'+
-      '</div>'+
-      '<p class="input-group">'+
-      '<input type="text" class="form-control" ng-model="motif" is-open="opened" show-button-bar="false">'+
-      '</p>'+
-      '<p ng-show="onError">Aucun motif inscrit.</p>'+
-      '</div>'+
-      '<div class="modal-footer">'+
-      '<button class="btn btn-primary" ng-click="done(true)">Valider</button>'+
-      '<button class="btn btn-danger" ng-click="done(false)">Annuler</button>'+
-      '</div>'
-    $templateCache.put('/dialogs/custom.html', html)
-  )
+#  .run(($templateCache) ->
+#    html = '<div class="modal-header">'+
+#      '<h4 class="modal-title">Motif</h4>'+
+#      '</div>'+
+#      '<div class="modal-body">'+
+#      '<p>Motifs précédents :</p>'+
+#      '<div ng-repeat="motif in motifs">'+
+#      '<div>{{motif}}</div>'+
+#      '</div>'+
+#      '<p class="input-group">'+
+#      '<input type="text" class="form-control" ng-model="motif" is-open="opened" show-button-bar="false">'+
+#      '</p>'+
+#      '<p ng-show="onError">Aucun motif inscrit.</p>'+
+#      '</div>'+
+#      '<div class="modal-footer">'+
+#      '<button class="btn btn-primary" ng-click="done(true)">Valider</button>'+
+#      '<button class="btn btn-danger" ng-click="done(false)">Annuler</button>'+
+#      '</div>'
+#    $templateCache.put('/dialogs/custom.html', html)
+#  )
 
-  .controller 'customDialogController', ($log, $scope, $modalInstance, data) ->
-    $scope.motifs = data
-    $scope.motif = ""
-    $scope.opened = false
-    $scope.onError = false
-    
-    $scope.$watch('data', (val, old) ->
-      $scope.opened = false
-    )
+#  .controller 'customDialogController', ($log, $scope, $modalInstance, data) ->
+#    $scope.motifs = data
+#    $scope.motif = ""
+#    $scope.opened = false
+#    $scope.onError = false
+#    
+#    $scope.$watch('data', (val, old) ->
+#      $scope.opened = false
+#    )#
 
-    $scope.open = ($event) ->
-      $event.preventDefault()
-      $event.stopPropagation()
-      $scope.opened = true
-
-    $scope.done = (valid) ->
-      if not valid
-        $modalInstance.close({valid: false, motif: ''})
-      else if $scope.motif == ''
-        $scope.onError = true
-        return
-      else
-        $modalInstance.close({valid: true, motif: $scope.motif})
-
-
-  .directive 'createSiteDirective', ->
-    restrict: 'E'
-    templateUrl: 'scripts/views/site/new_site.html'
-    controller: 'CreateSiteController'
-    scope:
-      protocoleId: '@'
-      typeSite: '@'
-      userRegistered: '@'
-    link: (scope, elem, attrs) ->
-      scope.collapsed = true
-      scope.title = 'Nouveau site'
-      attrs.$observe('protocoleId', (protocoleId) ->
-        scope.protocoleId = protocoleId
-      )
-      $(elem).on('shown.bs.collapse', ->
-        scope.loadMap(elem.find('.g-maps')[0])
-        return
-      )
-      attrs.$observe('typeSite', (value) ->
-        if value
-          scope.typeSite = value
-          scope.initSiteCreation()
-      )
+#    $scope.done = (valid) ->
+#      if not valid
+#        $modalInstance.close({valid: false, motif: ''})
+#      else if $scope.motif == ''
+#        $scope.onError = true
+#        return
+#      else
+#        $modalInstance.close({valid: true, motif: $scope.motif})
 
 
-  .controller 'CreateSiteController', ($timeout, $route, $scope, dialogs, session,
-                                       Backend, protocolesFactory) ->
+  .controller 'CreateSiteController', ($timeout, $route, $scope, $routeParams,
+                                       session, Backend, protocolesFactory) ->
     # map variables
-    mapProtocole = undefined
+    mapProtocole = null
     mapLoaded = false
     # random selection buttons and steps
     $scope.displaySteps = false
@@ -103,14 +83,22 @@ angular.module('createSiteViews', ['ngRoute', 'textAngular', 'ui.bootstrap',
     $scope.listNumberUsed = []
     #
     $scope.submitted = false
-    $scope.isAdmin = false
     session.getIsAdminPromise().then (isAdmin) ->
       $scope.isAdmin = isAdmin
     # site
     $scope.site = {}
-    $scope.site.titre = "Nouveau site"
+    $scope.site.titre = ""
     $scope.site.justification_non_aleatoire = ''
     $scope.justification_non_aleatoire = []
+
+    Backend.one('protocoles', $routeParams.protocoleId).get()
+      .then (protocole) ->
+        if breadcrumbsGetProtocoleDefer?
+          breadcrumbsGetProtocoleDefer.resolve(protocole)
+          breadcrumbsGetProtocoleDefer = undefined
+        $scope.protocole = protocole
+        initSiteCreation()
+        loadMap(angular.element('.g-maps')[0])
 
     $scope.$watch('siteForm.$pristine', (value) ->
       valid = siteValidated()
@@ -171,17 +159,17 @@ angular.module('createSiteViews', ['ngRoute', 'textAngular', 'ui.bootstrap',
         return
       return mapProtocole.mapValidated()
 
-    $scope.initSiteCreation = ->
+    initSiteCreation = ->
       if $scope.typeSite in ['CARRE', 'POINT_FIXE']
         $scope.randomSelectionAllowed = true
       else
         $scope.validTracetAllowed = true
         $scope.displaySteps = true
 
-    $scope.loadMap = (mapDiv) ->
+    loadMap = (mapDiv) ->
       if not mapLoaded
         mapLoaded = true
-        mapProtocole = protocolesFactory($scope.site, $scope.typeSite,
+        mapProtocole = protocolesFactory($scope.site, $scope.protocole.type_site,
                                          mapDiv, siteCallback)
         if $scope.typeSite in ['CARRE', 'POINT_FIXE']
           Backend.all('protocoles/'+$scope.protocoleId+'/sites').getList().then (sites) ->

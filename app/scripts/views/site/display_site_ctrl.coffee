@@ -4,7 +4,7 @@ breadcrumbsGetSiteDefer = undefined
 
 
 angular.module('displaySiteViews', ['ngRoute', 'textAngular', 'xin_backend',
-                                    'protocole_map'])
+                                    'protocole_map', 'editSiteViews'])
   .config ($routeProvider) ->
     $routeProvider
       .when '/sites',
