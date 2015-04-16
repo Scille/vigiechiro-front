@@ -124,7 +124,6 @@ angular.module('displaySiteViews', ['ngRoute', 'textAngular', 'xin_backend',
       protocoleId: '@'
       typeSite: '@'
     link: (scope, elem, attrs) ->
-      scope.loading = true
       session.getUserPromise().then (user) ->
         scope.userId = user._id
       attrs.$observe 'typeSite', (typeSite) ->
@@ -133,8 +132,7 @@ angular.module('displaySiteViews', ['ngRoute', 'textAngular', 'xin_backend',
             scope.sites = sites.plain()
             mapDiv = elem.find('.g-maps')[0]
             mapProtocole = protocolesFactory(mapDiv, "ALL_"+scope.typeSite)
-            mapProtocole.loadMap(scope.sites.plain())
-            scope.loading = false
+            mapProtocole.loadMap(sites.plain())
 
 
   .directive 'listSitesDirective', (session, Backend) ->
