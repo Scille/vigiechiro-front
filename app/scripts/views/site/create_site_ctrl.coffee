@@ -3,8 +3,9 @@
 breadcrumbsGetProtocoleDefer = undefined
 
 
-angular.module('createSiteViews', ['ngRoute', 'textAngular', 'ui.bootstrap',
-                                   'dialogs.main', 'xin_backend', 'protocole_map'])
+angular.module('createSiteViews', ['textAngular', 'ui.bootstrap',
+                                   'dialogs.main',
+                                   'protocole_map', 'modalSiteViews'])
   .config ($routeProvider) ->
     $routeProvider
       .when '/protocoles/:protocoleId/nouveau-site',
@@ -20,6 +21,7 @@ angular.module('createSiteViews', ['ngRoute', 'textAngular', 'ui.bootstrap',
               ['Nouveau Site', '#/protocoles/' + protocole._id + '/nouveau-site']
             ])
           return breadcrumbsDefer.promise
+
 
 #  .run(($templateCache) ->
 #    html = '<div class="modal-header">'+
@@ -63,10 +65,10 @@ angular.module('createSiteViews', ['ngRoute', 'textAngular', 'ui.bootstrap',
 
 
   .controller 'CreateSiteController', ($timeout, $route, $scope, $routeParams,
+                                       $modal,
                                        session, Backend, protocolesFactory) ->
     # map variables
     mapProtocole = null
-    mapLoaded = false
     # random selection buttons and steps
     $scope.displaySteps = false
     $scope.randomSelectionAllowed = false
@@ -87,8 +89,6 @@ angular.module('createSiteViews', ['ngRoute', 'textAngular', 'ui.bootstrap',
       $scope.isAdmin = isAdmin
     # site
     $scope.site = {}
-    $scope.site.titre = ""
-    $scope.site.justification_non_aleatoire = ''
     $scope.justification_non_aleatoire = []
 
     Backend.one('protocoles', $routeParams.protocoleId).get()
@@ -98,7 +98,22 @@ angular.module('createSiteViews', ['ngRoute', 'textAngular', 'ui.bootstrap',
           breadcrumbsGetProtocoleDefer = undefined
         $scope.protocole = protocole
         initSiteCreation()
-        loadMap(angular.element('.g-maps')[0])
+        createMap(angular.element('.g-maps')[0])
+
+    initSiteCreation = ->
+      if $scope.protocole.type_site in ['CARRE', 'POINT_FIXE']
+        $scope.site.generee_aleatoirement = false
+        $scope.randomSelectionAllowed = true
+      else
+        $scope.validTracetAllowed = true
+        $scope.displaySteps = true
+
+    createMap = (mapDiv) ->
+      mapProtocole = protocolesFactory(mapDiv, $scope.protocole.type_site,
+                                       siteCallback)
+      if $scope.protocole.type_site in ['CARRE', 'POINT_FIXE']
+        Backend.all('protocoles/'+$scope.protocole._id+'/sites').getList().then (sites) ->
+          mapProtocole.displaySites(sites.plain())
 
     $scope.$watch('siteForm.$pristine', (value) ->
       valid = siteValidated()
@@ -111,10 +126,14 @@ angular.module('createSiteViews', ['ngRoute', 'textAngular', 'ui.bootstrap',
     )
 
     siteCallback =
+      displayError: (error) ->
+        $scope.mapError =
+          message: error
       updateSteps: (steps) ->
+        $scope.mapError = undefined
         $scope.steps = steps.steps
         $scope.stepId = steps.step
-        if $scope.typeSite in ['CARRE', 'POINT_FIXE']
+        if $scope.protocole.type_site in ['CARRE', 'POINT_FIXE']
           if $scope.stepId == 0
             $scope.validLocalitesAllowed = false
           if $scope.stepId == 2
@@ -126,7 +145,7 @@ angular.module('createSiteViews', ['ngRoute', 'textAngular', 'ui.bootstrap',
           else if $scope.stepId == 4
             $scope.validLocalitesAllowed = false
             $scope.editLocalitesAllowed = true
-        else if $scope.typeSite == 'ROUTIER'
+        else if $scope.protocole.type_site == 'ROUTIER'
           if mapProtocole?
             $scope.tracetLength = mapProtocole.getTracetLength()
           if $scope.stepId == 2
@@ -141,13 +160,14 @@ angular.module('createSiteViews', ['ngRoute', 'textAngular', 'ui.bootstrap',
       # random selection buttons and steps
       $scope.resetFormAllowed = false
       $scope.displaySteps = false
-      if $scope.typeSite in ['CARRE', 'POINT_FIXE']
+      if $scope.protocole.type_site in ['CARRE', 'POINT_FIXE']
         $scope.randomSelectionAllowed = true
       $scope.validOriginAllowed = false
       $scope.retrySelectionAllowed = false
       $scope.validLocalitesAllowed = false
       $scope.editLocalitesAllowed = false
       $scope.validTracetAllowed = false
+      $scope.editTracetAllowed = false
       $scope.validSegmentsAllowed = false
       $scope.editSegmentsAllowed = false
       # random selection
@@ -156,24 +176,8 @@ angular.module('createSiteViews', ['ngRoute', 'textAngular', 'ui.bootstrap',
 
     siteValidated = ->
       if !mapProtocole
-        return
+        return false
       return mapProtocole.mapValidated()
-
-    initSiteCreation = ->
-      if $scope.typeSite in ['CARRE', 'POINT_FIXE']
-        $scope.randomSelectionAllowed = true
-      else
-        $scope.validTracetAllowed = true
-        $scope.displaySteps = true
-
-    loadMap = (mapDiv) ->
-      if not mapLoaded
-        mapLoaded = true
-        mapProtocole = protocolesFactory($scope.site, $scope.protocole.type_site,
-                                         mapDiv, siteCallback)
-        if $scope.typeSite in ['CARRE', 'POINT_FIXE']
-          Backend.all('protocoles/'+$scope.protocoleId+'/sites').getList().then (sites) ->
-            mapProtocole.displaySites(sites.plain())
 
     $scope.validLocalites = ->
       mapProtocole.validLocalites()
@@ -185,20 +189,34 @@ angular.module('createSiteViews', ['ngRoute', 'textAngular', 'ui.bootstrap',
       $scope.siteForm.$pristine = true
       $scope.siteForm.$dirty = false
 
+    # Tracet
     $scope.validTracet = ->
       if mapProtocole.validTracet()
         $scope.validTracetAllowed = false
-      else
-        throw "Error : tracet can not be validated"
+        $scope.editTracetAllowed = true
+        $scope.siteForm.$pristine = false
+        $scope.siteForm.$dirty = true
+    $scope.editTracet = ->
+      modalInstance = $modal.open(
+        templateUrl: 'scripts/views/site/modal/edit_tracet.html'
+        controller: 'ModalInstanceEditTracetController'
+      )
+      modalInstance.result.then(
+        (valid) ->
+          if valid
+            if mapProtocole.editTracet()
+              $scope.validTracetAllowed = true
+              $scope.editTracetAllowed = false
+              $scope.validSegmentsAllowed = false
+      )
 
+    # Troncons
     $scope.validSegments = ->
       if mapProtocole.validSegments()
         $scope.validSegmentsAllowed = false
         $scope.editSegmentsAllowed = true
         $scope.siteForm.$pristine = false
         $scope.siteForm.$dirty = true
-      else
-        throw "Error : segments can not be validated"
 
     $scope.editSegments = ->
       mapProtocole.editSegments()
@@ -233,63 +251,75 @@ angular.module('createSiteViews', ['ngRoute', 'textAngular', 'ui.bootstrap',
         mapProtocole.validOrigin($scope.listGrilleStocOrigin[number])
 
     $scope.retrySelection = ->
-      dlg = dialogs.create('/dialogs/custom.html', 'customDialogController',
-                           $scope.justification_non_aleatoire)
-      dlg.result.then (data) ->
-        if not data.valid
-          return
-        else
-          # no more cell to pick
-          if $scope.listNumberUsed.length == $scope.listGrilleStocOrigin.length
-            throw "Error: All cells picked"
-          # add motif
-          grille_stoc = $scope.listGrilleStocOrigin[$scope.listNumberUsed[$scope.listNumberUsed.length-1]]
-          $scope.justification_non_aleatoire.push(grille_stoc.numero+' : '+data.motif)
-          # empty map
-          mapProtocole.emptyMap()
-          mapProtocole.deleteValidCell()
-          number = Math.floor(Math.random() * $scope.listGrilleStocOrigin.length)
-          while (number in $scope.listNumberUsed)
-            number = Math.floor(Math.random() * $scope.listGrilleStocOrigin.length)
-          $scope.listNumberUsed.push(number)
-          mapProtocole.validOrigin($scope.listGrilleStocOrigin[number])
+#      dlg = dialogs.create('/dialogs/custom.html', 'customDialogController',
+#                           $scope.justification_non_aleatoire)
+#      dlg.result.then (data) ->
+#        if not data.valid
+#          return
+#        else
+#          # no more cell to pick
+#          if $scope.listNumberUsed.length == $scope.listGrilleStocOrigin.length
+#            throw "Error: All cells picked"
+#          # add motif
+#          grille_stoc = $scope.listGrilleStocOrigin[$scope.listNumberUsed[$scope.listNumberUsed.length-1]]
+#          $scope.justification_non_aleatoire.push(grille_stoc.numero+' : '+data.motif)
+#          # empty map
+#          mapProtocole.emptyMap()
+#          mapProtocole.deleteValidCell()
+#          number = Math.floor(Math.random() * $scope.listGrilleStocOrigin.length)
+#          while (number in $scope.listNumberUsed)
+#            number = Math.floor(Math.random() * $scope.listGrilleStocOrigin.length)
+#          $scope.listNumberUsed.push(number)
+#          mapProtocole.validOrigin($scope.listGrilleStocOrigin[number])
 
     $scope.saveSite = ->
+      # Form
       $scope.submitted = true
       if (not $scope.siteForm.$valid or
           not $scope.siteForm.$dirty)
         return
+      # Common payload
       payload =
         'titre': $scope.protocoleTitre
-        'protocole': $scope.protocoleId
+        'protocole': $scope.protocole._id
         'commentaire': $scope.siteForm.commentaire.$modelValue
-      if $scope.site.justification_non_aleatoire != ''
-        payload.justification_non_aleatoire = $scope.site.justification_non_aleatoire
-      if $scope.typeSite == 'POINT_FIXE' || $scope.typeSite == 'CARRE'
-        grille_stoc = mapProtocole.getIdGrilleStoc()
-        if grille_stoc != ''
-          payload.grille_stoc = grille_stoc
+      # If random grille stoc
+      if $scope.justification_non_aleatoire.length > 0
+        payload.generee_aleatoirement = true
+        payload.justification_non_aleatoire = ''
+        for justification in $scope.justification_non_aleatoire
+          payload.justification_non_aleatoire += justification+'\n'
+      # If grille stoc
+      if $scope.protocole.type_site in ['POINT_FIXE', 'CARRE']
+        payload.grille_stoc = mapProtocole.getIdGrilleStoc()
+      # If tracet
+      if $scope.protocole.type_site == 'ROUTIER'
+        payload.tracet = mapProtocole.getGeoJsonTrace()
       Backend.all('sites').post(payload).then(
         (site) ->
           localites = mapProtocole.saveMap()
-          payload =
-            localites: []
-          for localite in localites
-            tmp =
-              nom: localite.name
-#              coordonnee: localite.geometries.geometries[0]
-              geometries: localite.geometries
-              representatif: false
-            payload.localites.push(tmp)
-          site.customPUT(payload, "localites").then(
-            ->
-            (error) -> throw error
-          )
+          # If localites to save
+          if localites.length
+            payload =
+              localites: []
+            for localite in localites
+              tmp =
+                nom: localite.name
+  #              coordonnee: localite.geometries.geometries[0]
+                geometries: localite.geometries
+                representatif: false
+              payload.localites.push(tmp)
+            site.customPUT(payload, "localites").then(
+              ->
+              (error) -> throw error
+            )
+          # If verrouille
           if $scope.site.verrouille
             site.patch({'verrouille': true}).then(
               ->
               (error) -> throw error
             )
-          $route.reload()
+          # redirect to display site
+          window.location = '#/sites/'+site._id
         (error) -> throw "error " + error
       )

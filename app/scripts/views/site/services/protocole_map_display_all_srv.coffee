@@ -4,7 +4,7 @@
 angular.module('protocole_map_display_all', [])
   .factory 'ProtocoleMapDisplay', (GoogleMaps) ->
     class ProtocoleMapDisplay
-      constructor: (@sites, mapDiv) ->
+      constructor: (mapDiv) ->
         @_googleMaps = new GoogleMaps(mapDiv)
         # hide drawing manager
         @_googleMaps.setDrawingManagerOptions(drawingControl: false)
@@ -34,8 +34,8 @@ angular.module('protocole_map_display_all', [])
 
   .factory 'ProtocoleMapDisplayCarre', (GoogleMaps, ProtocoleMapDisplay) ->
     class ProtocoleMapDisplayCarre extends ProtocoleMapDisplay
-      constructor: (@sites, mapDiv) ->
-        super @sites, mapDiv
+      constructor: (mapDiv) ->
+        super mapDiv
 
       loadMap: ->
         for site in @sites or []
@@ -45,8 +45,8 @@ angular.module('protocole_map_display_all', [])
 
   .factory 'ProtocoleMapDisplayRoutier', (GoogleMaps, ProtocoleMapDisplay) ->
     class ProtocoleMapDisplayRoutier extends ProtocoleMapDisplay
-      constructor: (@sites, mapDiv) ->
-        super @sites, mapDiv
+      constructor: (mapDiv) ->
+        super mapDiv
 
       loadMap: ->
         # start loading
@@ -65,8 +65,8 @@ angular.module('protocole_map_display_all', [])
 
   .factory 'ProtocoleMapDisplayPointFixe', (GoogleMaps, ProtocoleMapDisplay) ->
     class ProtocoleMapDisplayPointFixe extends ProtocoleMapDisplay
-      constructor: (@sites, mapDiv) ->
-        super @sites, mapDiv
+      constructor: (mapDiv) ->
+        super mapDiv
 
       loadMap: ->
         for site in @sites or []

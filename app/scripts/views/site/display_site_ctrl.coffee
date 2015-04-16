@@ -105,9 +105,8 @@ angular.module('displaySiteViews', ['ngRoute', 'textAngular', 'xin_backend',
       attrs.$observe 'typeSite', (typeSite) ->
         if typeSite
           mapDiv = elem.find('.g-maps')[0]
-          mapProtocole = protocolesFactory(scope.site, scope.typeSite,
-                                           mapDiv)
-          mapProtocole.loadMap()
+          mapProtocole = protocolesFactory(mapDiv, scope.typeSite)
+          mapProtocole.loadMap(scope.site.plain())
       scope.lockSite = (lock) ->
         scope.site.patch({'verrouille': lock}).then(
           ->
@@ -133,9 +132,8 @@ angular.module('displaySiteViews', ['ngRoute', 'textAngular', 'xin_backend',
           Backend.all('protocoles/'+scope.protocoleId+'/sites').getList().then (sites) ->
             scope.sites = sites.plain()
             mapDiv = elem.find('.g-maps')[0]
-            mapProtocole = protocolesFactory(scope.sites, "ALL_"+scope.typeSite,
-                                             mapDiv)
-            mapProtocole.loadMap()
+            mapProtocole = protocolesFactory(mapDiv, "ALL_"+scope.typeSite)
+            mapProtocole.loadMap(scope.sites.plain())
             scope.loading = false
 
 

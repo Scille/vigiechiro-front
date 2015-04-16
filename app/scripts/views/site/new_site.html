@@ -32,8 +32,29 @@
           <span ng-show="$index < stepId">✓&nbsp;<strike>{{step}}</strike></span>
           <span ng-hide="$index < stepId">{{step}}</span>
           <a class="btn btn-primary" id="valid-origin"
-             ng-click="validOrigin()" ng-show="validOriginAllowed && $index == 0">
+             ng-click="validOrigin()"
+             ng-show="validOriginAllowed && $index == 0">
             Valider la zone
+          </a>
+          <a class="btn btn-primary" id="valid-tracet"
+             ng-click="validTracet()"
+             ng-show="validTracetAllowed && $index == 0">
+            Valider le tracet
+          </a>
+          <a class="btn btn-warning" id="edit-tracet"
+             ng-click="editTracet()"
+             ng-show="editTracetAllowed && $index == 0">
+            Modifier le tracet
+          </a>
+          <a class="btn btn-primary" id="valid-segments"
+             ng-click="validSegments()"
+             ng-show="validSegmentsAllowed && $index == 2">
+            Valider les tronçons
+          </a>
+          <a class="btn btn-warning" id="edit-segments"
+             ng-click="editSegments()"
+             ng-show="editSegmentsAllowed && $index == 3">
+            Modifier les tronçons
           </a>
           <span ng-show="$index == 3">
             <a class="btn btn-primary" id="valid-localites"
@@ -57,25 +78,13 @@
         </a>
       </div>
 
-      <div ng-show="validTracetAllowed">
-        <a class="btn btn-default" id="valid-tracet"
-           ng-click="validTracet()">
-          Valider le tracet
-        </a>
-        <span>
-          Longueur actuelle : <b>{{ tracetLength }}</b> kilomètres.
-        </span>
+      <div ng-show="protocole.type_site == 'ROUTIER'">
+        Longueur du tracet : <b>{{ tracetLength }}</b> kilomètres.
       </div>
 
-      <a class="btn btn-default" id="valid-segments"
-         ng-click="validSegments()" ng-show="validSegmentsAllowed">
-        Valider les tronçons
-      </a>
-
-      <a class="btn btn-default" id="edit-segments"
-         ng-click="editSegments()" ng-show="editSegmentsAllowed">
-        Modifier les tronçons
-      </a>
+      <p class="bg-danger" ng-show="mapError">
+        {{ mapError.message }}
+      </p>
 
       <div class="help-block has-error" ng-show="false">
       </div>

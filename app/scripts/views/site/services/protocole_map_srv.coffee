@@ -1,13 +1,5 @@
 'use strict'
 
-localite_colors = [
-  '#FF8000'
-  '#80FF00'
-  '#00FF80'
-  '#0080FF'
-  '#FF0080'
-]
-locBySegment = 5
 
 angular.module('protocole_map', ['protocole_map_carre',
                                  'protocole_map_point_fixe',
@@ -19,25 +11,25 @@ angular.module('protocole_map', ['protocole_map_carre',
                                  ProtocoleMapDisplayCarre,
                                  ProtocoleMapDisplayRoutier,
                                  ProtocoleMapDisplayPointFixe) ->
-    (site, protocoleAlgoSite, mapDiv, siteCallback = {}) ->
+    (mapDiv, protocoleAlgoSite, siteCallback = {}) ->
       if protocoleAlgoSite == 'ROUTIER'
-        return new ProtocoleMapRoutier(site, mapDiv, siteCallback)
+        return new ProtocoleMapRoutier(mapDiv, siteCallback)
       else if protocoleAlgoSite == 'CARRE'
-        return new ProtocoleMapCarre(site, mapDiv, siteCallback)
+        return new ProtocoleMapCarre(mapDiv, siteCallback)
       else if protocoleAlgoSite == 'POINT_FIXE'
-        return new ProtocoleMapPointFixe(site, mapDiv, siteCallback)
+        return new ProtocoleMapPointFixe(mapDiv, siteCallback)
       else if protocoleAlgoSite == 'ALL_ROUTIER'
-        return new ProtocoleMapDisplayRoutier(site, mapDiv)
+        return new ProtocoleMapDisplayRoutier(mapDiv)
       else if protocoleAlgoSite == 'ALL_CARRE'
-        return new ProtocoleMapDisplayCarre(site, mapDiv)
+        return new ProtocoleMapDisplayCarre(mapDiv)
       else if protocoleAlgoSite == 'ALL_POINT_FIXE'
-        return new ProtocoleMapDisplayPointFixe(site, mapDiv)
+        return new ProtocoleMapDisplayPointFixe(mapDiv)
       else
         throw "Error : unknown protocole #{protocoleAlgoSite}"
 
   .factory 'ProtocoleMap', ($timeout, $rootScope, Backend, GoogleMaps) ->
     class ProtocoleMap
-      constructor: (@site, mapDiv, @siteCallback) ->
+      constructor: (mapDiv, @siteCallback) ->
         @_localites = []
         @_step = 0
         @_steps = []
@@ -137,21 +129,6 @@ angular.module('protocole_map', ['protocole_map_carre',
       getOrigin: ->
         return @_circleLimit
 
-      getStartPoint: ->
-        localite = @loadGeoJson(@site.localites[0].geometries)
-        point = localite.getPath().getAt(0)
-        @_googleMaps.deleteOverlay(localite)
-        return point
-
-      getStopPoint: ->
-        nb_localites = @site.localites.length
-        localite = @loadGeoJson(@site.localites[nb_localites-1].geometries)
-        path = localite.getPath()
-        nb_points = path.getLength()
-        point = path.getAt(nb_points-1)
-        @_googleMaps.deleteOverlay(localite)
-        return point
-
       allowMapChanged: ->
         if not @site.verrouille?
           return true
@@ -169,6 +146,10 @@ angular.module('protocole_map', ['protocole_map_carre',
           loading: @loading
         if @siteCallback.updateSteps?
           @siteCallback.updateSteps(steps)
+
+      displayError: (error) ->
+        if @siteCallback.displayError?
+          @siteCallback.displayError(error)
 
       saveMap: ->
         result = []
@@ -202,18 +183,18 @@ angular.module('protocole_map', ['protocole_map_carre',
       setLocaliteName: ->
         return ''
 
-      loadMap: ->
+      loadMap: (site) ->
         # start loading
         @loading = true
         # ROUTIER type site create @_tracet and center on it
-        if !@site.grille_stoc?
+        if !site.grille_stoc?
           # rescue start and stop points
-          start = @getStartPoint()
-          stop = @getStopPoint()
+          start = @getStartPoint(site.localites)
+          stop = @getStopPoint(site.localites)
           # set @_tracet and bounds
           bounds = @_googleMaps.createBounds()
           tracet_latlngs = []
-          for localite in @site.localites
+          for localite in site.localites
             coordinates = localite.geometries.geometries[0].coordinates
             for point in coordinates
               tracet_latlngs.push(point)
@@ -238,7 +219,7 @@ angular.module('protocole_map', ['protocole_map_carre',
             @updateSite()
           $timeout(continueLoading, 1000)
         # load localites
-        for localite in @site.localites or []
+        for localite in site.localites or []
           newLocalite =
             name: localite.nom
             representatif: localite.representatif
@@ -253,12 +234,12 @@ angular.module('protocole_map', ['protocole_map_carre',
             newLocalite.overlay.setOptions({ title: localite.nom })
           @_localites.push(newLocalite)
         # generate grille_stoc for CARRE and POINT_FIXE type site
-        if @site.grille_stoc?
+        if site.grille_stoc?
           newCell = @createCell(
-            @site.grille_stoc.centre.coordinates[1],
-            @site.grille_stoc.centre.coordinates[0]
+            site.grille_stoc.centre.coordinates[1],
+            site.grille_stoc.centre.coordinates[0]
           )
-          @validNumeroGrille(newCell, @site.grille_stoc.numero, @site.grille_stoc._id)
+          @validNumeroGrille(newCell, site.grille_stoc.numero, site.grille_stoc._id)
           @validLocalites()
         # end loading
         @loading = false

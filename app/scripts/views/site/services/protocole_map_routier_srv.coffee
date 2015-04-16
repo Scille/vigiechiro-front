@@ -1,14 +1,21 @@
 'use strict'
 
-###*
- # args
- ## @div : element html (div) dans laquelle la map sera instanciée
-###
+localite_colors = [
+  '#FF8000'
+  '#80FF00'
+  '#00FF80'
+  '#0080FF'
+  '#FF0080'
+]
+locBySegment = 5
+
+
 angular.module('protocole_map_routier', [])
-  .factory 'ProtocoleMapRoutier', ($rootScope, Backend, GoogleMaps, ProtocoleMap) ->
+  .factory 'ProtocoleMapRoutier', ($rootScope, $timeout,
+                                   Backend, GoogleMaps, ProtocoleMap) ->
     class ProtocoleMapRoutier extends ProtocoleMap
-      constructor: (@site, mapDiv, @siteCallback) ->
-        super @site, mapDiv, @siteCallback
+      constructor: (mapDiv, @siteCallback) ->
+        super mapDiv, @siteCallback
         @_tracet = {}
         @_tracet.length = 0
         @_firstPoint = null
@@ -31,9 +38,72 @@ angular.module('protocole_map_routier', [])
         return [
           "Tracer le trajet complet en un seul trait. Le tracé doit atteindre 30 km ou plus.",
           "Sélectionner le point d'origine.",
-          "Placer les limites des segments de 2 km (+/-20%) sur le tracet en partant du point d'origine. ",
+          "Placer les limites des tronçons de 2 km (+/-20%) sur le tracet en partant du point d'origine.",
           "Valider les segments."
         ]
+
+
+      loadMap: (site) ->
+        console.log("site", site)
+        # start loading
+        @loading = true
+        # rescue start and stop points
+        start = @getStartPoint(site.localites)
+        stop = @getStopPoint(site.localites)
+        # set @_tracet and bounds
+        bounds = @_googleMaps.createBounds()
+        tracet_latlngs = []
+        for localite in site.localites
+          coordinates = localite.geometries.geometries[0].coordinates
+          for point in coordinates
+            tracet_latlngs.push(point)
+            @_googleMaps.extendBounds(bounds, point)
+        @_tracet.overlay = @_googleMaps.createLineString(tracet_latlngs)
+        @_tracet.overlay.setOptions({zIndex: 1})
+        # set view
+        @_googleMaps.setCenter(
+          start.lat(),
+          start.lng()
+        )
+        @_googleMaps.fitBounds(bounds)
+        #
+        continueLoading = =>
+          @validTracet()
+          if start.equals(@_firstPoint.getPosition())
+            @_googleMaps.trigger(@_firstPoint, 'click', {latLng: start})
+          else
+            @_googleMaps.trigger(@_lastPoint, 'click', {latLng: start})
+          @_googleMaps.clearListeners(@_tracet.overlay, 'click')
+          @_step = 4
+          @updateSite()
+        $timeout(continueLoading, 1000)
+        # load localites
+        for localite in site.localites or []
+          newLocalite =
+            name: localite.nom
+            representatif: localite.representatif
+          newLocalite.overlay = @loadGeoJson(localite.geometries)
+          if localite.nom[0] == 'T'
+            num_secteur = parseInt(localite.nom[localite.nom.length-1])-1
+            newLocalite.overlay.setOptions(
+              strokeColor: localite_colors[num_secteur]
+              zIndex: 2
+            )
+          else
+            newLocalite.overlay.setOptions({ title: localite.nom })
+          @_localites.push(newLocalite)
+        # generate grille_stoc for CARRE and POINT_FIXE type site
+        if site.grille_stoc?
+          newCell = @createCell(
+            site.grille_stoc.centre.coordinates[1],
+            site.grille_stoc.centre.coordinates[0]
+          )
+          @validNumeroGrille(newCell, site.grille_stoc.numero, site.grille_stoc._id)
+          @validLocalites()
+        # end loading
+        @loading = false
+        @updateSite()
+
 
       clearMap: ->
         for localite in @_localites
@@ -105,15 +175,33 @@ angular.module('protocole_map_routier', [])
           return false
 
       mapValidated: ->
-        if @_step < 3
+        if @_step < 1
           return false
         return true
 
+      getGeoJsonTrace: ->
+        trace =
+          chemin:
+            type: 'LineString'
+            coordinates: @_googleMaps.getPath(@_tracet.overlay)
+        if @_points.length
+          origin = @_points[0].getPosition()
+          trace.origine =
+            type: 'Point'
+            coordinates: [origin.lng(), origin.lat()]
+        return trace
+
+
+      # Tracet
       getTracetLength: ->
         return @_tracet.length
 
       validTracet: ->
         if !@_tracet.overlay?
+          @displayError("Pas de tracet")
+          return false
+        if @_tracet.length < 24
+          @displayError("Tracet trop court")
           return false
         # @_tracet becomes uneditable
         @_googleMaps.clearListeners(@_tracet.overlay, 'rightclick')
@@ -121,8 +209,6 @@ angular.module('protocole_map_routier', [])
           draggable: false
           editable: false
         )
-        @_step = 1
-        @updateSite()
         # Create origin points choice
         path = @_tracet.overlay.getPath()
         nbPoint = path.length
@@ -146,8 +232,52 @@ angular.module('protocole_map_routier', [])
                 @_padded_points.push(new_pt)
               else
                 console.log("Error : some points not on path")
+        # Update form
+        @_step = 1
+        @updateSite()
         return true
 
+      editTracet: ->
+        @_padded_points = []
+        @_firstPoint.setMap(null)
+        @_firstPoint = null
+        @_lastPoint.setMap(null)
+        @_lastPoint = null
+        @_points = []
+        # @_tracet becomes editable
+        @_googleMaps.addListener(@_tracet.overlay, 'mouseout', (e) =>
+          @_tracet.length = (@checkTotalLength()/1000).toFixed(1)
+          @updateSite()
+        )
+        @_googleMaps.setDrawingManagerOptions(
+          drawingControlOptions:
+            position: google.maps.ControlPosition.TOP_CENTER
+            drawingModes: [google.maps.drawing.OverlayType.POLYLINE]
+        )
+        @_googleMaps.addListener(@_tracet.overlay, 'rightclick', (e) =>
+          @_googleMaps.deleteOverlay(@_tracet.overlay)
+          @_tracet.overlay = undefined
+          @_tracet.length = 0
+          @_googleMaps.setDrawingManagerOptions(
+            drawingControlOptions:
+              position: google.maps.ControlPosition.TOP_CENTER
+              drawingModes: [
+                google.maps.drawing.OverlayType.POLYLINE
+              ]
+          )
+          @updateSite()
+        )
+        @_tracet.overlay.setOptions(
+          draggable: true
+          editable: true
+        )
+        # Update form
+        @_step = 0
+        @updateSite()
+        return true
+
+
+      # Origin point
       validOriginPoint: (e) =>
         # Up to date step
         @_step = 2
@@ -177,6 +307,7 @@ angular.module('protocole_map_routier', [])
         # Others
         @updateSite()
 
+      # Troncons
       addSegmentPoint: (e) =>
         closestPoint = @_googleMaps.findClosestPointOnPath(e.latLng, @_padded_points)
         point = @_googleMaps.createPoint(closestPoint.lat(), closestPoint.lng())
@@ -288,9 +419,13 @@ angular.module('protocole_map_routier', [])
 
       validSegments: ->
         if !@_segments.length
+          @displayError("Aucun tronçon")
           return false
         if @_points.length % 2
-          throw "Error : odd number of points"
+          message = "Nombre impaire de points. "+
+            "Le tracet doit commencer et finir par un tronçon."
+          @displayError(message)
+          return false
         # Events and points
         @_googleMaps.clearListeners(@_tracet.overlay, 'click')
         for segment in @_segments or []
@@ -369,3 +504,18 @@ angular.module('protocole_map_routier', [])
             latLng: point
           @_googleMaps.trigger(@_tracet.overlay, 'click', var_args)
         @updateSite()
+
+      getStartPoint: (localites) ->
+        localite = @loadGeoJson(localites[0].geometries)
+        point = localite.getPath().getAt(0)
+        @_googleMaps.deleteOverlay(localite)
+        return point
+
+      getStopPoint: (localites) ->
+        nb_localites = localites.length
+        localite = @loadGeoJson(localites[nb_localites-1].geometries)
+        path = localite.getPath()
+        nb_points = path.getLength()
+        point = path.getAt(nb_points-1)
+        @_googleMaps.deleteOverlay(localite)
+        return point

@@ -4,8 +4,8 @@
 angular.module('protocole_map_point_fixe', [])
   .factory 'ProtocoleMapPointFixe', ($rootScope, Backend, GoogleMaps, ProtocoleMap) ->
     class ProtocoleMapPointFixe extends ProtocoleMap
-      constructor: (@site, mapDiv, @siteCallback) ->
-        super @site, mapDiv, @siteCallback
+      constructor: (mapDiv, @siteCallback) ->
+        super mapDiv, @siteCallback
         @_steps = [
           "Positionner la zone de sélection aléatoire.",
           "Cliquer sur la carte pour sélection la grille stoc correspondante.",
