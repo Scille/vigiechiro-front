@@ -119,11 +119,14 @@ angular.module('taxonViews', ['ngRoute', 'ngSanitize', 'textAngular',
     $scope.isAdmin = false
     session.getIsAdminPromise().then (isAdmin) ->
       $scope.isAdmin = isAdmin
-    Backend.one('taxons', $routeParams.taxonId).get().then (taxon) ->
-      if breadcrumbsGetTaxonDefer?
-        breadcrumbsGetTaxonDefer.resolve(taxon)
-        breadcrumbsGetTaxonDefer = undefined
-      $scope.taxon = taxon.plain()
+    Backend.one('taxons', $routeParams.taxonId).get().then(
+      (taxon) ->
+        if breadcrumbsGetTaxonDefer?
+          breadcrumbsGetTaxonDefer.resolve(taxon)
+          breadcrumbsGetTaxonDefer = undefined
+        $scope.taxon = taxon.plain()
+      (error) -> window.location = '#/404'
+    )
 
   .controller 'EditTaxonCtrl', ($route, $routeParams, $scope, Backend) ->
     taxonResource = undefined
@@ -136,13 +139,16 @@ angular.module('taxonViews', ['ngRoute', 'ngSanitize', 'textAngular',
       Backend.one('taxons', $routeParams.taxonId).get(
         {}
         {'Cache-Control': 'no-cache'}
-      ).then (taxon) ->
-        if breadcrumbsGetTaxonDefer?
-          breadcrumbsGetTaxonDefer.resolve(taxon)
-          breadcrumbsGetTaxonDefer = undefined
-        taxonResource = taxon
-        $scope.taxon = taxon.plain()
-        $scope.taxon.parents = $scope.taxonsParents.idToData($scope.taxon.parents)
+      ).then(
+        (taxon) ->
+          if breadcrumbsGetTaxonDefer?
+            breadcrumbsGetTaxonDefer.resolve(taxon)
+            breadcrumbsGetTaxonDefer = undefined
+          taxonResource = taxon
+          $scope.taxon = taxon.plain()
+          $scope.taxon.parents = $scope.taxonsParents.idToData($scope.taxon.parents)
+        (error) -> window.location = '#/404'
+      )
     $scope.saveTaxon = ->
       $scope.submitted = true
       if (not $scope.taxonForm.$valid or
