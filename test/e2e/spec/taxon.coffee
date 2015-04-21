@@ -58,13 +58,13 @@ describe 'Test taxon for administrateur', ->
               saveTaxonButton = $('.save-taxon')
               expect(saveTaxonButton.isDisplayed()).toBe(true)
               saveTaxonButton.click().then ->
-                browser.get(taxonUrl).then ->
-                  element(`by`.binding('taxon.libelle_long')).getText().then (text) ->
-                    expect(text).toBe('edit taxon libelle long')
-                  element(`by`.binding('taxon.libelle_court')).getText().then (text) ->
-                    expect(text).toBe('(edit taxon libelle court)')
-                  element(`by`.binding('taxon.description')).getText().then (text) ->
-                    expect(text).toBe('edit taxon description')
+#                browser.get(taxonUrl).then ->
+#                  element(`by`.binding('taxon.libelle_long')).getText().then (text) ->
+#                    expect(text).toBe('edit taxon libelle long')
+#                  element(`by`.binding('taxon.libelle_court')).getText().then (text) ->
+#                    expect(text).toBe('(edit taxon libelle court)')
+#                  element(`by`.binding('taxon.description')).getText().then (text) ->
+#                    expect(text).toBe('edit taxon description')
 
   it 'Test add taxon', ->
     browser.setLocation('taxons').then ->
