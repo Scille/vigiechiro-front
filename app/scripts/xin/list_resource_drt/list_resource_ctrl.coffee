@@ -29,9 +29,10 @@ angular.module('xin_listResource', ['ngRoute', 'angularUtils.directives.dirPagin
     $scope.loading = true
     updateResourcesList = () ->
       $scope.loading = true
-      $scope.resourceBackend.getList($scope.lookup).then (items) ->
-        $scope.resources = items
-        $scope.loading = false
+      if $scope.resourceBackend?
+        $scope.resourceBackend.getList($scope.lookup).then (items) ->
+          $scope.resources = items
+          $scope.loading = false
     $scope.$watch(
       'lookup'
       ->

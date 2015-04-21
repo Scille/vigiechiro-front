@@ -19,14 +19,27 @@
 
 <hr>
 
-<div>
-  Bilan de la participation
-  {{ participation.bilan }}
+<div class="table-responsive">
+  <h4>Bilan de la participation</h4>
+  <table class="table table-striped table-condensed">
+    <tr>
+      <th>#</th>
+      <th>Taxon parent</th>
+      <th>Nom</th>
+      <th>Nb contact min</th>
+      <th>Nb contact max</th>
+    </tr>
+    <tr ng-show="participation.bilan.autre"
+        ng-repeat="line in participation.bilan.autre">
+      <td>{{$index+1}}</td>
+      <td>Autre</td>
+      <td>{{line.taxon.libelle_long}}</td>
+      <td>{{line.nb_contact_min}}</td>
+      <td>{{line.nb_contact_max}}</td>
+    </tr>
+  </table>
 </div>
 
-<a class="btn btn-primary" href="#/participation/{{participation._id}}/donnees">
+<a class="btn btn-primary" href="#/participations/{{participation._id}}/donnees">
   Voir les données
 </a>
-
-<list-donnees-directive participation-id="{{participation._id}}">
-</list-donnees-directive>

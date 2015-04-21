@@ -1,68 +1,73 @@
 <div>
-  <p>
+  <div>
     <b>{{ donnee.titre }}</b>
-    <a class="btn btn-primary" ng-click="editDonnee()">Modifier</a>
-    </p>
-  <p>
-    <span ng-show="donnee.commentaire">{{ donnee.commentaire }}</span>
-    <span ng-show="!donnee.commentaire">Aucun commentaire</span>
-  </p>
-  Fichier : {{ donnee.fichier }}
-  <br>
-  Date Fichier : {{ donnee.date_fichier }}
-  <br>
-  Probleme : {{ donnee.probleme }}
-  <br>
-  Sous Probleme : {{ donnee.sous_probleme }}
-  <br>
-  Taux échantilonnage : {{ donnee.taux_echantillonnage }}
-  <br>
-  Durée : {{ donnee.duree }}
-  <br>
-  Détection : {{ donnee.detection }}
-  <br>
-  Version : {{ donnee.detection.version }}
-  <br>
-  Origine : {{ donnee.detection.origine }}
-  <br>
-  <b>Observations</b>
-  <div ng-repeat="observation in donnee.observations">
-    Temps début : {{ observation.temps_debut }}
-    <br>
-    Temps fin : {{observation.temps_fin}}
-    <br>
-    Fréquence médiane : {{ observation.frequence_mediane }}
-    <br>
-    Tadarida taxon : {{ observation.tadarida_taxon }}
-    <br>
-    Tadarida probabilité : {{ observation.tadarida_probabilite }}
-    <br>
-    Tadarida taxon autre :
-    <div ng-repeat="autre in observation.tadarida_taxon_autre">
-      Autre taxon : {{ autre.taxon }}
-      <br>
-      Autre probabilité : {{autre.probabilite }}
-    </div>
-    Observateur taxon : {{ observation.observateur_taxon }}
-    <br>
-    Observateur probabilité : {{ observation_probabilite }}
-    <br>
-    Validateur taxon : {{ observation.validateur_taxon }}
-    <br>
-    Validateur probabilité : {{ observation.validateur_probabilite }}
-    <br>
-    Messages :
-    <div ng-repeat="message in observation.messages">
-      Message : {{ message.message }}
-      <br>
-      Auteur : {{ message.auteur }}
-      <br>
-      Date : {{ message.date }}
-    </div>
-  </div>
-</div>
 
-<div class="form-group input-group">
-  <input class="form-control" type="text" ng-model="post">
-  <a class="input-group-addon" ng-click="addPost()">Ajouter un message</a>
+    <a class="btn btn-default"
+       ng-click="CopyToClipboard('{{donnee.titre}}')">
+      Copier
+    </a>
+
+    <a class="btn btn-primary" ng-click="editDonnee()">Modifier</a>
+  </div>
+
+  <div class="table-responsive" ng-show="donnee.observations">
+    <table class="table table-striped table-condensed">
+      <thead>
+        <tr>
+          <th></th>
+          <th>Taxon Tadarida</th>
+          <th>Probabilité</th>
+          <th>Taxon observateur</th>
+          <th>Confiance observateur</th>
+          <th>Taxon validateur</th>
+          <th>Confiance validateur</th>
+        </tr>
+      </thead>
+
+      <tbody ng-repeat="observation in donnee.observations">
+        <tr>
+          <td class="btn" data-toggle="collapse"
+              data-target="#{{donnee.titre}}-{{$index}}">
+            <span class="glyphicon glyphicon-collapse-down">
+            </span>
+          </td>
+          <td>{{ observation.tadarida_taxon.libelle_long }}</td>
+          <td>{{ observation.tadarida_probabilite }}</td>
+          <td>{{ observation.observateur_taxon }}</td>
+          <td>{{ observation.observateur_probabilite }}</td>
+          <td>{{ observation.validateur_taxon }}</td>
+          <td>{{ observation.validateur_probabilite }}</td>
+        </tr>
+        <tr class="collapse" id="{{donnee.titre}}-{{$index}}"><td colspan="7">
+          <p><b>Autre taxon Tadarida :</b></p>
+          <div ng-repeat="autre in observation.tadarida_taxon_autre"
+               ng-show="autre.probabilite >= observation.tadarida_probabilite/2.1">
+            {{ autre.taxon.libelle_long }} : {{autre.probabilite }}
+          </div>
+          <p><b>Messages :</b></p>
+          <div ng-repeat="message in observation.messages"
+               ng-show="observation.messages.length">
+            Auteur : {{ message.auteur }}
+            <br>
+            Date : {{ message.date }}
+            <br>
+            Message : {{ message.message }}
+          </div>
+          <div ng-show="!observation.messages ||observation.messages.length == 0">
+            Ps de message pour le moment.
+          </div>
+          <div class="form-group input-group">
+            <input class="form-control" type="text" ng-model="post">
+            <a class="input-group-addon" ng-click="addPost({{observation._id}})">
+              Ajouter un message
+            </a>
+          </div>
+        </td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div ng-show="!donnee.observations">
+    Pas d'observation pour le moment.
+  </div>
 </div>

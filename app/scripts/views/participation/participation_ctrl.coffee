@@ -8,12 +8,9 @@ checkFileName = (file, type_site) ->
   if file.file.type in ['image/png', 'image/png', 'image/jpeg']
     return
   patt =
-    'CARRE': /^Cir\d+-\d+-Pass\d+-Tron\d+-Chiro_[01]_\d+_000.(wav|ta|tac)$/
-#    'POINT_FIXE': /^Car\d+-\d\d\d\d-Pass\d+-([A-H][12]|Z[1-9])_[01]_\d+_\d+_\d+.(wav|ta|tac)$/
-    'POINT_FIXE': /^Car\d+-\d\d\d\d-Pass\d+-.+_\d+_\d+_\d+.(wav|ta|tac)$/
-    'ROUTIER': /^Cir\d+-\d+-Pass\d+-Tron\d+-Chiro_[01]_\d+_000.(wav|ta|tac)$/
-#    if re.match(r'^Cir.+-[0-9]{4}-Pass[0-9]{1,2}-Tron[0-9]{1,2}-Chiro_[01]_[0-9]+_000$', basename):
-#    elif re.match(r'^Car.+-[0-9]{4}-Pass[0-9]{1,2}-(([A-H][12])|(Z[1-9]))-.*[01]_[0-9]{8}_[0-9]{6}_[0-9]{3}$', basename):
+    'CARRE': /^Cir.+-\d+-Pass\d+-Tron\d+-Chiro_[01]_\d+_000\.(wav|ta|tac)$/
+    'POINT_FIXE': /^Car.+-\d+-Pass\d+-([A-H][12]|Z[1-9])_.*[01]_\d+_\d+_\d+\.(wav|ta|tac)$/
+    'ROUTIER': /^Cir.+-\d+-Pass\d+-Tron\d+-Chiro_[01]_\d+_000\.(wav|ta|tac)$/
   res = patt[type_site].test(file.file.name)
   if !res
     throw "Error : bad file name format "+file.file.name
