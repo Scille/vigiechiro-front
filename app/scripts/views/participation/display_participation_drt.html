@@ -133,7 +133,7 @@
       <li class="list-group-item" ng-repeat="message in participation.messages">
         auteur : {{ message.auteur.pseudo }}
         <br>
-        date : {{ message.date }}
+        date : {{ message.date | xinDate: 'medium' }}
         <br>
         message : {{ message.message }}
       </li>

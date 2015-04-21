@@ -43,16 +43,18 @@ angular.module('donneeViews', ['ngRoute', 'xin_backend', 'xin_session',
     scope:
       donnee: '='
     link: (scope, elem, attrs) ->
-      scope.addPost = (observation_id) ->
-        console.log("Add new Post")
+      scope.addPost = (index, post) ->
         payload =
-          message: scope.post
-        scope.donnee.customPUT(payload,
-                               'observations/'+observation_id+'/messages')
-          .then(
-            -> $route.reload()
-            (error) -> throw error
-          )
+          message: post
+        scope.post = ''
+        Backend.one('donnees', scope.donnee._id).get().then (donnee) ->
+          donnee.customPUT(payload,
+                           'observations/'+index+'/messages')
+            .then(
+              -> $route.reload()
+              (error) -> throw error
+            )
+
       scope.editDonnee = ->
         modalInstance = $modal.open(
           templateUrl: 'scripts/views/donnee/edit_donnee.html'

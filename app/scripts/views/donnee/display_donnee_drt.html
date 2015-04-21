@@ -47,18 +47,19 @@
           <p><b>Messages :</b></p>
           <div ng-repeat="message in observation.messages"
                ng-show="observation.messages.length">
-            Auteur : {{ message.auteur }}
+            Auteur : {{ message.auteur.pseudo }}
             <br>
-            Date : {{ message.date }}
+            Date : {{ message.date | xinDate: 'medium' }}
             <br>
             Message : {{ message.message }}
           </div>
           <div ng-show="!observation.messages ||observation.messages.length == 0">
-            Ps de message pour le moment.
+            Pas de message pour le moment.
           </div>
           <div class="form-group input-group">
-            <input class="form-control" type="text" ng-model="post">
-            <a class="input-group-addon" ng-click="addPost({{observation._id}})">
+            <input class="form-control" type="text" ng-model="newPost">
+            {{ observation.newPost }}
+            <a class="input-group-addon" ng-click="addPost({{$index}}, newPost)">
               Ajouter un message
             </a>
           </div>
