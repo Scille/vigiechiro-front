@@ -19,5 +19,14 @@
 
 <hr>
 
+<div>
+  Bilan de la participation
+  {{ participation.bilan }}
+</div>
+
+<a class="btn btn-primary" href="#/participation/{{participation._id}}/donnees">
+  Voir les données
+</a>
+
 <list-donnees-directive participation-id="{{participation._id}}">
 </list-donnees-directive>

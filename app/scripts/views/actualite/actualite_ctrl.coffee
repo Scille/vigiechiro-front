@@ -27,13 +27,13 @@ angular.module('actualiteViews', ['xin_backend', 'xin_session'])
 #        # $location.search('where', $scope.lookup.where)
 #    $scope.resourceBackend = Backend.all('actualites')
 
-  .directive 'listMesActualitesDirective', (Backend) ->
+  .directive 'listMesActualitesDirective', (Backend, session) ->
     restrict: 'E'
     templateUrl: 'scripts/views/actualite/list_actualites_drt.html'
-    scope:
-      isAdmin: '='
     link: (scope, elem, attrs) ->
       scope.loading = true
+      session.getIsAdminPromise().then (isAdmin) ->
+        scope.isAdmin = isAdmin
       scope.actualites = []
       Backend.all('moi/actualites').getList().then (actualites) ->
         scope.actualites = actualites.plain()
