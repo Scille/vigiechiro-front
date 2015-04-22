@@ -122,7 +122,6 @@ angular.module('participationViews', ['ngRoute', 'textAngular', 'xin_listResourc
           breadcrumbsGetParticipationDefer.resolve(participation)
           breadcrumbsGetParticipationDefer = undefined
         $scope.participation = participation
-        console.log(participation.plain())
 
     $scope.addPost = ->
       payload =
@@ -195,8 +194,32 @@ angular.module('participationViews', ['ngRoute', 'textAngular', 'xin_listResourc
                                                          session, Backend) ->
     $scope.participation =
       date_debut: new Date()
+      configuration: {}
     $scope.fileUploader = []
     $scope.folderUploader = []
+
+    $scope.$watch 'site', (site) ->
+      if site?
+        if site.protocole.type_site in ['ROUTIER', 'CARRE']
+          $scope.participation.configuration =
+            detecteur_enregistreur_numero_serie: ''
+            detecteur_enregistreur_type: ''
+            micro_numero_serie: ''
+            micro_type: ''
+            piste0_expansion: ''
+            piste1_expansion: ''
+        else if site.protocole.type_site == 'POINT_FIXE'
+          $scope.participation.configuration =
+            detecteur_enregistreur_numero_serie: ''
+            detecteur_enregistreur_type: ''
+            micro0_position: ''
+            micro0_numero_serie: ''
+            micro0_type: ''
+            micro0_hauteur: ''
+            micro1_position: ''
+            micro1_numero_serie: ''
+            micro1_type: ''
+            micro1_hauteur: ''
 
     $scope.$watchCollection 'fileUploader', (newValue, oldValue) ->
       if newValue != oldValue
