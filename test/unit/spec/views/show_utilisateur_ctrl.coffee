@@ -1,6 +1,6 @@
 'use strict'
 
-describe 'Controller: ShowUtilisateurCtrl', ->
+describe 'Controller: ShowUtilisateurController', ->
 
   # load the controller's module
   beforeEach module 'xin_backend'
@@ -23,7 +23,7 @@ describe 'Controller: ShowUtilisateurCtrl', ->
         deferred = $q.defer()
         deferred.resolve(utilisateurs_builder('utilisateurs/moi'))
         return deferred.promise
-    $controller 'ShowUtilisateurCtrl',
+    $controller 'ShowUtilisateurController',
       $routeParams: routeParams
       $scope: scope
       Backend: Backend
