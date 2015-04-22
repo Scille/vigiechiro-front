@@ -261,8 +261,11 @@ angular.module('participationViews', ['ngRoute', 'textAngular', 'xin_listResourc
             if $scope.participation.meteo[key]?
               payload.meteo[key] = $scope.participation.meteo[key]
           else if key in ['detecteur_enregistreur_numero_serie',
+                          'detecteur_enregistreur_type',
+                          'micro_numero_serie', 'micro_type',
                           'micro0_position','micro0_numero_serie',
-                          'micro0_hauteur', 'micro1_position',
+                          'micro0_hauteur', 'micro0_type',
+                          'micro1_position', 'micro1_type',
                           'micro1_numero_serie', 'micro1_hauteur']
             if $scope.participation.configuration[key]?
               payload.configuration[key] = $scope.participation.configuration[key]
