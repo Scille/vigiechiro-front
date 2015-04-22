@@ -11,11 +11,13 @@ make_payload_macro = ($scope) ->
 make_payload = ($scope) ->
   payload = make_payload_macro($scope)
   payload.type_site = $scope.protocole.type_site
-  payload.taxon = $scope.protocole.taxon
+  payload.taxon = $scope.protocole.taxon._id
   return payload
 
 
-angular.module('protocoleViews', ['ngRoute', 'textAngular', 'xin_listResource',
+angular.module('protocoleViews', ['ngRoute', 'textAngular',
+                                  'ui.select', 'ngSanitize',
+                                  'xin_listResource',
                                   'xin_backend', 'xin_session', 'xin_tools',
                                   'displaySiteViews', 'createSiteViews'])
   .config ($routeProvider) ->
@@ -213,8 +215,10 @@ angular.module('protocoleViews', ['ngRoute', 'textAngular', 'xin_listResource',
     $scope.protocole = {}
     $scope.configuration_participation = {}
     $scope.taxons = []
-    Backend.all('taxons').getList().then (taxons) ->
+
+    Backend.all('taxons').all('liste').getList().then (taxons) ->
       $scope.taxons = taxons.plain()
+
     $scope.saveProtocole = ->
       $scope.submitted = true
       if not $scope.protocoleForm.$valid or not $scope.protocoleForm.$dirty
