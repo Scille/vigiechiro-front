@@ -7,7 +7,12 @@
       Copier
     </a>
 
-    <a class="btn btn-primary" ng-click="editDonnee()">Modifier</a>
+    <a class="btn btn-danger" ng-click="editDonnee()">Modifier</a>
+  </div>
+
+  <div>
+    <p>{{ donnee.commentaire }}</p>
+    <p>{{ donnee.probleme }}</p>
   </div>
 
   <div class="table-responsive" ng-show="donnee.observations">

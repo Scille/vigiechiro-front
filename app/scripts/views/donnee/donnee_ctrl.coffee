@@ -63,6 +63,12 @@ angular.module('donneeViews', ['ngRoute', 'xin_backend', 'xin_session',
             donnee: ->
               return scope.donnee
         )
+        modalInstance.result.then (payload) ->
+          Backend.one('donnees', scope.donnee._id).get().then (donnee) ->
+            donnee.patch(payload).then(
+              -> $route.reload()
+              (error) -> throw error
+            )
 
       scope.CopyToClipboard = (text) ->
         textToClipboard = text
@@ -127,3 +133,8 @@ angular.module('donneeViews', ['ngRoute', 'xin_backend', 'xin_session',
     $scope.done = (done) ->
       if !done
         $modalInstance.dismiss("cancel")
+      else
+        $modalInstance.close(
+          commentaire: $scope.donnee.commentaire
+          probleme: $scope.donnee.probleme
+        )
