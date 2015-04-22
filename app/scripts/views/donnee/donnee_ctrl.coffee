@@ -27,14 +27,17 @@ angular.module('donneeViews', ['ngRoute', 'xin_backend', 'xin_session',
     $scope.participation = {}
     $scope.donnees = []
     Backend.one('participations', $routeParams.participationId).get()
-      .then (participation) ->
-        $scope.participation = participation.plain()
-        if breadcrumbsGetParticipationDefer?
-          breadcrumbsGetParticipationDefer.resolve(participation)
-          breadcrumbsGetParticipationDefer = undefined
-    Backend.all('participations/'+$routeParams.participationId+'/donnees')
-      .getList().then (donnees) ->
-        $scope.donnees = donnees.plain()
+      .then(
+        (participation) ->
+          $scope.participation = participation.plain()
+          if breadcrumbsGetParticipationDefer?
+            breadcrumbsGetParticipationDefer.resolve(participation)
+            breadcrumbsGetParticipationDefer = undefined
+          Backend.all('participations/'+$routeParams.participationId+'/donnees')
+            .getList().then (donnees) ->
+              $scope.donnees = donnees.plain()
+        (error) -> window.location = '#404'
+      )
 
 
   .directive 'displayDonneeDirective', ($route, $modal, Backend) ->

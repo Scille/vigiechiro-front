@@ -42,14 +42,17 @@ angular.module('editSiteViews', ['ngRoute', 'textAngular', 'xin_backend',
     $scope.observateur = {}
 
     # site
-    Backend.one('sites', $routeParams.siteId).get().then (site) ->
-      if breadcrumbsGetSiteDefer?
-        breadcrumbsGetSiteDefer.resolve(site)
-        breadcrumbsGetSiteDefer = undefined
-      $scope.site = site
-      loadMap(angular.element($('.g-maps'))[0])
-      $scope.observateur._id = site.observateur._id
-      $scope.observateur.pseudo = site.observateur.pseudo
+    Backend.one('sites', $routeParams.siteId).get().then(
+      (site) ->
+        if breadcrumbsGetSiteDefer?
+          breadcrumbsGetSiteDefer.resolve(site)
+          breadcrumbsGetSiteDefer = undefined
+        $scope.site = site
+        loadMap(angular.element($('.g-maps'))[0])
+        $scope.observateur._id = site.observateur._id
+        $scope.observateur.pseudo = site.observateur.pseudo
+      (error) -> window.location = '#/404'
+    )
     # users list
     $scope.users = []
     Backend.all('utilisateurs').getList().then (users) ->

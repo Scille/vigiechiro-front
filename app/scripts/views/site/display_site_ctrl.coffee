@@ -27,19 +27,7 @@ angular.module('displaySiteViews', ['ngRoute', 'textAngular', 'xin_backend',
               [site.titre, '#/sites/' + site._id]
             ])
           return breadcrumbsDefer.promise
-      .when '/sites/:siteId/edition',
-        templateUrl: 'scripts/views/site/edit_site.html'
-        controller: 'EditSiteController'
-        breadcrumbs: ngInject ($q) ->
-          breadcrumbsDefer = $q.defer()
-          breadcrumbsGetSiteDefer = $q.defer()
-          breadcrumbsGetSiteDefer.promise.then (site) ->
-            breadcrumbsDefer.resolve([
-              ['Sites', '#/sites']
-              [site.titre, '#/sites/' + site._id]
-              ['Édition', '#/sites/' + site._id + '/edition']
-            ])
-          return breadcrumbsDefer.promise
+
 
   .controller 'ListSitesController', ($scope, Backend, session, DelayedEvent) ->
     $scope.title = "Tous les sites"
@@ -78,19 +66,22 @@ angular.module('displaySiteViews', ['ngRoute', 'textAngular', 'xin_backend',
 
   .controller 'DisplaySiteController', ($routeParams, $scope
                                         Backend, session) ->
-    Backend.one('sites', $routeParams.siteId).get().then (site) ->
-      if breadcrumbsGetSiteDefer?
-        breadcrumbsGetSiteDefer.resolve(site)
-        breadcrumbsGetSiteDefer = undefined
-      $scope.site = site
-      $scope.typeSite = site.protocole.type_site
-      session.getUserPromise().then (user) ->
-        $scope.userId = user._id
-        for protocole in user.protocoles
-          if protocole.protocole._id == $scope.site.protocole._id
-            if protocole.valide?
-              $scope.isProtocoleValid = true
-            break
+    Backend.one('sites', $routeParams.siteId).get().then(
+      (site) ->
+        if breadcrumbsGetSiteDefer?
+          breadcrumbsGetSiteDefer.resolve(site)
+          breadcrumbsGetSiteDefer = undefined
+        $scope.site = site
+        $scope.typeSite = site.protocole.type_site
+        session.getUserPromise().then (user) ->
+          $scope.userId = user._id
+          for protocole in user.protocoles
+            if protocole.protocole._id == $scope.site.protocole._id
+              if protocole.valide?
+                $scope.isProtocoleValid = true
+              break
+      (error) -> window.location = '#/404'
+    )
     session.getIsAdminPromise().then (isAdmin) ->
       $scope.isAdmin = isAdmin
 

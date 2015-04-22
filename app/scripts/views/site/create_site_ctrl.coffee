@@ -91,14 +91,16 @@ angular.module('createSiteViews', ['textAngular', 'ui.bootstrap',
     $scope.site = {}
     $scope.justification_non_aleatoire = []
 
-    Backend.one('protocoles', $routeParams.protocoleId).get()
-      .then (protocole) ->
+    Backend.one('protocoles', $routeParams.protocoleId).get().then(
+      (protocole) ->
         if breadcrumbsGetProtocoleDefer?
           breadcrumbsGetProtocoleDefer.resolve(protocole)
           breadcrumbsGetProtocoleDefer = undefined
         $scope.protocole = protocole
         initSiteCreation()
         createMap(angular.element('.g-maps')[0])
+      (error) -> window.location = '#/404'
+    )
 
     initSiteCreation = ->
       if $scope.protocole.type_site in ['CARRE', 'POINT_FIXE']

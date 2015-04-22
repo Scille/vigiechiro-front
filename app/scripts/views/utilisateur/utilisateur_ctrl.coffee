@@ -16,11 +16,11 @@ angular.module('utilisateurViews', ['ngRoute', 'xin_listResource', 'xin_tools',
     $routeProvider
       .when '/utilisateurs',
         templateUrl: 'scripts/views/utilisateur/list_utilisateurs.html'
-        controller: 'ListUtilisateursCtrl'
+        controller: 'ListUtilisateursController'
         breadcrumbs: 'Utilisateurs'
       .when '/utilisateurs/:userId',
         templateUrl: 'scripts/views/utilisateur/show_utilisateur.html'
-        controller: 'ShowUtilisateurCtrl'
+        controller: 'ShowUtilisateurController'
         breadcrumbs: ngInject ($q) ->
             breadcrumbsDefer = $q.defer()
             breadcrumbsGetUtilisateurDefer = $q.defer()
@@ -31,7 +31,7 @@ angular.module('utilisateurViews', ['ngRoute', 'xin_listResource', 'xin_tools',
               ])
             return breadcrumbsDefer.promise
 
-  .controller 'ListUtilisateursCtrl', ($scope, Backend, DelayedEvent) ->
+  .controller 'ListUtilisateursController', ($scope, Backend, DelayedEvent) ->
     $scope.lookup = {}
     # Filter field is trigger after 500ms of inactivity
     delayedFilter = new DelayedEvent(500)
@@ -44,7 +44,7 @@ angular.module('utilisateurViews', ['ngRoute', 'xin_listResource', 'xin_tools',
           delete $scope.lookup.q
     $scope.resourceBackend = Backend.all('utilisateurs')
 
-  .controller 'ShowUtilisateurCtrl', ($scope, $route, $routeParams, Backend, session) ->
+  .controller 'ShowUtilisateurController', ($scope, $route, $routeParams, Backend, session) ->
     $scope.submitted = false
     $scope.utilisateur = {}
     $scope.readOnly = false
@@ -56,17 +56,20 @@ angular.module('utilisateurViews', ['ngRoute', 'xin_listResource', 'xin_tools',
       userBackend = Backend.one('moi')
     else
       userBackend = Backend.one('utilisateurs', $routeParams.userId)
-    userBackend.get().then (utilisateur) ->
-      if breadcrumbsGetUtilisateurDefer?
-        breadcrumbsGetUtilisateurDefer.resolve(utilisateur)
-        breadcrumbsGetUtilisateurDefer = undefined
-      userResource = utilisateur
-      $scope.utilisateur = utilisateur.plain()
-      origin_role = $scope.utilisateur.role
-      session.getUserPromise().then (user) ->
-        $scope.isAdmin = user.role == 'Administrateur'
-        $scope.readOnly = (not $scope.isAdmin and
-                           user._id != utilisateur._id)
+    userBackend.get().then(
+      (utilisateur) ->
+        if breadcrumbsGetUtilisateurDefer?
+          breadcrumbsGetUtilisateurDefer.resolve(utilisateur)
+          breadcrumbsGetUtilisateurDefer = undefined
+        userResource = utilisateur
+        $scope.utilisateur = utilisateur.plain()
+        origin_role = $scope.utilisateur.role
+        session.getUserPromise().then (user) ->
+          $scope.isAdmin = user.role == 'Administrateur'
+          $scope.readOnly = (not $scope.isAdmin and
+                             user._id != utilisateur._id)
+      (error) -> window.location = '#/404'
+    )
 
     $scope.saveUser = ->
       $scope.submitted = true

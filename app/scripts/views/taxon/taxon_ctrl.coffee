@@ -136,10 +136,7 @@ angular.module('taxonViews', ['ngRoute', 'ngSanitize', 'textAngular',
     $scope.taxonsParents = new TaxonsParents(Backend, $scope.taxonId)
     $scope.taxonsParents.init ->
       # Force the cache control to get back the last version on the serveur
-      Backend.one('taxons', $routeParams.taxonId).get(
-        {}
-        {'Cache-Control': 'no-cache'}
-      ).then(
+      Backend.one('taxons', $routeParams.taxonId).get().then(
         (taxon) ->
           if breadcrumbsGetTaxonDefer?
             breadcrumbsGetTaxonDefer.resolve(taxon)

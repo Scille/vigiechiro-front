@@ -116,13 +116,14 @@ angular.module('participationViews', ['ngRoute', 'textAngular', 'xin_listResourc
 
   .controller 'DisplayParticipationController', ($scope, $route, $routeParams,
                                                  Backend) ->
-    Backend.one('participations', $routeParams.participationId).get()
-      .then (participation) ->
+    Backend.one('participations', $routeParams.participationId).get().then(
+      (participation) ->
         if breadcrumbsGetParticipationDefer?
           breadcrumbsGetParticipationDefer.resolve(participation)
           breadcrumbsGetParticipationDefer = undefined
         $scope.participation = participation
-
+      (error) -> window.location = '#/404'
+    )
     $scope.addPost = ->
       payload =
         message: $scope.post
@@ -130,7 +131,6 @@ angular.module('participationViews', ['ngRoute', 'textAngular', 'xin_listResourc
         -> $route.reload()
         (error) -> throw error
       )
-
 
   .directive 'displayParticipationDirective', (Backend) ->
     restrict: 'E'
@@ -178,9 +178,10 @@ angular.module('participationViews', ['ngRoute', 'textAngular', 'xin_listResourc
 
 
   .controller 'CreateParticipationController', ($routeParams, $scope, $timeout, Backend) ->
-    Backend.one('sites', $routeParams.siteId).get().then (site) ->
-      $scope.site = site
-
+    Backend.one('sites', $routeParams.siteId).get().then(
+      (site) -> $scope.site = site
+      (error) -> window.location = '#/404'
+    )
 
   .directive 'createParticipationDirective', ->
     restrict: 'E'
@@ -188,7 +189,6 @@ angular.module('participationViews', ['ngRoute', 'textAngular', 'xin_listResourc
     controller: 'CreateParticipationDirectiveController'
     scope:
       site: '='
-
 
   .controller 'CreateParticipationDirectiveController', ($route, $scope,
                                                          session, Backend) ->
@@ -304,8 +304,8 @@ angular.module('participationViews', ['ngRoute', 'textAngular', 'xin_listResourc
 
   .controller 'EditParticipationController', ($scope, $routeParams, Backend) ->
     $scope.participation = {}
-    Backend.one('participations', $routeParams.participationId).get()
-      .then (participation) ->
+    Backend.one('participations', $routeParams.participationId).get().then(
+      (participation) ->
         if breadcrumbsGetParticipationDefer?
           breadcrumbsGetParticipationDefer.resolve(participation)
           breadcrumbsGetParticipationDefer = undefined
@@ -313,7 +313,8 @@ angular.module('participationViews', ['ngRoute', 'textAngular', 'xin_listResourc
         Backend.one('protocoles', participation.site.protocole).get()
           .then (protocole) ->
             $scope.participation.site.protocole = protocole.plain()
-
+      (error) -> window.location = '#/404'
+    )
 
   .directive 'editParticipationDirective', ->
     restrict: 'E'

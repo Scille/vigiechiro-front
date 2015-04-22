@@ -150,20 +150,24 @@ angular.module('protocoleViews', ['ngRoute', 'textAngular',
           deferred.resolve(protocoles)
       return deferred.promise
 
+
   .controller 'DisplayProtocoleController', ($route, $routeParams, $scope, Backend, session) ->
     $scope.protocole = {}
     $scope.userRegistered = false
     session.getUserPromise().then (user) ->
       $scope.user = user.plain()
-      Backend.one('protocoles', $routeParams.protocoleId).get().then (protocole) ->
-        if breadcrumbsGetProtocoleDefer?
-          breadcrumbsGetProtocoleDefer.resolve(protocole)
-          breadcrumbsGetProtocoleDefer = undefined
-        $scope.protocole = protocole
-        for protocole in $scope.user.protocoles or []
-          if protocole.protocole._id == $scope.protocole._id
-            $scope.userRegistered = true
-            break
+      Backend.one('protocoles', $routeParams.protocoleId).get().then(
+        (protocole) ->
+          if breadcrumbsGetProtocoleDefer?
+            breadcrumbsGetProtocoleDefer.resolve(protocole)
+            breadcrumbsGetProtocoleDefer = undefined
+          $scope.protocole = protocole
+          for protocole in $scope.user.protocoles or []
+            if protocole.protocole._id == $scope.protocole._id
+              $scope.userRegistered = true
+              break
+        (error) -> window.location = '#/404'
+      )
     $scope.registerProtocole = ->
       Backend.one('moi/protocoles/'+$scope.protocole._id).put().then(
         (response) ->
@@ -181,18 +185,15 @@ angular.module('protocoleViews', ['ngRoute', 'textAngular',
     Backend.all('taxons').getList().then (taxons) ->
       $scope.taxons = taxons.plain()
     # Force the cache control to get back the last version on the serveur
-    Backend.one('protocoles', $routeParams.protocoleId).get(
-      {}
-      {'Cache-Control': 'no-cache'}
-    ).then (protocole) ->
-      if breadcrumbsGetProtocoleDefer?
-        breadcrumbsGetProtocoleDefer.resolve(protocole)
-        breadcrumbsGetProtocoleDefer = undefined
-      protocoleResource = protocole
-      $scope.protocole = protocole.plain()
-      $scope.configuration_participation = {}
-      for key in $scope.protocole.configuration_participation
-        $scope.configuration_participation[key] = true
+    Backend.one('protocoles', $routeParams.protocoleId).get().then(
+      (protocole) ->
+        if breadcrumbsGetProtocoleDefer?
+          breadcrumbsGetProtocoleDefer.resolve(protocole)
+          breadcrumbsGetProtocoleDefer = undefined
+        protocoleResource = protocole
+        $scope.protocole = protocole.plain()
+      (error) -> window.location = '#/404'
+    )
     $scope.saveProtocole = ->
       $scope.submitted = true
       if (not $scope.protocoleForm.$valid or
