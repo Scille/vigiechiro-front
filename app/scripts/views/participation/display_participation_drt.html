@@ -40,6 +40,18 @@
         Numéro de série du détecteur enregistreur :
         {{ participation.configuration.detecteur_enregistreur_numero_serie }}
       </div>
+      <div ng-if="participation.configuration.detecteur_enregistreur_type">
+        Type du détecteur enregistreur :
+        {{ participation.configuration.detecteur_enregistreur_type }}
+      </div>
+      <div ng-if="participation.configuration.micro_numero_serie">
+        Numéro de série du micro :
+        {{ participation.configuration.micro_numero_serie }}
+      </div>
+      <div ng-if="participation.configuration.micro_type">
+        Type du micro :
+        {{ participation.configuration.micro_type }}
+      </div>
       <div ng-if="participation.configuration.micro0_position">
         Position du micro 0 :
         {{ participation.configuration.micro0_position }}

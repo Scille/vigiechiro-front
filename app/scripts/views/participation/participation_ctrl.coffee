@@ -328,6 +328,29 @@ angular.module('participationViews', ['ngRoute', 'textAngular', 'xin_listResourc
     $scope.fileUploader = []
     $scope.folderUploader = []
 
+    $scope.$watch 'participation.site.protocole.type_site', (type_site) ->
+      if type_site?
+        if type_site in ['ROUTIER', 'CARRE']
+          $scope.participation.configuration =
+            detecteur_enregistreur_numero_serie: $scope.participation.configuration.detecteur_enregistreur_numero_serie or ''
+            detecteur_enregistreur_type: $scope.participation.configuration.detecteur_enregistreur_type or ''
+            micro_numero_serie: $scope.participation.configuration.micro_numero_serie or ''
+            micro_type: $scope.participation.configuration.micro_type or ''
+            piste0_expansion: $scope.participation.configuration.piste0_expansion or ''
+            piste1_expansion: $scope.participation.configuration.piste1_expansion or ''
+        else if type_site == 'POINT_FIXE'
+          $scope.participation.configuration =
+            detecteur_enregistreur_numero_serie: $scope.participation.configuration.detecteur_enregistreur_numero_serie or ''
+            detecteur_enregistreur_type: $scope.participation.configuration.detecteur_enregistreur_type or ''
+            micro0_position: $scope.participation.configuration.micro0_position or ''
+            micro0_numero_serie: $scope.participation.configuration.micro0_numero_serie or ''
+            micro0_type: $scope.participation.configuration.micro0_type or ''
+            micro0_hauteur: $scope.participation.configuration.micro0_hauteur or ''
+            micro1_position: $scope.participation.configuration.micro1_position or ''
+            micro1_numero_serie: $scope.participation.configuration.micro1_numero_serie or ''
+            micro1_type: $scope.participation.configuration.micro1_type or ''
+            micro1_hauteur: $scope.participation.configuration.micro1_hauteur or ''
+
     $scope.$watchCollection 'fileUploader', (newValue, oldValue) ->
       if newValue != oldValue
         $scope.participationForm.$setDirty()
@@ -352,7 +375,7 @@ angular.module('participationViews', ['ngRoute', 'textAngular', 'xin_listResourc
         'date_debut': date_debut
         'commentaire': $scope.participation.commentaire
         'meteo': {}
-        'configuration': {}
+        'configuration': $scope.participation.configuration
       # date fin
       if $scope.participation.date_fin?
         date_fin = new Date($scope.participation.date_fin)
@@ -371,14 +394,6 @@ angular.module('participationViews', ['ngRoute', 'textAngular', 'xin_listResourc
              key == 'vent' or key == 'couverture'
             if $scope.participation.meteo[key]?
               payload.meteo[key] = $scope.participation.meteo[key]
-          else if key == 'detecteur_enregistreur_numero_serie' or
-             key == 'micro0_position' or key == 'micro0_numero_serie' or
-             key == 'micro0_hauteur' or key == 'micro1_position' or
-             key == 'micro1_numero_serie' or key == 'micro1_hauteur'
-            if $scope.participation.configuration[key]?
-              payload.configuration[key] = $scope.participation.configuration[key]
-      if Object.keys(payload.configuration).length == 0
-        delete payload.configuration
       uploadingFiles = false
       # Check files
       for file in $scope.fileUploader or []
