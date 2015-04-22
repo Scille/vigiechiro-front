@@ -41,7 +41,7 @@ angular
         redirectTo: '/accueil'
       .when '/profil',
         templateUrl: 'scripts/views/utilisateur/show_utilisateur.html'
-        controller: 'ShowUtilisateurCtrl'
+        controller: 'ShowUtilisateurController'
         resolve: {$routeParams: -> return {'userId': 'moi'}}
         breadcrumbs: ngInject ($q, session) ->
           defer = $q.defer()
