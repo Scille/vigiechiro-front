@@ -109,6 +109,9 @@ angular.module('xin_google_maps', [])
             return false
         return true
 
+      createLatLng: (lat, lng) ->
+        new latLng(lat, lng)
+
       createPoint: (lat, lng, draggable = false, title = '') ->
         latlng = new google.maps.LatLng(lat, lng)
         return @createPointWithLatLng(latlng, draggable, title)
@@ -176,6 +179,8 @@ angular.module('xin_google_maps', [])
           vertice = vertices.getAt(i-1)
           latlngs.push([vertice.lat(), vertice.lng()])
         return latlngs
+
+      computeOffset: google.maps.geometry.spherical.computeOffset
 
       computeLength: (overlay) ->
         if !overlay?

@@ -6,6 +6,7 @@ angular.module('protocole_map_point_fixe', [])
     class ProtocoleMapPointFixe extends ProtocoleMap
       constructor: (mapDiv, @siteCallback) ->
         super mapDiv, @siteCallback
+        @_smallGrille = []
         @_steps = [
           "Positionner la zone de sélection aléatoire.",
           "Cliquer sur la carte pour sélection la grille stoc correspondante.",
@@ -92,3 +93,81 @@ angular.module('protocole_map_point_fixe', [])
           if parseInt(localite.name) == name
             return @setLocaliteName(name + 1)
         return name+''
+
+      validNumeroGrille: (cell, numero, id, editable = false) =>
+        # remove click event on map
+        @_googleMaps.clearListeners(@_googleMaps.getMap(), 'click')
+        # change color of cell
+        cell.setOptions(
+          strokeColor: '#00E000'
+          strokeOpacity: 1
+          strokeWeight: 2
+          fillColor: '#000000'
+          fillOpacity: 0
+        )
+        # get Path of cell
+        path = cell.getPath()
+        # register grille stoc
+        @_grilleStoc =
+          item: cell
+          numero: numero
+          id: id
+        lat = (path.getAt(0).lat() + path.getAt(2).lat()) / 2
+        lng = (path.getAt(0).lng() + path.getAt(2).lng()) / 2
+        @_googleMaps.setCenter(lat, lng)
+        @_googleMaps.setZoom(13)
+        @_step = 2
+        @updateSite()
+        @_googleMaps.setDrawingManagerOptions(drawingControl: true)
+        if editable
+          @_googleMaps.addListener(@_grilleStoc.item, 'rightclick', (e) =>
+            if confirm("Cette opération supprimera toutes les localités.")
+              @_step = 0
+              @_grilleStoc.item.setMap(null)
+              @_grilleStoc = {}
+              for localite in @_localites or []
+                @_googleMaps.deleteOverlay(localite.overlay)
+              @_localites = []
+              @_googleMaps.setDrawingManagerOptions(drawingControl: false)
+              @selectGrilleStoc()
+              @updateSite()
+          )
+        @displaySmallGrille()
+
+      # Display 4x4 grille into grille stoc
+      displaySmallGrille: ->
+        for small in @_smallGrille or []
+          small.setMap(null)
+        @_smallGrille = []
+        if !@_grilleStoc? or !@_grilleStoc.item?
+          return
+        # Get Center
+        p1 = @_grilleStoc.item.getPath().getAt(0)
+        p2 = @_grilleStoc.item.getPath().getAt(2)
+        center = @_googleMaps.interpolate(p1, p2, 0.5)
+        # Get NW
+        nw = @_googleMaps.computeOffset(center, 1000*Math.sqrt(2), -45)
+        # Generate points
+        p = []
+        p[0] = []
+        for i in [0..4]
+          p[i] = []
+          if i == 0
+            p[0][0] = nw
+          else
+            p[i][0] = @_googleMaps.computeOffset(p[i-1][0], 500, 180)
+          for j in [1..4]
+            p[i][j] = @_googleMaps.computeOffset(p[i][j-1], 500, 90)
+        # Generate Squares
+        for i in [0..3]
+          for j in [0..3]
+            path = [p[i][j], p[i+1][j], p[i+1][j+1], p[i][j+1]]
+            cell = @_googleMaps.createPolygonWithPaths(path, false, false)
+            cell.setOptions(
+              fillOpacity: 0
+              fillColor: '#000000'
+              strokeWeight: 1
+              strokeOpacity: 0.2
+              strokeColor: '#000000'
+            )
+            @_smallGrille.push(cell)
