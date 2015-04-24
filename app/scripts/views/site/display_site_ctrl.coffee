@@ -119,12 +119,17 @@ angular.module('displaySiteViews', ['ngRoute', 'textAngular', 'xin_backend',
         scope.userId = user._id
       attrs.$observe 'typeSite', (typeSite) ->
         if typeSite
-          Backend.all('protocoles/'+scope.protocoleId+'/sites').getList().then (sites) ->
-            scope.sites = sites.plain()
-            mapDiv = elem.find('.g-maps')[0]
-            mapProtocole = protocolesFactory(mapDiv, "ALL_"+scope.typeSite)
-            mapProtocole.loadMap(sites.plain())
-
+          sitesPromise = null
+          if typeSite in ["CARRE", "POINT_FIXE"]
+            sitesPromise = Backend.all('protocoles/'+scope.protocoleId+'/sites').all('grille_stoc')
+          else if typeSite == "ROUTIER"
+            sitesPromise = Backend.all('protocoles/'+scope.protocoleId+'/sites').all('tracet')
+          if sitesPromise
+            sitesPromise.getList().then (sites) ->
+                scope.sites = sites.plain()
+                mapDiv = elem.find('.g-maps')[0]
+                mapProtocole = protocolesFactory(mapDiv, "ALL_"+scope.typeSite)
+                mapProtocole.loadMap(sites.plain())
 
   .directive 'listSitesDirective', (session, Backend) ->
     restrict: 'E'
