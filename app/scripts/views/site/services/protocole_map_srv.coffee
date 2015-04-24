@@ -116,7 +116,8 @@ angular.module('protocole_map', ['protocole_map_carre',
         site = @_sites[index]
         @validNumeroGrille(site.overlay, site.grille_stoc.numero,
                            site.grille_stoc._id, false)
-        @displayLocalites(site.localites)
+        Backend.one('sites', site._id).get().then (site) =>
+          @displayLocalites(site.localites)
         @_step = 3
         @updateSite()
 

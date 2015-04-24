@@ -11,7 +11,6 @@ angular.module('modalSiteViews', [])
   .controller 'ModalInstanceRetrySelectionController', ($scope, $modalInstance, justification_non_aleatoire) ->
     $scope.justification_non_aleatoire = justification_non_aleatoire
     $scope.ok = ->
-      console.log($scope.motif)
       if $scope.motif in [undefined, '']
         $scope.onError = true
       else

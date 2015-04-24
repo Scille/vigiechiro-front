@@ -28,6 +28,7 @@ angular.module('createSiteViews', ['textAngular', 'ui.bootstrap',
                                        session, Backend, protocolesFactory) ->
     # map variables
     mapProtocole = null
+    $scope.sites = null
     # random selection buttons and steps
     $scope.resetFormAllowed = false
     $scope.displaySteps = false
@@ -77,8 +78,10 @@ angular.module('createSiteViews', ['textAngular', 'ui.bootstrap',
                                        siteCallback)
       # If CARRE or POINT_FIXE, display all sites already followed
       if $scope.protocole.type_site in ['CARRE', 'POINT_FIXE']
-        Backend.all('protocoles/'+$scope.protocole._id+'/sites').getList().then (sites) ->
-          mapProtocole.displaySites(sites.plain())
+        Backend.all('protocoles/'+$scope.protocole._id+'/sites').all('grille_stoc')
+          .getList().then (sites) ->
+            $scope.sites = sites.plain()
+            mapProtocole.displaySites($scope.sites)
 
     $scope.$watch('siteForm.$pristine', (value) ->
       valid = siteValidated()
@@ -213,9 +216,21 @@ angular.module('createSiteViews', ['textAngular', 'ui.bootstrap',
         r: origin.getRadius()
       Backend.all('grille_stoc/cercle').getList(parameters).then (grille_stoc) ->
         $scope.listGrilleStocOrigin = grille_stoc.plain()
-        number = Math.floor(Math.random() * $scope.listGrilleStocOrigin.length)
-        $scope.listNumberUsed.push(number)
-        mapProtocole.validOrigin($scope.listGrilleStocOrigin[number])
+        Backend.all('protocoles/'+$scope.protocole._id+'/sites').all('grille_stoc')
+          .getList().then (grille_stoc) ->
+            if $scope.listGrilleStocOrigin and $scope.sites
+              for index in [$scope.listGrilleStocOrigin.length-1..0]
+                for site in $scope.sites or []
+                  cell = $scope.listGrilleStocOrigin[index]
+                  if cell.numero == site.grille_stoc.numero
+                    $scope.listGrilleStocOrigin.splice(index, 1)
+                    break
+            firstSelection()
+
+    firstSelection = ->
+      number = Math.floor(Math.random() * $scope.listGrilleStocOrigin.length)
+      $scope.listNumberUsed.push(number)
+      mapProtocole.validOrigin($scope.listGrilleStocOrigin[number])
 
     $scope.retrySelection = ->
       modalInstance = $modal.open(
@@ -230,7 +245,11 @@ angular.module('createSiteViews', ['textAngular', 'ui.bootstrap',
           if motif and motif != ''
             # no more cell to pick
             if $scope.listNumberUsed.length == $scope.listGrilleStocOrigin.length
-              throw "Error: All cells picked"
+              $scope.randomSelectionAllowed = false
+              $scope.mapError =
+                message: "Plus de grille_stoc disponible."
+              $timeout(-> $scope.$apply())
+              return
             # add motif
             grille_stoc = $scope.listGrilleStocOrigin[$scope.listNumberUsed[$scope.listNumberUsed.length-1]]
             $scope.justification_non_aleatoire.push(grille_stoc.numero+' : '+motif)
@@ -264,34 +283,86 @@ angular.module('createSiteViews', ['textAngular', 'ui.bootstrap',
       # If grille stoc
       if $scope.protocole.type_site in ['POINT_FIXE', 'CARRE']
         payload.grille_stoc = mapProtocole.getIdGrilleStoc()
+        check =
+          protocole: $scope.protocole._id
+          grille_stoc: mapProtocole.getIdGrilleStoc()
+        Backend.all('sites').getList(check).then (sites) ->
+          if sites.plain().length
+            sites.customDELETE(sites[0]._id+'/localites').then(
+              localites = mapProtocole.saveMap()
+              # If localites to save
+              if localites.length
+                payload =
+                  localites: []
+                for localite in localites
+                  tmp =
+                    nom: localite.name
+      #              coordonnee: localite.geometries.geometries[0]
+                    geometries: localite.geometries
+                    representatif: false
+                  payload.localites.push(tmp)
+                sites.customPUT(payload, sites[0]._id+"/localites").then(
+                  -> window.location = '#/sites/'+sites[0]._id
+                  (error) -> throw error
+                )
+            )
+          else
+            Backend.all('sites').post(payload).then(
+              (site) ->
+                localites = mapProtocole.saveMap()
+                # If localites to save
+                if localites.length
+                  payload =
+                    localites: []
+                  for localite in localites
+                    tmp =
+                      nom: localite.name
+        #              coordonnee: localite.geometries.geometries[0]
+                      geometries: localite.geometries
+                      representatif: false
+                    payload.localites.push(tmp)
+                  site.customPUT(payload, "localites").then(
+                    ->
+                    (error) -> throw error
+                  )
+                # If verrouille
+                if $scope.site.verrouille
+                  site.patch({'verrouille': true}).then(
+                    ->
+                    (error) -> throw error
+                  )
+                # redirect to display site
+                window.location = '#/sites/'+site._id
+              (error) -> throw "error " + error
+            )
       # If tracet
-      if $scope.protocole.type_site == 'ROUTIER'
+      else if $scope.protocole.type_site == 'ROUTIER'
         payload.tracet = mapProtocole.getGeoJsonTrace()
-      Backend.all('sites').post(payload).then(
-        (site) ->
-          localites = mapProtocole.saveMap()
-          # If localites to save
-          if localites.length
-            payload =
-              localites: []
-            for localite in localites
-              tmp =
-                nom: localite.name
-  #              coordonnee: localite.geometries.geometries[0]
-                geometries: localite.geometries
-                representatif: false
-              payload.localites.push(tmp)
-            site.customPUT(payload, "localites").then(
-              ->
-              (error) -> throw error
-            )
-          # If verrouille
-          if $scope.site.verrouille
-            site.patch({'verrouille': true}).then(
-              ->
-              (error) -> throw error
-            )
-          # redirect to display site
-          window.location = '#/sites/'+site._id
-        (error) -> throw "error " + error
-      )
+        Backend.all('sites').post(payload).then(
+          (site) ->
+            localites = mapProtocole.saveMap()
+            # If localites to save
+            if localites.length
+              payload =
+                localites: []
+              for localite in localites
+                tmp =
+                  nom: localite.name
+    #              coordonnee: localite.geometries.geometries[0]
+                  geometries: localite.geometries
+                  representatif: false
+                payload.localites.push(tmp)
+              site.customPUT(payload, "localites").then(
+                ->
+                (error) -> throw error
+              )
+            # If verrouille
+            if $scope.site.verrouille
+              site.patch({'verrouille': true}).then(
+                ->
+                (error) -> throw error
+              )
+            # redirect to display site
+            window.location = '#/sites/'+site._id
+          (error) -> throw "error " + error
+        )
