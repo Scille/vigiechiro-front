@@ -10,6 +10,17 @@ Netcat (nc) pour debian
 sudo apt-get install netcat-openbsd
 ```
 
+Start webserver
+```
+Launch vigiechiro-ap
+```
+grunt serve
+```
+or
+grunt serve:dist
+```
+
+
 Tests end-to-end
 ```
 sudo npm install -g protractor

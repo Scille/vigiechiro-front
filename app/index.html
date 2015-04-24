@@ -1,143 +1,153 @@
 <!doctype html>
 <html class="no-js">
-  <head>
-    <meta charset="utf-8">
-    <title>Vigiechiro</title>
-    <meta name="description" content="">
-    <meta name="viewport" content="width=device-width">
-    <!-- Place favicon.ico and apple-touch-icon.png in the root directory -->
-    <!-- CDN css-->
-    <!-- build:css(.) styles/vendor.css -->
-    <!-- bower:css -->
-    <link rel="stylesheet" href="bower_components/bootstrap/dist/css/bootstrap.css" />
-    <link rel="stylesheet" href="bower_components/bootstrap-css-only/css/bootstrap.css" />
-    <link rel="stylesheet" href="bower_components/font-awesome/css/font-awesome.css" />
-    <link rel="stylesheet" href="bower_components/textAngular/src/textAngular.css" />
-    <link rel="stylesheet" href="bower_components/angular-ui-select/dist/select.css" />
-    <link rel="stylesheet" href="bower_components/angular-dialog-service/dist/dialogs.min.css" />
-    <!-- endbower -->
-    <!-- endbuild -->
-    <!-- build:css(.tmp) styles/main.css -->
-    <link rel="stylesheet" href="styles/datetimepicker.css" />
-    <link rel="stylesheet" href="styles/main.css">
-    <!-- endbuild -->
-  </head>
+<head>
+  <meta charset="utf-8">
+  <title>Vigiechiro</title>
+  <meta name="description" content="">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"/>
 
-  <body ng-app="vigiechiroApp">
-    <!--[if lt IE 7]>
-      <p class="browsehappy">You are using an <strong>outdated</strong> browser. Please <a href="http://browsehappy.com/">upgrade your browser</a> to improve your experience.</p>
-    <![endif]-->
-    <div class="waiting-for-angular container">
-      <img src="images/spinner.gif" class="img-responsive center-block" alt="Responsive image">
+  <!-- Place favicon.ico and apple-touch-icon.png in the root directory -->
+  <!-- CDN css-->
+  <!-- build:css(.) styles/vendor.css -->
+  <!-- bower:css -->
+  <link rel="stylesheet" href="bower_components/bootstrap/dist/css/bootstrap.css" />
+  <link rel="stylesheet" href="bower_components/bootstrap-material-design/dist/css/material.css" />
+  <link rel="stylesheet" href="bower_components/bootstrap-material-design/dist/css/ripples.css" />
+  <link rel="stylesheet" href="bower_components/font-awesome/css/font-awesome.css" />
+  <link rel="stylesheet" href="bower_components/textAngular/src/textAngular.css" />
+  <link rel="stylesheet" href="bower_components/angular-ui-select/dist/select.css" />
+  <link rel="stylesheet" href="bower_components/angular-dialog-service/dist/dialogs.min.css" />
+  <!-- endbower -->
+  <!-- endbuild -->
+  <!-- build:css(.tmp) styles/main.css -->
+  <link rel="stylesheet" href="styles/datetimepicker.css"/>
+  <link rel="stylesheet" href="styles/main.css">
+  <!-- endbuild -->
+</head>
+
+<body ng-app="vigiechiroApp">
+<!--[if lt IE 7]>
+<p class="browsehappy">You are using an <strong>outdated</strong> browser. Please <a href="http://browsehappy.com/">upgrade
+  your browser</a> to improve your experience.</p>
+<![endif]-->
+<!-- Login and content page displayed according to current login state -->
+<login-directive></login-directive>
+<content-directive class="content">
+  <!-- Navigation bar -->
+  <navbar-directive></navbar-directive>
+  <!-- Application content -->
+  <div class="container">
+    <div ng-view=""></div>
+  </div>
+  <div class="clearfix"></div>
+  <br/>
+  <footer class="footer">
+    <div class="container">
+      <a href="http://scille.eu" target="_blank">
+        <img src="images/logo-scille.png" width="20">&nbsp;Scille</a> vigiechiro demo
     </div>
-    <!-- Login and content page displayed according to current login state -->
-    <login-directive></login-directive>
-    <content-directive class="content">
-      <!-- Navigation bar -->
-      <navbar-directive></navbar-directive>
-      <!-- Application content -->
-      <div class="container">
-        <div ng-view=""></div>
-      </div>
-      <div class="clearfix"></div>
-      <br/>
-      <footer class="footer">
-        <div class="container">
-          <a href="http://scille.eu" target="_blank">
-            <img src="images/logo-scille.png" width="20">&nbsp;Scille</a> vigiechiro demo
-        </div>
-      </footer>
-    </content-directive>
+  </footer>
+</content-directive>
 
-    <!-- Google Analytics: change UA-XXXXX-X to be your site's ID -->
-     <script>
-       (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
-       (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
-       m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
-       })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+<!-- Google Analytics: change UA-XXXXX-X to be your site's ID -->
+<script>
+  (function (i, s, o, g, r, a, m) {
+    i['GoogleAnalyticsObject'] = r;
+    i[r] = i[r] || function () {
+        (i[r].q = i[r].q || []).push(arguments)
+      }, i[r].l = 1 * new Date();
+    a = s.createElement(o),
+      m = s.getElementsByTagName(o)[0];
+    a.async = 1;
+    a.src = g;
+    m.parentNode.insertBefore(a, m)
+  })(window, document, 'script', '//www.google-analytics.com/analytics.js', 'ga');
 
-       ga('create', 'UA-XXXXX-X');
-       ga('send', 'pageview');
-    </script>
+  ga('create', 'UA-XXXXX-X');
+  ga('send', 'pageview');
+</script>
 
-    <script src='//maps.googleapis.com/maps/api/js?sensor=false&libraries=drawing,geometry'></script>
+<script src='//maps.googleapis.com/maps/api/js?sensor=false&libraries=drawing,geometry'></script>
 
-    <!-- build:js(.) scripts/oldieshim.js -->
-    <!--[if lt IE 9]>
-    <script src="bower_components/es5-shim/es5-shim.js"></script>
-    <script src="bower_components/json3/lib/json3.js"></script>
-    <![endif]-->
-    <!-- endbuild -->
+<!-- build:js(.) scripts/oldieshim.js -->
+<!--[if lt IE 9]>
+<script src="bower_components/es5-shim/es5-shim.js"></script>
+<script src="bower_components/json3/lib/json3.js"></script>
+<![endif]-->
+<!-- endbuild -->
 
-    <!-- CDN scripts -->
-    <!-- build:js(.) scripts/vendor.js -->
-    <!-- bower:js -->
-    <script src="bower_components/jquery/dist/jquery.js"></script>
-    <script src="bower_components/angular/angular.js"></script>
-    <script src="bower_components/bootstrap/dist/js/bootstrap.js"></script>
-    <script src="bower_components/angular-sanitize/angular-sanitize.js"></script>
-    <script src="bower_components/angular-animate/angular-animate.js"></script>
-    <script src="bower_components/angular-touch/angular-touch.js"></script>
-    <script src="bower_components/angular-route/angular-route.js"></script>
-    <script src="bower_components/lodash/dist/lodash.compat.js"></script>
-    <script src="bower_components/restangular/dist/restangular.js"></script>
-    <script src="bower_components/flow.js/dist/flow.js"></script>
-    <script src="bower_components/ng-flow/dist/ng-flow.js"></script>
-    <script src="bower_components/angular-utils-pagination/dirPagination.js"></script>
-    <script src="bower_components/rangy/rangy-core.min.js"></script>
-    <script src="bower_components/rangy/rangy-cssclassapplier.min.js"></script>
-    <script src="bower_components/rangy/rangy-selectionsaverestore.min.js"></script>
-    <script src="bower_components/rangy/rangy-serializer.min.js"></script>
-    <script src="bower_components/textAngular/src/textAngular.js"></script>
-    <script src="bower_components/textAngular/src/textAngular-sanitize.js"></script>
-    <script src="bower_components/textAngular/src/textAngularSetup.js"></script>
-    <script src="bower_components/angular-ui-select/dist/select.js"></script>
-    <script src="bower_components/moment/moment.js"></script>
-    <script src="bower_components/angular-bootstrap/ui-bootstrap-tpls.js"></script>
-    <script src="bower_components/angular-translate/angular-translate.js"></script>
-    <script src="bower_components/angular-dialog-service/dist/dialogs.min.js"></script>
-    <script src="bower_components/angular-dialog-service/dist/dialogs-default-translations.min.js"></script>
-    <!-- endbower -->
-    <script src="bower_components/moment/locale/fr.js"></script>
-    <!-- endbuild -->
+<!-- CDN scripts -->
+<!-- build:js(.) scripts/vendor.js -->
+<!-- bower:js -->
+<script src="bower_components/jquery/dist/jquery.js"></script>
+<script src="bower_components/angular/angular.js"></script>
+<script src="bower_components/bootstrap/dist/js/bootstrap.js"></script>
+<script src="bower_components/angular-sanitize/angular-sanitize.js"></script>
+<script src="bower_components/angular-animate/angular-animate.js"></script>
+<script src="bower_components/angular-touch/angular-touch.js"></script>
+<script src="bower_components/angular-route/angular-route.js"></script>
+<script src="bower_components/lodash/dist/lodash.compat.js"></script>
+<script src="bower_components/restangular/dist/restangular.js"></script>
+<script src="bower_components/flow.js/dist/flow.js"></script>
+<script src="bower_components/ng-flow/dist/ng-flow.js"></script>
+<script src="bower_components/angular-utils-pagination/dirPagination.js"></script>
+<script src="bower_components/bootstrap-material-design/dist/js/material.js"></script>
+<script src="bower_components/bootstrap-material-design/dist/js/ripples.js"></script>
+<script src="bower_components/rangy/rangy-core.min.js"></script>
+<script src="bower_components/rangy/rangy-cssclassapplier.min.js"></script>
+<script src="bower_components/rangy/rangy-selectionsaverestore.min.js"></script>
+<script src="bower_components/rangy/rangy-serializer.min.js"></script>
+<script src="bower_components/textAngular/src/textAngular.js"></script>
+<script src="bower_components/textAngular/src/textAngular-sanitize.js"></script>
+<script src="bower_components/textAngular/src/textAngularSetup.js"></script>
+<script src="bower_components/angular-ui-select/dist/select.js"></script>
+<script src="bower_components/moment/moment.js"></script>
+<script src="bower_components/angular-bootstrap/ui-bootstrap-tpls.js"></script>
+<script src="bower_components/angular-translate/angular-translate.js"></script>
+<script src="bower_components/angular-dialog-service/dist/dialogs.min.js"></script>
+<script src="bower_components/angular-dialog-service/dist/dialogs-default-translations.min.js"></script>
+<script src="bower_components/arrive/src/arrive.js"></script>
+<!-- endbower -->
+<script src="bower_components/moment/locale/fr.js"></script>
+<!-- endbuild -->
 
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/angular-i18n/1.2.15/angular-locale_fr-fr.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/angular-i18n/1.2.15/angular-locale_fr-fr.js"></script>
 
-    <!-- build:js({.tmp,app}) scripts/scripts.js -->
-    <script src="scripts/datetimepicker.js"></script>
+<!-- build:js({.tmp,app}) scripts/scripts.js -->
+<script src="scripts/datetimepicker.js"></script>
 
-    <script src="scripts/app.js"></script>
-    <script src="scripts/settings.js"></script>
+<script src="scripts/app.js"></script>
+<script src="scripts/settings.js"></script>
 
-    <script src="scripts/views/accueil/accueil_ctrl.js"></script>
-    <script src="scripts/views/utilisateur/utilisateur_ctrl.js"></script>
-    <script src="scripts/views/taxon/taxon_ctrl.js"></script>
-    <script src="scripts/views/protocole/protocole_ctrl.js"></script>
-    <script src="scripts/views/site/create_site_ctrl.js"></script>
-    <script src="scripts/views/site/edit_site_ctrl.js"></script>
-    <script src="scripts/views/site/display_site_ctrl.js"></script>
-    <script src="scripts/views/site/services/protocole_map_srv.js"></script>
-    <script src="scripts/views/site/services/protocole_map_carre_srv.js"></script>
-    <script src="scripts/views/site/services/protocole_map_routier_srv.js"></script>
-    <script src="scripts/views/site/services/protocole_map_point_fixe_srv.js"></script>
-    <script src="scripts/views/site/services/protocole_map_display_all_srv.js"></script>
-    <script src="scripts/views/site/modal/modal_site.js"></script>
-    <script src="scripts/views/participation/participation_ctrl.js"></script>
-    <script src="scripts/views/actualite/actualite_ctrl.js"></script>
-    <script src="scripts/views/donnee/donnee_ctrl.js"></script>
+<script src="scripts/views/accueil/accueil_ctrl.js"></script>
+<script src="scripts/views/login/login_ctrl.js"></script>
+<script src="scripts/views/utilisateur/utilisateur_ctrl.js"></script>
+<script src="scripts/views/taxon/taxon_ctrl.js"></script>
+<script src="scripts/views/protocole/protocole_ctrl.js"></script>
+<script src="scripts/views/site/create_site_ctrl.js"></script>
+<script src="scripts/views/site/edit_site_ctrl.js"></script>
+<script src="scripts/views/site/display_site_ctrl.js"></script>
+<script src="scripts/views/site/services/protocole_map_srv.js"></script>
+<script src="scripts/views/site/services/protocole_map_carre_srv.js"></script>
+<script src="scripts/views/site/services/protocole_map_routier_srv.js"></script>
+<script src="scripts/views/site/services/protocole_map_point_fixe_srv.js"></script>
+<script src="scripts/views/site/services/protocole_map_display_all_srv.js"></script>
+<script src="scripts/views/site/modal/modal_site.js"></script>
+<script src="scripts/views/participation/participation_ctrl.js"></script>
+<script src="scripts/views/actualite/actualite_ctrl.js"></script>
+<script src="scripts/views/donnee/donnee_ctrl.js"></script>
 
-    <script src="scripts/xin/tools.js"></script>
-    <script src="scripts/xin/services/geolocation_srv.js"></script>
-    <script src="scripts/xin/services/session_srv.js"></script>
-    <script src="scripts/xin/services/storage_srv.js"></script>
-    <script src="scripts/xin/services/backend_srv.js"></script>
-    <script src="scripts/xin/services/google_maps_srv.js"></script>
-    <script src="scripts/xin/content_drt.js"></script>
-    <script src="scripts/xin/login_drt/login_ctrl.js"></script>
-    <script src="scripts/xin/upload_file/s3_upload_file_srv.js"></script>
-    <script src="scripts/xin/upload_file/upload_file_ctrl.js"></script>
-    <script src="scripts/xin/upload_file/upload_folder_ctrl.js"></script>
-    <script src="scripts/xin/list_resource_drt/list_resource_ctrl.js"></script>
-    <!-- endbuild -->
-  </body>
+<script src="scripts/xin/tools.js"></script>
+<script src="scripts/xin/services/geolocation_srv.js"></script>
+<script src="scripts/xin/services/session_srv.js"></script>
+<script src="scripts/xin/services/storage_srv.js"></script>
+<script src="scripts/xin/services/backend_srv.js"></script>
+<script src="scripts/xin/services/google_maps_srv.js"></script>
+<script src="scripts/xin/content_drt.js"></script>
+<script src="scripts/xin/upload_file/s3_upload_file_srv.js"></script>
+<script src="scripts/xin/upload_file/upload_file_ctrl.js"></script>
+<script src="scripts/xin/upload_file/upload_folder_ctrl.js"></script>
+<script src="scripts/xin/list_resource_drt/list_resource_ctrl.js"></script>
+<!-- endbuild -->
+</body>
 </html>

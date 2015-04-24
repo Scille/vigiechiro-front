@@ -16,7 +16,7 @@
 (function (factory) {
   'use strict';
   /* istanbul ignore if */
-  if (typeof define === 'function'  && /* istanbul ignore next */ define.amd) {
+  if (typeof define === 'function' && /* istanbul ignore next */ define.amd) {
     define(['angular', 'moment'], factory); // AMD
   } else {
     factory(window.angular, window.moment); // Browser global
@@ -87,8 +87,8 @@
         /* istanbul ignore next */
         if (configuration.dropdownSelector !== null && ((typeof jQuery === 'undefined') || (typeof jQuery().dropdown !== 'function'))) {
           $log.error('Please DO NOT specify the dropdownSelector option unless you are using jQuery AND Bootstrap.js. ' +
-          'Please include jQuery AND Bootstrap.js, or write code to close the dropdown in the on-set-time callback. \n\n' +
-          'The dropdownSelector configuration option is being removed because it will not function properly.');
+            'Please include jQuery AND Bootstrap.js, or write code to close the dropdown in the on-set-time callback. \n\n' +
+            'The dropdownSelector configuration option is being removed because it will not function properly.');
           delete configuration.dropdownSelector;
         }
       };
