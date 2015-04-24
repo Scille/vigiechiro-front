@@ -119,10 +119,10 @@ angular.module('editSiteViews', ['ngRoute', 'textAngular', 'xin_backend',
       $scope.displaySteps = true
 
     loadMap = (mapDiv) ->
-      mapProtocole = protocolesFactory($scope.site,
+      mapProtocole = protocolesFactory(mapDiv,
                                        $scope.site.protocole.type_site,
-                                       mapDiv, siteCallback)
-      mapProtocole.loadMap()
+                                       siteCallback)
+      mapProtocole.loadMap($scope.site)
 
     $scope.validLocalites = ->
       mapProtocole.validLocalites()
@@ -180,10 +180,10 @@ angular.module('editSiteViews', ['ngRoute', 'textAngular', 'xin_backend',
                   geometries: localite.geometries
                   representatif: false
                 payload.localites.push(tmp)
-                site.customPUT(payload, "localites").then(
-                  ->
-                  (error) -> throw error
-                )
+              site.customPUT(payload, "localites").then(
+                ->
+                (error) -> throw error
+              )
               $route.reload()
             (error) -> throw "Error " + error
           )
