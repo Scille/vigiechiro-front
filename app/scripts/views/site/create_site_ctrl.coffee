@@ -23,66 +23,28 @@ angular.module('createSiteViews', ['textAngular', 'ui.bootstrap',
           return breadcrumbsDefer.promise
 
 
-#  .run(($templateCache) ->
-#    html = '<div class="modal-header">'+
-#      '<h4 class="modal-title">Motif</h4>'+
-#      '</div>'+
-#      '<div class="modal-body">'+
-#      '<p>Motifs précédents :</p>'+
-#      '<div ng-repeat="motif in motifs">'+
-#      '<div>{{motif}}</div>'+
-#      '</div>'+
-#      '<p class="input-group">'+
-#      '<input type="text" class="form-control" ng-model="motif" is-open="opened" show-button-bar="false">'+
-#      '</p>'+
-#      '<p ng-show="onError">Aucun motif inscrit.</p>'+
-#      '</div>'+
-#      '<div class="modal-footer">'+
-#      '<button class="btn btn-primary" ng-click="done(true)">Valider</button>'+
-#      '<button class="btn btn-danger" ng-click="done(false)">Annuler</button>'+
-#      '</div>'
-#    $templateCache.put('/dialogs/custom.html', html)
-#  )
-
-#  .controller 'customDialogController', ($log, $scope, $modalInstance, data) ->
-#    $scope.motifs = data
-#    $scope.motif = ""
-#    $scope.opened = false
-#    $scope.onError = false
-#    
-#    $scope.$watch('data', (val, old) ->
-#      $scope.opened = false
-#    )#
-
-#    $scope.done = (valid) ->
-#      if not valid
-#        $modalInstance.close({valid: false, motif: ''})
-#      else if $scope.motif == ''
-#        $scope.onError = true
-#        return
-#      else
-#        $modalInstance.close({valid: true, motif: $scope.motif})
-
-
   .controller 'CreateSiteController', ($timeout, $route, $scope, $routeParams,
                                        $modal,
                                        session, Backend, protocolesFactory) ->
     # map variables
     mapProtocole = null
     # random selection buttons and steps
-    $scope.displaySteps = false
-    $scope.randomSelectionAllowed = false
     $scope.resetFormAllowed = false
+    $scope.displaySteps = false
+    # grille stoc
+    $scope.randomSelectionAllowed = false
     $scope.validOriginAllowed = false
     $scope.retrySelectionAllowed = false
-    $scope.validLocalitesAllowed = false
-    $scope.editLocalitesAllowed = false
-    $scope.validTracetAllowed = false
-    $scope.validSegmentsAllowed = false
-    $scope.editSegmentsAllowed = false
     # random selection
     $scope.listGrilleStocOrigin = []
     $scope.listNumberUsed = []
+    # tracet
+    $scope.validTracetAllowed = false
+    $scope.validSegmentsAllowed = false
+    $scope.editSegmentsAllowed = false
+    # all
+    $scope.validLocalitesAllowed = false
+    $scope.editLocalitesAllowed = false
     #
     $scope.submitted = false
     session.getIsAdminPromise().then (isAdmin) ->
@@ -113,6 +75,7 @@ angular.module('createSiteViews', ['textAngular', 'ui.bootstrap',
     createMap = (mapDiv) ->
       mapProtocole = protocolesFactory(mapDiv, $scope.protocole.type_site,
                                        siteCallback)
+      # If CARRE or POINT_FIXE, display all sites already followed
       if $scope.protocole.type_site in ['CARRE', 'POINT_FIXE']
         Backend.all('protocoles/'+$scope.protocole._id+'/sites').getList().then (sites) ->
           mapProtocole.displaySites(sites.plain())
@@ -131,6 +94,7 @@ angular.module('createSiteViews', ['textAngular', 'ui.bootstrap',
       displayError: (error) ->
         $scope.mapError =
           message: error
+        $timeout(-> $scope.$apply())
       updateSteps: (steps) ->
         $scope.mapError = undefined
         $scope.steps = steps.steps
@@ -228,6 +192,7 @@ angular.module('createSiteViews', ['textAngular', 'ui.bootstrap',
       $scope.siteForm.$dirty = false
       $timeout(-> $scope.$apply())
 
+    # grille stoc
     $scope.randomSelection = (random) ->
       $scope.resetFormAllowed = true
       $scope.displaySteps = true
@@ -253,26 +218,31 @@ angular.module('createSiteViews', ['textAngular', 'ui.bootstrap',
         mapProtocole.validOrigin($scope.listGrilleStocOrigin[number])
 
     $scope.retrySelection = ->
-#      dlg = dialogs.create('/dialogs/custom.html', 'customDialogController',
-#                           $scope.justification_non_aleatoire)
-#      dlg.result.then (data) ->
-#        if not data.valid
-#          return
-#        else
-#          # no more cell to pick
-#          if $scope.listNumberUsed.length == $scope.listGrilleStocOrigin.length
-#            throw "Error: All cells picked"
-#          # add motif
-#          grille_stoc = $scope.listGrilleStocOrigin[$scope.listNumberUsed[$scope.listNumberUsed.length-1]]
-#          $scope.justification_non_aleatoire.push(grille_stoc.numero+' : '+data.motif)
-#          # empty map
-#          mapProtocole.emptyMap()
-#          mapProtocole.deleteValidCell()
-#          number = Math.floor(Math.random() * $scope.listGrilleStocOrigin.length)
-#          while (number in $scope.listNumberUsed)
-#            number = Math.floor(Math.random() * $scope.listGrilleStocOrigin.length)
-#          $scope.listNumberUsed.push(number)
-#          mapProtocole.validOrigin($scope.listGrilleStocOrigin[number])
+      modalInstance = $modal.open(
+        templateUrl: 'scripts/views/site/modal/retry_selection.html'
+        controller: 'ModalInstanceRetrySelectionController'
+        resolve:
+          justification_non_aleatoire: ->
+            return $scope.justification_non_aleatoire
+      )
+      modalInstance.result.then(
+        (motif) ->
+          if motif and motif != ''
+            # no more cell to pick
+            if $scope.listNumberUsed.length == $scope.listGrilleStocOrigin.length
+              throw "Error: All cells picked"
+            # add motif
+            grille_stoc = $scope.listGrilleStocOrigin[$scope.listNumberUsed[$scope.listNumberUsed.length-1]]
+            $scope.justification_non_aleatoire.push(grille_stoc.numero+' : '+motif)
+            # empty map
+            mapProtocole.emptyMap()
+            mapProtocole.deleteGrilleStoc()
+            number = Math.floor(Math.random() * $scope.listGrilleStocOrigin.length)
+            while (number in $scope.listNumberUsed)
+              number = Math.floor(Math.random() * $scope.listGrilleStocOrigin.length)
+            $scope.listNumberUsed.push(number)
+            mapProtocole.validOrigin($scope.listGrilleStocOrigin[number])
+      )
 
     $scope.saveSite = ->
       # Form

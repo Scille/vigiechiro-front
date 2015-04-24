@@ -6,6 +6,8 @@ angular.module('protocole_map_carre', [])
     class ProtocoleMapCarre extends ProtocoleMap
       constructor: (mapDiv, @siteCallback) ->
         super mapDiv, @siteCallback
+        @_min = 5
+        @_max = 13
         @_steps = [
           "Positionner la zone de sélection aléatoire.",
           "Cliquer sur la carte pour sélection la grille stoc correspondante.",
@@ -55,16 +57,19 @@ angular.module('protocole_map_carre', [])
             else
               throw "Error : bad shape type " + overlay.type
             if isModified
+              if @getCountOverlays() >= @_max
+                @displayError("Nombre maximum de localités atteint.")
+                return false
               @saveOverlay(overlay)
               @_googleMaps.addListener(overlay, 'rightclick', (e) =>
                 @deleteOverlay(overlay)
-                if @getCountOverlays() < 5
+                if @getCountOverlays() < @_min
                   @_step = 2
                 else
                   @_step = 3
                 @updateSite()
               )
-              if @getCountOverlays() >= 5
+              if @getCountOverlays() >= @_min
                 @_step = 3
               else
                 @_step = 2

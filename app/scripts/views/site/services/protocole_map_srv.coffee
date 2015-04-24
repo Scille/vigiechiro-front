@@ -27,7 +27,7 @@ angular.module('protocole_map', ['protocole_map_carre',
       else
         throw "Error : unknown protocole #{protocoleAlgoSite}"
 
-  .factory 'ProtocoleMap', ($timeout, $rootScope, Backend, GoogleMaps) ->
+  .factory 'ProtocoleMap', ($timeout, $rootScope, $modal, Backend, GoogleMaps) ->
     class ProtocoleMap
       constructor: (mapDiv, @siteCallback) ->
         @_localites = []
@@ -88,14 +88,49 @@ angular.module('protocole_map', ['protocole_map_carre',
               throw "Error : no grille stoc found for "+overlay.getPosition().toString()
             cell = cells[0]
             # check if site already exist with the grille stoc
+            siteOp = false
             for site, index in @_sites
               if cell.numero == site.grille_stoc.numero
-                siteOp = confirm("Ce site est déjà suivi. Confirmez-vous vouloir y ajouter des localités opportunistes ?")
+                siteOp = true
+                modalInstance = $modal.open(
+                  templateUrl: 'scripts/views/site/modal/site_opportuniste.html'
+                  controller: 'ModalInstanceSiteOpportunisteController'
+                )
+                modalInstance.result.then(
+                  (valid) =>
+                    if valid
+                      @validAndDisplaySiteLocalites(index)
+                )
                 break
-            overlay = @createCell(cell.centre.coordinates[1],
-                                  cell.centre.coordinates[0])
-            @validNumeroGrille(overlay, cell.numero, cell._id, true)
+            if siteOp
+              return
+            else
+              overlay = @createCell(cell.centre.coordinates[1],
+                                    cell.centre.coordinates[0])
+              @validNumeroGrille(overlay, cell.numero, cell._id, true)
         )
+
+      validAndDisplaySiteLocalites: (index) ->
+        if !@_sites or !@_sites[index]
+          return
+        site = @_sites[index]
+        @validNumeroGrille(site.overlay, site.grille_stoc.numero,
+                           site.grille_stoc._id, false)
+        @displayLocalites(site.localites)
+        @_step = 3
+        @updateSite()
+
+      displayLocalites: (localites) ->
+        for localite in localites or []
+          @displayLocalite(localite)
+
+      displayLocalite: (localite) ->
+        newLocalite =
+          name: localite.nom
+          representatif: localite.representatif
+        newLocalite.overlay = @loadGeoJson(localite.geometries)
+        newLocalite.overlay.setTitle(localite.nom)
+        @_localites.push(newLocalite)
 
       selectGrilleStoc: ->
         @_step = 1
@@ -254,7 +289,7 @@ angular.module('protocole_map', ['protocole_map_carre',
             return @loadGeoJson(geometry)
         if geoJson.type == 'Point'
           overlay = @_googleMaps.createPoint(geoJson.coordinates[0],
-                                            geoJson.coordinates[1])
+                                             geoJson.coordinates[1])
         else if geoJson.type == 'Polygon'
           overlay = @_googleMaps.createPolygon(geoJson.coordinates[0])
         else if geoJson.type == 'LineString'
@@ -296,6 +331,8 @@ angular.module('protocole_map', ['protocole_map_carre',
           strokeColor: '#00E000'
           strokeOpacity: 1
           strokeWeight: 2
+          fillColor: '#000000'
+          fillOpacity: 0
         )
         # get Path of cell
         path = cell.getPath()
