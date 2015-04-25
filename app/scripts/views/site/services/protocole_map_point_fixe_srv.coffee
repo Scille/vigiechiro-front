@@ -162,12 +162,29 @@ angular.module('protocole_map_point_fixe', [])
         for i in [0..3]
           for j in [0..3]
             path = [p[i][j], p[i+1][j], p[i+1][j+1], p[i][j+1]]
-            cell = @_googleMaps.createPolygonWithPaths(path, false, false)
-            cell.setOptions(
+            center = @_googleMaps.interpolate(path[0], path[2], 0.5)
+            circle = @_googleMaps.createCircle(center, 25, false, false)
+            circle.setOptions(
               fillOpacity: 0
               fillColor: '#000000'
               strokeWeight: 1
               strokeOpacity: 0.2
               strokeColor: '#000000'
             )
-            @_smallGrille.push(cell)
+            @_smallGrille.push(circle)
+        @_smallGrille[0].name = 'A1'
+        @_smallGrille[1].name = 'A2'
+        @_smallGrille[2].name = 'B1'
+        @_smallGrille[3].name = 'B2'
+        @_smallGrille[4].name = 'C2'
+        @_smallGrille[5].name = 'C1'
+        @_smallGrille[6].name = 'D2'
+        @_smallGrille[7].name = 'D1'
+        @_smallGrille[8].name = 'E1'
+        @_smallGrille[9].name = 'E2'
+        @_smallGrille[10].name = 'F1'
+        @_smallGrille[11].name = 'F2'
+        @_smallGrille[12].name = 'G2'
+        @_smallGrille[13].name = 'G1'
+        @_smallGrille[14].name = 'H2'
+        @_smallGrille[15].name = 'H1'

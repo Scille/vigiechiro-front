@@ -125,6 +125,15 @@ angular.module('xin_google_maps', [])
         )
         return point
 
+      createCircle: (center, radius, draggable = false, editable = false) ->
+        new google.maps.Circle(
+          map: @_map
+          center: center
+          radius: radius
+          draggable: draggable
+          editable: editable
+        )
+
       createBounds: (sw = null, ne = null) ->
         bounds = new google.maps.LatLngBounds()
         if sw
