@@ -76,7 +76,7 @@ angular.module('protocole_map_point_fixe', [])
       saveOverlay: (overlay) =>
         localite = {}
         localite.overlay = overlay
-        localite.name = @setLocaliteName()
+        localite.name = @setLocaliteNameWithInterest(overlay)
         localite.overlay.setOptions({ title: localite.name })
         localite.representatif = false
         @_localites.push(localite)
@@ -87,12 +87,27 @@ angular.module('protocole_map_point_fixe', [])
         else
           return false
 
+      setLocaliteNameWithInterest: (overlay) ->
+        # Check if localite is near a point of interest
+        interestPoint = false
+        name = ''
+        position = overlay.getPosition()
+        for circle in @_smallGrille or []
+          distance = @_googleMaps.computeDistanceBetween(circle.getCenter(), position)
+          if distance <= 25
+            interestPoint = true
+            name = circle.name
+            break
+        if interestPoint
+          return name
+        else
+          return @setLocaliteName()
+
       setLocaliteName: (name = 1) ->
-        used = false
         for localite in @_localites
-          if parseInt(localite.name) == name
+          if localite.name == 'Z'+name
             return @setLocaliteName(name + 1)
-        return name+''
+        return 'Z'+name
 
       validNumeroGrille: (cell, numero, id, editable = false) =>
         # remove click event on map
