@@ -163,12 +163,16 @@ label {
 
 .searchbox {
   float: right !important;
-  margin-right: -15px;
+  margin-right: 20px;
   margin-top: -10px;
 }
 
 .form-control-wrapper .floating-label {
-  color: #207434; !important
+  color: #207434 !important;
+}
+
+.page-header {
+  border-bottom: none !important;
 }
 
 .form-control-wrapper .form-control:empty ~ .floating-label {
@@ -176,7 +180,7 @@ label {
 }
 
 .form-control {
-  color: #111111;
+  color: #000000 !important;
 }
 
 body {
@@ -189,5 +193,21 @@ body {
 }
 
 .form-control-wrapper .form-control:not(.empty) ~ .floating-label {
-  font-size: 10px; !important
+  font-size: 10px !important;
+}
+
+#grid {
+  height: 100%;
+}
+
+#outerWrapper{
+  overflow: hidden;
+}
+
+html, body, #maintContent, #outerGridWrapper, #grid
+{
+  margin: 0;
+  padding: 0;
+  border-width: 0;
+  height: 100%; /* DO NOT USE !important for setting the Grid height! */
 }

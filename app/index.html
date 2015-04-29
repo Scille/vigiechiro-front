@@ -23,21 +23,27 @@
   <link rel="stylesheet" href="styles/datetimepicker.css"/>
   <link rel="stylesheet" href="styles/main.css">
   <!-- endbuild -->
+  <link href="kendo/styles/kendo.common.min.css" rel="stylesheet">
+  <link href="kendo/styles/kendo.rtl.min.css" rel="stylesheet">
+  <link href="kendo/styles/kendo.default.min.css" rel="stylesheet">
+  <link href="kendo/styles/kendo.dataviz.min.css" rel="stylesheet">
+  <link href="kendo/styles/kendo.dataviz.default.min.css" rel="stylesheet">
 </head>
 
-<body ng-app="vigiechiroApp">
+<body ng-app="vigiechiroApp" style="height:100%" >
 <!--[if lt IE 7]>
 <p class="browsehappy">You are using an <strong>outdated</strong> browser. Please <a href="http://browsehappy.com/">upgrade
   your browser</a> to improve your experience.</p>
 <![endif]-->
 <!-- Login and content page displayed according to current login state -->
 <login-directive></login-directive>
-<content-directive class="content">
+<content-directive class="content fill">
   <!-- Navigation bar -->
-  <navbar-directive></navbar-directive>
+  <div id="header-content">
+    <navbar-directive></navbar-directive>
+  </div>
   <!-- Application content -->
-  <div class="container">
-    <div ng-view=""></div>
+  <div id="main-content" class="container" ng-view="app">
   </div>
   <div class="clearfix"></div>
   <br/>
@@ -142,6 +148,7 @@
 <script src="scripts/xin/services/session_srv.js"></script>
 <script src="scripts/xin/services/storage_srv.js"></script>
 <script src="scripts/xin/services/backend_srv.js"></script>
+<script src="scripts/xin/services/datasource_srv.js"></script>
 <script src="scripts/xin/services/google_maps_srv.js"></script>
 <script src="scripts/xin/content_drt.js"></script>
 <script src="scripts/xin/upload_file/s3_upload_file_srv.js"></script>
@@ -149,5 +156,6 @@
 <script src="scripts/xin/upload_file/upload_folder_ctrl.js"></script>
 <script src="scripts/xin/list_resource_drt/list_resource_ctrl.js"></script>
 <!-- endbuild -->
+<script src="kendo/js/kendo.all.min.js"></script>
 </body>
 </html>

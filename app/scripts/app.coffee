@@ -25,6 +25,7 @@ angular
     'xin_content',
     'xin_session',
     'xin_backend',
+    'xin_datasource',
     'xin_google_maps',
     'loginViews',
     'accueilViews',
@@ -41,6 +42,7 @@ angular
 
 .config ($routeProvider, RestangularProvider) ->
   $.material.init()
+
   $routeProvider
   .when '/',
     redirectTo: '/accueil'
@@ -81,6 +83,14 @@ angular
     )
     $scope.logout = ->
       session.logout()
+
+angular.module('corsApp', []).config [
+  '$httpProvider'
+  ($httpProvider) ->
+    $httpProvider.defaults.useXDomain = true
+    delete $httpProvider.defaults.headers.common['X-Requested-With']
+    return
+]
 
 
 

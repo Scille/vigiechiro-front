@@ -1,10 +1,7 @@
-<div class="container">
-  <list-resource-directive resource-backend="resourceBackend" lookup="lookup">
-    <a ng-href='#/taxons/{{resource._id}}'>
-      {{resource.libelle_long}}
-    </a>
-  </list-resource-directive>
-
+<div class="container fill" >
+  <div class="fill"  ng-controller="ListTaxonsCtrl" id="outerGridWrapper">
+    <kendo-grid id="grid" fillptions="GridOptions"/>
+  </div>
   <div class="text-center" ng-if="isAdmin">
     <a class="btn btn-default" id="create-taxon" href="#/taxons/nouveau">
       Nouveau taxon
