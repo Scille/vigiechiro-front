@@ -59,7 +59,7 @@ angular.module('protocoleViews', ['ngRoute', 'textAngular', 'xin_listResource',
           return breadcrumbsDefer.promise
 
   .controller 'ListProtocolesController', ($scope, $q, $location, Backend,
-                                           session, DelayedEvent) ->
+                                           Session, DelayedEvent) ->
     $scope.lookup = {}
     $scope.title = "Tous les protocoles"
     $scope.swap =
@@ -71,7 +71,7 @@ angular.module('protocoleViews', ['ngRoute', 'textAngular', 'xin_listResource',
     # if params.where?
     #   $scope.filterField = JSON.parse(params.where).$text.$search
     # else
-    session.getIsAdminPromise().then (isAdmin) ->
+    Session.getIsAdminPromise().then (isAdmin) ->
       $scope.isAdmin = isAdmin
     $scope.filterField = ''
     $scope.$watch 'filterField', (filterValue) ->
@@ -86,7 +86,7 @@ angular.module('protocoleViews', ['ngRoute', 'textAngular', 'xin_listResource',
     # Wrap protocole backend to check if the user is registered (see _status_*)
     resourceBackend_getList = $scope.resourceBackend.getList
     userProtocolesDictDefer = $q.defer()
-    session.getUserPromise().then (user) ->
+    Session.getUserPromise().then (user) ->
       userProtocolesDict = {}
       for userProtocole in user.protocoles or []
         userProtocolesDict[userProtocole.protocole._id] = userProtocole
@@ -105,7 +105,7 @@ angular.module('protocoleViews', ['ngRoute', 'textAngular', 'xin_listResource',
       return deferred.promise
 
   .controller 'ListMesProtocolesController', ($scope, $q, $location, Backend,
-                                     session, DelayedEvent) ->
+                                     Session, DelayedEvent) ->
     $scope.lookup = {}
     $scope.title = "Mes protocoles"
     $scope.swap =
@@ -130,7 +130,7 @@ angular.module('protocoleViews', ['ngRoute', 'textAngular', 'xin_listResource',
     # Wrap protocole backend to check if the user is registered (see _status_*)
     resourceBackend_getList = $scope.resourceBackend.getList
     userProtocolesDictDefer = $q.defer()
-    session.getUserPromise().then (user) ->
+    Session.getUserPromise().then (user) ->
       userProtocolesDict = {}
       for userProtocole in user.protocoles or []
         userProtocolesDict[userProtocole.protocole._id] = userProtocole
@@ -148,10 +148,10 @@ angular.module('protocoleViews', ['ngRoute', 'textAngular', 'xin_listResource',
           deferred.resolve(protocoles)
       return deferred.promise
 
-  .controller 'DisplayProtocoleController', ($route, $routeParams, $scope, Backend, session) ->
+  .controller 'DisplayProtocoleController', ($route, $routeParams, $scope, Backend, Session) ->
     $scope.protocole = {}
     $scope.userRegistered = false
-    session.getUserPromise().then (user) ->
+    Session.getUserPromise().then (user) ->
       $scope.user = user.plain()
       Backend.one('protocoles', $routeParams.protocoleId).get().then (protocole) ->
         if breadcrumbsGetProtocoleDefer?
@@ -165,7 +165,7 @@ angular.module('protocoleViews', ['ngRoute', 'textAngular', 'xin_listResource',
     $scope.registerProtocole = ->
       Backend.one('moi/protocoles/'+$scope.protocole._id).put().then(
         (response) ->
-          session.refreshPromise()
+          Session.refreshPromise()
           $route.reload()
         (error) -> throw error
       )
@@ -208,7 +208,7 @@ angular.module('protocoleViews', ['ngRoute', 'textAngular', 'xin_listResource',
         (error) -> throw error
       )
 
-  .controller 'CreateProtocoleController', ($scope, session, Backend) ->
+  .controller 'CreateProtocoleController', ($scope, Session, Backend) ->
     $scope.submitted = false
     $scope.protocole = {}
     $scope.configuration_participation = {}
@@ -228,7 +228,7 @@ angular.module('protocoleViews', ['ngRoute', 'textAngular', 'xin_listResource',
         (protocole) ->
           Backend.one('moi/protocoles/'+protocole._id).customPUT().then(
             ->
-              session.refreshPromise()
+              Session.refreshPromise()
               window.location = '#/protocoles/'+protocole._id
             (error) -> throw error
           )

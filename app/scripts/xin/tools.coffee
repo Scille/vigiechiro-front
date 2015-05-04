@@ -41,60 +41,15 @@ angular.module('xin_tools', [])
       window.resizeMyGrid()
 
 window.resizeMyGrid = () =>
-#Define Elements Needed
-  header = $("#header-content")
-  content = $("#main-content")
+  footer = $("footer")
   grid = $("#grid")
-
-  #Other variables
-  minimumAcceptableGridHeight = 100 #This is roughly 5 rows
-  otherElementsHeight = 0
-
-  #Get Window Height
-  windowHeight = $(window).innerHeight()
-
-  #Get Header Height if its existing
-  hasHeader = header.length
-  headerHeight = (if hasHeader then header.outerHeight(true) else 0)
-
-  #Get the Grid Element and Areas Inside It
-  contentArea = grid.find(".k-grid-content") #This is the content Where Grid is located
-  otherGridElements = grid.children().not(".k-grid-content") #This is anything ather than the Grid iteslf like header, commands, etc
-  console.debug otherGridElements
-
-  #Calcualte all Grid elements height
-  otherGridElements.each ->
-    otherElementsHeight += $(this).outerHeight(true)
-
-
-  #Get other elements same level as Grid
-  parentDiv = grid.parent("#outerGridWrapper")
-  hasMainContent = parentDiv.length
-  if hasMainContent
-    otherSiblingElements = content.children().not(".k-grid").not("#grid").not("script")
-
-    #Calculate all Sibling element height
-    otherSiblingElements.each ->
-      otherElementsHeight += $(this).outerHeight(true)
-
-  #footer
-  bottomPadding = $(".footer").outerHeight(true) + 30
-
-  #Check if Calculated height is below threshold
-  calculatedHeight = windowHeight - headerHeight - otherElementsHeight - bottomPadding
-  finalHeight = (if calculatedHeight < minimumAcceptableGridHeight then minimumAcceptableGridHeight else calculatedHeight)
-
-  #Apply the height for the content area
-  contentArea.height finalHeight
-
-
-window.resizeGridWrapper = ->
-  $("#outerGridWrapper").height $("body").innerHeight()
+  if (grid?)
+    contentArea = grid.find(".k-grid-content")
+    #Apply the height for the content area
+    contentArea.height = grid.position().top - footer.position().top - 10
 
 $(window).resize ->
-#  window.resizeGridWrapper()
   window.resizeMyGrid()
-#  $("#grid").data("kendoGrid").resize();
 
 
 window.ngInject = (v) ->

@@ -22,7 +22,7 @@ angular.module('editSiteViews', ['ngRoute', 'textAngular', 'xin_backend',
           return breadcrumbsDefer.promise
 
   .controller 'EditSiteController', ($timeout, $route, $routeParams, $scope,
-                                     session, Backend, protocolesFactory) ->
+                                     Session, Backend, protocolesFactory) ->
     # map variables
     mapProtocole = undefined
     mapLoaded = false
@@ -36,7 +36,7 @@ angular.module('editSiteViews', ['ngRoute', 'textAngular', 'xin_backend',
     #
     $scope.submitted = false
     $scope.isAdmin = false
-    session.getIsAdminPromise().then (isAdmin) ->
+    Session.getIsAdminPromise().then (isAdmin) ->
       $scope.isAdmin = isAdmin
     # user select in field observateur
     $scope.observateur = {}

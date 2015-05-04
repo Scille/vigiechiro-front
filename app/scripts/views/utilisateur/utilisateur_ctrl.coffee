@@ -19,10 +19,6 @@ angular.module('utilisateurViews', ['ngRoute', 'xin_listResource', 'xin_tools',
     controller: 'ShowUtilisateurCtrl'
     resolve: {$routeParams: -> return {'userId': 'moi'}}
     breadcrumbs: 'Profil Utilisateur'
-  .when '/settings',
-    templateUrl: 'scripts/views/utilisateur/settings.html'
-    controller: 'ShowUtilisateurCtrl'
-    breadcrumbs: 'Paramètres'
   .when '/utilisateurs',
     templateUrl: 'scripts/views/utilisateur/list_utilisateurs.html'
     controller: 'ListUtilisateursCtrl'
@@ -53,7 +49,7 @@ angular.module('utilisateurViews', ['ngRoute', 'xin_listResource', 'xin_tools',
         delete $scope.lookup.q
   $scope.resourceBackend = Backend.all('utilisateurs')
 
-.controller 'ShowUtilisateurCtrl', ($scope, $route, $routeParams, Backend, session) ->
+.controller 'ShowUtilisateurCtrl', ($scope, $route, $routeParams, Backend, Session) ->
   $scope.submitted = false
   $scope.utilisateur = {}
   $scope.readOnly = false
@@ -72,11 +68,10 @@ angular.module('utilisateurViews', ['ngRoute', 'xin_listResource', 'xin_tools',
     userResource = utilisateur
     $scope.utilisateur = utilisateur.plain()
     origin_role = $scope.utilisateur.role
-    session.getUserPromise().then (user) ->
+    Session.getUserPromise().then (user) ->
       $scope.isAdmin = user.role == 'Administrateur'
       $scope.readOnly = (not $scope.isAdmin and
         user._id != utilisateur._id)
-    $.material.init()
 
   $scope.saveUser = ->
     $scope.submitted = true
@@ -91,7 +86,6 @@ angular.module('utilisateurViews', ['ngRoute', 'xin_listResource', 'xin_tools',
     for field in ['professionnel', 'donnees_publiques']
       payload[field] = $scope.utilisateur[field]
     # Special handling for select
-##    $scope.utilisateur.role = 'Administrateur'
     if $scope.utilisateur.role != origin_role
       payload.role = $scope.utilisateur.role
     userBackend.patch(payload).then(

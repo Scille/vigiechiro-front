@@ -62,7 +62,7 @@ angular.module('participationViews', ['ngRoute', 'textAngular', 'xin_listResourc
           return breadcrumbsDefer.promise
 
 
-  .controller 'ListParticipationsController', ($scope, Backend, DelayedEvent, session) ->
+  .controller 'ListParticipationsController', ($scope, Backend, DelayedEvent, Session) ->
     $scope.title = "Toutes les participations"
     $scope.swap =
       title: "Voir mes participations"
@@ -81,7 +81,7 @@ angular.module('participationViews', ['ngRoute', 'textAngular', 'xin_listResourc
     $scope.resourceBackend = Backend.all('participations')
 
 
-  .controller 'ListMesParticipationsController', ($scope, Backend, DelayedEvent, session) ->
+  .controller 'ListMesParticipationsController', ($scope, Backend, DelayedEvent, Session) ->
     $scope.title = "Mes participations"
     $scope.swap =
       title: "Voir toutes les participations"
@@ -100,7 +100,7 @@ angular.module('participationViews', ['ngRoute', 'textAngular', 'xin_listResourc
     $scope.resourceBackend = Backend.all('moi/participations')
 
 
-  .directive 'listParticipationsDirective', (session, Backend) ->
+  .directive 'listParticipationsDirective', (Session, Backend) ->
     restrict: 'E'
     templateUrl: 'scripts/views/participation/list_participations_drt.html'
     scope:
@@ -192,7 +192,7 @@ angular.module('participationViews', ['ngRoute', 'textAngular', 'xin_listResourc
 
 
   .controller 'CreateParticipationDirectiveController', ($route, $scope,
-                                                         session, Backend) ->
+                                                         Session, Backend) ->
     $scope.participation =
       date_debut: new Date()
     $scope.fileUploader = []
@@ -298,7 +298,7 @@ angular.module('participationViews', ['ngRoute', 'textAngular', 'xin_listResourc
 
 
   .controller 'EditParticipationDirectiveController', ($route, $scope,
-                                                       session, Backend) ->
+                                                       Session, Backend) ->
     $scope.fileUploader = []
     $scope.folderUploader = []
 

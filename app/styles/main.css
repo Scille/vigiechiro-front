@@ -16,7 +16,6 @@ body {
 .header {
   border-bottom: 1px solid #e5e5e5;
 }
-
 /* Make the masthead heading the same height as the navigation */
 .header h3 {
   margin-top: 0;
@@ -38,7 +37,6 @@ body {
     max-width: 730px;
   }
 }
-
 .container-narrow > hr {
   margin: 30px 0;
 }
@@ -48,7 +46,6 @@ body {
   text-align: center;
   border-bottom: 1px solid #e5e5e5;
 }
-
 .jumbotron .btn {
   font-size: 21px;
   padding: 14px 24px;
@@ -58,7 +55,6 @@ body {
 .marketing {
   margin: 40px 0;
 }
-
 .marketing p + h4 {
   margin-top: 28px;
 }
@@ -72,12 +68,10 @@ body {
     padding-left: 0;
     padding-right: 0;
   }
-
   /* Space out the masthead */
   .header {
     margin-bottom: 30px;
   }
-
   /* Remove the bottom border on the jumbotron for visual effect */
   .jumbotron {
     border-bottom: 0;
@@ -103,7 +97,7 @@ body {
 }
 
 .footer {
-  position: absolute;
+  position: fixed;
   bottom: 0;
   width: 100%;
   /* Set the fixed height of the footer here */
@@ -196,10 +190,6 @@ body {
   font-size: 10px !important;
 }
 
-#grid {
-  height: 100%;
-}
-
 #outerWrapper{
   overflow: hidden;
 }
@@ -211,3 +201,19 @@ html, body, #maintContent, #outerGridWrapper, #grid
   border-width: 0;
   height: 100%; /* DO NOT USE !important for setting the Grid height! */
 }
+
+.container-action-button {
+  position: relative;
+  height: 14px;
+}
+
+.position-action-button {
+  position: absolute;
+  bottom: 0px;
+  right: 5px;
+}
+
+.ressource h1 {
+  margin-top: 0px;
+}
+

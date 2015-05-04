@@ -15,7 +15,7 @@ angular.module('settingsViews', ['ngRoute', 'xin_listResource', 'xin_tools',
   .config ($routeProvider) ->
     $routeProvider
       .when '/settings',
-        templateUrl: '../utilisateur/settings.html'
+        templateUrl: 'scripts/views/settings/settings.html'
         controller: 'SettingsCtrl'
         breadcrumbs: 'Paramètres'
 
@@ -32,7 +32,7 @@ angular.module('settingsViews', ['ngRoute', 'xin_listResource', 'xin_tools',
           delete $scope.lookup.q
     $scope.resourceBackend = Backend.all('utilisateurs')
 
-  .controller 'ShowUtilisateurCtrl', ($scope, $route, $routeParams, Backend, session) ->
+  .controller 'ShowUtilisateurCtrl', ($scope, $route, $routeParams, Backend, Session) ->
     $scope.submitted = false
     $scope.utilisateur = {}
     $scope.readOnly = false
@@ -51,7 +51,7 @@ angular.module('settingsViews', ['ngRoute', 'xin_listResource', 'xin_tools',
       userResource = utilisateur
       $scope.utilisateur = utilisateur.plain()
       origin_role = $scope.utilisateur.role
-      session.getUserPromise().then (user) ->
+      Session.getUserPromise().then (user) ->
         $scope.isAdmin = user.role == 'Administrateur'
         $scope.readOnly = (not $scope.isAdmin and
                            user._id != utilisateur._id)

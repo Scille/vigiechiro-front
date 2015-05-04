@@ -49,7 +49,7 @@ angular.module('createSiteViews', ['textAngular', 'ui.bootstrap',
 #    $scope.motif = ""
 #    $scope.opened = false
 #    $scope.onError = false
-#    
+#
 #    $scope.$watch('data', (val, old) ->
 #      $scope.opened = false
 #    )#
@@ -66,7 +66,7 @@ angular.module('createSiteViews', ['textAngular', 'ui.bootstrap',
 
   .controller 'CreateSiteController', ($timeout, $route, $scope, $routeParams,
                                        $modal,
-                                       session, Backend, protocolesFactory) ->
+                                       Session, Backend, protocolesFactory) ->
     # map variables
     mapProtocole = null
     # random selection buttons and steps
@@ -85,7 +85,7 @@ angular.module('createSiteViews', ['textAngular', 'ui.bootstrap',
     $scope.listNumberUsed = []
     #
     $scope.submitted = false
-    session.getIsAdminPromise().then (isAdmin) ->
+    Session.getIsAdminPromise().then (isAdmin) ->
       $scope.isAdmin = isAdmin
     # site
     $scope.site = {}

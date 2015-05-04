@@ -1,10 +1,21 @@
 <div class="container">
+  <div class="page-header">
+    <h3>{{ title }}</h3>
+    <a href="#/participations{{ swap.value }}"><h5>{{ swap.title }}</h5></a>
+  </div>
+
   <div class="list-group">
     <div class="row">
       <div class="col-xs-8">
 <!--          <label for="search">Filtre :</label>
           <input ng-model="filter" id="search" class="form-control"
                  placeholder="texte">-->
+  </div>
+      <div class="col-xs-4">
+          <label for="search">Nb de Résultats par page :</label>
+          <input type="number" class="form-control" ng-model="itemsPerPage">
+      </div>
+    </div>
   </div>
 
   <list-resource-directive resource-backend="resourceBackend" lookup="lookup">

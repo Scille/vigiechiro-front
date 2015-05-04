@@ -41,7 +41,7 @@ angular.module('displaySiteViews', ['ngRoute', 'textAngular', 'xin_backend',
             ])
           return breadcrumbsDefer.promise
 
-  .controller 'ListSitesController', ($scope, Backend, session, DelayedEvent) ->
+  .controller 'ListSitesController', ($scope, Backend, Session, DelayedEvent) ->
     $scope.title = "Tous les sites"
     $scope.swap =
       title: "Voir mes sites"
@@ -58,7 +58,7 @@ angular.module('displaySiteViews', ['ngRoute', 'textAngular', 'xin_backend',
           delete $scope.lookup.q
     $scope.resourceBackend = Backend.all('sites')
 
-  .controller 'ListMesSitesController', ($scope, Backend, session, DelayedEvent) ->
+  .controller 'ListMesSitesController', ($scope, Backend, Session, DelayedEvent) ->
     $scope.title = "Mes sites"
     $scope.swap =
       title: "Voir tous les sites"
@@ -77,25 +77,25 @@ angular.module('displaySiteViews', ['ngRoute', 'textAngular', 'xin_backend',
 
 
   .controller 'DisplaySiteController', ($routeParams, $scope
-                                        Backend, session) ->
+                                        Backend, Session) ->
     Backend.one('sites', $routeParams.siteId).get().then (site) ->
       if breadcrumbsGetSiteDefer?
         breadcrumbsGetSiteDefer.resolve(site)
         breadcrumbsGetSiteDefer = undefined
       $scope.site = site
       $scope.typeSite = site.protocole.type_site
-      session.getUserPromise().then (user) ->
+      Session.getUserPromise().then (user) ->
         $scope.userId = user._id
         for protocole in user.protocoles
           if protocole.protocole._id == $scope.site.protocole._id
             if protocole.valide?
               $scope.isProtocoleValid = true
             break
-    session.getIsAdminPromise().then (isAdmin) ->
+    Session.getIsAdminPromise().then (isAdmin) ->
       $scope.isAdmin = isAdmin
 
 
-  .directive 'displaySiteDirective', ($route, session, protocolesFactory) ->
+  .directive 'displaySiteDirective', ($route, Session, protocolesFactory) ->
     restrict: 'E'
     templateUrl: 'scripts/views/site/display_site_drt.html'
     scope:
@@ -113,11 +113,11 @@ angular.module('displaySiteViews', ['ngRoute', 'textAngular', 'xin_backend',
           (error) -> throw error
         )
         $route.reload()
-      session.getIsAdminPromise().then (isAdmin) ->
+      Session.getIsAdminPromise().then (isAdmin) ->
         scope.isAdmin = isAdmin
 
 
-  .directive 'displaySitesDirective', (session, Backend, protocolesFactory) ->
+  .directive 'displaySitesDirective', (Session, Backend, protocolesFactory) ->
     restrict: 'E'
     templateUrl: 'scripts/views/site/display_sites_drt.html'
     scope:
@@ -125,7 +125,7 @@ angular.module('displaySiteViews', ['ngRoute', 'textAngular', 'xin_backend',
       typeSite: '@'
     link: (scope, elem, attrs) ->
       scope.loading = true
-      session.getUserPromise().then (user) ->
+      Session.getUserPromise().then (user) ->
         scope.userId = user._id
       attrs.$observe 'typeSite', (typeSite) ->
         if typeSite
@@ -137,14 +137,14 @@ angular.module('displaySiteViews', ['ngRoute', 'textAngular', 'xin_backend',
             scope.loading = false
 
 
-  .directive 'listSitesDirective', (session, Backend) ->
+  .directive 'listSitesDirective', (Session, Backend) ->
     restrict: 'E'
     templateUrl: 'scripts/views/site/list_sites_drt.html'
     controller: 'listSitesDrtController'
     scope:
       protocoleId: '@'
     link: (scope, elem, attrs) ->
-      session.getUserPromise().then (user) ->
+      Session.getUserPromise().then (user) ->
         scope.userId = user._id
 
   .controller 'listSitesDrtController', ($scope, Backend) ->

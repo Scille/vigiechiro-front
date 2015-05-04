@@ -22,8 +22,7 @@ class TaxonsParents
       if callback?
         callback()
   parseResponse: (response) ->
-    if (response.status == 422 and
-      	response.data._error.message.match('^circular dependency'))
+    if (response.status == 422 and response.data._error.message.match('^circular dependency'))
       @error = true
   idToData: (ids) ->
     if ids?
@@ -37,11 +36,15 @@ class TaxonsParents
       datas
 
 
-angular.module('taxonViews', ['ngRoute', 'xin_session', 'xin_datasource'])
+angular
+.module('taxonViews', ['ngRoute', 'ngSanitize', "kendo.directives"
+                       'ui.select', 'xin_listResource',
+                       'xin_backend', 'xin_session', 'xin_tools', 'xin_datasource'])
 .config ($routeProvider) ->
   $routeProvider
   .when '/taxons',
     templateUrl: 'scripts/views/taxon/list_taxons.html'
+    controller: 'ListTaxonsCtrl'
     breadcrumbs: 'Taxons'
   .when '/taxons/nouveau',
     templateUrl: 'scripts/views/taxon/edit_taxon.html'
@@ -73,16 +76,21 @@ angular.module('taxonViews', ['ngRoute', 'xin_session', 'xin_datasource'])
         ])
       return breadcrumbsDefer.promise
 
-.controller 'ListTaxonsCtrl', ($scope, DataSource, resizeGrid) ->
+.controller 'ListTaxonsCtrl', ($scope, DataSource, resizeGrid, Session) ->
+  Session.getIsAdminPromise().then (isAdmin) ->
+    $scope.isAdmin = isAdmin
   columnsTaxons =
     [
       field: "libelle_long"
       title: "Libelle"
-      template: '<a href=\"\\#/taxons/ #: _id #\"> #: libelle_long # </a>'
+      template: '<a href=\"\\#/taxons/#: _id #\"> #: libelle_long # </a>'
     ]
-  $("#grid").kendoGrid(DataSource.getGridReadOption("/taxons", columnsTaxons))
-  $("#grid").data('kendoGrid').dataSource.sort({ field: "libelle_long", dir: "asc" });
-  $(window).trigger("resize")
+  modelTaxons =
+    _id:
+      type: "string"
+    libelle_long:
+      type: "string"
+  $scope.gridOptions = DataSource.getGridReadOption("/taxons", modelTaxons, columnsTaxons)
 
 .controller 'CreateTaxonCtrl', ($scope, Backend) ->
   $scope.submitted = false
@@ -106,11 +114,11 @@ angular.module('taxonViews', ['ngRoute', 'xin_session', 'xin_datasource'])
       (response) -> $scope.taxonsParents.parseResponse(response)
     )
 
-.controller 'DisplayTaxonCtrl', ($routeParams, $scope, session, Backend) ->
+.controller 'DisplayTaxonCtrl', ($routeParams, $scope, Session, Backend) ->
   $scope.taxon = {}
   $scope.taxonId = $routeParams.taxonId
   $scope.isAdmin = false
-  session.getIsAdminPromise().then (isAdmin) ->
+  Session.getIsAdminPromise().then (isAdmin) ->
     $scope.isAdmin = isAdmin
   Backend.one('taxons', $routeParams.taxonId).get().then (taxon) ->
     if breadcrumbsGetTaxonDefer?

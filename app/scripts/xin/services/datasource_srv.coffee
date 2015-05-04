@@ -2,32 +2,37 @@
 
 
 angular.module('xin_datasource', ['xin_session_tools', 'appSettings', 'xin_tools'])
-.factory 'DataSource', (sessionTools, SETTINGS, resizeGrid ) ->
+.factory 'DataSource', (sessionTools, SETTINGS, resizeGrid) ->
   class DataSource
-    @getGridReadOption: ( uri, columns) ->
+    @getGridReadOption: (uri, aModel, aColumns) ->
       gridOption =
         dataSource:
-          type: "jsonp"
           transport:
             read:
               url: SETTINGS.API_DOMAIN + uri
-              contentType: "application/json; charset=utf-8"
               dataType: "json"
+              data:
+                max_results: 100
               headers:
-                Authorization: sessionTools.buildAuthorizationHeader()
+                Authorization: sessionTools.getAuthorizationHeader()
+          serverPaging: false
+          serverSorting: false
+          pageSize: 100
           schema:
             type: "json"
             data: '_items'
-          pageSize: 50
-          serverPaging: false
-          serverSorting: false
-        columns: columns
+            id: "_id"
+            total: "total"
+            model: aModel
+        columns: aColumns
         resizable: true
-        dataBound: resizeGrid,
+        filterable:
+          extra: false
+          operators:
+            string:
+              contains: "Contains"
+        dataBound: resizeGrid
         scrollable:
           virtual: true
         sortable: true
       return gridOption
-
-
-

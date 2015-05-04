@@ -1,7 +1,7 @@
 'use strict'
 
 
-angular.module('xin_listResource', ['ngRoute', 'angularUtils.directives.dirPagination', 'xin_session'])
+angular.module('xin_listResource', ['ngRoute', 'angularUtils.directives.dirPagination', 'xin_backend', 'xin_session'])
 
 .config ($compileProvider, paginationTemplateProvider) ->
   paginationTemplateProvider.setPath('scripts/xin/list_resource_drt/dirPagination.tpl.html')
@@ -16,23 +16,22 @@ angular.module('xin_listResource', ['ngRoute', 'angularUtils.directives.dirPagin
           $compile(element.contents())(scope)
       )
 
-.controller 'ListResourceController', ($scope, $timeout, $location, session) ->
+.controller 'ListResourceController', ($scope, $timeout, $location, Session) ->
 # Load lookup pagination from $location
 # params = $location.search()
 # if params.page?
 #   $scope.lookup.page = parseInt(params.page)
 # if params.items?
 #   $scope.lookup.max_results = parseInt(params.items)
-  session.getUserPromise().then (user) ->
+  Session.getUserPromise().then (user) ->
     $scope.user = user.plain()
   $scope.resources = []
   $scope.loading = true
   updateResourcesList = () ->
     $scope.loading = true
-    if $scope.resourceBackend?
-      $scope.resourceBackend.getList($scope.lookup).then (items) ->
-        $scope.resources = items
-        $scope.loading = false
+    $scope.resourceBackend.getList($scope.lookup).then (items) ->
+      $scope.resources = items
+      $scope.loading = false
   $scope.$watch(
     'lookup'
     ->
@@ -61,7 +60,7 @@ angular.module('xin_listResource', ['ngRoute', 'angularUtils.directives.dirPagin
     $scope.lookup.page = newPage
     updateResourcesList()
 
-.directive 'listResourceDirective', (session, Backend) ->
+.directive 'listResourceDirective', (Session, Backend) ->
   restrict: 'E'
   transclude: true
   templateUrl: 'scripts/xin/list_resource_drt/list_resource.html'

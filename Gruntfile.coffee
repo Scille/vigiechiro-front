@@ -23,10 +23,10 @@ module.exports = (grunt) ->
   # Define the configuration for all the tasks
   grunt.initConfig
 
-# Project settings
+    # Project settings
     yeoman: appConfig
 
-# Watches files for changes and runs tasks based on the changed files
+    # Watches files for changes and runs tasks based on the changed files
     watch:
       bower:
         files: ["bower.json"]
@@ -65,11 +65,11 @@ module.exports = (grunt) ->
         ]
 
 
-# The actual grunt server settings
+    # The actual grunt server settings
     connect:
       options:
         port: 9000
-# Change this to '0.0.0.0' to access the server from outside.
+        # Change this to '0.0.0.0' to access the server from outside.
         hostname: "localhost"
         livereload: 35729
 
@@ -100,7 +100,7 @@ module.exports = (grunt) ->
           base: "<%= yeoman.dist %>"
 
 
-# Make sure code styles are up to par and there are no obvious mistakes
+    # Make sure code styles are up to par and there are no obvious mistakes
     jshint:
       options:
         jshintrc: ".jshintrc"
@@ -110,7 +110,7 @@ module.exports = (grunt) ->
         src: ["Gruntfile.js"]
 
 
-# Empties folders to start fresh
+    # Empties folders to start fresh
     clean:
       dist:
         files: [
@@ -125,7 +125,7 @@ module.exports = (grunt) ->
       server: ".tmp"
 
 
-# Add vendor prefixed styles
+    # Add vendor prefixed styles
     autoprefixer:
       options:
         browsers: ["last 1 version"]
@@ -139,14 +139,14 @@ module.exports = (grunt) ->
         ]
 
 
-# Automatically inject Bower components into the app
+    # Automatically inject Bower components into the app
     wiredep:
       app:
         src: ["<%= yeoman.app %>/index.html"]
         ignorePath: /\.\.\//
 
 
-# Compiles CoffeeScript to JavaScript
+    # Compiles CoffeeScript to JavaScript
     coffee:
       options:
         sourceMap: true
@@ -171,7 +171,7 @@ module.exports = (grunt) ->
         ]
 
 
-# Renames files for browser caching purposes
+    # Renames files for browser caching purposes
     filerev:
       dist:
         src: [
@@ -182,9 +182,9 @@ module.exports = (grunt) ->
         ]
 
 
-# Reads HTML for usemin blocks to enable smart builds that automatically
-# concat, minify and revision files. Creates configurations in memory so
-# additional tasks can operate on them
+    # Reads HTML for usemin blocks to enable smart builds that automatically
+    # concat, minify and revision files. Creates configurations in memory so
+    # additional tasks can operate on them
     useminPrepare:
       html: "<%= yeoman.app %>/index.html"
       options:
@@ -201,7 +201,7 @@ module.exports = (grunt) ->
             post: {}
 
 
-# Performs rewrites based on filerev and the useminPrepare configuration
+    # Performs rewrites based on filerev and the useminPrepare configuration
     usemin:
       html: ["<%= yeoman.dist %>/**/*.html"]
       css: ["<%= yeoman.dist %>/styles/**/*.css"]
@@ -212,31 +212,31 @@ module.exports = (grunt) ->
         ]
 
 
-# The following *-min tasks will produce minified files in the dist folder
-# By default, your `index.html`'s <!-- Usemin block --> will take care of
-# minification. These next options are pre-configured if you do not wish
-# to use the Usemin blocks.
-# cssmin: {
-#   dist: {
-#     files: {
-#       '<%= yeoman.dist %>/styles/main.css': [
-#         '.tmp/styles/**/*.css'
-#       ]
-#     }
-#   }
-# },
-# uglify: {
-#   dist: {
-#     files: {
-#       '<%= yeoman.dist %>/scripts/scripts.js': [
-#         '<%= yeoman.dist %>/scripts/scripts.js'
-#       ]
-#     }
-#   }
-# },
-# concat: {
-#   dist: {}
-# },
+    # The following *-min tasks will produce minified files in the dist folder
+    # By default, your `index.html`'s <!-- Usemin block --> will take care of
+    # minification. These next options are pre-configured if you do not wish
+    # to use the Usemin blocks.
+    # cssmin: {
+    #   dist: {
+    #     files: {
+    #       '<%= yeoman.dist %>/styles/main.css': [
+    #         '.tmp/styles/**/*.css'
+    #       ]
+    #     }
+    #   }
+    # },
+    # uglify: {
+    #   dist: {
+    #     files: {
+    #       '<%= yeoman.dist %>/scripts/scripts.js': [
+    #         '<%= yeoman.dist %>/scripts/scripts.js'
+    #       ]
+    #     }
+    #   }
+    # },
+    # concat: {
+    #   dist: {}
+    # },
     imagemin:
       options:
         cache: false
@@ -278,8 +278,8 @@ module.exports = (grunt) ->
         ]
 
 
-# ng-annotate tries to make the code safe for minification automatically
-# by using the Angular long form for dependency injection.
+    # ng-annotate tries to make the code safe for minification automatically
+    # by using the Angular long form for dependency injection.
     ngAnnotate:
       dist:
         files: [
@@ -293,13 +293,13 @@ module.exports = (grunt) ->
         ]
 
 
-# Replace Google CDN references
+    # Replace Google CDN references
     cdnify:
       dist:
         html: ["<%= yeoman.dist %>/*.html"]
 
 
-# Copies remaining files to places other tasks can use
+    # Copies remaining files to places other tasks can use
     copy:
       dist:
         files: [
@@ -344,7 +344,7 @@ module.exports = (grunt) ->
         src: "**/*.css"
 
 
-# Run some tasks in parallel to speed up the build process
+    # Run some tasks in parallel to speed up the build process
     concurrent:
       server: [
         "coffee:dist"
@@ -362,7 +362,7 @@ module.exports = (grunt) ->
       ]
 
 
-# Test settings
+    # Test settings
     karma:
       options:
         configFile: "test/unit/karma.conf.coffee"
@@ -374,7 +374,7 @@ module.exports = (grunt) ->
         singleRun: false
 
 
-# E2e test settings
+    # E2e test settings
     protractor:
       options:
         configFile: "test/e2e/protractor.conf.coffee"

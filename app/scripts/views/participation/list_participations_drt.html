@@ -1,4 +1,5 @@
 <div class="container">
+  <div ng-show="!loading">
   <div ng-show="participations.length != 0">
     <div class="page-header">
       <h3>Mes participations</h3>
@@ -14,9 +15,10 @@
       <h3><i>Vous n'avez pas de participation pour le moment</i></h3>
     </div>
   </div>
+  </div>
 
   <div ng-if="loading">
-    <center><img src="images/spinner.gif"></img></center>
+    <center><img src="images/spinner.gif"></center>
     <center>Changement de la liste des participations...</center>
   </div>
 </div>

@@ -39,14 +39,14 @@ angular.module('actualiteViews', ['xin_backend', 'xin_session'])
         scope.actualites = actualites.plain()
         scope.loading = false
 
-  .directive 'displayActualiteDirective', ($route, Backend, session) ->
+  .directive 'displayActualiteDirective', ($route, Backend, Session) ->
     restrict: 'E'
     templateUrl: 'scripts/views/actualite/display_actualite_drt.html'
     scope:
       actualite: '='
       isAdmin: '='
     link: (scope, elem, attrs) ->
-      session.getUserPromise().then (user) ->
+      Session.getUserPromise().then (user) ->
         scope.user = user.plain()
       scope.validInscription = (valid) ->
         Backend.one('protocoles', scope.actualite.protocole._id).get()
@@ -55,7 +55,7 @@ angular.module('actualiteViews', ['xin_backend', 'xin_session'])
               protocole.customPUT(null, 'observateurs/' + scope.actualite.sujet._id)
                 .then(
                   ->
-                    session.refreshPromise()
+                    Session.refreshPromise()
                     $route.reload()
                   -> throw "Error validation inscription"
                 )
@@ -63,13 +63,13 @@ angular.module('actualiteViews', ['xin_backend', 'xin_session'])
               protocole.customDELETE('observateurs/' + scope.actualite.sujet._id)
                 .then(
                   ->
-                    session.refreshPromise()
+                    Session.refreshPromise()
                     $route.reload()
                   -> throw "Error validation inscription"
                 )
 
 
-  .directive 'listActualitesValidationsDirective', (session) ->
+  .directive 'listActualitesValidationsDirective', (Session) ->
     restrict: 'E'
     templateUrl: 'scripts/views/actualite/list_actualites_validations.html'
     controller: 'listActualitesValidationsController'
@@ -77,11 +77,11 @@ angular.module('actualiteViews', ['xin_backend', 'xin_session'])
       type: '@'
       protocoleId: '@'
     link: (scope, elem, attrs) ->
-      session.getIsAdminPromise().then (isAdmin) ->
+      Session.getIsAdminPromise().then (isAdmin) ->
         scope.isAdmin = isAdmin
 
   .controller 'listActualitesValidationsController', ($scope, $route,
-                                                      Backend, session) ->
+                                                      Backend, Session) ->
     $scope.$watch(
       'protocoleId'
       (value) ->
@@ -100,7 +100,7 @@ angular.module('actualiteViews', ['xin_backend', 'xin_session'])
             protocole.customPUT(null, 'observateurs/' + $scope.actualite.sujet._id)
               .then(
                 ->
-                  session.refreshPromise()
+                  Session.refreshPromise()
                   $route.reload()
                 -> throw "Error validation inscription"
               )
@@ -108,7 +108,7 @@ angular.module('actualiteViews', ['xin_backend', 'xin_session'])
             protocole.customDELETE('observateurs/' + $scope.actualite.sujet._id)
               .then(
                 ->
-                  session.refreshPromise()
+                  Session.refreshPromise()
                   $route.reload()
                 -> throw "Error validation inscription"
               )

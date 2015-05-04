@@ -1,4 +1,21 @@
 <div class="container">
+  <div class="page-header">
+    <h3>Utilisateurs</h3>
+  </div>
+
+  <div class="list-group">
+    <div class="row">
+      <div class="col-xs-8">
+          <label for="search">Filtre :</label>
+          <input ng-model="filterField" class="form-control search-field" placeholder="texte">
+      </div>
+      <div class="col-xs-4">
+          <label for="search">Nb de Résultats par page :</label>
+          <input type="number" class="form-control max-results-field" ng-model="lookup.max_results">
+      </div>
+    </div>
+  </div>
+
   <list-resource-directive resource-backend="resourceBackend" lookup="lookup">
     <a ng-href='#/utilisateurs/{{resource._id}}'>
       {{resource.pseudo}}
