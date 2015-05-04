@@ -80,8 +80,8 @@ body {
 
 .g-maps {
   height: 400px;
-  margin: 0px;
-  padding: 0px;
+  margin: 0;
+  padding: 0;
 }
 
 /* Sticky footer styles
@@ -174,7 +174,7 @@ label {
 }
 
 .form-control {
-  color: #000000 !important;
+  color: #1A1A1A !important;
 }
 
 body {
@@ -194,13 +194,14 @@ body {
   overflow: hidden;
 }
 
-html, body, #maintContent, #outerGridWrapper, #grid
+html, body, #maintContent, .ressource, #kendoGrid, #kendoEditor, content-directive
 {
   margin: 0;
   padding: 0;
   border-width: 0;
-  height: 100%; /* DO NOT USE !important for setting the Grid height! */
+  height: 100%;
 }
+
 
 .container-action-button {
   position: relative;
@@ -209,11 +210,11 @@ html, body, #maintContent, #outerGridWrapper, #grid
 
 .position-action-button {
   position: absolute;
-  bottom: 0px;
+  bottom: 0;
   right: 5px;
 }
 
 .ressource h1 {
-  margin-top: 0px;
+  margin-top: 0;
 }
 

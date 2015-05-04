@@ -38,7 +38,7 @@ class TaxonsParents
 
 angular
 .module('taxonViews', ['ngRoute', 'ngSanitize', "kendo.directives"
-                       'ui.select', 'xin_listResource',
+
                        'xin_backend', 'xin_session', 'xin_tools', 'xin_datasource'])
 .config ($routeProvider) ->
   $routeProvider
@@ -76,7 +76,7 @@ angular
         ])
       return breadcrumbsDefer.promise
 
-.controller 'ListTaxonsCtrl', ($scope, DataSource, resizeGrid, Session) ->
+.controller 'ListTaxonsCtrl', ($scope, DataSource, Session) ->
   Session.getIsAdminPromise().then (isAdmin) ->
     $scope.isAdmin = isAdmin
   columnsTaxons =
@@ -90,7 +90,9 @@ angular
       type: "string"
     libelle_long:
       type: "string"
-  $scope.gridOptions = DataSource.getGridReadOption("/taxons", modelTaxons, columnsTaxons)
+  $('#kendoGrid').kendoGrid(DataSource.getGridReadOption('/taxons', modelTaxons, columnsTaxons))
+  $('#kendoGrid').data('kendoGrid').dataSource.sort({field: 'libelle_long', dir: 'asc'})
+  $(window).trigger('resize')
 
 .controller 'CreateTaxonCtrl', ($scope, Backend) ->
   $scope.submitted = false
@@ -110,9 +112,10 @@ angular
       'description': $scope.taxon.description
       'parents': $scope.taxonsParents.dataToId($scope.taxon.parents)
     Backend.all('taxons').post(payload).then(
-      -> window.location = '#/taxons'
+      -> window.location = '#/taxons/' + $routeParams.taxonId
       (response) -> $scope.taxonsParents.parseResponse(response)
     )
+  $(window).trigger('resize')
 
 .controller 'DisplayTaxonCtrl', ($routeParams, $scope, Session, Backend) ->
   $scope.taxon = {}
@@ -157,6 +160,9 @@ angular
     payload.description = $scope.taxon.description
     # Finally refresh the page (needed for cache reasons)
     taxonResource.patch(payload).then(
-      -> $route.reload()
+      -> window.location = '#/taxons/' + $routeParams.taxonId
       (response) -> $scope.taxonsParents.parseResponse(response)
     )
+  $(window).trigger('resize')
+
+

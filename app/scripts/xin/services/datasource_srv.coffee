@@ -2,7 +2,7 @@
 
 
 angular.module('xin_datasource', ['xin_session_tools', 'appSettings', 'xin_tools'])
-.factory 'DataSource', (sessionTools, SETTINGS, resizeGrid) ->
+.factory 'DataSource', (sessionTools, SETTINGS) ->
   class DataSource
     @getGridReadOption: (uri, aModel, aColumns) ->
       gridOption =
@@ -31,7 +31,6 @@ angular.module('xin_datasource', ['xin_session_tools', 'appSettings', 'xin_tools
           operators:
             string:
               contains: "Contains"
-        dataBound: resizeGrid
         scrollable:
           virtual: true
         sortable: true

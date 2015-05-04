@@ -11,7 +11,7 @@
 ###
 
 angular
-  .module('vigiechiroApp', [
+.module('vigiechiroApp', [
     'ngAnimate',
     'ngRoute',
     'ngSanitize',
@@ -39,8 +39,8 @@ angular
     'donneeViews'
   ])
 
-  .run (Backend, SETTINGS) ->
-    Backend.setBaseUrl(SETTINGS.API_DOMAIN)
+.run (Backend, SETTINGS) ->
+  Backend.setBaseUrl(SETTINGS.API_DOMAIN)
 
 .config ($routeProvider, RestangularProvider) ->
   $routeProvider

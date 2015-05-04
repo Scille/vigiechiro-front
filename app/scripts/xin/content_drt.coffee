@@ -3,8 +3,8 @@
 
 angular.module('xin_content', ['xin_session'])
 .directive 'contentDirective', (Session) ->
-  restrict: 'E'
+  restrict: 'A'
   link: (scope, elem, attrs) ->
-    elem.hide()
     Session.getUserPromise().then ->
-      elem.show()
+      () -> elem.show()
+      () -> elem.hide()
