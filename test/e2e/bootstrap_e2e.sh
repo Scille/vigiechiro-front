@@ -5,7 +5,7 @@ BACKEND_DIR="vigiechiro-api"
 
 run_backend() {
     # Backend is mandatory for e2e tests, install it submodule then start it
-    git submodule init
+    git submodule update --init --remote
     cd $BACKEND_DIR
     if [ ! -d "venv" ]; then
         # Install virtualenv and dependancies
