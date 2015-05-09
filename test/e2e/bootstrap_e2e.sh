@@ -3,22 +3,11 @@
 BASEDIR=$(dirname $0)
 BACKEND_DIR="vigiechiro-api"
 
-clone_repo() {
-    BACKEND_REPO="Scille/vigiechiro-api.git"
-    BRANCH="master"
-    if [ ! -z "$GITHUB_VIGIECHIRO_API_TOKEN" ]
-    then
-        git clone https://$GITHUB_VIGIECHIRO_API_TOKEN@github.com/$BACKEND_REPO -b $BRANCH
-    else
-        git clone git@github.com:$BACKEND_REPO -b $BRANCH
-    fi
-}
-
 run_backend() {
-    # Backend is mandatory for e2e tests, install it from github then start it
-    if [ ! -d "$BACKEND_DIR" ]; then
-        clone_repo
-        cd $BACKEND_DIR
+    # Backend is mandatory for e2e tests, install it submodule then start it
+    git submodule init
+    cd $BACKEND_DIR
+    if [ ! -d "venv" ]; then
         # Install virtualenv and dependancies
         virtualenv -p /usr/bin/python3 venv
         . ./venv/bin/activate
@@ -26,7 +15,6 @@ run_backend() {
         pip install -e .
         pip install -r dev-requirements.txt
     else
-        cd $BACKEND_DIR
         . ./venv/bin/activate
     fi
     # /!\ make sure to set FRONT_DOMAIN according to the e2e connexion

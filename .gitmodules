@@ -1,0 +1,3 @@
+[submodule "test/e2e/vigiechiro-api"]
+	path = test/e2e/vigiechiro-api
+	url = git@github.com:Scille/vigiechiro-api.git
