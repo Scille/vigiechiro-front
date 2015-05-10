@@ -1,5 +1,6 @@
 <div class="container">
   <form class="simple-form bs-component" novalidate name="userForm" ng-submit="saveUser()">
+    <submit/>
     <div class="row">
       <div class="col-sm-6">
         <input type="text" class="form-control floating-label" id="pseudo" name="pseudo"
@@ -71,11 +72,6 @@
         </label>
       </div>
     </div>
-
-    <div class="form-group">
-      <input class="save-user btn btn-primary" type="submit" value="Sauvegarder" ng-hide="userForm.$pristine">
-    </div>
-
   </form>
 </div>
 <script>

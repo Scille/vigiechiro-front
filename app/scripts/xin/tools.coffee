@@ -1,20 +1,21 @@
 'use strict'
 
-window.resizeContainerGrid = (kendo, isGrid = false) =>
+window.resizeContainerGrid = (kendo) =>
   footer = $('footer')
   mainContent = $('#main-content')
   grid = $('#' + kendo)
-  if (mainContent? && footer? && grid?)
+  if (mainContent.length > 0 && footer.length > 0 && grid.length > 0)
     footerOffset = footer.offset()
     gridOffset = mainContent.offset()
     if (footerOffset? && gridOffset?)
-      height = footerOffset.top - gridOffset.top - 90
-      grid.height( height)
-      if (isGrid)
-        grid.data('kendoGrid').resize();
+      height = footerOffset.top - gridOffset.top - 20
+      grid.height(height)
+      dataKendoGrid = grid.data('kendoGrid')
+      if (dataKendoGrid?)
+        dataKendoGrid.resize();
 
 window.resizeContainerEditor = (kendo) =>
-  window.resizeContainerGrid( kendo, false)
+  window.resizeContainerGrid(kendo)
 
 
 $(document).ready(() =>
@@ -23,8 +24,6 @@ $(document).ready(() =>
     window.resizeContainerGrid('kendoGrid')
   )
 )
-
-
 
 
 window.ngInject = (v) ->
