@@ -25,11 +25,13 @@ angular.module('xin_session', ['xin_storage', 'xin_backend'])
         deferred.reject()
         @_userPromise = deferred.promise
 
-    @isAuthenticated = (successCallback, errorCallback) =>
-      @_userPromise = Backend.one('moi').get(
-        {},
-        {'Cache-Control': 'no-cache'}
-      ).then(successCallback, errorCallback)
+    @isLogged = =>
+      deferred = $q.defer()
+      @_userPromise.then(
+        (user) -> deferred.resolve(true)
+        -> deferred.resolve(false)
+      )
+      return deferred.promise
 
     @getUserPromise = => @_userPromise
     @getIsAdminPromise = =>

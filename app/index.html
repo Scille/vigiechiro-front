@@ -32,23 +32,14 @@
   your browser</a> to improve your experience.</p>
 <![endif]-->
 <!-- Login and content page displayed according to current login state -->
-<login-directive></login-directive>
-<content-directive class="content">
-  <!-- Navigation bar -->
-  <div id="header-content">
-    <navbar-directive></navbar-directive>
+<login-directive ng-show="isNotLogged"></login-directive>
+<content-directive ng-show="isLogged"></content-directive>
+<footer class="footer">
+  <div class="container">
+    <a href="http://scille.eu" target="_blank">
+      <img src="images/logo-scille.png" width="20">&nbsp;Scille</a> vigiechiro demo
   </div>
-    <!-- Application content -->
-  <div id="main-content"  class="container" ng-view></div>
-  <div class="clearfix"></div>
-  <br/>
-  <footer class="footer">
-    <div class="container">
-      <a href="http://scille.eu" target="_blank">
-        <img src="images/logo-scille.png" width="20">&nbsp;Scille</a> vigiechiro demo
-    </div>
-  </footer>
-</content-directive>
+</footer>
 
 <!-- Google Analytics: change UA-XXXXX-X to be your site's ID -->
 <script>
@@ -139,8 +130,9 @@
 <script src="scripts/xin/services/backend_srv.js"></script>
 <script src="scripts/xin/services/datasource_srv.js"></script>
 <script src="scripts/xin/services/google_maps_srv.js"></script>
-<script src="scripts/xin/content_drt.js"></script>
+<script src="scripts/xin/content_drt/content_drt.js"></script>
 <script src="scripts/xin/login_drt/login_ctrl.js"></script>
+<script src="scripts/xin/editor_drt/editor_ctrl.js"></script>
 <script src="scripts/xin/navbar_drt/navbar_drt.js"></script>
 <script src="scripts/xin/action_drt/update_drt.js"></script>
 <script src="scripts/xin/action_drt/create_drt.js"></script>

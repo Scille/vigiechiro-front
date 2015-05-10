@@ -84,11 +84,16 @@ angular
       field: "libelle_long"
       title: "Libelle"
       template: '<a href=\"\\#/taxons/#: _id #\"> #: libelle_long # </a>'
+    ,
+      field: "libelle_court"
+      title: "Libelle court"
     ]
   modelTaxons =
     _id:
       type: "string"
     libelle_long:
+      type: "string"
+    libelle_court:
       type: "string"
   $('#kendoGrid').kendoGrid(DataSource.getGridReadOption('/taxons', modelTaxons, columnsTaxons))
   $('#kendoGrid').data('kendoGrid').dataSource.sort({field: 'libelle_long', dir: 'asc'})

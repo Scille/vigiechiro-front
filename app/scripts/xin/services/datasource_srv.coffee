@@ -31,7 +31,5 @@ angular.module('xin_datasource', ['xin_session_tools', 'appSettings', 'xin_tools
           operators:
             string:
               contains: "Contains"
-        scrollable:
-          virtual: true
         sortable: true
       return gridOption

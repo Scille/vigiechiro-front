@@ -19,6 +19,7 @@ angular
     'flow',
     'appSettings',
     'xin_login',
+    'xin_editor',
     'xin_tools',
     'xin_content',
     'xin_session',

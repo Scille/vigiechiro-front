@@ -8,7 +8,7 @@ window.resizeContainerGrid = (kendo, isGrid = false) =>
     footerOffset = footer.offset()
     gridOffset = mainContent.offset()
     if (footerOffset? && gridOffset?)
-      height = footerOffset.top - gridOffset.top - 75
+      height = footerOffset.top - gridOffset.top - 90
       grid.height( height)
       if (isGrid)
         grid.data('kendoGrid').resize();
