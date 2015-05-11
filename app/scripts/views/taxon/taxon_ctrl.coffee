@@ -37,9 +37,9 @@ class TaxonsParents
 
 
 angular
-.module('taxonViews', ['ngRoute', 'ngSanitize', "kendo.directives"
-
+.module('taxonViews', ['ngRoute', 'ngSanitize', "kendo.directives",
                        'xin_backend', 'xin_session', 'xin_tools', 'xin_datasource'])
+
 .config ($routeProvider) ->
   $routeProvider
   .when '/taxons',
@@ -76,28 +76,41 @@ angular
         ])
       return breadcrumbsDefer.promise
 
-.controller 'ListTaxonsCtrl', ($scope, DataSource, Session) ->
+.controller 'ListTaxonsCtrl', ($scope, DataSource, Session, Backend) ->
   Session.getIsAdminPromise().then (isAdmin) ->
     $scope.isAdmin = isAdmin
-  columnsTaxons =
-    [
-      field: "libelle_long"
-      title: "Libelle"
-      template: '<a href=\"\\#/taxons/#: _id #\"> #: libelle_long # </a>'
-    ,
-      field: "libelle_court"
-      title: "Libelle court"
-    ]
-  modelTaxons =
-    _id:
-      type: "string"
-    libelle_long:
-      type: "string"
-    libelle_court:
-      type: "string"
-  $('#kendoGrid').kendoGrid(DataSource.getGridReadOption('/taxons', modelTaxons, columnsTaxons))
-  $('#kendoGrid').data('kendoGrid').dataSource.sort({field: 'libelle_long', dir: 'asc'})
-  $(window).trigger('resize')
+  resourceBackend = Backend.all('taxons')
+  $scope.gridOptions =
+    model:
+      _id:
+        type: "string"
+      libelle_long:
+        type: "string"
+      libelle_court:
+        type: "string"
+    columns:
+      [
+        field: "libelle_long"
+        title: "Libellé"
+        template: '<a href=\"\\#/taxons/#: _id #\"> #: libelle_long # </a>'
+      ,
+        field: "libelle_court"
+        title: "Libellé court"
+      ]
+    dataSource:
+      sort:
+        field: 'libelle_long'
+        dir: 'asc'
+      shema:
+        data: 'd'
+      transport:
+        read: (e) ->
+          lookup = {}
+          resourceBackend.getList(lookup).then(
+            (items) -> e.success(items)
+            (error) -> throw error
+          )
+      pageSize: 2
 
 .controller 'CreateTaxonCtrl', ($scope, Backend) ->
   $scope.submitted = false
