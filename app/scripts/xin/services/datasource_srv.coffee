@@ -12,17 +12,17 @@ angular.module('xin_datasource', ['xin_session_tools', 'appSettings', 'xin_tools
               url: SETTINGS.API_DOMAIN + uri
               dataType: "json"
               data:
-                max_results: 100
+                max_results: 20
               headers:
                 Authorization: sessionTools.getAuthorizationHeader()
-          serverPaging: false
+          serverPaging: true
           serverSorting: false
-          pageSize: 100
+          pageSize: 20
           schema:
             type: "json"
-            data: '_items'
-            id: "_id"
-            total: "total"
+            data: "_items"
+            total: (response) =>
+              return response._meta.total
             model: aModel
         columns: aColumns
         resizable: true
@@ -32,4 +32,7 @@ angular.module('xin_datasource', ['xin_session_tools', 'appSettings', 'xin_tools
             string:
               contains: "Contains"
         sortable: true
+        dataBound: window.resizeContainer()
+        scrollable:
+          virtual: true
       return gridOption

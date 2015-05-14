@@ -1,8 +1,8 @@
-"user strict"
+"use strict"
 
 
 angular.module('xin_content', ['ngRoute', 'xin_session'])
-.directive 'contentDirective', ($location, $route, Session) ->
+.directive 'xinContent', ($location, $route, Session) ->
   restrict: 'E'
   templateUrl: 'scripts/xin/content_drt/content.html'
   link: ($scope, elem, attrs) ->

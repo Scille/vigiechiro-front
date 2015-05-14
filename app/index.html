@@ -32,14 +32,9 @@
   your browser</a> to improve your experience.</p>
 <![endif]-->
 <!-- Login and content page displayed according to current login state -->
-<login-directive ng-show="isNotLogged"></login-directive>
-<content-directive ng-show="isLogged"></content-directive>
-<footer class="footer">
-  <div class="container">
-    <a href="http://scille.eu" target="_blank">
-      <img src="images/logo-scille.png" width="20">&nbsp;Scille</a> vigiechiro demo
-  </div>
-</footer>
+<xin-login ng-show="isNotLogged"></xin-login>
+<xin-content ng-show="isLogged"></xin-content>
+<xin-footer></xin-footer>
 
 <!-- Google Analytics: change UA-XXXXX-X to be your site's ID -->
 <script>
@@ -52,7 +47,7 @@
    ga('send', 'pageview');
 </script>
 
-<script src='//maps.googleapis.com/maps/api/js?sensor=false&libraries=drawing,geometry'></script>
+<!--<script src='//maps.googleapis.com/maps/api/js?sensor=false&libraries=drawing,geometry'></script>-->
 
 <!-- build:js(.) scripts/oldieshim.js -->
 <!--[if lt IE 9]>
@@ -131,12 +126,18 @@
 <script src="scripts/xin/services/datasource_srv.js"></script>
 <script src="scripts/xin/services/google_maps_srv.js"></script>
 <script src="scripts/xin/content_drt/content_drt.js"></script>
-<script src="scripts/xin/login_drt/login_ctrl.js"></script>
-<script src="scripts/xin/editor_drt/editor_ctrl.js"></script>
+<script src="scripts/xin/footer_drt/footer_drt.js"></script>
+<script src="scripts/xin/login_drt/login_drt.js"></script>
+<script src="scripts/xin/editor_drt/editor_drt.js"></script>
 <script src="scripts/xin/navbar_drt/navbar_drt.js"></script>
 <script src="scripts/xin/action_drt/update_drt.js"></script>
 <script src="scripts/xin/action_drt/create_drt.js"></script>
 <script src="scripts/xin/action_drt/submit_drt.js"></script>
+<script src="scripts/xin/input_drt/input_drt.js"></script>
+<script src="scripts/xin/input_drt/email_drt.js"></script>
+<script src="scripts/xin/input_drt/number_drt.js"></script>
+<script src="scripts/xin/input_drt/checkbox_drt.js"></script>
+<script src="scripts/xin/input_drt/textarea_drt.js"></script>
 <script src="scripts/xin/upload_file/s3_upload_file_srv.js"></script>
 <script src="scripts/xin/upload_file/upload_file_ctrl.js"></script>
 <script src="scripts/xin/upload_file/upload_folder_ctrl.js"></script>

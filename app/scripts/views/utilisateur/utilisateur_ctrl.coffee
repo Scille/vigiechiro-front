@@ -75,11 +75,11 @@ angular.module('utilisateurViews', ['ngRoute', 'xin_listResource', 'xin_tools',
 
   $scope.saveUser = ->
     $scope.submitted = true
-    if (not $scope.userForm.$valid or not $scope.userForm.$dirty or not userResource?)
+    if (not $scope.xinForm.$valid or not $scope.xinForm.$dirty or not userResource?)
       return
     payload = {}
     # Retrieve the modified fields from the form
-    for key, value of $scope.userForm
+    for key, value of $scope.xinForm
       if key.charAt(0) != '$' and value.$dirty
         payload[key] = $scope.utilisateur[key]
     # Special handling for radio buttons

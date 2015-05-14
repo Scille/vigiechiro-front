@@ -1,79 +1,44 @@
-<div class="container ressource">
-  <form class="simple-form" novalidate name="taxonForm" ng-submit="saveTaxon()">
-    <submit/>
-    <div class="row">
-      <div class="col-sm-3">
-        <div class="form-group" ng-class="{'has-error': taxonForm.libelle_long.$invalid && !taxonForm.$pristine}">
-          <input type="text" class="form-control floating-label" id="libelle_long" name="libelle_long"
-                 ng-model="taxon.libelle_long" ng-disabled="readOnly" required placeholder="Nom français (latin)">
-        </div>
+<form class="simple-form" novalidate name="xinForm" ng-submit="saveTaxon()">
+  <xin-submit></xin-submit>
+  <div class="row">
+    <div class="col-sm-3">
+      <div class="form-group" ng-class="{'has-error': taxonForm.libelle_long.$invalid && !taxonForm.$pristine}">
+        <input type="text" class="form-control floating-label" id="libelle_long" name="libelle_long"
+               ng-model="taxon.libelle_long" ng-disabled="readOnly" required placeholder="Nom français (latin)">
       </div>
-      <div class="col-sm-3">
-        <div class="form-group" ng-class="{'has-error': taxonForm.libelle_court.$invalid && !taxonForm.$pristine}">
-          <input type="text" class="form-control floating-label" id="libelle_court" name="libelle_court"
-                 ng-model="taxon.libelle_court" ng-disabled="readOnly" required placeholder="Code">
-        </div>
-      </div>
-
-      <div class="col-sm-6">
-        <div class="form-group" ng-class="{'has-error': taxonsParents.error && !taxonForm.$pristine}">
-          <div class="form-control-wrapper">
-            <ui-select multiple class="form-control" id="taxons_parents" name="taxons_parents" ng-model="taxon.parents"
-                       ng-disabled="disabled" on-select="someFunction($item, $model)">
-              <ui-select-match>{{$item.libelle_long}}</ui-select-match>
-              <ui-select-choices repeat="taxon in taxonsParents.availableTaxons | filter:$select.search">
-                {{taxon.libelle_long}}
-              </ui-select-choices>
-            </ui-select>
-            <div class="floating-label">Taxons Parents</div>
-            <span class="material-input"></span>
-          </div>
-        </div>
-        <span ng-show="submitted && taxonsParents.error"
-              class="help-block">Les parents ne doivent pas former de boucle de dépendance</span>
+    </div>
+    <div class="col-sm-3">
+      <div class="form-group" ng-class="{'has-error': taxonForm.libelle_court.$invalid && !taxonForm.$pristine}">
+        <input type="text" class="form-control floating-label" id="libelle_court" name="libelle_court"
+               ng-model="taxon.libelle_court" ng-disabled="readOnly" required placeholder="Code">
       </div>
     </div>
 
-    <div class="input-group form-group">
-      <textarea kendo-editor id="kendoEditor" k-ng-model="taxon.description" tools="[
-'bold',
-'italic',
-'underline',
-'strikethrough',
-'justifyLeft',
-'justifyCenter',
-'justifyRight',
-'justifyFull',
-'insertUnorderedList',
-'insertOrderedList',
-'indent',
-'outdent',
-'createLink',
-'unlink',
-'insertImage',
-'insertFile',
-'subscript',
-'superscript',
-'createTable',
-'addRowAbove',
-'addRowBelow',
-'addColumnLeft',
-'addColumnRight',
-'deleteRow',
-'deleteColumn',
-'viewHtml',
-'formatting',
-'cleanFormatting',
-'fontName',
-'fontSize',
-'foreColor',
-'backColor',
-'print'
-]"></textarea>
+    <div class="col-sm-6">
+      <div class="form-group" ng-class="{'has-error': taxonsParents.error && !taxonForm.$pristine}">
+        <div class="form-control-wrapper">
+          <ui-select multiple class="form-control" id="taxons_parents" name="taxons_parents" ng-model="taxon.parents"
+                     ng-disabled="disabled" on-select="someFunction($item, $model)">
+            <ui-select-match>{{$item.libelle_long}}</ui-select-match>
+            <ui-select-choices repeat="taxon in taxonsParents.availableTaxons | filter:$select.search">
+              {{taxon.libelle_long}}
+            </ui-select-choices>
+          </ui-select>
+          <div class="floating-label">Taxons Parents</div>
+          <span class="material-input"></span>
+        </div>
+      </div>
+      <span ng-show="submitted && taxonsParents.error"
+            class="help-block">Les parents ne doivent pas former de boucle de dépendance</span>
     </div>
-  </form>
-</div>
+  </div>
+
+  <div class="input-group form-group">
+    <xin-editor></xin-editor>
+  </div>
+</form>
 <script>
   $.material.options.autofill = true;
   $.material.init();
 </script>
+

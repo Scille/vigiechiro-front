@@ -79,38 +79,24 @@ angular
 .controller 'ListTaxonsCtrl', ($scope, DataSource, Session, Backend) ->
   Session.getIsAdminPromise().then (isAdmin) ->
     $scope.isAdmin = isAdmin
-  resourceBackend = Backend.all('taxons')
-  $scope.gridOptions =
-    model:
-      _id:
-        type: "string"
-      libelle_long:
-        type: "string"
-      libelle_court:
-        type: "string"
-    columns:
-      [
-        field: "libelle_long"
-        title: "Libellé"
-        template: '<a href=\"\\#/taxons/#: _id #\"> #: libelle_long # </a>'
-      ,
-        field: "libelle_court"
-        title: "Libellé court"
-      ]
-    dataSource:
-      sort:
-        field: 'libelle_long'
-        dir: 'asc'
-      shema:
-        data: 'd'
-      transport:
-        read: (e) ->
-          lookup = {}
-          resourceBackend.getList(lookup).then(
-            (items) -> e.success(items)
-            (error) -> throw error
-          )
-      pageSize: 2
+  columnsTaxons =
+    [
+      field: "libelle_long"
+      title: "Libelle"
+      template: '<a href=\"\\#/taxons/#: _id #\"> #: libelle_long # </a>'
+    ,
+      field: "libelle_court"
+      title: "Libelle court"
+    ]
+  modelTaxons =
+    _id:
+      type: "string"
+    libelle_long:
+      type: "string"
+    libelle_court:
+      type: "string"
+  $scope.gridOptions =  DataSource.getGridReadOption('/taxons', modelTaxons, columnsTaxons)
+
 
 .controller 'CreateTaxonCtrl', ($scope, Backend) ->
   $scope.submitted = false

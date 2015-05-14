@@ -36,6 +36,10 @@ module.exports = (grunt) ->
         files: ["<%= yeoman.app %>/scripts/**/*.{coffee,litcoffee,coffee.md}"]
         tasks: ["newer:coffee:dist"]
 
+      jade:
+        files: ["<%= yeoman.app %>/scripts/**/*.{jade}"]
+        tasks: ["newer:jade:dist"]
+
       coffeeTest:
         files: ["test/**/*.{coffee,litcoffee,coffee.md}"]
         tasks: [
@@ -170,6 +174,15 @@ module.exports = (grunt) ->
           ext: ".js"
         ]
 
+    jade:
+      dist:
+        files: [
+          expand: true,
+          cwd: "<%= yeoman.app %>/scripts"
+          src: "**/*.jade",
+          dest: ".tmp/scripts",
+          ext: '.html'
+        ]
 
     # Renames files for browser caching purposes
     filerev:
@@ -348,6 +361,7 @@ module.exports = (grunt) ->
     concurrent:
       server: [
         "coffee:dist"
+        "jade:dist"
         "copy:styles"
       ]
       test: [
@@ -356,6 +370,7 @@ module.exports = (grunt) ->
       ]
       dist: [
         "coffee"
+        "jade"
         "copy:styles"
         "imagemin"
         "svgmin"

@@ -194,7 +194,7 @@ body {
   overflow: hidden;
 }
 
-html, body, #maintContent, .ressource, #kendoGrid, #kendoEditor, content-directive
+html, body, #maintContent, .ressource, #kendoGrid, #kendoEditor, xin-content
 {
   margin: 0;
   padding: 0;

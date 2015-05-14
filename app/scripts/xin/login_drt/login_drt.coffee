@@ -1,7 +1,7 @@
 'use strict'
 
 angular.module('xin_login', ['ngRoute', 'xin_session', 'appSettings'])
-.directive 'loginDirective', ($location, $route, Session, SETTINGS) ->
+.directive 'xinLogin', ($location, $route, Session, SETTINGS) ->
   restrict: 'E'
   templateUrl: 'scripts/xin/login_drt/login.html'
   link: ($scope, elem, attrs) ->
@@ -25,5 +25,4 @@ angular.module('xin_login', ['ngRoute', 'xin_session', 'appSettings'])
   Session.logout().then (user) ->
     document.location( '/')
 
-'use strict'
 

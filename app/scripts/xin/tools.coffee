@@ -1,28 +1,28 @@
 'use strict'
 
-window.resizeContainerGrid = (kendo) =>
+window.resizeContainer = () =>
   footer = $('footer')
   mainContent = $('#main-content')
-  grid = $('#' + kendo)
-  if (mainContent.length > 0 && footer.length > 0 && grid.length > 0)
+  if (mainContent.length > 0 && footer.length > 0)
     footerOffset = footer.offset()
-    gridOffset = mainContent.offset()
-    if (footerOffset? && gridOffset?)
-      height = footerOffset.top - gridOffset.top - 20
-      grid.height(height)
-      dataKendoGrid = grid.data('kendoGrid')
-      if (dataKendoGrid?)
-        dataKendoGrid.resize();
+    mainOffset = mainContent.offset()
+    if (footerOffset? && mainOffset?)
+      height = footerOffset.top - mainOffset.top - 20
+      mainContent.height(height)
+      grid = $('#kendoGrid')
+      if (grid.length > 0)
+        grid.height( height)
+        dataKendoGrid = grid.data('kendoGrid')
+        if (dataKendoGrid?)
+          dataKendoGrid.resize()
+          grid = $('#kendoGrid')
+      grid = $('#kendoEditor')
+      if (grid.length > 0)
+        grid.height( height)
 
-window.resizeContainerEditor = (kendo) =>
-  window.resizeContainerGrid(kendo)
 
-
-$(document).ready(() =>
-  $(window).resize(() ->
-    window.resizeContainerEditor('kendoEditor')
-    window.resizeContainerGrid('kendoGrid')
-  )
+$(window).resize(() ->
+    window.resizeContainer()
 )
 
 
