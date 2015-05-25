@@ -18,18 +18,23 @@ do =>
       label: 'Pseudo'
 
   ### @ngInject ###
-  ListUtilisateursCtrl = ($scope, Backend, DelayedEvent) =>
-    $scope.lookup = {}
-    # Filter field is trigger after 500ms of inactivity
-    delayedFilter = new DelayedEvent(500)
-    $scope.filterField = ''
-    $scope.$watch 'filterField', (filterValue) ->
-      delayedFilter.triggerEvent ->
-        if filterValue? and filterValue != ''
-          $scope.lookup.q = filterValue
-        else if $scope.lookup.q?
-          delete $scope.lookup.q
-    $scope.resourceBackend = Backend.all('utilisateurs')
+  ListUtilisateursCtrl = ($scope, Datasource) =>
+    columns =
+      [
+        field: "pseudo"
+        title: "Pseudo"
+        template: '<a href=\"\\#/utilisateurs/#: _id #\"> #: pseudo # </a>'
+      ,
+        field: "role"
+        title: "Role"
+      ]
+    fields =
+      pseudo:
+        type: "string"
+      role:
+        type: "string"
+    $scope.gridOptions =  Datasource.getGridReadOption('/utilisateurs', fields, columns)
+
 
   ### @ngInject ###
   ShowUtilisateurCtrl = ($scope, $route, $routeParams, Backend, Session, breadcrumbs, SessionTools) =>
