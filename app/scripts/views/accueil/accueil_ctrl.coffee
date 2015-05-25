@@ -6,7 +6,7 @@ do =>
     .when '/accueil',
       templateUrl: 'scripts/views/accueil/accueil.html'
       controller: 'AccueilCtrl'
-      label: ''
+      label: 'Accueil'
 
   #### @ngInject ###
   controller = ($scope, Backend) ->

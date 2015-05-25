@@ -42,6 +42,8 @@ do =>
 
       undefineUser : () =>
         self.user = {}
+        $rootScope.isAdmin = self.isAdmin()
+        $rootScope.isLogged = self.isLogged()
         SessionTools.removeAuthorizationHeader()
         PubSub.publish('user', self.user)
 

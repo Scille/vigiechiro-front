@@ -1,26 +1,26 @@
-html
-  body
-    form.simple-form(novalidate='', name='xinForm', ng-submit='saveTaxon()')
-      xin-submit
-      .row
-        .col-sm-3
-          .form-group(ng-class="{'has-error': taxonForm.libelle_long.$invalid && !taxonForm.$pristine}")
-            input#libelle_long.form-control.floating-label(type='text', name='libelle_long', ng-model='taxon.libelle_long', ng-disabled='readOnly', required='', placeholder='Nom français (latin)')
-        .col-sm-3
-          .form-group(ng-class="{'has-error': taxonForm.libelle_court.$invalid && !taxonForm.$pristine}")
-            input#libelle_court.form-control.floating-label(type='text', name='libelle_court', ng-model='taxon.libelle_court', ng-disabled='readOnly', required='', placeholder='Code')
-        .col-sm-6
-          .form-group(ng-class="{'has-error': taxonsParents.error && !taxonForm.$pristine}")
-            .form-control-wrapper
-              ui-select#taxons_parents.form-control(multiple='', name='taxons_parents', ng-model='taxon.parents', ng-disabled='disabled', on-select='someFunction($item, $model)')
-                ui-select-match {{$item.libelle_long}}
-                ui-select-choices(repeat='taxon in taxonsParents.availableTaxons | filter:$select.search')
-                  | {{taxon.libelle_long}}
-              .floating-label Taxons Parents
-              span.material-input
-          span.help-block(ng-show='submitted && taxonsParents.error') Les parents ne doivent pas former de boucle de dépendance
-      .input-group.form-group
+form.simple-form.height100(novalidate='', name='xinForm', ng-submit='saveTaxon()')
+  xin-submit
+  .row
+    .col-sm-3
+      .form-group(ng-class="{'has-error': taxonForm.libelle_long.$invalid && !taxonForm.$pristine}")
+        input#libelle_long.form-control.floating-label(type='text', name='libelle_long', ng-model='taxon.libelle_long', ng-disabled='readOnly', required='', placeholder='Nom français (latin)')
+    .col-sm-3
+      .form-group(ng-class="{'has-error': taxonForm.libelle_court.$invalid && !taxonForm.$pristine}")
+        input#libelle_court.form-control.floating-label(type='text', name='libelle_court', ng-model='taxon.libelle_court', ng-disabled='readOnly', required='', placeholder='Code')
+    .col-sm-6
+      .form-group(ng-class="{'has-error': taxonsParents.error && !taxonForm.$pristine}")
+        .form-control-wrapper
+          ui-select#taxons_parents.form-control(multiple='', name='taxons_parents', ng-model='taxon.parents', ng-disabled='disabled', on-select='someFunction($item, $model)')
+            ui-select-match {{$item.libelle_long}}
+            ui-select-choices(repeat='taxon in taxonsParents.availableTaxons | filter:$select.search')
+              | {{taxon.libelle_long}}
+          .floating-label Taxons Parents
+          span.material-input
+      span.help-block(ng-show='submitted && taxonsParents.error') Les parents ne doivent pas former de boucle de dépendance
+  .row
+    .col-sm-12
+      .form-group
         xin-editor
-    script.
-      $.material.options.autofill = true;
-      $.material.init();
+script.
+  $.material.options.autofill = true;
+  $.material.init();

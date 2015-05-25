@@ -9,7 +9,7 @@ do =>
 
         self.subscriptions[subscription] = []  unless self.subscriptions[subscription]
 
-        subscriber self.lastData[subscription] if self.lastData[subscription]
+        subscriber self.lastData[subscription] if self.lastData[subscription]?
 
         # adds the callback to the array & returns the index for deletion later
         index = (self.subscriptions[subscription].push(subscriber) - 1)

@@ -37,7 +37,7 @@ module.exports = (grunt) ->
         tasks: ["newer:coffee:dist"]
 
       jade:
-        files: ["<%= yeoman.app %>/scripts/**/*.{jade}"]
+        files: ["<%= yeoman.app %>/**/*.{jade}"]
         tasks: ["newer:jade:dist"]
 
       coffeeTest:
@@ -179,7 +179,7 @@ module.exports = (grunt) ->
         files: [
           expand: true,
           cwd: "<%= yeoman.app %>"
-          src: "**/*.jade",
+          src: "**/*.jade"
           dest: ".tmp"
           ext: '.html'
         ]

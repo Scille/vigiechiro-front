@@ -36,7 +36,6 @@ do =>
     $scope.submitted = false
     $scope.utilisateur = {}
     $scope.readOnly = false
-    origin_role = undefined
     userBackend = undefined
     if $routeParams.userId == 'moi'
       userBackend = Backend.one('moi')
@@ -44,7 +43,6 @@ do =>
       userBackend = Backend.one('utilisateurs', $routeParams.userId)
     userBackend.get().then (utilisateur) ->
       $scope.utilisateur = utilisateur.plain()
-      origin_role = $scope.utilisateur.role
       breadcrumbs.options =
         'Pseudo': $scope.utilisateur.pseudo
       $scope.readOnly = (not Session.isAdmin() and Session.getUser()._id != $scope.utilisateur._id)

@@ -39,6 +39,6 @@ nav.navbar.navbar-default.navbar-static-top(role="navigation")
   a.navbar-link(href="#/", title="homepage")
     span.glyphicon.glyphicon-home.icons-padding
   x(ng-repeat="breadcrumb in breadcrumbs.get() track by breadcrumb.path", ng-class="{ active: $last }")
-    | &#62;
-    a.navbar-link(ng-if="!$last", ng-href="div") {{breadcrumb.label}} (id="{{breadcrumb.path}}")
+    | &nbsp;>&nbsp;&nbsp;
+    a.navbar-link(ng-if="!$last", ng-href="#{{breadcrumb.path}}") {{breadcrumb.label}}
     t(style="color:#009FFF;font-size:16pt;", ng-if="$last") {{breadcrumb.label}}

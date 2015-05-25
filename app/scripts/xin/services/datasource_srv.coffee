@@ -44,6 +44,7 @@ do =>
         scrollable:
           virtual: true
         sortable: true
+        dataBound: window.resizeContainer
 
     return self
 

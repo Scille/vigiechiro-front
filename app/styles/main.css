@@ -109,10 +109,16 @@ body {
 -------------------------------------------------- */
 /* Not required for template or sticky footer method. */
 
-.container {
+.container
+{
   width: auto;
   max-width: 950px;
-  padding: 0 15px;
+  padding: 0 0;
+}
+
+.height100
+{
+  height:100%;
 }
 
 .container .text-muted {
@@ -194,7 +200,11 @@ body {
   overflow: hidden;
 }
 
-html, body, #maintContent, .ressource, #kendoGrid, #kendoEditor, xin-content
+.panescroll{
+  overflow-y:scroll;
+}
+
+html, body, #mainContent, .ressource, xin-content
 {
   margin: 0;
   padding: 0;

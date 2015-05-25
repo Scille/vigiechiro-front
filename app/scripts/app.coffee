@@ -27,8 +27,7 @@ do ->
 
 
   ### @ngInject ###
-  AppCtrl = ($scope, PubSub, Session, breadcrumbs) =>
-    $scope.breadcrumbs = breadcrumbs;
+  AppCtrl = ($scope, PubSub, Session) =>
     PubSub.subscribe 'user', (user) =>
       $scope.isLogged = Session.isLogged()
 

@@ -15,10 +15,12 @@ window.resizeContainer = () =>
         dataKendoGrid = grid.data('kendoGrid')
         if (dataKendoGrid?)
           dataKendoGrid.resize()
-          grid = $('#kendoGrid')
-      grid = $('#kendoEditor')
+      grid = $('.k-editor')
       if (grid.length > 0)
-        grid.height( height)
+        grid.height( height - 70)
+      grid = $('#xinPaneContent')
+      if (grid.length > 0)
+        grid.height( height - 40)
 
 
 $(window).resize(() ->
