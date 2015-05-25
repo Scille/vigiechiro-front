@@ -29,7 +29,7 @@ do =>
       removeAuthorizationHeader: () =>
         Storage.removeItem('auth-session-token')
 
-      logRequestError: =>
+      logRequestError: () =>
         # A 401 error happened, this is normal if the user is not currently
         # logged in (i.e. no auth-session-token is set), otherwise it means the
         # current auth-session-token is no longer valid (thus we have to force
@@ -37,6 +37,20 @@ do =>
         if self.getAuthorizationHeader()?
           self.removeAuthorizationHeader()
           $window.location.reload()
+
+      getModifiedRessource: ( scope, input) =>
+        payload =  {}
+
+        if (not scope.xinForm.$valid or not scope.xinForm.$dirty or not input)
+          return
+
+        angular.copy( input, payload)
+
+        payload._id = undefined
+        payload._created = undefined
+        payload._updated = undefined
+
+        return payload
 
     return self
 

@@ -32,29 +32,27 @@ do =>
     $scope.resourceBackend = Backend.all('utilisateurs')
 
   ### @ngInject ###
-  ShowUtilisateurCtrl = ($scope, $route, $routeParams, Backend, Session, breadcrumbs) =>
-    $scope.submitted = false
+  ShowUtilisateurCtrl = ($scope, $route, $routeParams, Backend, Session, breadcrumbs, SessionTools) =>
     $scope.utilisateur = {}
     $scope.readOnly = false
-    userBackend = undefined
     if $routeParams.userId == 'moi'
-      userBackend = Backend.one('moi')
+      $scope.userBackend = Backend.one('moi')
     else
-      userBackend = Backend.one('utilisateurs', $routeParams.userId)
-    userBackend.get().then (utilisateur) ->
+      $scope.userBackend = Backend.one('utilisateurs', $routeParams.userId)
+
+    $scope.userBackend.get().then (utilisateur) ->
       $scope.utilisateur = utilisateur.plain()
       breadcrumbs.options =
         'Pseudo': $scope.utilisateur.pseudo
       $scope.readOnly = (not Session.isAdmin() and Session.getUser()._id != $scope.utilisateur._id)
 
     $scope.saveUser = ->
-      $scope.submitted = true
-      if (not $scope.xinForm.$valid or not $scope.xinForm.$dirty or not $scope.utilisateur.role)
-        return
-      userBackend.patch($scope.utilisateur).then(
-        -> $route.reload()
-        (error) -> throw "Error " + error
-      )
+      payload = SessionTools.getModifiedRessource( $scope, $scope.utilisateur)
+      if (payload?)
+        $scope.userBackend.patch( payload).then(
+          -> $route.reload()
+          (error) -> throw "Error " + error
+        )
 
   angular.module('utilisateurViews', [])
   .config( config)

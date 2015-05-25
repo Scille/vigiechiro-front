@@ -78,27 +78,20 @@ do =>
 
 
   ### @ngInject ###
-  CreateTaxonCtrl = ($scope, Backend, TaxonsParents) =>
+  CreateTaxonCtrl = ($scope, Backend, TaxonsParents, SessionTools) =>
     $scope.submitted = false
     $scope.taxon = {parents: []}
     $scope.taxonsParents = new TaxonsParents(Backend, $scope.taxonId)
     $scope.taxonsParents.init()
+
     $scope.saveTaxon = ->
-      $scope.submitted = true
-      if not $scope.taxonForm.$valid or not $scope.taxonForm.$dirty
-        return
-      parents = []
-      for parent in $scope.taxon.parents
-        parents.push(parent._id)
-      payload =
-        'libelle_long': $scope.taxonForm.libelle_long.$modelValue
-        'libelle_court': $scope.taxonForm.libelle_court.$modelValue
-        'description': $scope.taxon.description
-        'parents': $scope.taxonsParents.dataToId($scope.taxon.parents)
-      Backend.all('taxons').post(payload).then(
-        -> window.location = '#/taxons/' + $routeParams.taxonId
-        (response) -> $scope.taxonsParents.parseResponse(response)
-      )
+      payload = SessionTools.getModifiedRessource( $scope, $scope.taxon)
+      if (payload?)
+        payload.parents = $scope.taxonsParents.dataToId($scope.taxon.parents)
+        Backend.all('taxons').post(payload).then(
+          -> window.location = '#/taxons/' + $routeParams.taxonId
+          (response) -> $scope.taxonsParents.parseResponse(response)
+        )
     $(window).trigger('resize')
 
 
@@ -114,9 +107,7 @@ do =>
 
 
   ### @ngInject ###
-  EditTaxonCtrl = ($route, $routeParams, $scope, Backend, breadcrumbs) =>
-    $scope.taxonResource = undefined
-    $scope.submitted = false
+  EditTaxonCtrl = ($route, $routeParams, $scope, Backend, breadcrumbs, SessionTools) =>
     $scope.taxonId = $routeParams.taxonId
     $scope.taxon = {}
     $scope.taxonsParents = new TaxonsParents(Backend, $scope.taxonId)
@@ -134,16 +125,14 @@ do =>
         $(window).trigger('resize')
 
     $scope.saveTaxon = ->
-      $scope.submitted = true
-      if (not $scope.taxonForm.$valid or not $scope.taxonForm.$dirty or not taxonResource?)
-        return
-      payload = $scope.taxon
-      payload.parents = $scope.taxonsParents.dataToId($scope.taxon.parents)
-      # Finally refresh the page (needed for cache reasons)
-      $scope.taxonResource.patch(payload).then(
-        -> window.location = '#/taxons/' + $routeParams.taxonId
-        (response) -> $scope.taxonsParents.parseResponse(response)
-      )
+      payload = SessionTools.getModifiedRessource( $scope, $scope.taxon)
+      if (payload?)
+        payload.parents = $scope.taxonsParents.dataToId($scope.taxon.parents)
+        # Finally refresh the page (needed for cache reasons)
+        $scope.taxonResource.patch(payload).then(
+          -> window.location = '#/taxons/' + $routeParams.taxonId
+          (response) -> $scope.taxonsParents.parseResponse(response)
+        )
 
 
   angular.module('taxonViews', [])
