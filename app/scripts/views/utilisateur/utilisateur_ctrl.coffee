@@ -1,94 +1,65 @@
-'use strict'
+do =>
 
-breadcrumbsGetUtilisateurDefer = undefined
+  ### @ngInject ###
+  config = ($routeProvider) =>
+    $routeProvider
+    .when '/profil',
+      templateUrl: 'scripts/views/utilisateur/show_utilisateur.html'
+      controller: ShowUtilisateurCtrl
+      resolve: {$routeParams: -> return {'userId': 'moi'}}
+      label: 'Profil Utilisateur'
+    .when '/utilisateurs',
+      templateUrl: 'scripts/views/utilisateur/list_utilisateurs.html'
+      controller: ListUtilisateursCtrl
+      label: 'Utilisateurs'
+    .when '/utilisateurs/:userId',
+      templateUrl: 'scripts/views/utilisateur/show_utilisateur.html'
+      controller: ShowUtilisateurCtrl
+      label: 'Pseudo'
 
+  ### @ngInject ###
+  ListUtilisateursCtrl = ($scope, Backend, DelayedEvent) =>
+    $scope.lookup = {}
+    # Filter field is trigger after 500ms of inactivity
+    delayedFilter = new DelayedEvent(500)
+    $scope.filterField = ''
+    $scope.$watch 'filterField', (filterValue) ->
+      delayedFilter.triggerEvent ->
+        if filterValue? and filterValue != ''
+          $scope.lookup.q = filterValue
+        else if $scope.lookup.q?
+          delete $scope.lookup.q
+    $scope.resourceBackend = Backend.all('utilisateurs')
 
-###*
- # @ngdoc function
- # @name vigiechiroApp.controller:ShowUtilisateurCtrl
- # @description
- # # ShowUtilisateurCtrl
- # Controller of the vigiechiroApp
-###
-angular.module('utilisateurViews', ['ngRoute', 'xin_listResource', 'xin_tools',
-                                    'xin_session', 'xin_backend'])
-.config ($routeProvider) ->
-  $routeProvider
-  .when '/profil',
-    templateUrl: 'scripts/views/utilisateur/show_utilisateur.html'
-    controller: 'ShowUtilisateurCtrl'
-    resolve: {$routeParams: -> return {'userId': 'moi'}}
-    breadcrumbs: 'Profil Utilisateur'
-  .when '/utilisateurs',
-    templateUrl: 'scripts/views/utilisateur/list_utilisateurs.html'
-    controller: 'ListUtilisateursCtrl'
-    breadcrumbs: 'Utilisateurs'
-  .when '/utilisateurs/:userId',
-    templateUrl: 'scripts/views/utilisateur/show_utilisateur.html'
-    controller: 'ShowUtilisateurCtrl'
-    breadcrumbs: ngInject ($q) ->
-      breadcrumbsDefer = $q.defer()
-      breadcrumbsGetUtilisateurDefer = $q.defer()
-      breadcrumbsGetUtilisateurDefer.promise.then (utilisateur) ->
-        breadcrumbsDefer.resolve([
-          ['Utilisateurs', '#/utilisateurs']
-          [utilisateur.pseudo, '#/utilisateurs/' + utilisateur._id]
-        ])
-      return breadcrumbsDefer.promise
+  ### @ngInject ###
+  ShowUtilisateurCtrl = ($scope, $route, $routeParams, Backend, Session, breadcrumbs) =>
+    $scope.submitted = false
+    $scope.utilisateur = {}
+    $scope.readOnly = false
+    origin_role = undefined
+    userBackend = undefined
+    if $routeParams.userId == 'moi'
+      userBackend = Backend.one('moi')
+    else
+      userBackend = Backend.one('utilisateurs', $routeParams.userId)
+    userBackend.get().then (utilisateur) ->
+      $scope.utilisateur = utilisateur.plain()
+      origin_role = $scope.utilisateur.role
+      breadcrumbs.options =
+        'Pseudo': $scope.utilisateur.pseudo
+      $scope.readOnly = (not Session.isAdmin() and Session.getUser()._id != $scope.utilisateur._id)
 
-.controller 'ListUtilisateursCtrl', ($scope, Backend, DelayedEvent) ->
-  $scope.lookup = {}
-  # Filter field is trigger after 500ms of inactivity
-  delayedFilter = new DelayedEvent(500)
-  $scope.filterField = ''
-  $scope.$watch 'filterField', (filterValue) ->
-    delayedFilter.triggerEvent ->
-      if filterValue? and filterValue != ''
-        $scope.lookup.q = filterValue
-      else if $scope.lookup.q?
-        delete $scope.lookup.q
-  $scope.resourceBackend = Backend.all('utilisateurs')
+    $scope.saveUser = ->
+      $scope.submitted = true
+      if (not $scope.xinForm.$valid or not $scope.xinForm.$dirty or not $scope.utilisateur.role)
+        return
+      userBackend.patch($scope.utilisateur).then(
+        -> $route.reload()
+        (error) -> throw "Error " + error
+      )
 
-.controller 'ShowUtilisateurCtrl', ($scope, $route, $routeParams, Backend, Session) ->
-  $scope.submitted = false
-  $scope.utilisateur = {}
-  $scope.readOnly = false
-  $scope.isAdmin = false
-  userResource = undefined
-  origin_role = undefined
-  userBackend = undefined
-  if $routeParams.userId == 'moi'
-    userBackend = Backend.one('moi')
-  else
-    userBackend = Backend.one('utilisateurs', $routeParams.userId)
-  userBackend.get().then (utilisateur) ->
-    if breadcrumbsGetUtilisateurDefer?
-      breadcrumbsGetUtilisateurDefer.resolve(utilisateur)
-      breadcrumbsGetUtilisateurDefer = undefined
-    userResource = utilisateur
-    $scope.utilisateur = utilisateur.plain()
-    origin_role = $scope.utilisateur.role
-    Session.getUserPromise().then (user) ->
-      $scope.isAdmin = user.role == 'Administrateur'
-      $scope.readOnly = (not $scope.isAdmin and
-        user._id != utilisateur._id)
-
-  $scope.saveUser = ->
-    $scope.submitted = true
-    if (not $scope.xinForm.$valid or not $scope.xinForm.$dirty or not userResource?)
-      return
-    payload = {}
-    # Retrieve the modified fields from the form
-    for key, value of $scope.xinForm
-      if key.charAt(0) != '$' and value.$dirty
-        payload[key] = $scope.utilisateur[key]
-    # Special handling for radio buttons
-    for field in ['professionnel', 'donnees_publiques']
-      payload[field] = $scope.utilisateur[field]
-    # Special handling for select
-    if $scope.utilisateur.role != origin_role
-      payload.role = $scope.utilisateur.role
-    userBackend.patch(payload).then(
-      -> $route.reload()
-      (error) -> throw "Error " + error
-    )
+  angular.module('utilisateurViews', [])
+  .config( config)
+  .controller( 'Edit', ShowUtilisateurCtrl)
+  .controller( 'Display', ShowUtilisateurCtrl)
+  .controller( 'List', ListUtilisateursCtrl)

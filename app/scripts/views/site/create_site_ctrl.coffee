@@ -1,7 +1,5 @@
 'use strict'
 
-breadcrumbsGetProtocoleDefer = undefined
-
 
 angular.module('createSiteViews', ['textAngular', 'ui.bootstrap',
                                    'dialogs.main',
@@ -11,16 +9,7 @@ angular.module('createSiteViews', ['textAngular', 'ui.bootstrap',
       .when '/protocoles/:protocoleId/nouveau-site',
         templateUrl: 'scripts/views/site/new_site.html'
         controller: 'CreateSiteController'
-        breadcrumbs: ngInject ($q) ->
-          breadcrumbsDefer = $q.defer()
-          breadcrumbsGetProtocoleDefer = $q.defer()
-          breadcrumbsGetProtocoleDefer.promise.then (protocole) ->
-            breadcrumbsDefer.resolve([
-              ['Protocoles', '#/protocoles']
-              [protocole.titre, '#/protocoles/' + protocole._id]
-              ['Nouveau Site', '#/protocoles/' + protocole._id + '/nouveau-site']
-            ])
-          return breadcrumbsDefer.promise
+        label: 'Nouveau site'
 
 
 #  .run(($templateCache) ->
@@ -85,17 +74,11 @@ angular.module('createSiteViews', ['textAngular', 'ui.bootstrap',
     $scope.listNumberUsed = []
     #
     $scope.submitted = false
-    Session.getIsAdminPromise().then (isAdmin) ->
-      $scope.isAdmin = isAdmin
     # site
     $scope.site = {}
     $scope.justification_non_aleatoire = []
 
-    Backend.one('protocoles', $routeParams.protocoleId).get()
-      .then (protocole) ->
-        if breadcrumbsGetProtocoleDefer?
-          breadcrumbsGetProtocoleDefer.resolve(protocole)
-          breadcrumbsGetProtocoleDefer = undefined
+    Backend.one('protocoles', $routeParams.protocoleId).get().then (protocole) ->
         $scope.protocole = protocole
         initSiteCreation()
         createMap(angular.element('.g-maps')[0])

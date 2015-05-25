@@ -1,0 +1,12 @@
+html
+  body
+    xin-update
+      .text-center
+        h4 ({{taxon.libelle_court}})
+      .panel.panel-body(ng-if='taxon.parents && taxon.parents.length > 0')
+        h4 Taxons parents
+        ul
+          li.taxon-parent(ng-repeat='parent in taxon.parents')
+            a(href='#/taxons/{{parent._id}}') {{parent.libelle_long}}
+      .panel.panel-body
+        span(ng-bind-html='taxon.description')

@@ -1,12 +1,15 @@
-'use strict'
+do =>
 
+  ###*
+  # factory
+  # @ngInject
+  ###
+  Datasource = (SessionTools, SETTINGS) =>
 
-angular.module('xin_datasource', ['xin_session_tools', 'appSettings', 'xin_tools'])
-.factory 'DataSource', (sessionTools, SETTINGS) ->
-  class DataSource
-    @getGridReadOption: (uri, aModel, aColumns) ->
-      gridOption =
-        dataSource:
+    self =
+
+      getDatasourceOption: (uri, aFields) =>
+        dataSource = new kendo.data.DataSource(
           transport:
             read:
               url: SETTINGS.API_DOMAIN + uri
@@ -14,7 +17,7 @@ angular.module('xin_datasource', ['xin_session_tools', 'appSettings', 'xin_tools
               data:
                 max_results: 20
               headers:
-                Authorization: sessionTools.getAuthorizationHeader()
+                Authorization: SessionTools.getAuthorizationHeader()
           serverPaging: true
           serverSorting: false
           pageSize: 20
@@ -23,7 +26,14 @@ angular.module('xin_datasource', ['xin_session_tools', 'appSettings', 'xin_tools
             data: "_items"
             total: (response) =>
               return response._meta.total
-            model: aModel
+            model:
+              id: '_id'
+              fields: aFields
+        )
+
+
+      getGridReadOption: (uri, aFields, aColumns) =>
+        dataSource: self.getDatasourceOption(uri, aFields)
         columns: aColumns
         resizable: true
         filterable:
@@ -31,8 +41,11 @@ angular.module('xin_datasource', ['xin_session_tools', 'appSettings', 'xin_tools
           operators:
             string:
               contains: "Contains"
-        sortable: true
-        dataBound: window.resizeContainer()
         scrollable:
           virtual: true
-      return gridOption
+        sortable: true
+
+    return self
+
+  angular.module('xin_datasource', [])
+  .factory('Datasource', Datasource)

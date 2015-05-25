@@ -23,8 +23,7 @@ angular.module('xin_listResource', ['ngRoute', 'angularUtils.directives.dirPagin
 #   $scope.lookup.page = parseInt(params.page)
 # if params.items?
 #   $scope.lookup.max_results = parseInt(params.items)
-  Session.getUserPromise().then (user) ->
-    $scope.user = user.plain()
+  $scope.user = Session.getUser()
   $scope.resources = []
   $scope.loading = true
   updateResourcesList = () ->

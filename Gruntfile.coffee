@@ -178,9 +178,9 @@ module.exports = (grunt) ->
       dist:
         files: [
           expand: true,
-          cwd: "<%= yeoman.app %>/scripts"
+          cwd: "<%= yeoman.app %>"
           src: "**/*.jade",
-          dest: ".tmp/scripts",
+          dest: ".tmp"
           ext: '.html'
         ]
 

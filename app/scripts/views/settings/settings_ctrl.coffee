@@ -1,7 +1,5 @@
 'use strict'
 
-breadcrumbsGetUtilisateurDefer = undefined
-
 
 ###*
  # @ngdoc function
@@ -17,7 +15,7 @@ angular.module('settingsViews', ['ngRoute', 'xin_listResource', 'xin_tools',
       .when '/settings',
         templateUrl: 'scripts/views/settings/settings.html'
         controller: 'SettingsCtrl'
-        breadcrumbs: 'Paramètres'
+        label: 'Paramètres'
 
   .controller 'SettingsCtrl', ($scope, Backend, DelayedEvent) ->
     $scope.lookup = {}
@@ -36,8 +34,6 @@ angular.module('settingsViews', ['ngRoute', 'xin_listResource', 'xin_tools',
     $scope.submitted = false
     $scope.utilisateur = {}
     $scope.readOnly = false
-    $scope.isAdmin = false
-    userResource = undefined
     origin_role = undefined
     userBackend = undefined
     if $routeParams.userId == 'moi'
@@ -48,19 +44,15 @@ angular.module('settingsViews', ['ngRoute', 'xin_listResource', 'xin_tools',
       if breadcrumbsGetUtilisateurDefer?
         breadcrumbsGetUtilisateurDefer.resolve(utilisateur)
         breadcrumbsGetUtilisateurDefer = undefined
-      userResource = utilisateur
       $scope.utilisateur = utilisateur.plain()
       origin_role = $scope.utilisateur.role
-      Session.getUserPromise().then (user) ->
-        $scope.isAdmin = user.role == 'Administrateur'
-        $scope.readOnly = (not $scope.isAdmin and
-                           user._id != utilisateur._id)
+      $scope.readOnly = (not Session.isAdmin() and Session.getUser()._id != utilisateur._id)
 
     $scope.saveUser = ->
       $scope.submitted = true
       if (not $scope.userForm.$valid or
           not $scope.userForm.$dirty or
-          not userResource?)
+          not $scope.utilisateur?)
         return
       payload = {}
       # Retrieve the modified fields from the form

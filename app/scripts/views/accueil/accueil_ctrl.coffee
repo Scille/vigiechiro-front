@@ -1,17 +1,18 @@
-'use strict'
+do =>
 
+  ### @ngInject ###
+  config = ($routeProvider) ->
+    $routeProvider
+    .when '/accueil',
+      templateUrl: 'scripts/views/accueil/accueil.html'
+      controller: 'AccueilCtrl'
+      label: ''
 
-angular.module('accueilViews', ['ngRoute', 'xin_backend', 'xin_session', 'xin_uploadFile'])
-.config ($routeProvider) ->
-  $routeProvider
-  .when '/accueil',
-    templateUrl: 'scripts/views/accueil/accueil.html'
-    controller: 'AccueilCtrl'
-
-.controller 'AccueilCtrl', ($scope, Backend, Session) ->
-  Session.getUserPromise().then (user) ->
-    $scope.isAdmin = false
-    if user.role == "Administrateur"
-      $scope.isAdmin = true
+  #### @ngInject ###
+  controller = ($scope, Backend) ->
     Backend.all('moi/sites').getList().then (sites) =>
       $scope.userSites = sites.plain()
+
+  angular.module('accueilViews', [])
+  .config(config)
+  .controller('AccueilCtrl', controller)

@@ -30,8 +30,6 @@ angular.module('actualiteViews', ['xin_backend', 'xin_session'])
   .directive 'listMesActualitesDirective', (Backend) ->
     restrict: 'E'
     templateUrl: 'scripts/views/actualite/list_actualites_drt.html'
-    scope:
-      isAdmin: '='
     link: (scope, elem, attrs) ->
       scope.loading = true
       scope.actualites = []
@@ -44,10 +42,9 @@ angular.module('actualiteViews', ['xin_backend', 'xin_session'])
     templateUrl: 'scripts/views/actualite/display_actualite_drt.html'
     scope:
       actualite: '='
-      isAdmin: '='
     link: (scope, elem, attrs) ->
-      Session.getUserPromise().then (user) ->
-        scope.user = user.plain()
+      $rootScope.$on 'session', ( event, Session) =>
+        scope.session = Session
       scope.validInscription = (valid) ->
         Backend.one('protocoles', scope.actualite.protocole._id).get()
           .then (protocole) ->
@@ -77,8 +74,6 @@ angular.module('actualiteViews', ['xin_backend', 'xin_session'])
       type: '@'
       protocoleId: '@'
     link: (scope, elem, attrs) ->
-      Session.getIsAdminPromise().then (isAdmin) ->
-        scope.isAdmin = isAdmin
 
   .controller 'listActualitesValidationsController', ($scope, $route,
                                                       Backend, Session) ->

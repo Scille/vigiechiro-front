@@ -1,16 +1,22 @@
-'use strict'
+do =>
 
+  ###*
+  # factory
+  # @ngInject
+  ###
+  Storage = () =>
 
-angular.module('xin_storage', [])
-  .factory 'storage', ->
     class Storage
-      # localStorage uses native code, must wrap the calls...
       @getItem: (key) -> window.localStorage.getItem(key)
+
       @setItem: (key, value) =>
         window.localStorage.setItem(key, value)
+
       @removeItem: (key) =>
         window.localStorage.removeItem(key)
-      @clear: -> window.localStorage.clear()
+
+      @clear: () => window.localStorage.clear()
+
       @addEventListener: (handler) =>
         if window.addEventListener?
           #Normal browsers
@@ -18,3 +24,7 @@ angular.module('xin_storage', [])
         else
           # for IE (why make your life more difficult)
           window.attachEvent "onstorage", handler
+
+
+  angular.module('xin_storage', [])
+  .factory( 'Storage', Storage)

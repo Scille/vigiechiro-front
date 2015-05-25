@@ -1,8 +1,5 @@
 'use strict'
 
-breadcrumbsGetSiteDefer = undefined
-
-
 angular.module('editSiteViews', ['ngRoute', 'textAngular', 'xin_backend',
                                  'protocole_map'])
   .config ($routeProvider) ->
@@ -10,16 +7,7 @@ angular.module('editSiteViews', ['ngRoute', 'textAngular', 'xin_backend',
       .when '/sites/:siteId/edition',
         templateUrl: 'scripts/views/site/edit_site.html'
         controller: 'EditSiteController'
-        breadcrumbs: ngInject ($q) ->
-          breadcrumbsDefer = $q.defer()
-          breadcrumbsGetSiteDefer = $q.defer()
-          breadcrumbsGetSiteDefer.promise.then (site) ->
-            breadcrumbsDefer.resolve([
-              ['Sites', '#/sites']
-              [site.titre, '#/sites/' + site._id]
-              ['Édition', '#/sites/' + site._id + '/edition']
-            ])
-          return breadcrumbsDefer.promise
+        label: 'Edition'
 
   .controller 'EditSiteController', ($timeout, $route, $routeParams, $scope,
                                      Session, Backend, protocolesFactory) ->
@@ -35,17 +23,11 @@ angular.module('editSiteViews', ['ngRoute', 'textAngular', 'xin_backend',
     $scope.editSegmentsAllowed = false
     #
     $scope.submitted = false
-    $scope.isAdmin = false
-    Session.getIsAdminPromise().then (isAdmin) ->
-      $scope.isAdmin = isAdmin
     # user select in field observateur
     $scope.observateur = {}
 
     # site
     Backend.one('sites', $routeParams.siteId).get().then (site) ->
-      if breadcrumbsGetSiteDefer?
-        breadcrumbsGetSiteDefer.resolve(site)
-        breadcrumbsGetSiteDefer = undefined
       $scope.site = site
       loadMap(angular.element($('.g-maps'))[0])
       $scope.observateur._id = site.observateur._id

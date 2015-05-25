@@ -1,7 +1,5 @@
 'use strict'
 
-breadcrumbsGetSiteDefer = undefined
-
 
 angular.module('displaySiteViews', ['ngRoute', 'textAngular', 'xin_backend',
                                     'protocole_map', 'editSiteViews'])
@@ -10,36 +8,17 @@ angular.module('displaySiteViews', ['ngRoute', 'textAngular', 'xin_backend',
       .when '/sites',
         templateUrl: 'scripts/views/site/list_sites.html'
         controller: 'ListSitesController'
-        breadcrumbs: 'Sites'
+        label: 'Sites'
       .when '/sites/mes-sites',
         templateUrl: 'scripts/views/site/list_sites.html'
         controller: 'ListMesSitesController'
-        breadcrumbs: 'Mes Sites'
+        label: 'Mes Sites'
       .when '/sites/:siteId',
         templateUrl: 'scripts/views/site/display_site.html'
         controller: 'DisplaySiteController'
-        breadcrumbs: ngInject ($q) ->
-          breadcrumbsDefer = $q.defer()
-          breadcrumbsGetSiteDefer = $q.defer()
-          breadcrumbsGetSiteDefer.promise.then (site) ->
-            breadcrumbsDefer.resolve([
-              ['Sites', '#/sites']
-              [site.titre, '#/sites/' + site._id]
-            ])
-          return breadcrumbsDefer.promise
       .when '/sites/:siteId/edition',
         templateUrl: 'scripts/views/site/edit_site.html'
         controller: 'EditSiteController'
-        breadcrumbs: ngInject ($q) ->
-          breadcrumbsDefer = $q.defer()
-          breadcrumbsGetSiteDefer = $q.defer()
-          breadcrumbsGetSiteDefer.promise.then (site) ->
-            breadcrumbsDefer.resolve([
-              ['Sites', '#/sites']
-              [site.titre, '#/sites/' + site._id]
-              ['Édition', '#/sites/' + site._id + '/edition']
-            ])
-          return breadcrumbsDefer.promise
 
   .controller 'ListSitesController', ($scope, Backend, Session, DelayedEvent) ->
     $scope.title = "Tous les sites"
@@ -79,21 +58,15 @@ angular.module('displaySiteViews', ['ngRoute', 'textAngular', 'xin_backend',
   .controller 'DisplaySiteController', ($routeParams, $scope
                                         Backend, Session) ->
     Backend.one('sites', $routeParams.siteId).get().then (site) ->
-      if breadcrumbsGetSiteDefer?
-        breadcrumbsGetSiteDefer.resolve(site)
-        breadcrumbsGetSiteDefer = undefined
       $scope.site = site
       $scope.typeSite = site.protocole.type_site
-      Session.getUserPromise().then (user) ->
-        $scope.userId = user._id
-        for protocole in user.protocoles
-          if protocole.protocole._id == $scope.site.protocole._id
-            if protocole.valide?
-              $scope.isProtocoleValid = true
-            break
-    Session.getIsAdminPromise().then (isAdmin) ->
-      $scope.isAdmin = isAdmin
-
+      user = Session.getUser()
+      $scope.userId = user._id
+      for protocole in user.protocoles
+        if protocole.protocole._id == $scope.site.protocole._id
+          if protocole.valide?
+            $scope.isProtocoleValid = true
+          break
 
   .directive 'displaySiteDirective', ($route, Session, protocolesFactory) ->
     restrict: 'E'
@@ -113,8 +86,6 @@ angular.module('displaySiteViews', ['ngRoute', 'textAngular', 'xin_backend',
           (error) -> throw error
         )
         $route.reload()
-      Session.getIsAdminPromise().then (isAdmin) ->
-        scope.isAdmin = isAdmin
 
 
   .directive 'displaySitesDirective', (Session, Backend, protocolesFactory) ->
@@ -125,8 +96,8 @@ angular.module('displaySiteViews', ['ngRoute', 'textAngular', 'xin_backend',
       typeSite: '@'
     link: (scope, elem, attrs) ->
       scope.loading = true
-      Session.getUserPromise().then (user) ->
-        scope.userId = user._id
+      user = Session.getUser()
+      scope.userId = user._id
       attrs.$observe 'typeSite', (typeSite) ->
         if typeSite
           Backend.all('protocoles/'+scope.protocoleId+'/sites').getList().then (sites) ->
@@ -144,8 +115,8 @@ angular.module('displaySiteViews', ['ngRoute', 'textAngular', 'xin_backend',
     scope:
       protocoleId: '@'
     link: (scope, elem, attrs) ->
-      Session.getUserPromise().then (user) ->
-        scope.userId = user._id
+    user = Session.getUser()
+    scope.userId = user._id
 
   .controller 'listSitesDrtController', ($scope, Backend) ->
     $scope.$watch(

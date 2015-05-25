@@ -1,0 +1,140 @@
+doctype html
+html.no-js
+  head
+    meta(charset='utf-8')
+    title Vigiechiro
+    meta(name='description', content='')
+    meta(name='viewport', content='width=device-width')
+    // Place favicon.ico and apple-touch-icon.png in the root directory
+    // CDN css
+    // build:css(.) styles/vendor.css
+    // bower:css
+    link(rel='stylesheet', href='bower_components/bootstrap/dist/css/bootstrap.css')
+    link(rel='stylesheet', href='bower_components/bootstrap-material-design/dist/css/material.css')
+    link(rel='stylesheet', href='bower_components/bootstrap-material-design/dist/css/ripples.css')
+    link(rel='stylesheet', href='bower_components/font-awesome/css/font-awesome.css')
+    link(rel='stylesheet', href='bower_components/textAngular/src/textAngular.css')
+    link(rel='stylesheet', href='bower_components/angular-ui-select/dist/select.css')
+    link(rel='stylesheet', href='bower_components/angular-dialog-service/dist/dialogs.min.css')
+    // endbower
+    // endbuild
+    // build:css(.tmp) styles/main.css
+    link(href='styles/kendo.common-material.min.css', rel='stylesheet')
+    link(href='styles/kendo.material.min.css', rel='stylesheet')
+    link(rel='stylesheet', href='styles/datetimepicker.css')
+    link(rel='stylesheet', href='styles/main.css')
+    // endbuild
+  body(ng-app='vigiechiroApp')
+    //if lt IE 7
+      p.browsehappy
+        | You are using an
+        strong outdated
+        |  browser. Please
+        a(href='http://browsehappy.com/')
+          | upgrade
+          | your browser
+        |  to improve your experience.
+    // Login and content page displayed according to current login state
+    xin-login(ng-show='isLogged == false')
+    xin-content(ng-show='isLogged')
+    xin-footer
+    // Google Analytics: change UA-XXXXX-X to be your site's ID
+    script.
+      (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+          (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+        m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+      })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+      ga('create', 'UA-XXXXX-X');
+      ga('send', 'pageview');
+    // <script src='//maps.googleapis.com/maps/api/js?sensor=false&libraries=drawing,geometry'></script>
+    // build:js(.) scripts/oldieshim.js
+    //if lt IE 9
+      script(src='bower_components/es5-shim/es5-shim.js')
+      script(src='bower_components/json3/lib/json3.js')
+    // endbuild
+    // CDN scripts
+    // build:js(.) scripts/vendor.js
+    // bower:js
+    script(src='bower_components/jquery/dist/jquery.js')
+    script(src='bower_components/angular/angular.js')
+    script(src='bower_components/bootstrap/dist/js/bootstrap.js')
+    script(src='bower_components/angular-sanitize/angular-sanitize.js')
+    script(src='bower_components/angular-animate/angular-animate.js')
+    script(src='bower_components/angular-touch/angular-touch.js')
+    script(src='bower_components/angular-route/angular-route.js')
+    script(src='bower_components/lodash/dist/lodash.compat.js')
+    script(src='bower_components/restangular/dist/restangular.js')
+    script(src='bower_components/flow.js/dist/flow.js')
+    script(src='bower_components/ng-flow/dist/ng-flow.js')
+    script(src='bower_components/ng-breadcrumbs/dist/ng-breadcrumbs.min.js')
+    script(src='bower_components/angular-utils-pagination/dirPagination.js')
+    script(src='bower_components/bootstrap-material-design/dist/js/material.js')
+    script(src='bower_components/bootstrap-material-design/dist/js/ripples.js')
+    script(src='bower_components/rangy/rangy-core.min.js')
+    script(src='bower_components/rangy/rangy-cssclassapplier.min.js')
+    script(src='bower_components/rangy/rangy-selectionsaverestore.min.js')
+    script(src='bower_components/rangy/rangy-serializer.min.js')
+    script(src='bower_components/textAngular/src/textAngular.js')
+    script(src='bower_components/textAngular/src/textAngular-sanitize.js')
+    script(src='bower_components/textAngular/src/textAngularSetup.js')
+    script(src='bower_components/angular-ui-select/dist/select.js')
+    script(src='bower_components/moment/moment.js')
+    script(src='bower_components/angular-bootstrap/ui-bootstrap-tpls.js')
+    script(src='bower_components/angular-translate/angular-translate.js')
+    script(src='bower_components/angular-dialog-service/dist/dialogs.min.js')
+    script(src='bower_components/angular-dialog-service/dist/dialogs-default-translations.min.js')
+    script(src='bower_components/arrive/src/arrive.js')
+    // endbower
+    script(src='bower_components/moment/locale/fr.js')
+    // endbuild
+    script(src='https://cdnjs.cloudflare.com/ajax/libs/angular-i18n/1.2.15/angular-locale_fr-fr.js')
+    script(src='scripts/kendo/kendo.web.min.js')
+    // build:js({.tmp,app}) scripts/scripts.js
+    script(src='scripts/xin/tools.js')
+    script(src='scripts/xin/services/geolocation_srv.js')
+    script(src='scripts/xin/services/session_srv.js')
+    script(src='scripts/xin/services/session_tools_srv.js')
+    script(src='scripts/xin/services/storage_srv.js')
+    script(src='scripts/xin/services/backend_srv.js')
+    script(src='scripts/xin/services/pubsub_srv.js')
+    script(src='scripts/xin/services/datasource_srv.js')
+    script(src='scripts/xin/services/google_maps_srv.js')
+    script(src='scripts/xin/services/pubsub_srv.js')
+    script(src='scripts/xin/content_drt/content_drt.js')
+    script(src='scripts/xin/footer_drt/footer_drt.js')
+    script(src='scripts/xin/login_drt/login_drt.js')
+    script(src='scripts/xin/editor_drt/editor_drt.js')
+    script(src='scripts/xin/navbar_drt/navbar_drt.js')
+    script(src='scripts/xin/action_drt/action_drt.js')
+    script(src='scripts/xin/input_drt/input_drt.js')
+    script(src='scripts/xin/upload_file/s3_upload_file_srv.js')
+    script(src='scripts/xin/upload_file/upload_file_ctrl.js')
+    script(src='scripts/xin/upload_file/upload_folder_ctrl.js')
+    script(src='scripts/xin/list_resource_drt/list_resource_ctrl.js')
+    script(src='scripts/datetimepicker.js')
+    script(src='scripts/views/accueil/accueil_ctrl.js')
+    script(src='scripts/views/utilisateur/utilisateur_ctrl.js')
+    script(src='scripts/views/taxon/taxon_ctrl.js')
+    script(src='scripts/views/taxon/taxonsparents.js')
+    script(src='scripts/views/protocole/protocole_ctrl.js')
+    script(src='scripts/views/site/create_site_ctrl.js')
+    script(src='scripts/views/site/edit_site_ctrl.js')
+    script(src='scripts/views/settings/settings_ctrl.js')
+    script(src='scripts/views/site/display_site_ctrl.js')
+    script(src='scripts/views/site/services/protocole_map_srv.js')
+    script(src='scripts/views/site/services/protocole_map_carre_srv.js')
+    script(src='scripts/views/site/services/protocole_map_routier_srv.js')
+    script(src='scripts/views/site/services/protocole_map_point_fixe_srv.js')
+    script(src='scripts/views/site/services/protocole_map_display_all_srv.js')
+    script(src='scripts/views/site/modal/modal_site.js')
+    script(src='scripts/views/participation/participation_ctrl.js')
+    script(src='scripts/views/actualite/actualite_ctrl.js')
+    script(src='scripts/views/donnee/donnee_ctrl.js')
+    script(src='scripts/app.js')
+    script(src='scripts/settings.js')
+    // endbuild
+    script.
+      $(document).ready(function() {
+        $.material.options.autofill = true;
+        $.material.init();
+      });

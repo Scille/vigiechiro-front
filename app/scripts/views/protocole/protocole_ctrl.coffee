@@ -1,7 +1,5 @@
 'use strict'
 
-breadcrumbsGetProtocoleDefer = undefined
-
 make_payload_macro = ($scope) ->
   payload =
     'titre': $scope.protocoleForm.titre.$modelValue
@@ -23,40 +21,22 @@ angular.module('protocoleViews', ['ngRoute', 'textAngular', 'xin_listResource',
   .when '/protocoles',
     templateUrl: 'scripts/views/protocole/list_protocoles.html'
     controller: 'ListProtocolesController'
-    breadcrumbs: 'Protocoles'
+    label: 'Protocoles'
   .when '/protocoles/mes-protocoles',
     templateUrl: 'scripts/views/protocole/list_protocoles.html'
     controller: 'ListMesProtocolesController'
-    breadcrumbs: 'Mes Protocoles'
+    label: 'Mes Protocoles'
   .when '/protocoles/nouveau',
     templateUrl: 'scripts/views/protocole/edit_protocole.html'
     controller: 'CreateProtocoleController'
-    breadcrumbs: 'Nouveau Protocole'
+    label: 'Nouveau Protocole'
   .when '/protocoles/:protocoleId',
     templateUrl: 'scripts/views/protocole/display_protocole.html'
     controller: 'DisplayProtocoleController'
-    breadcrumbs: ngInject ($q) ->
-      breadcrumbsDefer = $q.defer()
-      breadcrumbsGetProtocoleDefer = $q.defer()
-      breadcrumbsGetProtocoleDefer.promise.then (protocole) ->
-        breadcrumbsDefer.resolve([
-          ['Protocoles', '#/protocoles']
-          [protocole.titre, '#/protocoles/' + protocole._id]
-        ])
-      return breadcrumbsDefer.promise
   .when '/protocoles/:protocoleId/edition',
     templateUrl: 'scripts/views/protocole/edit_protocole.html'
     controller: 'EditProtocoleController'
-    breadcrumbs: ngInject ($q) ->
-      breadcrumbsDefer = $q.defer()
-      breadcrumbsGetProtocoleDefer = $q.defer()
-      breadcrumbsGetProtocoleDefer.promise.then (protocole) ->
-        breadcrumbsDefer.resolve([
-          ['Protocoles', '#/protocoles']
-          [protocole.titre, '#/protocoles/' + protocole._id]
-          ['Édition', '#/protocoles/' + protocole._id + '/edition']
-        ])
-      return breadcrumbsDefer.promise
+    label: 'Edition'
 
 .controller 'ListProtocolesController', ($scope, $q, $location, Backend,
                                          Session, DelayedEvent) ->
@@ -71,8 +51,6 @@ angular.module('protocoleViews', ['ngRoute', 'textAngular', 'xin_listResource',
   # if params.where?
   #   $scope.filterField = JSON.parse(params.where).$text.$search
   # else
-  Session.getIsAdminPromise().then (isAdmin) ->
-    $scope.isAdmin = isAdmin
   $scope.filterField = ''
   $scope.$watch 'filterField', (filterValue) ->
     delayedFilter.triggerEvent ->
@@ -85,24 +63,18 @@ angular.module('protocoleViews', ['ngRoute', 'textAngular', 'xin_listResource',
   $scope.resourceBackend = Backend.all('protocoles')
   # Wrap protocole backend to check if the user is registered (see _status_*)
   resourceBackend_getList = $scope.resourceBackend.getList
-  userProtocolesDictDefer = $q.defer()
-  Session.getUserPromise().then (user) ->
-    userProtocolesDict = {}
-    for userProtocole in user.protocoles or []
-      userProtocolesDict[userProtocole.protocole._id] = userProtocole
-    userProtocolesDictDefer.resolve(userProtocolesDict)
+  user = Session.getUser()
+  userProtocolesDict = {}
+  for userProtocole in user.protocoles or []
+    userProtocolesDict[userProtocole.protocole._id] = userProtocole
   $scope.resourceBackend.getList = (lookup) ->
-    deferred = $q.defer()
-    userProtocolesDictDefer.promise.then (userProtocolesDict) ->
-      resourceBackend_getList(lookup).then (protocoles) ->
-        for protocole in protocoles
-          if userProtocolesDict[protocole._id]?
-            if userProtocolesDict[protocole._id].valide
-              protocole._status_registered = true
-            else
-              protocole._status_toValidate = true
-        deferred.resolve(protocoles)
-    return deferred.promise
+    resourceBackend_getList(lookup).then (protocoles) ->
+      for protocole in protocoles
+        if userProtocolesDict[protocole._id]?
+          if userProtocolesDict[protocole._id].valide
+            protocole._status_registered = true
+          else
+            protocole._status_toValidate = true
 
 .controller 'ListMesProtocolesController', ($scope, $q, $location, Backend,
                                             Session, DelayedEvent) ->
@@ -129,43 +101,33 @@ angular.module('protocoleViews', ['ngRoute', 'textAngular', 'xin_listResource',
   $scope.resourceBackend = Backend.all('moi/protocoles')
   # Wrap protocole backend to check if the user is registered (see _status_*)
   resourceBackend_getList = $scope.resourceBackend.getList
-  userProtocolesDictDefer = $q.defer()
-  Session.getUserPromise().then (user) ->
-    userProtocolesDict = {}
-    for userProtocole in user.protocoles or []
-      userProtocolesDict[userProtocole.protocole._id] = userProtocole
-    userProtocolesDictDefer.resolve(userProtocolesDict)
+  user = Session.getUser()
+  userProtocolesDict = {}
+  for userProtocole in user.protocoles or []
+    userProtocolesDict[userProtocole.protocole._id] = userProtocole
   $scope.resourceBackend.getList = (lookup) ->
-    deferred = $q.defer()
-    userProtocolesDictDefer.promise.then (userProtocolesDict) ->
-      resourceBackend_getList(lookup).then (protocoles) ->
-        for protocole in protocoles
-          if userProtocolesDict[protocole._id]?
-            if userProtocolesDict[protocole._id].valide
-              protocole._status_registered = true
-            else
-              protocole._status_toValidate = true
-        deferred.resolve(protocoles)
-    return deferred.promise
+    resourceBackend_getList(lookup).then (protocoles) ->
+      for protocole in protocoles
+        if userProtocolesDict[protocole._id]?
+          if userProtocolesDict[protocole._id].valide
+            protocole._status_registered = true
+          else
+            protocole._status_toValidate = true
 
 .controller 'DisplayProtocoleController', ($route, $routeParams, $scope, Backend, Session) ->
   $scope.protocole = {}
   $scope.userRegistered = false
-  Session.getUserPromise().then (user) ->
-    $scope.user = user.plain()
-    Backend.one('protocoles', $routeParams.protocoleId).get().then (protocole) ->
-      if breadcrumbsGetProtocoleDefer?
-        breadcrumbsGetProtocoleDefer.resolve(protocole)
-        breadcrumbsGetProtocoleDefer = undefined
-      $scope.protocole = protocole
-      for protocole in $scope.user.protocoles or []
-        if protocole.protocole._id == $scope.protocole._id
-          $scope.userRegistered = true
-          break
+  $scope.user = Session.getUser()
+  Backend.one('protocoles', $routeParams.protocoleId).get().then (protocole) ->
+    $scope.protocole = protocole
+    for protocole in $scope.user.protocoles or []
+      if protocole.protocole._id == $scope.protocole._id
+        $scope.userRegistered = true
+        break
   $scope.registerProtocole = ->
     Backend.one('moi/protocoles/' + $scope.protocole._id).put().then(
       (response) ->
-        Session.refreshPromise()
+        Session.refresh()
         $route.reload()
       (error) -> throw error
     )
@@ -183,9 +145,6 @@ angular.module('protocoleViews', ['ngRoute', 'textAngular', 'xin_listResource',
     {}
     {'Cache-Control': 'no-cache'}
   ).then (protocole) ->
-    if breadcrumbsGetProtocoleDefer?
-      breadcrumbsGetProtocoleDefer.resolve(protocole)
-      breadcrumbsGetProtocoleDefer = undefined
     protocoleResource = protocole
     $scope.protocole = protocole.plain()
     $scope.configuration_participation = {}
