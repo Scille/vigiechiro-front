@@ -62,7 +62,7 @@ module.exports = (grunt) ->
           livereload: "<%= connect.options.livereload %>"
 
         files: [
-          "<%= yeoman.app %>/**/*.html"
+          ".tmp/**/*.html"
           ".tmp/styles/**/*.css"
           ".tmp/scripts/**/*.js"
           "<%= yeoman.app %>/images/**/*.{png,jpg,jpeg,gif,webp,svg}"
@@ -177,7 +177,7 @@ module.exports = (grunt) ->
     jade:
       dist:
         files: [
-          expand: true,
+          expand: true
           cwd: "<%= yeoman.app %>"
           src: "**/*.jade"
           dest: ".tmp"

@@ -76,9 +76,18 @@ do =>
         type: "string"
     $scope.gridOptions =  Datasource.getGridReadOption('/taxons', fieldsTaxon, columnsTaxon)
 
+  ### @ngInject ###
+  DisplayTaxonCtrl = ($routeParams, $scope, Backend, breadcrumbs) =>
+    $scope.taxon = {}
+    $scope.taxonId = $routeParams.taxonId
+    Backend.one('taxons', $routeParams.taxonId).get().then (taxon) ->
+      $scope.taxon = taxon.plain()
+      breadcrumbs.options =
+        'Libelle': $scope.taxon.libelle_long + ' (' + $scope.taxon.libelle_court + ')'
+      $(window).trigger('resize')
 
   ### @ngInject ###
-  CreateTaxonCtrl = ($scope, Backend, TaxonsParents, SessionTools) =>
+  CreateTaxonCtrl = ($scope, Backend, SessionTools) =>
     $scope.submitted = false
     $scope.taxon = {parents: []}
     $scope.taxonsParents = new TaxonsParents(Backend, $scope.taxonId)
@@ -93,18 +102,6 @@ do =>
           (response) -> $scope.taxonsParents.parseResponse(response)
         )
     $(window).trigger('resize')
-
-
-  ### @ngInject ###
-  DisplayTaxonCtrl = ($routeParams, $scope, Backend, breadcrumbs) =>
-    $scope.taxon = {}
-    $scope.taxonId = $routeParams.taxonId
-    Backend.one('taxons', $routeParams.taxonId).get().then (taxon) ->
-      $scope.taxon = taxon.plain()
-      breadcrumbs.options =
-        'Libelle': $scope.taxon.libelle_long + ' (' + $scope.taxon.libelle_court + ')'
-      $(window).trigger('resize')
-
 
   ### @ngInject ###
   EditTaxonCtrl = ($route, $routeParams, $scope, Backend, breadcrumbs, SessionTools) =>

@@ -10,7 +10,7 @@
 do ->
 
   ### @ngInject ###
-  config = ($routeProvider, $locationProvider) =>
+  config = ($routeProvider) =>
     $routeProvider
     .when '/',
       redirectTo: '/accueil'
@@ -40,6 +40,7 @@ do ->
   angular
   .module('vigiechiroApp', ['ngAnimate',
                             'ngRoute',
+                            'ngMessages',
                             'ngSanitize',
                             'ngTouch',
                             'ng-breadcrumbs',

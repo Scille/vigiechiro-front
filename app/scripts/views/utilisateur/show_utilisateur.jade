@@ -2,7 +2,7 @@ form.simple-form.bs-component(novalidate='', name='xinForm', ng-submit='saveUser
   xin-submit
   .row
     .col-sm-6
-      xin-input(ng-model='utilisateur.pseudo', placeholder='Pseudo', ng-class="{'has-error': userForm.pseudo.$invalid && !userForm.$pristine}", required='')
+      xin-input(ng-model='utilisateur.pseudo', placeholder='Pseudo', required='')
     .col-sm-6
       select.form-control.floating-label(placeholder='Role', ng-model='utilisateur.role', ng-disabled='!isAdmin')
         option(value='Administrateur') Administrateur
