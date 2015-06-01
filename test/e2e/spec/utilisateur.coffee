@@ -125,6 +125,6 @@ describe 'Test list utilisateurs', ->
 
   it 'Test result per page', ->
     $(".max-results-field")
-      .sendKeys(protractor.Key.chord(protractor.Key.CONTROL, "a"))
+      .clear()
       .sendKeys('2')
     expect($$('.list-group-item').count()).toEqual(2)

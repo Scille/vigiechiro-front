@@ -72,7 +72,10 @@ angular.module('xin_uploadFile', ['appSettings', 'xin_s3uploadFile'])
         uploader = new S3FileUploader(file,
           onProgress: -> _.defer(-> $scope.$apply())
           onFinished: -> _.defer(-> $scope.$apply())
-          onError: -> _.defer(-> $scope.$apply())
+          onError: (status) ->
+            if status?
+              console.log(status)
+            _.defer(-> $scope.$apply())
         )
         $scope.uploaders.push(uploader)
         uploader.start()

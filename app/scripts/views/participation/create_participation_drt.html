@@ -136,6 +136,18 @@
         ng-show="submitted && participationForm.pieces_jointes.$error.uploading">
         Le transfert des pièces jointes n'est pas terminé
       </span>
+      <span class="help-block"
+            ng-show="participationForm.pieces_jointes.$error.filename">
+        Les fichiers suivants ne respectent pas le format attendu
+        {{ fileFormat }} :
+        <div ng-repeat="filename in badFilesNames">
+          {{ filename }}
+        </div>
+      </span>
+      <span class="help-block"
+        ng-show="participationForm.pieces_jointes.$error.xhr">
+        {{ xhrError }}
+      </span>
     </div>
 
     <div class="form-group"

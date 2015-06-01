@@ -191,6 +191,7 @@ angular.module('xin_s3uploadFile', ['appSettings'])
                   )
                   @_context.part_number += 1
                   @_continueMultiPartUpload(@_context)
+                onError: (error) => @_onError(error)
               uploadToS3(callbacks, 'PUT', slice, response.s3_signed_url)
             (error) -> throw error
           )
