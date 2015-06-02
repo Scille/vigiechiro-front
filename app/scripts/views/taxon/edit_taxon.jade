@@ -2,11 +2,9 @@ form.simple-form.height100(novalidate='', name='xinForm', ng-submit='saveTaxon()
   xin-submit
   .row
     .col-sm-3
-      .form-group(ng-class="{'has-error': taxonForm.libelle_long.$invalid && !taxonForm.$pristine}")
-        xin-input.form-control.floating-label(ng-model='taxon.libelle_long', ng-disabled='readOnly', required='', placeholder='Nom français (latin)')
+      xin-input.form-control.floating-label(ng-model='taxon.libelle_long', ng-disabled='readOnly', required='', placeholder='Nom français (latin)')
     .col-sm-3
-      .form-group(ng-class="{'has-error': taxonForm.libelle_court.$invalid && !taxonForm.$pristine}")
-        xin-input#libelle_court.form-control.floating-label(type='text', name='libelle_court', ng-model='taxon.libelle_court', ng-disabled='readOnly', required='', placeholder='Code')
+      xin-input#libelle_court.form-control.floating-label(type='text', name='libelle_court', ng-model='taxon.libelle_court', ng-disabled='readOnly', required='', placeholder='Code')
     .col-sm-6
       .form-group(ng-class="{'has-error': taxonsParents.error && !taxonForm.$pristine}")
         .form-control-wrapper

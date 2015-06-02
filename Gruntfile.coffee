@@ -19,6 +19,7 @@ module.exports = (grunt) ->
     dist: "dist"
 
   grunt.loadNpmTasks "grunt-protractor-runner"
+  grunt.loadNpmTasks "grunt-contrib-jade"
 
   # Define the configuration for all the tasks
   grunt.initConfig
@@ -37,7 +38,7 @@ module.exports = (grunt) ->
         tasks: ["newer:coffee:dist"]
 
       jade:
-        files: ["<%= yeoman.app %>/**/*.{jade}"]
+        files: ["<%= yeoman.app %>/**/*.jade"]
         tasks: ["newer:jade:dist"]
 
       coffeeTest:
@@ -62,7 +63,8 @@ module.exports = (grunt) ->
           livereload: "<%= connect.options.livereload %>"
 
         files: [
-          ".tmp/**/*.html"
+          "<%= yeoman.app %>/**/*.html"
+          "<%= yeoman.app %>/**/*.jade"
           ".tmp/styles/**/*.css"
           ".tmp/scripts/**/*.js"
           "<%= yeoman.app %>/images/**/*.{png,jpg,jpeg,gif,webp,svg}"
@@ -146,7 +148,7 @@ module.exports = (grunt) ->
     # Automatically inject Bower components into the app
     wiredep:
       app:
-        src: ["<%= yeoman.app %>/index.html"]
+        src: ["<%= yeoman.app %>/index.jade"]
         ignorePath: /\.\.\//
 
 
@@ -175,12 +177,15 @@ module.exports = (grunt) ->
         ]
 
     jade:
+      options:
+        client: false
+        pretty: true
       dist:
         files: [
-          expand: true
           cwd: "<%= yeoman.app %>"
           src: "**/*.jade"
           dest: ".tmp"
+          expand: true
           ext: '.html'
         ]
 

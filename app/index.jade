@@ -10,12 +10,12 @@ html.no-js
     // build:css(.) styles/vendor.css
     // bower:css
     link(rel='stylesheet', href='bower_components/bootstrap/dist/css/bootstrap.css')
-    link(rel='stylesheet', href='bower_components/bootstrap-material-design/dist/css/material.css')
-    link(rel='stylesheet', href='bower_components/bootstrap-material-design/dist/css/ripples.css')
     link(rel='stylesheet', href='bower_components/font-awesome/css/font-awesome.css')
     link(rel='stylesheet', href='bower_components/textAngular/src/textAngular.css')
     link(rel='stylesheet', href='bower_components/angular-ui-select/dist/select.css')
     link(rel='stylesheet', href='bower_components/angular-dialog-service/dist/dialogs.min.css')
+    link(rel='stylesheet', href='bower_components/bootstrap-material-design/dist/css/material.css')
+    link(rel='stylesheet', href='bower_components/bootstrap-material-design/dist/css/ripples.css')
     // endbower
     // endbuild
     // build:css(.tmp) styles/main.css
@@ -25,16 +25,6 @@ html.no-js
     link(rel='stylesheet', href='styles/main.css')
     // endbuild
   body(ng-app='vigiechiroApp')
-    //if lt IE 7
-      p.browsehappy
-        | You are using an
-        strong outdated
-        |  browser. Please
-        a(href='http://browsehappy.com/')
-          | upgrade
-          | your browser
-        |  to improve your experience.
-    // Login and content page displayed according to current login state
     xin-login(ng-show='isLogged == false')
     xin-content(ng-show='isLogged')
     xin-footer
@@ -57,10 +47,12 @@ html.no-js
     // bower:js
     script(src='bower_components/jquery/dist/jquery.js')
     script(src='bower_components/angular/angular.js')
+    script(src='bower_components/angular-bootstrap/ui-bootstrap-tpls.js')
     script(src='bower_components/bootstrap/dist/js/bootstrap.js')
     script(src='bower_components/angular-sanitize/angular-sanitize.js')
     script(src='bower_components/angular-animate/angular-animate.js')
     script(src='bower_components/angular-touch/angular-touch.js')
+    script(src='bower_components/angular-messages/angular-messages.js')
     script(src='bower_components/angular-route/angular-route.js')
     script(src='bower_components/lodash/dist/lodash.compat.js')
     script(src='bower_components/restangular/dist/restangular.js')
@@ -68,8 +60,6 @@ html.no-js
     script(src='bower_components/ng-flow/dist/ng-flow.js')
     script(src='bower_components/ng-breadcrumbs/dist/ng-breadcrumbs.min.js')
     script(src='bower_components/angular-utils-pagination/dirPagination.js')
-    script(src='bower_components/bootstrap-material-design/dist/js/material.js')
-    script(src='bower_components/bootstrap-material-design/dist/js/ripples.js')
     script(src='bower_components/rangy/rangy-core.min.js')
     script(src='bower_components/rangy/rangy-cssclassapplier.min.js')
     script(src='bower_components/rangy/rangy-selectionsaverestore.min.js')
@@ -79,11 +69,12 @@ html.no-js
     script(src='bower_components/textAngular/src/textAngularSetup.js')
     script(src='bower_components/angular-ui-select/dist/select.js')
     script(src='bower_components/moment/moment.js')
-    script(src='bower_components/angular-bootstrap/ui-bootstrap-tpls.js')
     script(src='bower_components/angular-translate/angular-translate.js')
     script(src='bower_components/angular-dialog-service/dist/dialogs.min.js')
     script(src='bower_components/angular-dialog-service/dist/dialogs-default-translations.min.js')
     script(src='bower_components/arrive/src/arrive.js')
+    script(src='bower_components/bootstrap-material-design/dist/js/material.js')
+    script(src='bower_components/bootstrap-material-design/dist/js/ripples.js')
     // endbower
     script(src='bower_components/moment/locale/fr.js')
     // endbuild

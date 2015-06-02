@@ -4,10 +4,10 @@ do ->
   # xin-navbar directive
   # @ngInject
   ###
-  xinNavbar = (evalCallDefered, PubSub, breadcrumbs) =>
+  xinNavbar = (evalCallDefered, breadcrumbs, PubSub) =>
     restrict: 'E'
+    replace: false
     templateUrl: 'scripts/xin/navbar_drt/navbar.html'
-    scope: {}
     link: (scope) =>
       scope.breadcrumbs = breadcrumbs;
       PubSub.subscribe 'user', (user) =>
