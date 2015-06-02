@@ -5,7 +5,7 @@ breadcrumbsGetParticipationDefer = undefined
 checkFilesName = (scope, uploaders, files, type_site) ->
   patt =
     'CARRE': /^Cir.+-\d+-Pass\d+-Tron\d+-Chiro_[01]_\d+_000\.(wav|ta|tac)$/
-    'POINT_FIXE': /^Car.+-\d+-Pass\d+-([A-H][12]|Z[1-9])_.*[01]_\d+_\d+_\d+\.(wav|ta|tac)$/
+    'POINT_FIXE': /^Car.+-\d+-Pass\d+-([A-H][12]|Z[1-9])-.*[01]_\d+_\d+_\d+\.(wav|ta|tac)$/
     'ROUTIER': /^Cir.+-\d+-Pass\d+-Tron\d+-Chiro_[01]_\d+_000\.(wav|ta|tac)$/
   for file in files or []
     if not file? or file.file.type in ['image/png', 'image/png', 'image/jpeg']
