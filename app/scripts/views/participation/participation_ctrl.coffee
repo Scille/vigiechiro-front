@@ -243,7 +243,7 @@ angular.module('participationViews', ['ngRoute', 'textAngular', 'xin_listResourc
         for i in [oldValue.length..newValue.length-1]
           for file in newValue[i].uploaders
             files.push(file)
-        checkFilesName($scope, files, $scope.site.protocole.type_site)
+        checkFilesName($scope, 'folderUploader', files, $scope.site.protocole.type_site)
 
     $scope.saveParticipation = ->
       $scope.submitted = true
@@ -371,8 +371,8 @@ angular.module('participationViews', ['ngRoute', 'textAngular', 'xin_listResourc
         files = []
         for i in [oldValue.length..newValue.length-1]
           files.push(newValue[i])
-        checkFilesName($scope, files,
-                      $scope.participation.site.protocole.type_site)
+        checkFilesName($scope, 'fileUploader', files,
+                       $scope.participation.site.protocole.type_site)
     $scope.$watchCollection 'folderUploader', (newValue, oldValue) ->
       if newValue != oldValue
         $scope.participationForm.$setDirty()
@@ -380,7 +380,7 @@ angular.module('participationViews', ['ngRoute', 'textAngular', 'xin_listResourc
         for i in [oldValue.length..newValue.length-1]
           for file in newValue[i].uploaders
             files.push(file)
-        checkFilesName($scope, files,
+        checkFilesName($scope, 'folderUploader', files,
                        $scope.participation.site.protocole.type_site)
 
     $scope.saveParticipation = ->

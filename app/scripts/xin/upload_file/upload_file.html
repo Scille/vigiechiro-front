@@ -8,11 +8,18 @@
   <div>
     {{uploader.file.name}}
     <div class="progress">
-      <div class="progress-bar" role="progressbar"
+      <div class="progress-bar progress-bar-striped active" role="progressbar"
            aria-valuenow="{{uploader.progress}}"
            aria-valuemin="0" aria-valuemax="100"
-           style="width: {{uploader.progress}}%;">
+           style="width: {{uploader.progress}}%;"
+           ng-show="uploader.progress < 100">
         {{uploader.progress + '%'}}
+      </div>
+      <div class="progress-bar progress-bar-success" role="progressbar"
+           aria-valuenow="100"
+           aria-valuemin="0" aria-valuemax="100"
+           style="width: 100%;"
+           ng-show="uploader.progress == 100">
       </div>
     </div>
     <button class="btn btn-warning btn-xs" type="button" ng-click="uploader.pause()"
@@ -29,4 +36,8 @@
       Annuler
     </button>
   </div>
+</div>
+
+<div class="help-block" ng-show="error.show">
+  {{ error.message }}
 </div>

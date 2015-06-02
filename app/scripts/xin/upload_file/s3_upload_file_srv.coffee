@@ -72,7 +72,6 @@ angular.module('xin_s3uploadFile', ['appSettings'])
         return
       xhr.onload = ->
         if xhr.status == 200
-          callbacks.onProgress?(100)
           callbacks.onFinished?(xhr)
         else
           callbacks.onError?('Upload error: ' + xhr.status)
@@ -126,7 +125,7 @@ angular.module('xin_s3uploadFile', ['appSettings'])
         @_pause.resolve()
         if not @_bootstraped
           @_bootstraped = true
-          @_onProgress(0)
+          @_onProgress(0, @file.size)
           # Call the backend to get back a signed S3 url
           if @file.size < @sliceSize
             @_startSingleUpload()
@@ -209,7 +208,7 @@ angular.module('xin_s3uploadFile', ['appSettings'])
             payload.mime = 'application/tac'
         callbacks =
           onError: (error) => @_onError(error)
-          onProgress: (percent) => @_onProgress(percent)
+          onProgress: (loaded, total) => @_onProgress(loaded, total)
           onFinished: =>
             Backend.one('fichiers', @id).get().then (fileBackend) =>
               fileBackend.post().then(
@@ -230,5 +229,5 @@ angular.module('xin_s3uploadFile', ['appSettings'])
                 contentType = 'application/tac'
             uploadToS3(callbacks, 'PUT', @file, response.s3_signed_url,
               {'Content-Type': contentType})
-          (error) -> throw error
+          (error) => @_onError(error)
         )

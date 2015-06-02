@@ -74,6 +74,9 @@ angular.module('xin_uploadFile', ['appSettings', 'xin_s3uploadFile'])
           onFinished: -> _.defer(-> $scope.$apply())
           onError: (status) ->
             if status?
+#              $scope.error =
+#                show: true
+#                message: status
               console.log(status)
             _.defer(-> $scope.$apply())
         )
