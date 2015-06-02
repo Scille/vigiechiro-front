@@ -25,26 +25,6 @@ angular.module('xin_uploadFolder', ['appSettings', 'xin_s3uploadFile'])
       cancel = (e) ->
         e.stopPropagation()
         e.preventDefault()
-      drop[0].addEventListener("dragover",
-        (e) ->
-          cancel(e)
-          scope.dragOverClass = 'drag-over'
-          _.defer(-> scope.$apply())
-        false)
-      drop[0].addEventListener("dragleave",
-        (e) ->
-          cancel(e)
-          scope.dragOverClass = ''
-          _.defer(-> scope.$apply())
-        false)
-      drop[0].addEventListener('drop',
-        (e) ->
-          cancel(e)
-          scope.dragOverClass = ''
-          _.defer(-> scope.$apply())
-          scope.uploadFiles(e.dataTransfer.files)
-        false
-      )
       scope.fileInput = elem.find('.files-input')[0]
 
 

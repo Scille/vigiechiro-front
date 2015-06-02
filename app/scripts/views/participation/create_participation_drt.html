@@ -138,8 +138,9 @@
       </span>
       <span class="help-block"
             ng-show="participationForm.pieces_jointes.$error.filename">
-        Les fichiers suivants ne respectent pas le format attendu
-        {{ fileFormat }} :
+        Les fichiers suivants ne respectent pas le format attendu.
+        <br>
+        Exemple de nom de fichier : {{ fileFormat }}
         <div ng-repeat="filename in badFilesNames">
           {{ filename }}
         </div>

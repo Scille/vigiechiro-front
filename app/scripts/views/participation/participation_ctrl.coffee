@@ -7,13 +7,17 @@ checkFilesName = (scope, uploaders, files, type_site) ->
     'CARRE': /^Cir.+-\d+-Pass\d+-Tron\d+-Chiro_[01]_\d+_000\.(wav|ta|tac)$/
     'POINT_FIXE': /^Car.+-\d+-Pass\d+-([A-H][12]|Z[1-9])-.*[01]_\d+_\d+_\d+\.(wav|ta|tac)$/
     'ROUTIER': /^Cir.+-\d+-Pass\d+-Tron\d+-Chiro_[01]_\d+_000\.(wav|ta|tac)$/
+  exemples =
+    'CARRE': 'Cir170517-2014-Pass10-Tron3-Chiro_0_20140702_000.wav'
+    'POINT_FIXE': 'Car170517-2014-Pass1-C1-OB-1_20140702_224038_761.wav'
+    'ROUTIER': 'Cir170517-2014-Pass10-Tron3-Chiro_1_20140702_000.wav'
   for file in files or []
     if not file? or file.file.type in ['image/png', 'image/png', 'image/jpeg']
       continue
     else
       res = patt[type_site].test(file.file.name)
       if !res
-        scope.fileFormat = patt[type_site].toString()
+        scope.fileFormat = exemples[type_site]
         scope.participationForm.pieces_jointes = {$error: {filename: true}}
         index = scope.badFilesNames.indexOf(file.file.name)
         if index == -1
