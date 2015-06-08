@@ -44,6 +44,7 @@ angular.module('xin.fileUploader', ['xin_s3uploadFile'])
       uploader: '=?'
     link: (scope, elem, attrs) ->
       elem[0].onchange = (e) ->
+        console.log("onchange")
         if not scope.uploader?
           console.log("Uploader not available")
           return
@@ -78,6 +79,7 @@ angular.module('xin.fileUploader', ['xin_s3uploadFile'])
           @transmitted_size += file.file.transmitted_size
 
       addFiles: (files) ->
+        console.log("addFiles")
         length = files.length
         for i in [0..length-1]
           file = files.pop()
@@ -95,6 +97,7 @@ angular.module('xin.fileUploader', ['xin_s3uploadFile'])
               for item, index in @onProgress
                 if item == file
                   @onProgress.splice(index, 1)
+                  break
               @nbFileOnProgress--
               @itemsCompleted++
               file.status = 'success'
