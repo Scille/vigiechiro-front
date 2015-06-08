@@ -7,7 +7,6 @@ angular.module('xin_uploadFile', ['appSettings', 'xin_s3uploadFile', 'xin.fileUp
     templateUrl: 'scripts/xin/upload_file/upload_file.html'
     controller: 'UploadFileController'
     scope:
-      multiple: '@'
       uploader: '=?'
       regexp: '=?'
     link: (scope, elem, attrs) ->
@@ -15,10 +14,13 @@ angular.module('xin_uploadFile', ['appSettings', 'xin_s3uploadFile', 'xin.fileUp
       drop = elem.find('.drop')
       input = drop.find('input')
       if attrs.multiple?
-        input.attr('multiple', '')
-        scope.multipleSelect = true
-      else
-        scope.multipleSelect = false
+        scope.multiple = true
+        input[0].setAttribute('multiple', '')
+      if attrs.directory?
+        scope.directory = true
+        input[0].setAttribute('directory', '')
+        input[0].setAttribute('webkitdirectory', '')
+        input[0].setAttribute('mozdirectory', '')
 
       scope.$watch 'regexp', (regexp) ->
         if regexp? and regexp.length
@@ -28,13 +30,14 @@ angular.module('xin_uploadFile', ['appSettings', 'xin_s3uploadFile', 'xin.fileUp
         input.click()
         return
 
-      scope.fileInput = elem.find('.files-input')[0]
-
 
   .controller 'UploadFileController', ($scope, Backend, S3FileUploader, FileUploader) ->
     $scope.warnings = []
+    $scope.errors =
+      filters: []
+      back: []
+      xhr: []
     uploader = $scope.uploader = new FileUploader()
-    $scope.errorCount = 0
 
     $scope.addRegExpFilter = (regexp) ->
       if regexp? and regexp.length
@@ -64,5 +67,13 @@ angular.module('xin_uploadFile', ['appSettings', 'xin_s3uploadFile', 'xin.fileUp
     uploader.onWhenAddingFileFailed = (item, filter) ->
       text = "Le fichier "+item.name+" n'a pas pu être ajouté à la liste. "+
              filter.name
-      $scope.error =
-        text: text
+      $scope.errors.filters.push(text)
+      $scope.$apply()
+
+    uploader.onAddingWarningsComplete = ->
+      for warning in @warnings
+        if $scope.directory?
+          $scope.warnings.push(warning.name+" n'est pas un dossier.")
+        else
+          $scope.warnings.push(warning.name+" n'est pas un fichier.")
+      $scope.$apply()

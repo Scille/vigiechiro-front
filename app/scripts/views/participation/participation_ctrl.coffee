@@ -19,9 +19,8 @@ sendFiles = ($scope, participation) ->
     pieces_jointes: []
   for file in $scope.fileUploader.queue or []
     payload.pieces_jointes.push(file.file.id)
-  for folder in $scope.folderUploader or []
-    for file in folder.uploaders
-      payload.pieces_jointes.push(file.id)
+  for file in $scope.folderUploader.queue or []
+    payload.pieces_jointes.push(file.file.id)
   participation.customPUT(payload, 'pieces_jointes').then(
     -> window.location = '#/participations/'+participation._id
     -> throw "Error : PUT files"
@@ -30,7 +29,7 @@ sendFiles = ($scope, participation) ->
 
 angular.module('participationViews', ['ngRoute', 'textAngular', 'xin_listResource',
                                       'xin_backend', 'xin_session', 'xin_tools',
-                                      'xin_uploadFile', 'xin_uploadFolder',
+                                      'xin_uploadFile',
                                       'ui.bootstrap.datetimepicker'])
   .config ($routeProvider) ->
     $routeProvider
@@ -278,16 +277,10 @@ angular.module('participationViews', ['ngRoute', 'textAngular', 'xin_listResourc
             if $scope.participation.configuration[key]?
               payload.configuration[key] = $scope.participation.configuration[key]
       # Check files
-      # TODO call function
-      for file in $scope.fileUploader.queue or []
-        if file.file.status != 'success'
-          $scope.participationForm.pieces_jointes = {$error: {uploading: true}}
-          return
-      for folder in $scope.folderUploader or []
-        for file in folder.uploaders
-          if file.status != 'done'
-            $scope.participationForm.pieces_jointes = {$error: {uploading: true}}
-            return
+      if not $scope.fileUploader.isAllComplete() or
+         not $scope.folderUploader.isAllComplete()
+        $scope.participationForm.pieces_jointes = {$error: {uploading: true}}
+        return
       # Post
       Backend.all('sites/'+$scope.site._id+'/participations').post(payload).then(
         (participation) ->
@@ -392,15 +385,10 @@ angular.module('participationViews', ['ngRoute', 'textAngular', 'xin_listResourc
               payload.meteo[key] = $scope.participation.meteo[key]
       uploadingFiles = false
       # Check files
-      for file in $scope.fileUploader or []
-        if file.status != 'done'
-          $scope.participationForm.pieces_jointes = {$error: {uploading: true}}
-          return
-      for folder in $scope.folderUploader
-        for file in folder.uploaders
-          if file.status != 'done'
-            $scope.participationForm.pieces_jointes = {$error: {uploading: true}}
-            return
+      if not $scope.fileUploader.isAllComplete() or
+         not $scope.folderUploader.isAllComplete()
+        $scope.participationForm.pieces_jointes = {$error: {uploading: true}}
+        return
       # Patch
       $scope.participation.patch(payload).then(
         (participation) ->

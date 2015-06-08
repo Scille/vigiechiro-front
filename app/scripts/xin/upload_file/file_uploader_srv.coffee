@@ -3,23 +3,31 @@ angular.module('xin.fileUploader', ['xin_s3uploadFile'])
     restrict: 'A'
     scope:
       uploader: '=?'
+      directory: '='
     link: (scope, elem, attrs) ->
-      if attrs.overClass? and attrs.overClass != ''
-        elem[0].addEventListener('dragover',
-          (e) ->
-            e.preventDefault()
-            elem.addClass(attrs.overClass)
-          false)
-        elem[0].addEventListener('dragleave',
-          (e) ->
-            elem.removeClass(attrs.overClass)
-          false)
+      scope.$watch 'directory', (directory) ->
+        if directory?
+          elem[0].removeEventListener('dragover')
+          elem[0].removeEventListener('dragleave')
+        else
+          if attrs.overClass? and attrs.overClass != ''
+            elem[0].addEventListener('dragover',
+              (e) ->
+                e.preventDefault()
+                elem.addClass(attrs.overClass)
+              false
+            )
+            elem[0].addEventListener('dragleave',
+              (e) ->
+                elem.removeClass(attrs.overClass)
+              false
+            )
 
       elem[0].addEventListener('drop',
         (e) ->
           e.preventDefault()
           elem.removeClass(attrs.overClass)
-          # Check if inputs are files
+          # Check if inputs are files or directories
           if not scope.uploader?
             console.log("Uploader not available")
             return
@@ -28,8 +36,10 @@ angular.module('xin.fileUploader', ['xin_s3uploadFile'])
           length = e.dataTransfer.items.length
           for i in [0..length-1]
             entry = e.dataTransfer.items[i].webkitGetAsEntry()
-            if (entry.isFile)
+            if (entry.isFile and not scope.directory?)
               files.push(e.dataTransfer.files[i])
+            else if (entry.isDirectory and scope.directory?)
+              console.log("Drop doesn't work for directories")
             else
               warnings.push(e.dataTransfer.files[i])
           scope.uploader.addFiles(files)
@@ -62,8 +72,10 @@ angular.module('xin.fileUploader', ['xin_s3uploadFile'])
         @onProgress = []
         @filters = []
         @warnings = []
+        @directories = []
         @maxParallelUpload = 5
         @itemsCompleted = 0
+        @itemsFailed = 0
         @nbFileOnProgress = 0
         @size = 0
         @transmitted_size = 0
@@ -78,10 +90,27 @@ angular.module('xin.fileUploader', ['xin_s3uploadFile'])
         for file in @queue
           @transmitted_size += file.file.transmitted_size
 
+      removeFileOnProgress: (file) ->
+        for item, index in @onProgress
+          if item == file
+            @onProgress.splice(index, 1)
+            break
+
       addFiles: (files) ->
+        if not files.length
+          return
         length = files.length
         for i in [0..length-1]
           file = files.pop()
+          # check if directory
+          if file.webkitRelativePath? and file.webkitRelativePath != ''
+            split = file.webkitRelativePath.split("/")
+            fullName = '.'
+            for i in [0..split.length-2]
+              fullName += '/'+split[i]
+            if @directories.indexOf(fullName) == -1
+              @directories.push(fullName)
+          #
           if not @checkFilters(file)
             continue
           file.status = 'ready'
@@ -93,16 +122,15 @@ angular.module('xin.fileUploader', ['xin_s3uploadFile'])
               file.transmitted_size = transmitted_size
               @computeTransmittedSize()
             onSuccess: (file) =>
-              for item, index in @onProgress
-                if item == file
-                  @onProgress.splice(index, 1)
-                  break
+              @removeFileOnProgress(file)
               @nbFileOnProgress--
               @itemsCompleted++
               file.status = 'success'
               @startOne()
             onError: (status) ->
-              console.log("Error")
+              @removeFileOnProgress(file)
+              @nbFileOnProgress--
+              @itemsFailed++
               if status?
                 console.log(status)
             onCancel: ->
@@ -113,7 +141,8 @@ angular.module('xin.fileUploader', ['xin_s3uploadFile'])
         @onAddingComplete?()
 
       addWarnings: (warnings) ->
-        console.log(warnings)
+        @warnings = warnings
+        @onAddingWarningsComplete?()
 
       checkFilters: (file) ->
         result = true
@@ -136,6 +165,6 @@ angular.module('xin.fileUploader', ['xin_s3uploadFile'])
 
       isAllComplete: ->
         for file in @queue
-          if not file.status == 'done'
+          if not (file.file.status == 'success')
             return false
         return true

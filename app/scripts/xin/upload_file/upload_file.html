@@ -1,74 +1,90 @@
 <div class="drop row" uploader="uploader"
      over-class="drag-over" file-over
-     ng-click="clickFileInput()">
+     ng-click="clickFileInput()" directory="directory">
   <input type="file" class="btn hidden" file-select
          uploader="uploader">
-  <center>Cliquez ou déposez vos fichiers ici</center>
+  <center ng-if="!directory">Cliquez ou déposez vos fichiers ici</center>
+  <center ng-if="directory">Cliquez ici</center>
 </div>
 
-<div class="well" ng-show="uploader.queue.length">
-  <div class="row">
-    <div class="col-md-6">Nombre de fichiers : {{uploader.queue.length}}</div>
-    <div class="col-md-6">
-      {{uploader.transmitted_size/1024/1024 | number: 2}}/{{uploader.size/1024/1024 | number: 2}} MB
+<div ng-if="!scope.directory">
+  <div class="well" ng-show="uploader.queue.length">
+    <div class="row">
+      <div class="col-md-6">Nombre de fichiers : {{uploader.queue.length}}</div>
+      <div class="col-md-6">
+        {{uploader.transmitted_size/1024/1024 | number: 2}}/{{uploader.size/1024/1024 | number: 2}} MB
+      </div>
+    </div>
+    <div class="row">
+      <div class="col-md-6">Succés : {{ uploader.itemsCompleted }}</div>
+      <div class="col-md-6">Echec : {{ uploader.itemsFailed }}</div>
     </div>
   </div>
-  <div class="row">
-    <div class="col-md-6">Succés : {{ uploader.itemsCompleted }}</div>
-    <div class="col-md-6">Echec : {{ errorCount }}</div>
+  <div class="alert alert-success" ng-show="uploader.directories.length">
+    Dossiers uploadés :
+    <div ng-repeat="directory in uploader.directories">
+      {{ directory }}
+    </div>
   </div>
-</div>
-<div class="alert alert-warning" ng-show="warnings.length">
-  <div ng-repeat="warning in warnings">
-    {{ warning }}
+  <div class="alert alert-warning" ng-show="warnings.length">
+    <div ng-repeat="warning in warnings">
+      {{ warning }}
+    </div>
   </div>
-</div>
-<div class="alert alert-danger" ng-show="error">
-  {{ error }}
-</div>
-<span class="help-block"
-      ng-show="participationForm.pieces_jointes.$error.filename">
-  Les fichiers suivants ne respectent pas le format attendu.
-  <br>
-  Exemple de nom de fichier : {{ fileFormat }}
-  <div ng-repeat="filename in badFilesNames">
-    {{ filename }}
+  <div class="alert alert-danger" ng-show="errors.filters.length">
+    <div ng-repeat="error in errors.filters">
+      {{ error }}
+    </div>
   </div>
-</span>
+  <div class="alert alert-danger" ng-show="errors.back.length">
+    <div ng-repeat="error in errors.back">
+      {{ error }}
+    </div>
+  </div>
+  <span class="help-block"
+        ng-show="participationForm.pieces_jointes.$error.filename">
+    Les fichiers suivants ne respectent pas le format attendu.
+    <br>
+    Exemple de nom de fichier : {{ fileFormat }}
+    <div ng-repeat="filename in badFilesNames">
+      {{ filename }}
+    </div>
+  </span>
 
-<div ng-repeat="item in uploader.onProgress" class="form-group">
-  <div class="row">
-    <div class="col-md-10">{{item.name}}</div>
-    <div class="col-md-2">
-      {{item.transmitted_size/1024/1024|number:2 }}/{{ item.size/1024/1024|number:2 }} MB
+  <div ng-repeat="item in uploader.onProgress" class="form-group">
+    <div class="row">
+      <div class="col-md-10">{{item.name}}</div>
+      <div class="col-md-2">
+        {{item.transmitted_size/1024/1024|number:2 }}/{{ item.size/1024/1024|number:2 }} MB
+      </div>
     </div>
+    <div class="progress">
+      <div class="progress-bar progress-bar-striped active" role="progressbar"
+           aria-valuenow="{{item.transmitted_size/item.size*100}}"
+           aria-valuemin="0" aria-valuemax="100"
+           style="width: {{item.transmitted_size/item.size*100}}%;"
+           ng-show="item.transmitted_size/item.size*100 < 100">
+        {{ item.transmitted_size/item.size*100|number:1 }}%
+      </div>
+      <div class="progress-bar progress-bar-success" role="progressbar"
+           aria-valuenow="100"
+           aria-valuemin="0" aria-valuemax="100"
+           style="width: 100%;"
+           ng-show="item.transmitted_size/item.size*100 == 100">
+      </div>
+    </div>
+    <button class="btn btn-warning btn-xs" type="button" ng-click="item.pause()"
+            ng-if="item.status == 'onprogress'">
+      Pause
+    </button>
+    <button class="btn btn-warning btn-xs" type="button" ng-click="item.start()"
+            ng-if="item.status == 'pause'">
+      Continuer
+    </button>
+    <button class="btn btn-danger btn-xs" type="button"
+            ng-click="stopUploader(item)"
+            ng-if="item.status != 'cancel' && item.status != 'success'">
+      Annuler
+    </button>
   </div>
-  <div class="progress">
-    <div class="progress-bar progress-bar-striped active" role="progressbar"
-         aria-valuenow="{{item.transmitted_size/item.size*100}}"
-         aria-valuemin="0" aria-valuemax="100"
-         style="width: {{item.transmitted_size/item.size*100}}%;"
-         ng-show="item.transmitted_size/item.size*100 < 100">
-      {{ item.transmitted_size/item.size*100|number:1 }}%
-    </div>
-    <div class="progress-bar progress-bar-success" role="progressbar"
-         aria-valuenow="100"
-         aria-valuemin="0" aria-valuemax="100"
-         style="width: 100%;"
-         ng-show="item.transmitted_size/item.size*100 == 100">
-    </div>
-  </div>
-  <button class="btn btn-warning btn-xs" type="button" ng-click="item.pause()"
-          ng-if="item.status == 'onprogress'">
-    Pause
-  </button>
-  <button class="btn btn-warning btn-xs" type="button" ng-click="item.start()"
-          ng-if="item.status == 'pause'">
-    Continuer
-  </button>
-  <button class="btn btn-danger btn-xs" type="button"
-          ng-click="stopUploader(item)"
-          ng-if="item.status != 'cancel' && item.status != 'success'">
-    Annuler
-  </button>
 </div>
