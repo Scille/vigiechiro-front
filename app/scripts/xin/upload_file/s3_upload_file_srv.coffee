@@ -2,12 +2,6 @@
 
 
 angular.module('xin_s3uploadFile', ['appSettings'])
-  .directive 'customOnChange', () ->
-    restrict: "A"
-    link: (scope, element, attrs) ->
-      onChangeFunc = element.scope()[attrs.customOnChange]
-      element.bind('change', onChangeFunc)
-
 
   .directive 'accessFileDirective', (SETTINGS, Backend) ->
     restrict: 'E'
@@ -38,7 +32,7 @@ angular.module('xin_s3uploadFile', ['appSettings'])
 
   .directive 'accessPhotoDirective', (SETTINGS, Backend) ->
     restrict: 'E'
-    template: '<img src="{{s3_signed_url}}"</img><span ng-show="onError">{{error}}</span>'
+    template: '<img ng-src="{{s3_signed_url}}"</img><span ng-show="onError">{{error}}</span>'
     scope:
       file: '='
     link: (scope, elem, attrs) ->
@@ -72,7 +66,7 @@ angular.module('xin_s3uploadFile', ['appSettings'])
         return
       xhr.onload = ->
         if xhr.status == 200
-          callbacks.onFinished?(xhr)
+          callbacks.onSuccess?(xhr)
         else
           callbacks.onError?('Upload error: ' + xhr.status)
       xhr.onerror = ->
@@ -88,28 +82,19 @@ angular.module('xin_s3uploadFile', ['appSettings'])
       # 5Mo
       sliceSize: 5 * 1024 * 1024
       constructor: (file, @userCallbacks) ->
-        @status = 'stalled'
         @file = file
-        @id = undefined
-        @progress = 0
-        @transmitted_size = 0
         @_pause = $q.defer()
-        @_bootstraped = false
         @_context = undefined
 
-      _onFinished: () ->
-        @progress = 100
-        @status = 'done'
-        @userCallbacks.onFinished?()
+      _onSuccess: () ->
+        @userCallbacks.onSuccess?(@file)
       _onProgress: (loaded, total) ->
         @_pause.promise.then =>
-          @transmitted_size = loaded
-          @progress = Math.round (loaded / total) * 100
-          @userCallbacks.onProgress?(loaded, total)
+          @userCallbacks.onProgress?(@file, loaded)
       _onError: (status) ->
         @userCallbacks.onError?(status)
       stop: ->
-        @status = 'dead'
+        @file.status = 'cancel'
         @_pause = $q.defer()
         if @_context
           # Call backend to delete the corresponding resource
@@ -118,13 +103,12 @@ angular.module('xin_s3uploadFile', ['appSettings'])
             (error) -> throw error
           )
       pause: ->
-        @status = 'pause'
+        @file.status = 'pause'
         @_pause = $q.defer()
       start: () ->
-        @status = 'started'
         @_pause.resolve()
-        if not @_bootstraped
-          @_bootstraped = true
+        if @file.status == 'ready'
+          @file.status = 'onprogress'
           @_onProgress(0, @file.size)
           # Call the backend to get back a signed S3 url
           if @file.size < @sliceSize
@@ -146,7 +130,7 @@ angular.module('xin_s3uploadFile', ['appSettings'])
         # Create the file in the backend
         Backend.all('fichiers').post(payload).then(
           (response) =>
-            @id = response._id
+            @file.id = response._id
             @_context =
               id: response._id
               part_number: 1
@@ -167,7 +151,7 @@ angular.module('xin_s3uploadFile', ['appSettings'])
             payload =
               parts: @_context.parts
             fileBackend.customPOST(payload).then(
-              => @_onFinished()
+              => @_onSuccess()
               (e) => @_onError(e)
             )
             return
@@ -183,7 +167,7 @@ angular.module('xin_s3uploadFile', ['appSettings'])
                   @_context.transmitted_size += slice.size * (slicePercent - lastSlicePercent) / 100
                   lastSlicePercent = slicePercent
                   @_onProgress?(@_context.transmitted_size, @_context.file.size)
-                onFinished: (request) =>
+                onSuccess: (request) =>
                   @_context.parts.push(
                     part_number: @_context.part_number
                     etag: request.getResponseHeader("ETag")
@@ -209,16 +193,16 @@ angular.module('xin_s3uploadFile', ['appSettings'])
         callbacks =
           onError: (error) => @_onError(error)
           onProgress: (loaded, total) => @_onProgress(loaded, total)
-          onFinished: =>
-            Backend.one('fichiers', @id).get().then (fileBackend) =>
+          onSuccess: =>
+            Backend.one('fichiers', @file.id).get().then (fileBackend) =>
               fileBackend.post().then(
-                =>  @_onFinished()
+                =>  @_onSuccess()
                 (error) -> throw error
               )
         Backend.all('fichiers').post(payload).then(
           (response) =>
             etag = response._etag
-            @id = response._id
+            @file.id = response._id
             contentType = @file.type
             if contentType == ''
               ta = /\.ta$/

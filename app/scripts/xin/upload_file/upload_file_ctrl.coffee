@@ -1,22 +1,17 @@
 'use strict'
 
 
-angular.module('xin_uploadFile', ['appSettings', 'xin_s3uploadFile'])
+angular.module('xin_uploadFile', ['appSettings', 'xin_s3uploadFile', 'xin.fileUploader'])
   .directive 'uploadFileDirective', ->
     restrict: 'E'
     templateUrl: 'scripts/xin/upload_file/upload_file.html'
     controller: 'UploadFileController'
     scope:
       multiple: '@'
-      uploaders: '=?'
+      uploader: '=?'
+      regexp: '=?'
     link: (scope, elem, attrs) ->
       scope.dragOverClass = ''
-      if not attrs.uploaders?
-        scope.uploaders = []
-      else
-        if not scope[attrs.uploaders]?
-          scope[attrs.uploaders] = []
-        scope.uploaders = scope[attrs.uploaders]
       drop = elem.find('.drop')
       input = drop.find('input')
       if attrs.multiple?
@@ -24,62 +19,50 @@ angular.module('xin_uploadFile', ['appSettings', 'xin_s3uploadFile'])
         scope.multipleSelect = true
       else
         scope.multipleSelect = false
+
+      scope.$watch 'regexp', (regexp) ->
+        if regexp? and regexp.length
+          scope.addRegExpFilter(regexp)
+
       scope.clickFileInput = ->
         input.click()
-#        _.defer(-> input.click())
         return
-      cancel = (e) ->
-        e.stopPropagation()
-        e.preventDefault()
-      drop[0].addEventListener("dragover",
-        (e) ->
-          cancel(e)
-          scope.dragOverClass = 'drag-over'
-          _.defer(-> scope.$apply())
-        false)
-      drop[0].addEventListener("dragleave",
-        (e) ->
-          cancel(e)
-          scope.dragOverClass = ''
-          _.defer(-> scope.$apply())
-        false)
-      drop[0].addEventListener('drop',
-        (e) ->
-          cancel(e)
-          scope.dragOverClass = ''
-          _.defer(-> scope.$apply())
-          scope.uploadFiles(e.dataTransfer.files)
-        false
-      )
+
       scope.fileInput = elem.find('.files-input')[0]
 
 
-  .controller 'UploadFileController', ($scope, Backend, S3FileUploader) ->
-    resetFileInput = ->
-      elem = $($scope.fileInput)
-      elem.wrap('<form>').closest('form').get(0).reset()
-      elem.unwrap()
+  .controller 'UploadFileController', ($scope, Backend, S3FileUploader, FileUploader) ->
+    $scope.warnings = []
+    uploader = $scope.uploader = new FileUploader()
+    $scope.errorCount = 0
+
+    $scope.addRegExpFilter = (regexp) ->
+      if regexp? and regexp.length
+        uploader.filters.push(
+          name: "Format incorrect."
+          fn: (item) ->
+            if item.type in ['image/png', 'image/png', 'image/jpeg']
+              return true
+            for reg in regexp
+              if reg.test(item.name)
+                return true
+            return false
+        )
+
+    $scope.pauseAll = ->
+      console.log("pause")
+      uploader.pauseAll()
+
     $scope.stopUploader = (uploader) ->
       uploader.stop()
-      _.remove($scope.uploaders, (up) -> up == uploader)
-    $scope.fileInputUploadFiles = () ->
-      $scope.uploadFiles($scope.fileInput.files)
-    $scope.uploadFiles = (files) ->
-      files = files or $scope.fileInput.files
-      if not $scope.multipleSelect and $scope.uploaders.length > 0
-        return
-      for file in files
-        uploader = new S3FileUploader(file,
-          onProgress: -> _.defer(-> $scope.$apply())
-          onFinished: -> _.defer(-> $scope.$apply())
-          onError: (status) ->
-            if status?
-#              $scope.error =
-#                show: true
-#                message: status
-              console.log(status)
-            _.defer(-> $scope.$apply())
-        )
-        $scope.uploaders.push(uploader)
-        uploader.start()
-      resetFileInput()
+      _.remove($scope.uploader, (up) -> up == uploader)
+
+    uploader.onAddingComplete = ->
+      uploader.startAll()
+      $scope.$apply()
+
+    uploader.onWhenAddingFileFailed = (item, filter) ->
+      text = "Le fichier "+item.name+" n'a pas pu être ajouté à la liste. "+
+             filter.name
+      $scope.error =
+        text: text

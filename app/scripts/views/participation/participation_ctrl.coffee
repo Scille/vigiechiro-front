@@ -2,7 +2,7 @@
 
 breadcrumbsGetParticipationDefer = undefined
 
-checkFilesName = (scope, uploaders, files, type_site) ->
+makeRegExp = ($scope, type_site) ->
   patt =
     'CARRE': /^Cir.+-\d+-Pass\d+-Tron\d+-Chiro_[01]_\d+_000\.(wav|ta|tac)$/
     'POINT_FIXE': /^Car.+-\d+-Pass\d+-([A-H][12]|Z[1-9])-.*[01]_\d+_\d+_\d+\.(wav|ta|tac)$/
@@ -11,20 +11,21 @@ checkFilesName = (scope, uploaders, files, type_site) ->
     'CARRE': 'Cir170517-2014-Pass10-Tron3-Chiro_0_20140702_000.wav'
     'POINT_FIXE': 'Car170517-2014-Pass1-C1-OB-1_20140702_224038_761.wav'
     'ROUTIER': 'Cir170517-2014-Pass10-Tron3-Chiro_1_20140702_000.wav'
-  for file in files or []
-    if not file? or file.file.type in ['image/png', 'image/png', 'image/jpeg']
-      continue
-    else
-      res = patt[type_site].test(file.file.name)
-      if !res
-        scope.fileFormat = exemples[type_site]
-        scope.participationForm.pieces_jointes = {$error: {filename: true}}
-        index = scope.badFilesNames.indexOf(file.file.name)
-        if index == -1
-          scope.badFilesNames.push(file.file.name)
-        file.stop()
-        index = scope[uploaders].indexOf(file)
-        scope[uploaders].splice(index, 1)
+  $scope.regexp = [patt[type_site]]
+  $scope.fileFormatExemple = exemples[type_site]
+
+sendFiles = ($scope, participation) ->
+  payload =
+    pieces_jointes: []
+  for file in $scope.fileUploader.queue or []
+    payload.pieces_jointes.push(file.file.id)
+  for folder in $scope.folderUploader or []
+    for file in folder.uploaders
+      payload.pieces_jointes.push(file.id)
+  participation.customPUT(payload, 'pieces_jointes').then(
+    -> window.location = '#/participations/'+participation._id
+    -> throw "Error : PUT files"
+  )
 
 
 angular.module('participationViews', ['ngRoute', 'textAngular', 'xin_listResource',
@@ -212,6 +213,7 @@ angular.module('participationViews', ['ngRoute', 'textAngular', 'xin_listResourc
 
     $scope.$watch 'site', (site) ->
       if site?
+        makeRegExp($scope, site.protocole.type_site)
         if site.protocole.type_site in ['ROUTIER', 'CARRE']
           $scope.participation.configuration =
             detecteur_enregistreur_numero_serie: ''
@@ -236,18 +238,9 @@ angular.module('participationViews', ['ngRoute', 'textAngular', 'xin_listResourc
     $scope.$watchCollection 'fileUploader', (newValue, oldValue) ->
       if newValue != oldValue
         $scope.participationForm.$setDirty()
-        files = []
-        for i in [oldValue.length..newValue.length-1]
-          files.push(newValue[i])
-        checkFilesName($scope, 'fileUploader', files, $scope.site.protocole.type_site)
     $scope.$watchCollection 'folderUploader', (newValue, oldValue) ->
       if newValue != oldValue
-        files = []
         $scope.participationForm.$setDirty()
-        for i in [oldValue.length..newValue.length-1]
-          for file in newValue[i].uploaders
-            files.push(file)
-        checkFilesName($scope, 'folderUploader', files, $scope.site.protocole.type_site)
 
     $scope.saveParticipation = ->
       $scope.submitted = true
@@ -286,11 +279,12 @@ angular.module('participationViews', ['ngRoute', 'textAngular', 'xin_listResourc
             if $scope.participation.configuration[key]?
               payload.configuration[key] = $scope.participation.configuration[key]
       # Check files
-      for file in $scope.fileUploader or []
-        if file.status != 'done'
+      # TODO call function
+      for file in $scope.fileUploader.queue or []
+        if file.file.status != 'success'
           $scope.participationForm.pieces_jointes = {$error: {uploading: true}}
           return
-      for folder in $scope.folderUploader
+      for folder in $scope.folderUploader or []
         for file in folder.uploaders
           if file.status != 'done'
             $scope.participationForm.pieces_jointes = {$error: {uploading: true}}
@@ -299,21 +293,11 @@ angular.module('participationViews', ['ngRoute', 'textAngular', 'xin_listResourc
       Backend.all('sites/'+$scope.site._id+'/participations').post(payload).then(
         (participation) ->
           Backend.one('participations', participation._id).get().then (participation) ->
-            if $scope.fileUploader.length == 0 && $scope.folderUploader.length == 0
+            if $scope.fileUploader.queue.length == 0 && $scope.folderUploader.length == 0
               window.location = '#/participations/'+participation._id
               return
             else
-            payload =
-              pieces_jointes: []
-            for file in $scope.fileUploader
-              payload.pieces_jointes.push(file.id)
-            for folder in $scope.folderUploader
-              for file in folder.uploaders
-                payload.pieces_jointes.push(file.id)
-            participation.customPUT(payload, 'pieces_jointes').then(
-              -> window.location = '#/participations/'+participation._id
-              -> throw "Error : PUT files"
-            )
+              sendFiles($scope, participation)
         (error) -> throw "Error : participation save "+error
       )
 
@@ -348,6 +332,7 @@ angular.module('participationViews', ['ngRoute', 'textAngular', 'xin_listResourc
 
     $scope.$watch 'participation.site.protocole.type_site', (type_site) ->
       if type_site?
+        makeRegExp($scope, type_site)
         if type_site in ['ROUTIER', 'CARRE']
           $scope.participation.configuration =
             detecteur_enregistreur_numero_serie: $scope.participation.configuration.detecteur_enregistreur_numero_serie or ''
@@ -372,20 +357,9 @@ angular.module('participationViews', ['ngRoute', 'textAngular', 'xin_listResourc
     $scope.$watchCollection 'fileUploader', (newValue, oldValue) ->
       if newValue != oldValue
         $scope.participationForm.$setDirty()
-        files = []
-        for i in [oldValue.length..newValue.length-1]
-          files.push(newValue[i])
-        checkFilesName($scope, 'fileUploader', files,
-                       $scope.participation.site.protocole.type_site)
     $scope.$watchCollection 'folderUploader', (newValue, oldValue) ->
       if newValue != oldValue
         $scope.participationForm.$setDirty()
-        files = []
-        for i in [oldValue.length..newValue.length-1]
-          for file in newValue[i].uploaders
-            files.push(file)
-        checkFilesName($scope, 'folderUploader', files,
-                       $scope.participation.site.protocole.type_site)
 
     $scope.saveParticipation = ->
       $scope.submitted = true
@@ -436,16 +410,6 @@ angular.module('participationViews', ['ngRoute', 'textAngular', 'xin_listResourc
               window.location = '#/participations/'+participation._id
               return
             else
-            payload =
-              pieces_jointes: []
-            for file in $scope.fileUploader
-              payload.pieces_jointes.push(file.id)
-            for folder in $scope.folderUploader
-              for file in folder.uploaders
-                payload.pieces_jointes.push(file.id)
-            participation.customPUT(payload, 'pieces_jointes').then(
-              -> window.location = '#/participations/'+participation._id
-              -> throw "Error : PUT files"
-            )
+              sendFiles($scope, participation)
         (error) -> throw "Error : participation save "+error
       )

@@ -119,12 +119,13 @@
                 placeholder="Commentaire"></textarea>
     </div>
 
+    <div>Exemple de nom de fichier : {{fileFormatExemple}}</div>
     <div class="form-group"
       ng-class="{'has-error': participationForm.pieces_jointes.$invalid && !participationForm.$pristine}">
       <div class="input-group">
         <span class="input-group-addon">Fichiers joints</span>
         <div style="padding-right: 1em; border-left: 1px solid #ccc">
-          <upload-file-directive uploaders="fileUploader" multiple>
+          <upload-file-directive uploader="fileUploader" regexp="regexp" multiple>
           </upload-file-directive>
         </div>
       </div>
@@ -136,17 +137,9 @@
         ng-show="submitted && participationForm.pieces_jointes.$error.uploading">
         Le transfert des pièces jointes n'est pas terminé
       </span>
-      <span class="help-block"
-            ng-show="participationForm.pieces_jointes.$error.filename">
-        Les fichiers suivants ne respectent pas le format attendu.
-        <br>
-        Exemple de nom de fichier : {{ fileFormat }}
-        <div ng-repeat="filename in badFilesNames">
-          {{ filename }}
-        </div>
-      </span>
     </div>
 
+<!--
     <div class="form-group"
       ng-class="{'has-error': participationForm.folder.$invalid && !participationForm.$pristine}">
       <div class="input-group">
@@ -165,6 +158,7 @@
         Le transfert des pièces jointes n'est pas terminé
       </span>
     </div>
+-->
 
     <div class="form-group"
       ng-class="{'has-error': participationForm.configuration.detecteur_enregistreur_numero_serie.$invalid && !participationForm.$pristine}"
