@@ -107,6 +107,7 @@ angular.module('xin.fileUploader', ['xin_s3uploadFile'])
               console.log("onCancel")
           )
           @queue.push(file)
+          console.log(@queue.length)
         @computeSize()
         @onAddingComplete?()
 

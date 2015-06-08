@@ -58,6 +58,7 @@ angular.module('xin_uploadFile', ['appSettings', 'xin_s3uploadFile', 'xin.fileUp
       _.remove($scope.uploader, (up) -> up == uploader)
 
     uploader.onAddingComplete = ->
+      console.info("Adding Complete")
       uploader.startAll()
       $scope.$apply()
 
