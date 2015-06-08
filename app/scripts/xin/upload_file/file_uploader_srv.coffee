@@ -44,7 +44,6 @@ angular.module('xin.fileUploader', ['xin_s3uploadFile'])
       uploader: '=?'
     link: (scope, elem, attrs) ->
       onChange = ->
-        console.log("onchange")
         if not scope.uploader?
           console.log("Uploader not available")
           return
@@ -80,7 +79,6 @@ angular.module('xin.fileUploader', ['xin_s3uploadFile'])
           @transmitted_size += file.file.transmitted_size
 
       addFiles: (files) ->
-        console.log("addFiles")
         length = files.length
         for i in [0..length-1]
           file = files.pop()
@@ -141,28 +139,3 @@ angular.module('xin.fileUploader', ['xin_s3uploadFile'])
           if not file.status == 'done'
             return false
         return true
-
-
-#    uploader.onAfterAddingFile = (fileItem) ->
-#      console.info('onAfterAddingFile', fileItem)
-#    uploader.onAfterAddingAll = (addedFileItems) ->
-#      console.info('onAfterAddingAll', addedFileItems)
-#    uploader.onBeforeUploadItem = (item) ->
-#      console.info('onBeforeUploadItem', item)
-#    uploader.onProgressItem = (fileItem, progress) ->
-#      console.info('onProgressItem', fileItem, progress)
-#    uploader.onProgressAll = (progress) ->
-#      console.info('onProgressAll', progress)
-#    uploader.onSuccessItem = (fileItem, response, status, headers) ->
-#      fileItem.id = response.id
-#      fileItem._links =
-#        data: response._links.data
-#      console.info('onSuccessItem', fileItem, response, status, headers)
-#    uploader.onErrorItem = (fileItem, response, status, headers) ->
-#      console.info('onErrorItem', fileItem, response, status, headers)
-#    uploader.onCancelItem = (fileItem, response, status, headers) ->
-#      console.info('onCancelItem', fileItem, response, status, headers)
-#    uploader.onCompleteItem = (fileItem, response, status, headers) ->
-#      console.info('onCompleteItem', fileItem, response, status, headers)
-#    uploader.onCompleteAll = () ->
-#      console.info('onCompleteAll')

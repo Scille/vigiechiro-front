@@ -25,7 +25,6 @@ angular.module('donneeViews', ['ngRoute', 'xin_backend', 'xin_session',
 
   .controller 'ListDonneesController', ($scope, $routeParams, Backend) ->
     $scope.participation = {}
-    $scope.donnees = []
     Backend.one('participations', $routeParams.participationId).get()
       .then(
         (participation) ->
@@ -33,9 +32,9 @@ angular.module('donneeViews', ['ngRoute', 'xin_backend', 'xin_session',
           if breadcrumbsGetParticipationDefer?
             breadcrumbsGetParticipationDefer.resolve(participation)
             breadcrumbsGetParticipationDefer = undefined
-          Backend.all('participations/'+$routeParams.participationId+'/donnees')
-            .getList().then (donnees) ->
-              $scope.donnees = donnees.plain()
+
+          $scope.lookup = {}
+          $scope.resourceBackend = Backend.all('participations/'+$routeParams.participationId+'/donnees')
         (error) -> window.location = '#404'
       )
 

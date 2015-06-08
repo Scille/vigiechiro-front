@@ -161,32 +161,31 @@ angular.module('participationViews', ['ngRoute', 'textAngular', 'xin_listResourc
         return true
 
   .controller 'displayParticipationDrtController', ($scope, Backend) ->
-    $scope.wav_lookup =
-      wav: true
-    $scope.ta_lookup =
-      ta: true
-    $scope.tc_lookup =
-      tc: true
-    $scope.$watch(
-      'participation'
-      (participation) ->
-        if participation?
-          # display images
-          Backend.all('participations/'+$scope.participation._id+'/pieces_jointes')
-            .getList({photos: true}).then (photos) ->
-              $scope.photos = photos.plain()
-          #
-          $scope.resourceBackend = Backend.all('participations/'+$scope.participation._id+'/pieces_jointes')
+    $scope.$watch('participation', (participation) ->
+      if participation?
+        # display images
+        Backend.all('participations/'+$scope.participation._id+'/pieces_jointes')
+          .getList({photos: true}).then (photos) ->
+            $scope.photos = photos.plain()
     )
     $scope.displayWavFiles = ->
-      $scope.wav_lookup =
-        wav: true
+      if not $scope.wavBackend?
+        $scope.wavBackend = Backend.all('participations/'+$scope.participation._id+'/pieces_jointes')
+      if not $scope.wav_lookup?
+        $scope.wav_lookup =
+          wav: true
     $scope.displayTaFiles = ->
-      $scope.ta_lookup =
-        ta: true
+      if not $scope.taBackend?
+        $scope.taBackend = Backend.all('participations/'+$scope.participation._id+'/pieces_jointes')
+      if not $scope.ta_lookup?
+        $scope.ta_lookup =
+          ta: true
     $scope.displayTcFiles = ->
-      $scope.tc_lookup =
-        tc: true
+      if not $scope.tcBackend?
+        $scope.tcBackend = Backend.all('participations/'+$scope.participation._id+'/pieces_jointes')
+      if not $scope.tc_lookup?
+        $scope.tc_lookup =
+          tc: true
 
 
   .controller 'CreateParticipationController', ($routeParams, $scope, $timeout, Backend) ->

@@ -119,7 +119,8 @@
                 placeholder="Commentaire"></textarea>
     </div>
 
-    <div>Exemple de nom de fichier : {{fileFormatExemple}}</div>
+    <div class="alert alert-warning">Exemple de nom de fichier : {{fileFormatExemple}}</div>
+    <div class="alert alert-danger">Nombre limite de fichié pouvant petre uploadé en 1 fois.</div>
     <div class="form-group"
       ng-class="{'has-error': participationForm.pieces_jointes.$invalid && !participationForm.$pristine}">
       <div class="input-group">
@@ -139,7 +140,6 @@
       </span>
     </div>
 
-<!--
     <div class="form-group"
       ng-class="{'has-error': participationForm.folder.$invalid && !participationForm.$pristine}">
       <div class="input-group">
@@ -158,7 +158,6 @@
         Le transfert des pièces jointes n'est pas terminé
       </span>
     </div>
--->
 
     <div class="form-group"
       ng-class="{'has-error': participationForm.configuration.detecteur_enregistreur_numero_serie.$invalid && !participationForm.$pristine}"

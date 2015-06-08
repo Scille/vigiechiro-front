@@ -16,13 +16,8 @@ angular.module('xin_listResource', ['ngRoute', 'angularUtils.directives.dirPagin
             $compile(element.contents())(scope)
         )
 
+
   .controller 'ListResourceController', ($scope, $timeout, $location, session) ->
-    # Load lookup pagination from $location
-    # params = $location.search()
-    # if params.page?
-    #   $scope.lookup.page = parseInt(params.page)
-    # if params.items?
-    #   $scope.lookup.max_results = parseInt(params.items)
     session.getUserPromise().then (user) ->
       $scope.user = user.plain()
     $scope.resources = []
@@ -37,29 +32,13 @@ angular.module('xin_listResource', ['ngRoute', 'angularUtils.directives.dirPagin
       'lookup'
       ->
         updateResourcesList()
-        # Save pagination in $location
-        # params = $location.search()
-        # if $scope.lookup.max_results != params.max_results
-        #   $location.search('items', $scope.lookup.max_results)
-        # if $scope.lookup.page != params.page
-        #   $location.search('page', $scope.lookup.page)
-      true
-    )
-    $scope.$watch(
-      'resourceBackend'
-      ->
-        updateResourcesList()
-        # Save pagination in $location
-        # params = $location.search()
-        # if $scope.lookup.max_results != params.max_results
-        #   $location.search('items', $scope.lookup.max_results)
-        # if $scope.lookup.page != params.page
-        #   $location.search('page', $scope.lookup.page)
       true
     )
     $scope.pageChange = (newPage) ->
+      if $scope.lookup.page == newPage
+        return
       $scope.lookup.page = newPage
-      updateResourcesList()
+
 
   .directive 'listResourceDirective', (session, Backend) ->
     restrict: 'E'
@@ -72,14 +51,16 @@ angular.module('xin_listResource', ['ngRoute', 'angularUtils.directives.dirPagin
     link: (scope, elem, attrs, ctrl, transclude) ->
       if not attrs.lookup?
         scope.lookup = {}
-      scope.lookup.page = scope.lookup.page or 1
-      scope.lookup.max_results = scope.lookup.max_results or 20
-      if !transclude
-        throw "Illegal use of lgTranscludeReplace directive in the template," +
-              " no parent directive that requires a transclusion found."
-        return
-      transclude (clone) ->
-        scope.resourceTemplate = ''
-        clone.each (index, node) ->
-          if node.outerHTML?
-            scope.resourceTemplate += node.outerHTML
+      scope.$watch 'lookup', (lookup) ->
+        if lookup?
+          scope.lookup.page = scope.lookup.page or 1
+          scope.lookup.max_results = scope.lookup.max_results or 20
+          if !transclude
+            throw "Illegal use of lgTranscludeReplace directive in the template," +
+                  " no parent directive that requires a transclusion found."
+            return
+          transclude (clone) ->
+            scope.resourceTemplate = ''
+            clone.each (index, node) ->
+              if node.outerHTML?
+                scope.resourceTemplate += node.outerHTML

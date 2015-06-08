@@ -96,7 +96,16 @@
           <span ng-show="false">Cacher les fichiers son</span>
         </a>
         <div class="container collapse" id="display-wav-files-collapse">
-          <list-resource-directive resource-backend="resourceBackend"
+          <div class="list-group">
+            <div class="row">
+              <div class="col-xs-4">
+                <label for="search">Nb de Résultats par page :</label>
+                <input type="number" class="form-control max-results-field"
+                       ng-model="wav_lookup.max_results">
+              </div>
+            </div>
+          </div>
+          <list-resource-directive resource-backend="wavBackend"
                                    lookup="wav_lookup">
             <access-file-directive file="resource"></access-file-directive>
           </list-resource-directive>
@@ -112,7 +121,7 @@
           Afficher les fichiers Tadarida D
         </a>
         <div class="container collapse" id="display-ta-files-collapse">
-          <list-resource-directive resource-backend="resourceBackend"
+          <list-resource-directive resource-backend="taBackend"
                                    lookup="ta_lookup">
             <access-file-directive file="resource"></access-file-directive>
           </list-resource-directive>
@@ -128,7 +137,7 @@
           Afficher les fichiers Tadarida C
         </a>
         <div class="container collapse" id="display-tc-files-collapse">
-          <list-resource-directive resource-backend="resourceBackend"
+          <list-resource-directive resource-backend="tcBackend"
                                    lookup="tc_lookup">
             <access-file-directive file="resource"></access-file-directive>
           </list-resource-directive>

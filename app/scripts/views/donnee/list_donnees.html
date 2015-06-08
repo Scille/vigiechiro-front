@@ -1,12 +1,19 @@
 <div class="panel panel-default">
-  <ul class="list-group">
-    <li class="list-group-item">
-      <b>Liste des données</b>
-    </li>
+  <div class="page-header">
+    <h3>Liste des données</h3>
+  </div>
 
-    <li class="list-group-item" ng-repeat="donnee in donnees">
-      <display-donnee-directive donnee="donnee">
-      </display-donnee-directive>
-    </li>
-  </ul>
+  <div class="list-group">
+    <div class="row">
+      <div class="col-xs-4">
+        <label for="search">Nb de Résultats par page :</label>
+        <input type="number" class="form-control max-results-field" ng-model="lookup.max_results">
+      </div>
+    </div>
+  </div>
+
+  <list-resource-directive resource-backend="resourceBackend" lookup="lookup">
+    <display-donnee-directive donnee="resource">
+    </display-donnee-directive>
+  </list-resource-directive>
 </div>
