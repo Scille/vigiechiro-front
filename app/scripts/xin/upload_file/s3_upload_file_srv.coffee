@@ -115,6 +115,7 @@ angular.module('xin_s3uploadFile', ['appSettings'])
             @_startSingleUpload()
           else
             @_startMultiPartUpload()
+          @userCallbacks.onStart?(@file)
       _startMultiPartUpload: () ->
         payload =
           mime: @file.type

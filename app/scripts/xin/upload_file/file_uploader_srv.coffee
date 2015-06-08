@@ -57,11 +57,13 @@ angular.module('xin.fileUploader', ['xin_s3uploadFile'])
     class FileUploader
       constructor: () ->
         @queue = []
+        @ready = []
+        @onProgress = []
         @filters = []
         @warnings = []
         @maxParallelUpload = 5
         @itemsCompleted = 0
-        @fileOnProgress = 0
+        @nbFileOnProgress = 0
         @size = 0
         @transmitted_size = 0
 
@@ -83,13 +85,17 @@ angular.module('xin.fileUploader', ['xin_s3uploadFile'])
             continue
           file.status = 'ready'
           file.transmitted_size = 0
-          # TODO check filters
           file = new S3FileUploader(file,
+            onStart: (file) =>
+              @onProgress.push(file)
             onProgress: (file, transmitted_size) =>
               file.transmitted_size = transmitted_size
               @computeTransmittedSize()
             onSuccess: (file) =>
-              @fileOnProgress--
+              for item, index in @onProgress
+                if item == file
+                  @onProgress.splice(index, 1)
+              @nbFileOnProgress--
               @itemsCompleted++
               file.status = 'success'
               @startOne()
@@ -116,14 +122,14 @@ angular.module('xin.fileUploader', ['xin_s3uploadFile'])
         return result
 
       startAll: ->
-        for i in [1..@maxParallelUpload-@fileOnProgress]
+        for i in [1..@maxParallelUpload-@nbFileOnProgress]
           @startOne()
 
       startOne: ->
-        if @fileOnProgress < @maxParallelUpload
-          i = @itemsCompleted + @fileOnProgress
+        if @nbFileOnProgress < @maxParallelUpload
+          i = @itemsCompleted + @nbFileOnProgress
           if i < @queue.length
-            @fileOnProgress++
+            @nbFileOnProgress++
             @queue[i].start()
 
       isAllComplete: ->
