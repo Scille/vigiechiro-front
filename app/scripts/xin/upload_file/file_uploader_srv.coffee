@@ -24,7 +24,7 @@ angular.module('xin.fileUploader', ['xin_s3uploadFile'])
             console.log("Uploader not available")
             return
           files = []
-          warnins = []
+          warnings = []
           length = e.dataTransfer.items.length
           for i in [0..length-1]
             entry = e.dataTransfer.items[i].webkitGetAsEntry()
@@ -43,7 +43,7 @@ angular.module('xin.fileUploader', ['xin_s3uploadFile'])
     scope:
       uploader: '=?'
     link: (scope, elem, attrs) ->
-      elem[0].onchange = (e) ->
+      onChange = ->
         console.log("onchange")
         if not scope.uploader?
           console.log("Uploader not available")
@@ -52,6 +52,7 @@ angular.module('xin.fileUploader', ['xin_s3uploadFile'])
         for file in this.files or []
           files.push(file)
         scope.uploader.addFiles(files)
+      elem.bind('change', onChange)
 
 
   .factory 'FileUploader', (S3FileUploader) ->
@@ -110,7 +111,6 @@ angular.module('xin.fileUploader', ['xin_s3uploadFile'])
               console.log("onCancel")
           )
           @queue.push(file)
-          console.log(@queue.length)
         @computeSize()
         @onAddingComplete?()
 
