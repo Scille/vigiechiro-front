@@ -28,6 +28,22 @@
       <th>Nom</th>
       <th>Nb contact min</th>
       <th>Nb contact max</th>
+    <tr ng-show="participation.bilan.chiropteres"
+        ng-repeat="line in participation.bilan.chiropteres">
+      <td>{{$index+1}}</td>
+      <td>Chiroptères</td>
+      <td>{{line.taxon.libelle_long}}</td>
+      <td>{{line.nb_contact_min}}</td>
+      <td>{{line.nb_contact_max}}</td>
+    </tr>
+    <tr ng-show="participation.bilan.orthopteres"
+        ng-repeat="line in participation.bilan.orthopteres">
+      <td>{{$index+1}}</td>
+      <td>Orthopteres</td>
+      <td>{{line.taxon.libelle_long}}</td>
+      <td>{{line.nb_contact_min}}</td>
+      <td>{{line.nb_contact_max}}</td>
+    </tr>
     </tr>
     <tr ng-show="participation.bilan.autre"
         ng-repeat="line in participation.bilan.autre">
