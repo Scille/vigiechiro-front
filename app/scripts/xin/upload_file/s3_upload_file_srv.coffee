@@ -87,35 +87,42 @@ angular.module('xin_s3uploadFile', ['appSettings'])
         @_context = undefined
 
       _onSuccess: () ->
-        @userCallbacks.onSuccess?(@file)
+        @userCallbacks.onSuccess?(this)
       _onProgress: (loaded, total) ->
         @_pause.promise.then =>
-          @userCallbacks.onProgress?(@file, loaded)
-      _onError: (status) ->
-        @userCallbacks.onError?(status)
-      stop: ->
-        @file.status = 'cancel'
+          @userCallbacks.onProgress?(this, loaded)
+      _onErrorBack: (status) ->
+        @userCallbacks.onErrorBack?(this, status)
+      _onErrorXhr: (status) ->
+        @userCallbacks.onErrorXhr?(this, status)
+      cancel: ->
         @_pause = $q.defer()
+        # TODO ?
         if @_context
           # Call backend to delete the corresponding resource
-          Backend.all('fichiers').one(@_context.id).customDELETE('multipart/annuler').then(
-            ->
-            (error) -> throw error
+#          Backend.all('fichiers').one(@_context.id).customDELETE('multipart/annuler').then(
+#            -> @userCallbacks.cancel?(this)
+#            (error) -> throw error
+#          )
+          Backend.all('fichiers').one(@_context.id).remove().then(
+            -> @userCallbacks.cancel?(this)
+            (error) -> console.log(error)
           )
+        @userCallbacks.onCancel?(this)
       pause: ->
-        @file.status = 'pause'
+        @userCallbacks.onPause?(this)
         @_pause = $q.defer()
+
       start: () ->
         @_pause.resolve()
         if @file.status == 'ready'
-          @file.status = 'onprogress'
           @_onProgress(0, @file.size)
           # Call the backend to get back a signed S3 url
           if @file.size < @sliceSize
             @_startSingleUpload()
           else
             @_startMultiPartUpload()
-          @userCallbacks.onStart?(@file)
+          @userCallbacks.onStart?(this)
       _startMultiPartUpload: () ->
         payload =
           mime: @file.type
@@ -153,7 +160,7 @@ angular.module('xin_s3uploadFile', ['appSettings'])
               parts: @_context.parts
             fileBackend.customPOST(payload).then(
               => @_onSuccess()
-              (e) => @_onError(e)
+              (e) => @_onErrorBack(e)
             )
             return
           # Call backend to get signed part request
@@ -175,7 +182,7 @@ angular.module('xin_s3uploadFile', ['appSettings'])
                   )
                   @_context.part_number += 1
                   @_continueMultiPartUpload(@_context)
-                onError: (error) => @_onError(error)
+                onError: (error) => @_onErrorXhr(error)
               uploadToS3(callbacks, 'PUT', slice, response.s3_signed_url)
             (error) -> throw error
           )
@@ -192,13 +199,13 @@ angular.module('xin_s3uploadFile', ['appSettings'])
           else if tac.test(payload.titre)
             payload.mime = 'application/tac'
         callbacks =
-          onError: (error) => @_onError(error)
+          onError: (error) => @_onErrorXhr(error)
           onProgress: (loaded, total) => @_onProgress(loaded, total)
           onSuccess: =>
             Backend.one('fichiers', @file.id).get().then (fileBackend) =>
               fileBackend.post().then(
                 =>  @_onSuccess()
-                (error) -> throw error
+                (error) -> @_onErrorBack(error)
               )
         Backend.all('fichiers').post(payload).then(
           (response) =>
@@ -214,5 +221,5 @@ angular.module('xin_s3uploadFile', ['appSettings'])
                 contentType = 'application/tac'
             uploadToS3(callbacks, 'PUT', @file, response.s3_signed_url,
               {'Content-Type': contentType})
-          (error) => @_onError(error)
+          (error) => @_onErrorBack(error)
         )

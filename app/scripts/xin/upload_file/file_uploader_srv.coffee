@@ -1,3 +1,6 @@
+'use strict'
+
+
 angular.module('xin.fileUploader', ['xin_s3uploadFile'])
   .directive 'fileOver', () ->
     restrict: 'A'
@@ -61,24 +64,27 @@ angular.module('xin.fileUploader', ['xin_s3uploadFile'])
         for file in this.files or []
           files.push(file)
         scope.uploader.addFiles(files)
+        elem[0].value = ''
       elem.bind('change', onChange)
 
 
   .factory 'FileUploader', (S3FileUploader) ->
     class FileUploader
       constructor: () ->
-        @queue = []
-        @ready = []
-        @onProgress = []
         @filters = []
-        @warnings = []
+        @parallelUpload = 8
+        @init()
+
+      init: ->
+        @queue = []
+        @onProgress = []
         @directories = []
-        @maxParallelUpload = 5
+        @warnings = []
         @itemsCompleted = 0
         @itemsFailed = 0
-        @nbFileOnProgress = 0
         @size = 0
         @transmitted_size = 0
+        @status = 'ready'
 
       computeSize: ->
         @size = 0
@@ -102,39 +108,40 @@ angular.module('xin.fileUploader', ['xin_s3uploadFile'])
         length = files.length
         for i in [0..length-1]
           file = files.pop()
-          # check if directory
-          if file.webkitRelativePath? and file.webkitRelativePath != ''
-            split = file.webkitRelativePath.split("/")
-            fullName = '.'
-            for i in [0..split.length-2]
-              fullName += '/'+split[i]
-            if @directories.indexOf(fullName) == -1
-              @directories.push(fullName)
-          #
           if not @checkFilters(file)
             continue
           file.status = 'ready'
           file.transmitted_size = 0
           file = new S3FileUploader(file,
-            onStart: (file) =>
-              @onProgress.push(file)
-            onProgress: (file, transmitted_size) =>
-              file.transmitted_size = transmitted_size
+            onStart: (s3File) =>
+              s3File.file.status = 'progress'
+              @onProgress.push(s3File)
+            onProgress: (s3File, transmitted_size) =>
+              s3File.file.transmitted_size = transmitted_size
               @computeTransmittedSize()
-            onSuccess: (file) =>
-              @removeFileOnProgress(file)
-              @nbFileOnProgress--
+            onPause: (s3File) =>
+              s3File.file.status = 'pause'
+            onSuccess: (s3File) =>
+              @removeFileOnProgress(s3File)
               @itemsCompleted++
-              file.status = 'success'
+              s3File.file.status = 'success'
               @startOne()
-            onError: (status) ->
-              @removeFileOnProgress(file)
-              @nbFileOnProgress--
+            onErrorBack: (s3File, status) =>
+              s3File.file.status = 'failure'
+              @removeFileOnProgress(s3File)
               @itemsFailed++
               if status?
                 console.log(status)
-            onCancel: ->
-              console.log("onCancel")
+            onErrorXhr: (s3File, status) =>
+              s3File.file.status = 'failure'
+              @removeFileOnProgress(s3File)
+              @itemsFailed++
+              if status?
+                console.log(status)
+            onCancel: (s3File) =>
+              s3File.file.status = 'cancel'
+              @removeFileOnProgress(s3File)
+              @itemsFailed++
           )
           @queue.push(file)
         @computeSize()
@@ -153,18 +160,41 @@ angular.module('xin.fileUploader', ['xin_s3uploadFile'])
         return result
 
       startAll: ->
-        for i in [1..@maxParallelUpload-@nbFileOnProgress]
+        @status = 'progress'
+        for file in @onProgress
+          file.start()
+        for i in [1..@parallelUpload]
           @startOne()
 
       startOne: ->
-        if @nbFileOnProgress < @maxParallelUpload
-          i = @itemsCompleted + @nbFileOnProgress
+        if @status == 'pause'
+          return
+        onProgress = @onProgress.length
+        if onProgress < @parallelUpload
+          i = @itemsCompleted + onProgress
           if i < @queue.length
-            @nbFileOnProgress++
             @queue[i].start()
+
+      pauseAll: ->
+        @status = 'pause'
+        for file in @onProgress
+          file.pause()
+
+      cancelOne: (item) ->
+        for file, index in @queue
+          if file == item
+            item.cancel()
+            return
+
+      cancelAll: ->
+        for file in @queue
+          if file.file.status not in ['ready', 'failure']
+            file.cancel()
+        @init()
+        @onCancelAllComplete?()
 
       isAllComplete: ->
         for file in @queue
-          if not (file.file.status == 'success')
+          if not (file.file.status in ['success', 'failure', 'cancel'])
             return false
         return true

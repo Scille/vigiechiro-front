@@ -39,6 +39,21 @@ angular.module('xin_uploadFile', ['appSettings', 'xin_s3uploadFile', 'xin.fileUp
       xhr: []
     uploader = $scope.uploader = new FileUploader()
 
+    # Remove sub-directories
+    uploader.filters.push(
+      name: "Sous-dossiers ignorés."
+      fn: (item) ->
+        if item.webkitRelativePath? and item.webkitRelativePath != ''
+          split = item.webkitRelativePath.split("/")
+          if split.length > 2
+            return false
+          else
+            nameDirectory = split[0]
+            if uploader.directories.indexOf(nameDirectory) == -1
+              uploader.directories.push(nameDirectory)
+        return true
+    )
+
     $scope.addRegExpFilter = (regexp) ->
       if regexp? and regexp.length
         uploader.filters.push(
@@ -52,22 +67,24 @@ angular.module('xin_uploadFile', ['appSettings', 'xin_s3uploadFile', 'xin.fileUp
             return false
         )
 
-    $scope.pauseAll = ->
-      console.log("pause")
-      uploader.pauseAll()
-
-    $scope.stopUploader = (uploader) ->
-      uploader.stop()
-      _.remove($scope.uploader, (up) -> up == uploader)
-
     uploader.onAddingComplete = ->
-      uploader.startAll()
-      $scope.$apply()
+      if uploader.status in ['ready', 'progress']
+        uploader.startAll()
 
     uploader.onWhenAddingFileFailed = (item, filter) ->
-      text = "Le fichier "+item.name+" n'a pas pu être ajouté à la liste. "+
-             filter.name
-      $scope.errors.filters.push(text)
+      if filter.name == "Sous-dossiers ignorés."
+        split = item.webkitRelativePath.split("/")
+        nameDirectory = "."
+        for i in [0..split.length-2]
+          nameDirectory += "/"+split[i]
+        text = "Le dossier "+nameDirectory+" a été ignoré. "+
+               filter.name
+        if $scope.errors.filters.indexOf(text) == -1
+          $scope.errors.filters.push(text)
+      else
+        text = "Le fichier "+item.name+" n'a pas pu être ajouté à la liste. "+
+               filter.name
+        $scope.errors.filters.push(text)
       $scope.$apply()
 
     uploader.onAddingWarningsComplete = ->
@@ -77,3 +94,10 @@ angular.module('xin_uploadFile', ['appSettings', 'xin_s3uploadFile', 'xin.fileUp
         else
           $scope.warnings.push(warning.name+" n'est pas un fichier.")
       $scope.$apply()
+
+    uploader.onCancelAllComplete = ->
+      $scope.warnings = []
+      $scope.errors =
+        filters: []
+        back: []
+        xhr: []
