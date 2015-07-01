@@ -2,7 +2,7 @@
 
 
 angular.module('modalSiteViews', [])
-  .controller 'ModalInstanceEditTracetController', ($scope, $modalInstance) ->
+  .controller 'ModalInstanceEditRouteController', ($scope, $modalInstance) ->
     $scope.ok = ->
       $modalInstance.close(true)
     $scope.cancel = ->

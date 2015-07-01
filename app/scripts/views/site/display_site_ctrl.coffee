@@ -4,7 +4,7 @@ breadcrumbsGetSiteDefer = undefined
 
 
 angular.module('displaySiteViews', ['ngRoute', 'textAngular', 'xin_backend',
-                                    'protocole_map', 'editSiteViews'])
+                                    'protocole_map'])
   .config ($routeProvider) ->
     $routeProvider
       .when '/sites',
@@ -45,6 +45,7 @@ angular.module('displaySiteViews', ['ngRoute', 'textAngular', 'xin_backend',
         else if $scope.lookup.q?
           delete $scope.lookup.q
     $scope.resourceBackend = Backend.all('sites')
+
 
   .controller 'ListMesSitesController', ($scope, Backend, session, DelayedEvent) ->
     $scope.title = "Mes sites"
@@ -96,8 +97,8 @@ angular.module('displaySiteViews', ['ngRoute', 'textAngular', 'xin_backend',
       attrs.$observe 'typeSite', (typeSite) ->
         if typeSite
           mapDiv = elem.find('.g-maps')[0]
-          mapProtocole = protocolesFactory(mapDiv, scope.typeSite)
-          mapProtocole.loadMap(scope.site.plain())
+          map = protocolesFactory(mapDiv, scope.typeSite)
+          map.loadMapDisplay(scope.site.plain())
       scope.lockSite = (lock) ->
         scope.site.patch({'verrouille': lock}).then(
           ->
@@ -128,8 +129,9 @@ angular.module('displaySiteViews', ['ngRoute', 'textAngular', 'xin_backend',
             sitesPromise.getList().then (sites) ->
                 scope.sites = sites.plain()
                 mapDiv = elem.find('.g-maps')[0]
-                mapProtocole = protocolesFactory(mapDiv, "ALL_"+scope.typeSite)
-                mapProtocole.loadMap(sites.plain())
+                map = protocolesFactory(mapDiv, "ALL_"+scope.typeSite)
+                map.loadMap(sites.plain())
+
 
   .directive 'listSitesDirective', (session, Backend) ->
     restrict: 'E'
@@ -140,6 +142,7 @@ angular.module('displaySiteViews', ['ngRoute', 'textAngular', 'xin_backend',
     link: (scope, elem, attrs) ->
       session.getUserPromise().then (user) ->
         scope.userId = user._id
+
 
   .controller 'listSitesDrtController', ($scope, Backend) ->
     $scope.$watch(

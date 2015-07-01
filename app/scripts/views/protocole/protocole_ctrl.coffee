@@ -19,7 +19,7 @@ angular.module('protocoleViews', ['ngRoute', 'textAngular',
                                   'ui.select', 'ngSanitize',
                                   'xin_listResource',
                                   'xin_backend', 'xin_session', 'xin_tools',
-                                  'displaySiteViews', 'createSiteViews'])
+                                  'displaySiteViews'])
   .config ($routeProvider) ->
     $routeProvider
       .when '/protocoles',

@@ -27,6 +27,7 @@ angular
     'utilisateurViews',
     'taxonViews',
     'protocoleViews',
+    'siteViews'
     'participationViews',
     'actualiteViews',
     'donneeViews'

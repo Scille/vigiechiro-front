@@ -4,14 +4,25 @@
 angular.module('protocole_map_point_fixe', [])
   .factory 'ProtocoleMapPointFixe', ($rootScope, Backend, GoogleMaps, ProtocoleMap) ->
     class ProtocoleMapPointFixe extends ProtocoleMap
-      constructor: (mapDiv, @siteCallback) ->
-        super mapDiv, @siteCallback
+      constructor: (mapDiv, @typeProtocole, @callbacks) ->
+        super mapDiv, @typeProtocole, @callbacks
+        @_min = 1
         @_smallGrille = []
         @_steps = [
-          "Positionner la zone de sélection aléatoire.",
-          "Cliquer sur la carte pour sélection la grille stoc correspondante.",
-          "Définir au moins 1 localité à l'intérieur du carré."
-          "Valider les localités."
+            id: 'start'
+            message: "Positionner la zone de sélection aléatoire."
+          ,
+            id: 'selectGrilleStoc'
+            message: "Cliquer sur la carte pour sélection la grille stoc correspondante."
+          ,
+            id: 'editLocalities'
+            message: "Définir au moins 1 localité à l'intérieur du carré."
+          ,
+            id: 'validLocalities'
+            message: "Valider les localités."
+          ,
+            id: 'end'
+            message: "Cartographie achevée."
         ]
         @_googleMaps.setDrawingManagerOptions(
           drawingControlOptions:
@@ -21,73 +32,47 @@ angular.module('protocole_map_point_fixe', [])
             ]
         )
         @_googleMaps.setDrawingManagerOptions(drawingControl: false)
-        @loading = true
-        @updateSite()
-        @loading = false
-
-      clearMap: ->
-        @_googleMaps.setDrawingManagerOptions(
-          drawingControl: false
-          drawingMode: ''
-        )
-        for localite in @_localites
-          localite.overlay.setMap(null)
-        @_localites = []
-        @_step = 0
-        if @_circleLimit?
-          @_circleLimit.setMap(null)
-          @_circleLimit = null
-        @_newSelection = false
-        if Object.keys(@_grilleStoc).length
-          @_grilleStoc.item.setMap(null)
-          @_grilleStoc = {}
         @updateSite()
 
-      mapsCallback: ->
+      mapCallback: ->
         overlayCreated: (overlay) =>
           isModified = false
-          if @_step == 1
+          if @_step == 'selectGrilleStoc'
             @getGrilleStoc(overlay)
             return false
           else
             if overlay.type == "Point"
-              if @_googleMaps.isPointInPolygon(overlay, @_grilleStoc.item)
+              if @_googleMaps.isPointInPolygon(overlay, @_grilleStoc.overlay)
                 isModified = true
             else
-              throw "Error : bad shape type " + overlay.type
+              @callbacks.displayError?("Mauvaise forme : " + overlay.type)
             if isModified
               @saveOverlay(overlay)
               @_googleMaps.addListener(overlay, 'rightclick', (e) =>
                 @deleteOverlay(overlay)
-                if @getCountOverlays() < 1
-                  @_step = 2
+                if @getCountOverlays() < @_min
+                  @_step = 'editLocalities'
                 else
-                  @_step = 3
+                  @_step = 'validLocalities'
                 @updateSite()
               )
-              if @getCountOverlays() >= 1
-                @_step = 3
+              if @getCountOverlays() >= @_min
+                @_step = 'validLocalities'
               else
-                @_step = 2
+                @_step = 'editLocalities'
               @updateSite()
               return true
             return false
 
       saveOverlay: (overlay) =>
-        localite = {}
-        localite.overlay = overlay
-        localite.name = @setLocaliteNameWithInterest(overlay)
-        localite.overlay.setOptions({ title: localite.name })
-        localite.representatif = false
-        @_localites.push(localite)
+        locality = {}
+        locality.overlay = overlay
+        locality.name = @setLocalityNameWithInterest(overlay)
+        locality.overlay.setOptions({ title: locality.name })
+        locality.representatif = false
+        @_localities.push(locality)
 
-      mapValidated: ->
-        if @_step == 4
-          return true
-        else
-          return false
-
-      setLocaliteNameWithInterest: (overlay) ->
+      setLocalityNameWithInterest: (overlay) ->
         # Check if localite is near a point of interest
         interestPoint = false
         name = ''
@@ -101,12 +86,12 @@ angular.module('protocole_map_point_fixe', [])
         if interestPoint
           return name
         else
-          return @setLocaliteName()
+          return @setLocalityName()
 
-      setLocaliteName: (name = 1) ->
-        for localite in @_localites
+      setLocalityName: (name = 1) ->
+        for localite in @_localities
           if localite.name == 'Z'+name
-            return @setLocaliteName(name + 1)
+            return @setLocalityName(name + 1)
         return 'Z'+name
 
       validNumeroGrille: (cell, numero, id, editable = false) =>
@@ -124,41 +109,41 @@ angular.module('protocole_map_point_fixe', [])
         path = cell.getPath()
         # register grille stoc
         @_grilleStoc =
-          item: cell
+          overlay: cell
           numero: numero
           id: id
         lat = (path.getAt(0).lat() + path.getAt(2).lat()) / 2
         lng = (path.getAt(0).lng() + path.getAt(2).lng()) / 2
         @_googleMaps.setCenter(lat, lng)
         @_googleMaps.setZoom(13)
-        @_step = 2
-        @updateSite()
         @_googleMaps.setDrawingManagerOptions(drawingControl: true)
         if editable
-          @_googleMaps.addListener(@_grilleStoc.item, 'rightclick', (e) =>
+          @_googleMaps.addListener(@_grilleStoc.overlay, 'rightclick', (e) =>
             if confirm("Cette opération supprimera toutes les localités.")
-              @_step = 0
-              @_grilleStoc.item.setMap(null)
+              @_step = 'start'
+              @_grilleStoc.overlay.setMap(null)
               @_grilleStoc = {}
-              for localite in @_localites or []
+              for localite in @_localities or []
                 @_googleMaps.deleteOverlay(localite.overlay)
-              @_localites = []
+              @_localities = []
               @_googleMaps.setDrawingManagerOptions(drawingControl: false)
               @selectGrilleStoc()
               @updateSite()
           )
         @displaySmallGrille()
+        @_step = 'editLocalities'
+        @updateSite()
 
       # Display 4x4 grille into grille stoc
       displaySmallGrille: ->
         for small in @_smallGrille or []
           small.setMap(null)
         @_smallGrille = []
-        if !@_grilleStoc? or !@_grilleStoc.item?
+        if !@_grilleStoc? or !@_grilleStoc.overlay?
           return
         # Get Center
-        p1 = @_grilleStoc.item.getPath().getAt(0)
-        p2 = @_grilleStoc.item.getPath().getAt(2)
+        p1 = @_grilleStoc.overlay.getPath().getAt(0)
+        p2 = @_grilleStoc.overlay.getPath().getAt(2)
         center = @_googleMaps.interpolate(p1, p2, 0.5)
         # Get NW
         nw = @_googleMaps.computeOffset(center, 1000*Math.sqrt(2), -45)

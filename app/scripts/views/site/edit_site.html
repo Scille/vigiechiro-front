@@ -1,91 +1,127 @@
-<div class="container">
-  <div class="text-center">
-    <div class="page-header text-center">
-      <h3>Edition du site {{site.titre}}</h3>
+<div class="text-center">
+  <div class="page-header text-center">
+    <h3>{{site.titre}}</h3>
+    Protocole {{ protocole.type_site }}
+    <a class="btn btn-default" href="#/protocoles/{{protocole._id}}">
+      {{protocole.titre}}
+    </a>
+  </div>
+</div>
+
+<div class="panel panel-default panel-body">
+
+  <div ng-if="creation">
+    <div ng-show="randomSelectionAllowed">
+      <b>Faire un tirage aléatoire</b>
+      <a class="btn btn-primary" id="random-selection-true"
+         ng-click="randomSelection(true)">
+        Oui
+      </a>
+      <a class="btn btn-warning" id="random-selection-false"
+         ng-click="randomSelection(false)">
+        Non
+      </a>
+    </div>
+
+    <div ng-show="resetFormAllowed">
+      <a class="btn btn-danger" ng-click="resetForm()">
+        Réinitialiser le formulaire
+      </a>
     </div>
   </div>
 
+  <div class="form-group input-group" ng-if="!creation && isAdmin">
+    <span class="input-group-addon">Observateur</span>
+    <select class="form-control" name="observateur"
+            ng-model="site.observateur._id"
+            ng-options="user._id as user.pseudo for user in users track by user._id">
+    </select>
+  </div>
 
-  <div class="panel panel-default">
-    <div class="panel-body">
-      <form class="simple-form" novalidate name="siteForm" ng-submit="saveSite()">
-        <div class="form-group input-group" ng-show="isAdmin">
-          <span class="input-group-addon">Observateur</span>
-          <select class="form-control" name="observateur"
-                  ng-model="observateur._id"
-                  ng-options="user._id as user.pseudo for user in users">
-          </select>
-        </div>
+  <ul class="list-group" ng-show="displaySteps">
+    <li class="list-group-item" ng-repeat="step in steps">
+      <span ng-show="strikeStep($index, stepId, steps)">✓&nbsp;<strike>{{step.message}}</strike></span>
+      <span ng-hide="strikeStep($index, stepId, steps)">{{step.message}}</span>
+      <a class="btn btn-primary" id="valid-origin"
+         ng-click="validOrigin()"
+         ng-show="validOriginAllowed && step.id == 'start'">
+        Valider la zone
+      </a>
+      <a class="btn btn-warning" id="retry-selection"
+         ng-click="retrySelection()"
+         ng-show="creation && retrySelectionAllowed && step.id == 1">
+        Refaire un tirage
+      </a>
+      <a class="btn btn-primary" id="valid-route"
+         ng-click="validRoute()"
+         ng-show="validRouteAllowed && step.id == 'start'">
+        Valider le tracé
+      </a>
+      <a class="btn btn-warning" id="edit-route"
+         ng-click="editRoute()"
+         ng-show="editRouteAllowed && step.id == 'selectOrigin'">
+        Modifier le tracé
+      </a>
+      <a class="btn btn-primary" id="valid-sections"
+         ng-click="validSections()"
+         ng-show="validSectionsAllowed && step.id == 'validSections'">
+        Valider les tronçons
+      </a>
+      <a class="btn btn-warning" id="edit-sections"
+         ng-click="editSections()"
+         ng-show="editSectionsAllowed && step.id == 'validSections'">
+        Modifier les tronçons
+      </a>
+      <a class="btn btn-primary" id="valid-localities"
+         ng-click="validLocalities()"
+         ng-show="validLocalitiesAllowed && step.id == 'editLocalities'">
+        Valider les localités
+      </a>
+      <a class="btn btn-warning" id="edit-localities"
+         ng-click="editLocalities()"
+         ng-show="editLocalitiesAllowed && step.id == 'validLocalities'">
+        Modifier les localités
+      </a>
+    </li>
+  </ul>
 
-        <ul class="list-group" ng-show="displaySteps">
-          <li class="list-group-item" ng-repeat="step in steps">
-            <span ng-show="$index < stepId">✓&nbsp;<strike>{{step}}</strike></span>
-            <span ng-hide="$index < stepId">{{step}}</span>
-            <span ng-show="$index == 3">
-              <a class="btn btn-primary" id="valid-localites"
-                 ng-click="validLocalites()"
-                 ng-show="validLocalitesAllowed">
-                Valider les localités
-              </a>
-              <a class="btn btn-warning" id="edit-localites"
-                 ng-click="editLocalites()"
-                 ng-show="editLocalitesAllowed">
-                Modifier les localités
-              </a>
-            </span>
-          </li>
-        </ul>
+  <div ng-show="protocole.type_site == 'ROUTIER'">
+    Longueur du tracé : <b>{{ routeLength }}</b> kilomètres.
+  </div>
 
-        <div ng-show="!site.verrouille">
-          <div ng-show="validTracetAllowed">
-            <a class="btn btn-default" id="valid-tracet"
-               ng-click="validTracet()">
-              Valider le tracet
-            </a>
-            <span>
-              Longueur actuelle : <b>{{ tracetLength }}</b> kilomètres.
-            </span>
-          </div>
+  <p class="bg-danger" ng-show="mapError">
+    {{ mapError.message }}
+  </p>
+  <p class="bg-warning" ng-show="mapWarning">
+    {{ mapWarning.message }}
+  </p>
 
-          <a class="btn btn-default" id="valid-segments"
-             ng-click="validSegments()" ng-show="validSegmentsAllowed">
-            Valider les tronçons
-          </a>
+  <div class="help-block has-error" ng-show="false">
+  </div>
 
-          <a class="btn btn-default" id="edit-segments"
-             ng-click="editSegments()" ng-show="editSegmentsAllowed">
-            Modifier les tronçons
-          </a>
-        </div>
+  <div class="form-group">
+    <div class="g-maps"></div>
+  </div>
 
-        <div class="form-group">
-          <!--<input type="text" class="numero_grille_stoc" value="numéro grille stoc"
-            ng-if="protocoleAlgoSite != 'ROUTIER'">-->
-          <div class="g-maps"></div>
-        </div>
+  <div class="form-group">
+    <textarea rows="3" class="form-control" name="commentaire"
+              ng-model="site.commentaire" ng-disabled="readOnly"
+              placeholder="Commentaire">
+    </textarea>
+  </div>
 
-        <div class="form-group">
-          <textarea rows="3" class="form-control" name="commentaire"
-                    ng-model="site.commentaire" ng-disabled="readOnly"
-                    placeholder="Commentaire"></textarea>
-        </div>
+  <div class="checkbox" ng-show="isAdmin && observateur.registered">
+    <label>
+      <input type="checkbox" name="verrouille" ng-model="site.verrouille"
+             ng-true-value="true" ng-false-value="false">
+        Verrouillé
+    </label>
+  </div>
+  <div ng-show="isAdmin && !observateur.registered">
+    Le site ne peut pas être verrouillé car l'observateur {{observateur.pseudo}} n'est pas inscrit au protocole.
+  </div>
 
-        <div class="checkbox" ng-show="isAdmin && observateur.registered">
-          <label>
-            <input type="checkbox" name="verrouille" ng-model="site.verrouille"
-                   ng-true-value="true" ng-false-value="false">
-              Verrouillé
-          </label>
-        </div>
-        <div ng-show="!observateur.registered">
-          Le site ne peut pas être verrouillé car l'observateur {{observateur.pseudo}} n'est pas inscrit au protocole.
-        </div>
-
-        <div class="form-group">
-          <input class="save-user btn btn-primary" type="submit" value="Sauvegarder"
-                 ng-hide="siteForm.$pristine">
-        </div>
-      </form>
-    </div>
+  <div class="form-group">
+    <a class="save-user btn btn-primary" href="" ng-click="saveSite()">Sauvegarder</a>
   </div>
 </div>
