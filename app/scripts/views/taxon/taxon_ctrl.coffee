@@ -12,7 +12,7 @@ do =>
       @_initPromise.then (items) =>
         # Remove the current taxon from the list of possible parents
         if currentTaxonId?
-          @availableTaxons = items.filter (item) -> item._id != currentTaxonId
+          @availableTaxons = items.filter (item) -> item._id isnt currentTaxonId
         else
           @availableTaxons = items
         @parentTaxonsDict = {}
@@ -22,7 +22,7 @@ do =>
           callback()
 
     parseResponse: (response) ->
-      if (response.status == 422 and response.data._error.message.match('^circular dependency'))
+      if (response.status is 422 and response.data._error.message.match('^circular dependency'))
         @error = true
 
     idToData: (ids) ->
@@ -76,32 +76,34 @@ do =>
         type: "string"
     $scope.gridOptions =  Datasource.getGridReadOption('/taxons', fieldsTaxon, columnsTaxon)
 
+
+
   ### @ngInject ###
-  DisplayTaxonCtrl = ($routeParams, $scope, Backend, breadcrumbs) =>
-    $scope.taxon = {}
+  DisplayTaxonCtrl = ($routeParams, $scope, Backend, breadcrumbs, $sce) =>
     $scope.taxonId = $routeParams.taxonId
+    $scope.taxon = {}
     Backend.one('taxons', $routeParams.taxonId).get().then (taxon) ->
       $scope.taxon = taxon.plain()
+
       breadcrumbs.options =
         'Libelle': $scope.taxon.libelle_long + ' (' + $scope.taxon.libelle_court + ')'
       $(window).trigger('resize')
 
   ### @ngInject ###
-  CreateTaxonCtrl = ($scope, Backend, SessionTools) =>
+  CreateTaxonCtrl = ($scope, Backend, $routeParams, SessionTools) =>
     $scope.submitted = false
     $scope.taxon = {parents: []}
     $scope.taxonsParents = new TaxonsParents(Backend, $scope.taxonId)
-    $scope.taxonsParents.init()
+    $scope.taxonsParents.init ->
+      $(window).trigger('resize')
 
-    $scope.saveTaxon = ->
+    $scope.saveTaxon = =>
       payload = SessionTools.getModifiedRessource( $scope, $scope.taxon)
       if (payload?)
         payload.parents = $scope.taxonsParents.dataToId($scope.taxon.parents)
         Backend.all('taxons').post(payload).then(
-          -> window.location = '#/taxons/' + $routeParams.taxonId
-          (response) -> $scope.taxonsParents.parseResponse(response)
+          -> window.location = '#/taxons/'
         )
-    $(window).trigger('resize')
 
   ### @ngInject ###
   EditTaxonCtrl = ($route, $routeParams, $scope, Backend, breadcrumbs, SessionTools) =>
@@ -109,26 +111,24 @@ do =>
     $scope.taxon = {}
     $scope.taxonsParents = new TaxonsParents(Backend, $scope.taxonId)
     $scope.taxonsParents.init ->
-  # Force the cache control to get back the last version on the serveur
+# Force the cache control to get back the last version on the serveur
       Backend.one('taxons', $routeParams.taxonId).get(
         {}
         {'Cache-Control': 'no-cache'}
       ).then (taxon) ->
         $scope.taxonResource = taxon
         $scope.taxon = taxon.plain()
-        $scope.taxon.parents = $scope.taxonsParents.idToData($scope.taxon.parents)
         breadcrumbs.options =
           'Libelle': $scope.taxon.libelle_long + ' (' + $scope.taxon.libelle_court + ')'
         $(window).trigger('resize')
 
-    $scope.saveTaxon = ->
+    $scope.saveTaxon = =>
       payload = SessionTools.getModifiedRessource( $scope, $scope.taxon)
       if (payload?)
         payload.parents = $scope.taxonsParents.dataToId($scope.taxon.parents)
         # Finally refresh the page (needed for cache reasons)
         $scope.taxonResource.patch(payload).then(
           -> window.location = '#/taxons/' + $routeParams.taxonId
-          (response) -> $scope.taxonsParents.parseResponse(response)
         )
 
 
@@ -138,6 +138,3 @@ do =>
   .controller( 'Display', DisplayTaxonCtrl)
   .controller( 'Create', CreateTaxonCtrl)
   .controller( 'List', ListTaxonsCtrl)
-
-
-

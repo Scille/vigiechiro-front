@@ -1,79 +1,103 @@
 'use strict'
 
 
-angular.module('xin_uploadFile', ['appSettings', 'xin_s3uploadFile'])
+angular.module('xin_uploadFile', ['appSettings', 'xin_s3uploadFile', 'xin.fileUploader'])
   .directive 'uploadFileDirective', ->
     restrict: 'E'
     templateUrl: 'scripts/xin/upload_file/upload_file.html'
     controller: 'UploadFileController'
     scope:
-      multiple: '@'
-      uploaders: '=?'
+      uploader: '=?'
+      regexp: '=?'
     link: (scope, elem, attrs) ->
       scope.dragOverClass = ''
-      if not attrs.uploaders?
-        scope.uploaders = []
-      else
-        if not scope[attrs.uploaders]?
-          scope[attrs.uploaders] = []
-        scope.uploaders = scope[attrs.uploaders]
       drop = elem.find('.drop')
       input = drop.find('input')
       if attrs.multiple?
-        input.attr('multiple', '')
-        scope.multipleSelect = true
-      else
-        scope.multipleSelect = false
+        scope.multiple = true
+        input[0].setAttribute('multiple', '')
+      if attrs.directory?
+        scope.directory = true
+        input[0].setAttribute('directory', '')
+        input[0].setAttribute('webkitdirectory', '')
+        input[0].setAttribute('mozdirectory', '')
+
+      scope.$watch 'regexp', (regexp) ->
+        if regexp? and regexp.length
+          scope.addRegExpFilter(regexp)
+
       scope.clickFileInput = ->
         input.click()
-#        _.defer(-> input.click())
         return
-      cancel = (e) ->
-        e.stopPropagation()
-        e.preventDefault()
-      drop[0].addEventListener("dragover",
-        (e) ->
-          cancel(e)
-          scope.dragOverClass = 'drag-over'
-          _.defer(-> scope.$apply())
-        false)
-      drop[0].addEventListener("dragleave",
-        (e) ->
-          cancel(e)
-          scope.dragOverClass = ''
-          _.defer(-> scope.$apply())
-        false)
-      drop[0].addEventListener('drop',
-        (e) ->
-          cancel(e)
-          scope.dragOverClass = ''
-          _.defer(-> scope.$apply())
-          scope.uploadFiles(e.dataTransfer.files)
-        false
-      )
-      scope.fileInput = elem.find('.files-input')[0]
 
 
-  .controller 'UploadFileController', ($scope, Backend, S3FileUploader) ->
-    resetFileInput = ->
-      elem = $($scope.fileInput)
-      elem.wrap('<form>').closest('form').get(0).reset()
-      elem.unwrap()
-    $scope.stopUploader = (uploader) ->
-      uploader.stop()
-      _.remove($scope.uploaders, (up) -> up == uploader)
-    $scope.fileInputUploadFiles = () ->
-      $scope.uploadFiles($scope.fileInput.files)
-    $scope.uploadFiles = (files) ->
-      files = files or $scope.fileInput.files
-      if not $scope.multipleSelect and $scope.uploaders.length > 0
-        return
-      for file in files
-        uploader = new S3FileUploader(file,
-          onProgress: -> _.defer(-> $scope.$apply())
-          onFinished: -> _.defer(-> $scope.$apply())
-          onError: -> _.defer(-> $scope.$apply())
+  .controller 'UploadFileController', ($scope, Backend, S3FileUploader, FileUploader) ->
+    $scope.warnings = []
+    $scope.errors =
+      filters: []
+      back: []
+      xhr: []
+    uploader = $scope.uploader = new FileUploader()
+
+    # Remove sub-directories
+    uploader.filters.push(
+      name: "Sous-dossiers ignorés."
+      fn: (item) ->
+        if item.webkitRelativePath? and item.webkitRelativePath != ''
+          split = item.webkitRelativePath.split("/")
+          if split.length > 2
+            return false
+          else
+            nameDirectory = split[0]
+            if uploader.directories.indexOf(nameDirectory) == -1
+              uploader.directories.push(nameDirectory)
+        return true
+    )
+
+    $scope.addRegExpFilter = (regexp) ->
+      if regexp? and regexp.length
+        uploader.filters.push(
+          name: "Format incorrect."
+          fn: (item) ->
+            if item.type in ['image/png', 'image/png', 'image/jpeg']
+              return true
+            for reg in regexp
+              if reg.test(item.name)
+                return true
+            return false
         )
-        $scope.uploaders.push(uploader)
-        uploader.start()
-      resetFileInput()
+
+    uploader.onAddingComplete = ->
+      if uploader.status in ['ready', 'progress']
+        uploader.startAll()
+
+    uploader.onWhenAddingFileFailed = (item, filter) ->
+      if filter.name == "Sous-dossiers ignorés."
+        split = item.webkitRelativePath.split("/")
+        nameDirectory = "."
+        for i in [0..split.length-2]
+          nameDirectory += "/"+split[i]
+        text = "Le dossier "+nameDirectory+" a été ignoré. "+
+               filter.name
+        if $scope.errors.filters.indexOf(text) == -1
+          $scope.errors.filters.push(text)
+      else
+        text = "Le fichier "+item.name+" n'a pas pu être ajouté à la liste. "+
+               filter.name
+        $scope.errors.filters.push(text)
+      $scope.$apply()
+
+    uploader.onAddingWarningsComplete = ->
+      for warning in @warnings
+        if $scope.directory?
+          $scope.warnings.push(warning.name+" n'est pas un dossier.")
+        else
+          $scope.warnings.push(warning.name+" n'est pas un fichier.")
+      $scope.$apply()
+
+    uploader.onCancelAllComplete = ->
+      $scope.warnings = []
+      $scope.errors =
+        filters: []
+        back: []
+        xhr: []

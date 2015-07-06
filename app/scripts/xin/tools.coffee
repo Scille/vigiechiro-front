@@ -1,36 +1,33 @@
 'use strict'
 
-window.resizeContainer = () =>
-  footer = $('footer')
-  mainContent = $('#main-content')
-  if (mainContent.length > 0 && footer.length > 0)
-    footerOffset = footer.offset()
-    mainOffset = mainContent.offset()
-    if (footerOffset? && mainOffset?)
-      height = footerOffset.top - mainOffset.top - 20
-      mainContent.height(height)
-      grid = $('#kendoGrid1')
-      if (grid.length > 0)
-        grid.height( height)
-        dataKendoGrid = grid.data('kendoGrid')
-        if (dataKendoGrid?)
-          dataKendoGrid.resize()
-      grid = $('#kendoGrid2')
-      if (grid.length > 0)
-        grid.height( height)
-        dataKendoGrid = grid.data('kendoGrid')
-        if (dataKendoGrid?)
-          dataKendoGrid.resize()
-      grid = $('.k-editor')
-      if (grid.length > 0)
-        grid.height( height - 70)
-      grid = $('#xinPaneContent')
-      if (grid.length > 0)
-        grid.height( height - 40)
+window.resizeContainer = =>
+  grid = $('.k-grid-content')
+  if (grid? and grid.length > 0)
+    grid.height( $(window).height() - grid.offset().top - 6)
+    dataKendoGrid = grid.data('kendoGrid')
+    if (dataKendoGrid?)
+      dataKendoGrid.resize()
+  section = $('.xin-heightsection100')
+  panelSubmit = $('#panelSubmit')
+  if (section? and section.length > 0 and panelSubmit?)
+    section.height( section.offset().top - panelSubmit.offset().top - 30)  # rajouter le padding
+  else
+  if (section? and section.length > 0)
+    section.height( $(window).height() - section.offset().top - 60)
+  else
+    section = $('.maincontent')
+  form = $('.xin-heightform100')
+  if (form? and form.length > 0 and section.length > 0)
+    form.height( section.height() - form.offset().top + section.offset().top)
+  tag = $('.xin-height100')
+  if (tag? and tag.length > 0 and section.length > 0)
+    tag.height( section.height() - tag.offset().top + section.offset().top)
+  grid = $('.k-content')
+  if (grid? and grid.length > 0 and section.length > 0)
+    grid.css( 'height', section.height() - grid.offset().top + section.offset().top)
 
-
-$(window).resize(() ->
-    window.resizeContainer()
+$(window).resize( ->
+  window.resizeContainer()
 )
 
 
@@ -55,7 +52,7 @@ angular.module('xin_tools', [])
       eventCurrent = @eventCount
       $timeout(
         =>
-          if eventCurrent == @eventCount
+          if eventCurrent is @eventCount
             action()
         @timer
       )
@@ -79,46 +76,3 @@ angular.module('xin_tools', [])
       defer.resolve(elem)
     return defer.promise
 
-.service 'createHtmlEditor', () ->
-  (description) ->
-    $('#kendoEditor').kendoEditor(
-      domain: description
-      resizable:
-        min: 100
-        max: 600
-      tools: [
-        "bold"
-        "italic"
-        "underline"
-        "strikethrough"
-        "justifyLeft"
-        "justifyCenter"
-        "justifyRight"
-        "justifyFull"
-        "insertUnorderedList"
-        "insertOrderedList"
-        "indent"
-        "outdent"
-        "createLink"
-        "unlink"
-        "insertImage"
-        "subscript"
-        "superscript"
-        "createTable"
-        "addRowAbove"
-        "addRowBelow"
-        "addColumnLeft"
-        "addColumnRight"
-        "deleteRow"
-        "deleteColumn"
-        "viewHtml"
-        "formatting"
-        "cleanFormatting"
-        "fontName"
-        "fontSize"
-        "foreColor"
-        "backColor"
-        "print"
-      ]
-    )
-    $(window).trigger("resize")

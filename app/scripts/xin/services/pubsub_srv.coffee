@@ -1,9 +1,9 @@
 do =>
 
-  PubSub = () =>
+  PubSub = =>
     self =
-      subscriptions : {}
-      lastData : {}
+      subscriptions: {}
+      lastData: {}
 
       subscribe: (subscription, subscriber) ->
 

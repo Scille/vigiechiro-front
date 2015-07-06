@@ -1,12 +1,18 @@
-md-sidenav.site-sidenav.md-sidenav-left.md-whiteframe-z2(md-component-id='left', md-is-locked-open="$mdMedia('gt-sm')")
-  header.nav-header
-    a.xin-logo(ng-href='#/')
-      img(src='/images/chauvesouris.png')
-      h1.xin-logotype.md-heading Vigiechiro
-  md-divider
+aside.sidebar.fixed
+  .brand-logo
+    #logo
+      img(src="/images/chauvesouris.png", height="64", style="margin-top:-3px;margin-left:-28px")
+    |     Vigiechiro
+  .user-logged-in
+    .content
+      .user-name
+        | {{user.pseudo}}
+      .user-actions
+        a.m-r-5(href='#/profil') Profile
+        a(ng-click='logout()') Logout
   ul(ng-cloak='')
-    a(menu-link='', href='#/', icon='md md-blur-on') Vigiechiro
-    a(menu-link='', href='#/participations/mes-participations', icon='md md-insert-chart') Participations
-    a(menu-link='', href='#/protocoles/mes-protocoles', icon='md md-blur-on') Vigiechiro
-    a(menu-link='', href='#/taxons', icon='md md-insert-chart') Participations
-    a(menu-link='', href='#/utilisateurs', icon='md md-insert-chart') Utilisateurs
+    a(menu-link='', href='#/participations/mes-participations', icon='md md-call-merge') Participation
+    a(menu-link='', href='#/sites/mes-sites', icon='md md-terrain') Sites
+    a(menu-link='', href='#/protocoles/mes-protocoles', icon='md md-vpn-key') Protocoles
+    a(menu-link='', href='#/taxons', icon='md md-android') Taxons
+    a(menu-link='', href='#/utilisateurs', icon='md md-account-child') Utilisateurs

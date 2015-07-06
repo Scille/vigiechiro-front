@@ -1,21 +1,38 @@
 do =>
-  xinCreate = () ->
+  ### @ngInject ###
+  xinActions = (Session, PubSub) =>
     restrict: 'E'
-    templateUrl: 'scripts/xin/action_drt/create.html'
-    link: ($scope) ->
-      $scope.hrefValue = window.location.href + "/nouveau"
+    replace: true
+    templateUrl: 'scripts/xin/action_drt/action.html'
+    link: (scope) ->
+      scope.hrefValue = window.location.href + "/nouveau"
+      scope.isSelected = false
+      PubSub.subscribe 'grid', (select) =>
+        scope.$apply =>
+          scope.isSelected = select.length > 0 and Session.isAdmin()
+      scope.createItem = =>
+        window.location = scope.hrefValue
+      scope.deleteItem = =>
+        # pas implemente
+        t = 1
 
-  xinSubmit = () ->
+
+
+  xinSubmit = ->
     restrict: 'E'
+    replace: true
     templateUrl: 'scripts/xin/action_drt/submit.html'
 
-  xinUpdate = () ->
+  xinUpdate = ->
     restrict: 'E'
+    replace: true
     templateUrl: 'scripts/xin/action_drt/update.html'
-    link: ($scope) ->
-      $scope.hrefValue = window.location.href + "/edition"
+    link: (scope) ->
+      scope.hrefValue = window.location.href + "/edition"
+      scope.updateItem = =>
+        window.location = scope.hrefValue
 
   angular.module('xin_action', [])
-  .directive('xinCreate', xinCreate)
+  .directive('xinActions', xinActions)
   .directive('xinSubmit', xinSubmit)
   .directive('xinUpdate', xinUpdate)

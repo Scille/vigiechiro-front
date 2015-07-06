@@ -43,13 +43,13 @@ describe 'Service: session', ->
     $rootScope = _$rootScope_
     $httpBackend = _$httpBackend_
 
-  it 'Test trigger login', inject ($window, session, sessionTools) ->
+  it 'Test trigger login', inject ($window, session, SessionTools) ->
     spyOn($window.location, 'reload').and.callThrough()
     session.login(test_token)
     expect($window.location.reload).toHaveBeenCalled()
-    expect(sessionTools.getAuthorizationHeader()).toEqual(test_authorization_header)
+    expect(SessionTools.getAuthorizationHeader()).toEqual(test_authorization_header)
 
-  it 'Test login from another tab', inject ($window, storage, session, sessionTools) ->
+  it 'Test login from another tab', inject ($window, storage, session, SessionTools) ->
     spyOn($window.location, 'reload').and.callThrough()
     storage.setItem('auth-session-token', test_token)
     # Send a fake event to simulate the other tab
@@ -60,22 +60,22 @@ describe 'Service: session', ->
     )
     $rootScope.$digest() # Trigger promises
     expect($window.location.reload).toHaveBeenCalled()
-    expect(sessionTools.getAuthorizationHeader()).toEqual(test_authorization_header)
+    expect(SessionTools.getAuthorizationHeader()).toEqual(test_authorization_header)
 
   describe 'Once logged in', ->
 
     beforeEach inject (session) ->
       session.login(test_token)
 
-    it 'Test logout', inject ($window, session, sessionTools) ->
+    it 'Test logout', inject ($window, session, SessionTools) ->
       spyOn($window.location, 'reload').and.callThrough()
       $httpBackend.expectPOST('/logout').respond(200)
       session.logout()
       $rootScope.$digest() # Trigger promises
       expect($window.location.reload).toHaveBeenCalled()
-      expect(sessionTools.getAuthorizationHeader()).toBeUndefined()
+      expect(SessionTools.getAuthorizationHeader()).toBeUndefined()
 
-    it 'Test logout from another tab', inject ($window, session, sessionTools) ->
+    it 'Test logout from another tab', inject ($window, session, SessionTools) ->
       spyOn($window.location, 'reload').and.callThrough()
       storage.removeItem('auth-session-token')
       # Send a fake event to simulate the other tab
@@ -86,7 +86,7 @@ describe 'Service: session', ->
       )
       $rootScope.$digest() # Trigger promises
       expect($window.location.reload).toHaveBeenCalled()
-      expect(sessionTools.getAuthorizationHeader()).toBeUndefined()
+      expect(SessionTools.getAuthorizationHeader()).toBeUndefined()
 
 
 describe 'Outdated token', ->

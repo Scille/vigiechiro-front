@@ -16,7 +16,7 @@
 (function (factory) {
   'use strict';
   /* istanbul ignore if */
-  if (typeof define === 'function' && /* istanbul ignore next */ define.amd) {
+  if (typeof define === 'function'  && /* istanbul ignore next */ define.amd) {
     define(['angular', 'moment'], factory); // AMD
   } else {
     factory(window.angular, window.moment); // Browser global

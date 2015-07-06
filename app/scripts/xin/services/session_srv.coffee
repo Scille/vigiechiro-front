@@ -9,15 +9,14 @@ do =>
     self =
       user: {}
 
-      init : () =>
+      init: =>
         Backend.setBaseUrl(SETTINGS.API_DOMAIN)
         $rootScope.$on '$routeChangeSuccess', self.routeChanged
         self.connect()
 
-      connect : () =>
+      connect: =>
         # Force the cache to really get current user
         # Get back the user from the backend
-        kendo.ui.progress($("body"), true);
         Backend.one('moi').get(
           {},
           {'Cache-Control': 'false'}
@@ -25,41 +24,39 @@ do =>
         .then(
           (user) =>
             self.defineUser(user)
-            kendo.ui.progress($("body"), false);
-          () =>
+          =>
             self.undefineUser()
-            kendo.ui.progress($("body"), false);
         )
 
-      isLogged : () =>
-        return SessionTools.getAuthorizationHeader() != undefined
+      isLogged: =>
+        return SessionTools.getAuthorizationHeader() isnt undefined
 
-      defineUser : (aUser) =>
+      defineUser: (aUser) =>
         self.user = aUser.plain()
         $rootScope.isAdmin = self.isAdmin()
         $rootScope.isLogged = self.isLogged()
         PubSub.publish('user', self.user)
 
-      undefineUser : () =>
+      undefineUser: =>
         self.user = {}
         $rootScope.isAdmin = self.isAdmin()
         $rootScope.isLogged = self.isLogged()
         SessionTools.removeAuthorizationHeader()
         PubSub.publish('user', self.user)
 
-      getUser : () =>
+      getUser: =>
         return self.user
 
-      isAdmin : () =>
-        return self.user.role == 'Administrateur'
+      isAdmin: =>
+        return self.user.role is 'Administrateur'
 
-      logout : () =>
+      logout: =>
         self.user = {}
         SessionTools.removeAuthorizationHeader()
         Backend.one('logout').post().then(postLogout, postLogout)
         self.connect()
 
-      routeChanged : () =>
+      routeChanged: =>
         authToken = $location.search().token
         if (authToken?)
           SessionTools.applyAuthorizationHeader(authToken)

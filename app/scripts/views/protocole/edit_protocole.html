@@ -1,6 +1,6 @@
 <div class="container">
 
-  <form class="simple-form" novalidate name="xinForm"
+  <form class="simple-form" novalidate name="protocoleForm"
         ng-submit="saveProtocole()">
 
     <div class="input-group form-group">
@@ -39,15 +39,22 @@
         Champ requis
       </span>
 
-      <div class="input-group form-group">
-        <span class="input-group-addon">Taxon</span>
-        <select class="form-control" ng-model="protocole.taxon"
-                ng-options="taxon._id as taxon.libelle_long for taxon in taxons">
-        </select>
+      <div class="form-group" ng-class="{'has-error': taxons.error && !protocoleForm.$pristine}">
+        <div class="input-group">
+          <label class="input-group-addon" for="protocole_taxon">Taxon</label>
+          <ui-select id="protocole_taxon" name="protocole_taxon"
+                     ng-model="protocole.taxon" theme="bootstrap"
+                     ng-disabled="disabled">
+            <ui-select-match>{{$select.selected.libelle_long}}</ui-select-match>
+            <ui-select-choices repeat="taxon in taxons | filter:$select.search">
+              {{taxon.libelle_long}}
+            </ui-select-choices>
+          </ui-select>
+        </div>
+        <span ng-show="submitted && !protocole.taxon" class="help-block">
+          Champ requis
+        </span>
       </div>
-      <span ng-show="submitted && !protocole.taxon" class="help-block">
-        Champ requis
-      </span>
     </div>
 
     <div class="input-group form-group">

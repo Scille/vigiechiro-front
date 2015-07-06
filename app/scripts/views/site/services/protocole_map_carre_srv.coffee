@@ -4,13 +4,25 @@
 angular.module('protocole_map_carre', [])
   .factory 'ProtocoleMapCarre', ($rootScope, Backend, GoogleMaps, ProtocoleMap) ->
     class ProtocoleMapCarre extends ProtocoleMap
-      constructor: (mapDiv, @siteCallback) ->
-        super mapDiv, @siteCallback
+      constructor: (mapDiv, @typeProtocole, @callbacks) ->
+        super mapDiv, @typeProtocole, @callbacks
+        @_min = 5
+        @_max = 13
         @_steps = [
-          "Positionner la zone de sélection aléatoire.",
-          "Cliquer sur la carte pour sélection la grille stoc correspondante.",
-          "Définir entre 5 et 13 localités à l'intérieur du carré."
-          "Valider les localités."
+            id: 'start'
+            message: "Positionner la zone de sélection aléatoire."
+          ,
+            id: 'selectGrilleStoc'
+            message: "Cliquer sur la carte pour sélection la grille stoc correspondante."
+          ,
+            id: 'editLocalities'
+            message: "Définir entre 5 et 13 localités à l'intérieur du carré."
+          ,
+            id: 'validLocalities'
+            message: "Valider les localités."
+          ,
+            id: 'end'
+            message: "Cartographie achevée."
         ]
         @_googleMaps.setDrawingManagerOptions(
           drawingControlOptions:
@@ -20,54 +32,37 @@ angular.module('protocole_map_carre', [])
             ]
         )
         @_googleMaps.setDrawingManagerOptions(drawingControl: false)
-        @loading = true
-        @updateSite()
-        @loading = false
-
-      clearMap: ->
-        @_googleMaps.setDrawingManagerOptions(
-          drawingControl: false
-          drawingMode: ''
-        )
-        for localite in @_localites
-          localite.overlay.setMap(null)
-        @_localites = []
-        @_step = 0
-        if @_circleLimit?
-          @_circleLimit.setMap(null)
-          @_circleLimit = null
-        @_newSelection = false
-        if Object.keys(@_grilleStoc).length
-          @_grilleStoc.item.setMap(null)
-          @_grilleStoc = {}
         @updateSite()
 
-      mapsCallback: ->
+      mapCallback: ->
         overlayCreated: (overlay) =>
           isModified = false
-          if @_step == 1
+          if @_step == 'selectGrilleStoc'
             @getGrilleStoc(overlay)
             return false
           else
             if overlay.type == "Point"
-              if @_googleMaps.isPointInPolygon(overlay, @_grilleStoc.item)
+              if @_googleMaps.isPointInPolygon(overlay, @_grilleStoc.overlay)
                 isModified = true
             else
-              throw "Error : bad shape type " + overlay.type
+              @callbacks.displayError?("Mauvaise forme : " + overlay.type)
             if isModified
+              if @getCountOverlays() >= @_max
+                @callbacks.displayError?("Nombre maximum de localités atteint.")
+                return false
               @saveOverlay(overlay)
               @_googleMaps.addListener(overlay, 'rightclick', (e) =>
                 @deleteOverlay(overlay)
-                if @getCountOverlays() < 5
-                  @_step = 2
+                if @getCountOverlays() < @_min
+                  @_step = 'editLocalities'
                 else
-                  @_step = 3
+                  @_step = 'validLocalities'
                 @updateSite()
               )
-              if @getCountOverlays() >= 5
-                @_step = 3
+              if @getCountOverlays() >= @_min
+                @_step = 'validLocalities'
               else
-                @_step = 2
+                @_step = 'editLocalities'
               @updateSite()
               return true
             return false
@@ -75,20 +70,14 @@ angular.module('protocole_map_carre', [])
       saveOverlay: (overlay) =>
         localite = {}
         localite.overlay = overlay
-        localite.name = @setLocaliteName()
+        localite.name = @setLocalityName()
         localite.overlay.setOptions({ title: localite.name })
         localite.representatif = false
-        @_localites.push(localite)
+        @_localities.push(localite)
 
-      mapValidated: ->
-        if @_step == 4
-          return true
-        else
-          return false
-
-      setLocaliteName: (name = 1) ->
+      setLocalityName: (name = 1) ->
         used = false
-        for localite in @_localites
-          if parseInt(localite.name) == name
-            return @setLocaliteName(name + 1)
+        for locality in @_localities
+          if parseInt(locality.name) == name
+            return @setLocalityName(name + 1)
         return name+''

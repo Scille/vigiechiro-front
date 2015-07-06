@@ -44,6 +44,10 @@ angular.module('xin_google_maps', [])
         if @callbackDict.mapsMoved?
           google.maps.event.addListener(@_map, 'dragend', @callbackDict.mapsMoved)
         google.maps.event.addListener(@_drawingManager, 'overlaycomplete', @overlayCreated)
+        # projection
+        google.maps.event.addListenerOnce(@_map, "projection_changed", =>
+          @callbackDict.onProjectionReady?()
+        )
 
       overlayCreated: (e) =>
         new_overlay = e.overlay
@@ -62,9 +66,6 @@ angular.module('xin_google_maps', [])
       addListener: google.maps.event.addListener
 
       clearListeners: google.maps.event.clearListeners
-
-      deleteOverlay: (overlay) ->
-        overlay.setMap(null)
 
       displayInfo: (overlay) ->
         infoWindow = new google.maps.InfoWindow()
@@ -109,6 +110,9 @@ angular.module('xin_google_maps', [])
             return false
         return true
 
+      createLatLng: (lat, lng) ->
+        new latLng(lat, lng)
+
       createPoint: (lat, lng, draggable = false, title = '') ->
         latlng = new google.maps.LatLng(lat, lng)
         return @createPointWithLatLng(latlng, draggable, title)
@@ -121,6 +125,15 @@ angular.module('xin_google_maps', [])
           title: title
         )
         return point
+
+      createCircle: (center, radius, draggable = false, editable = false) ->
+        new google.maps.Circle(
+          map: @_map
+          center: center
+          radius: radius
+          draggable: draggable
+          editable: editable
+        )
 
       createBounds: (sw = null, ne = null) ->
         bounds = new google.maps.LatLngBounds()
@@ -177,6 +190,8 @@ angular.module('xin_google_maps', [])
           latlngs.push([vertice.lat(), vertice.lng()])
         return latlngs
 
+      computeOffset: google.maps.geometry.spherical.computeOffset
+
       computeLength: (overlay) ->
         if !overlay?
           return 0
@@ -191,13 +206,21 @@ angular.module('xin_google_maps', [])
         )
         return google.maps.geometry.poly.isLocationOnEdge(point, poly, tolerance)
 
-      findClosestPointOnPath: (drop_pt, path_pts) ->
+      findClosestPointOnPath: (drop_pt, path_pts, banned = []) ->
         # Stores the distances of each pt on the path from the marker point
         distances = []
         # Stores the key of point on the path that corresponds to a distance
         distance_keys = []
         # For each point on the path
         for key in [0..path_pts.length-1]
+          toBan = false
+          for ban in banned
+            if path_pts[key].lat() == ban.getPosition().lat() and
+               path_pts[key].lng() == ban.getPosition().lng()
+              toBan = true
+              break
+          if toBan
+            continue
           # Find the distance in a linear crows-flight line between the marker point and the current path point
           d = google.maps.geometry.spherical
             .computeDistanceBetween(drop_pt, path_pts[key])
@@ -226,3 +249,9 @@ angular.module('xin_google_maps', [])
         return latLngBetween
 
       trigger: google.maps.event.trigger
+
+      hideDrawingManager: ->
+        @setDrawingManagerOptions(
+          drawingControl: false
+          drawingMode: ''
+        )

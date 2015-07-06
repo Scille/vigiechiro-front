@@ -4,12 +4,12 @@ do =>
   # factory
   # @ngInject
   ###
-  Datasource = (SessionTools, SETTINGS) =>
+  Datasource = (SessionTools, SETTINGS, PubSub) =>
 
     self =
 
       getDatasourceOption: (uri, aFields) =>
-        dataSource = new kendo.data.DataSource(
+        new kendo.data.DataSource(
           transport:
             read:
               url: SETTINGS.API_DOMAIN + uri
@@ -36,6 +36,9 @@ do =>
         dataSource: self.getDatasourceOption(uri, aFields)
         columns: aColumns
         resizable: true
+        selectable: 'multiple,row'
+        change: (e) =>
+          PubSub.publish('grid', e.sender.table.select())
         filterable:
           extra: false
           operators:
@@ -45,6 +48,16 @@ do =>
           virtual: true
         sortable: true
         dataBound: window.resizeContainer
+
+      selectItems: (idAr) ->
+        grid = $("#kendoGrid")
+        if not idAr instanceof Array
+          idAr = [ idAr ]
+        items = grid.items().filter((i, el) ->
+          idAr.indexOf(grid.dataItem(el).Id) isnt -1
+        )
+        grid.select items
+        return
 
     return self
 

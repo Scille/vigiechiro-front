@@ -4,32 +4,32 @@ do =>
   # factory
   # @ngInject
   ###
-  SessionTools = ($q, $window, $location, Storage) =>
+  SessionTools = ($window, $location, localStorageService) =>
     self =
 
       applyAuthorizationHeader: (token) =>
-        Storage.setItem('auth-session-token', token)
+        localStorageService.set('auth-session-token', token)
         #remove the token parameter
         url = '/#' + $location.path()
         params = ''
         for key, value in $location.search()
-          if key != 'token'
+          if key isnt 'token'
             params += "#{value}&"
         if (params.length > 0)
           url = url + '?' + params
         $window.location.href = url
 
-      getAuthorizationHeader: () =>
-        token = Storage.getItem('auth-session-token')
+      getAuthorizationHeader: =>
+        token = localStorageService.get('auth-session-token')
         if token?
           return "Basic " + btoa("#{token}:")
         else
           return undefined
 
-      removeAuthorizationHeader: () =>
-        Storage.removeItem('auth-session-token')
+      removeAuthorizationHeader: =>
+        localStorageService.remove('auth-session-token')
 
-      logRequestError: () =>
+      logRequestError: =>
         # A 401 error happened, this is normal if the user is not currently
         # logged in (i.e. no auth-session-token is set), otherwise it means the
         # current auth-session-token is no longer valid (thus we have to force
@@ -40,9 +40,6 @@ do =>
 
       getModifiedRessource: ( scope, input) =>
         payload =  {}
-
-        if (not scope.xinForm.$valid or not scope.xinForm.$dirty or not input)
-          return
 
         angular.copy( input, payload)
 

@@ -1,20 +1,20 @@
 <div class="container">
   <div ng-show="!loading">
-  <div ng-show="participations.length != 0">
-    <div class="page-header">
-      <h3>Mes participations</h3>
+    <div ng-show="participations.length != 0">
+      <div class="page-header">
+        <h3>Mes participations</h3>
+      </div>
+      <ul class="list-group">
+        <li class="list-group-item" ng-repeat="participation in participations">
+            <a href="#/participations/{{participation._id}}">
+              Participation du {{ participation.date_debut | xinDate: 'medium' }}
+            </a>
+        </li>
+      </ul>
+      <div ng-show="participations.length == 0" class="text-center">
+        <h3><i>Vous n'avez pas de participation pour le moment</i></h3>
+      </div>
     </div>
-    <ul class="list-group">
-      <li class="list-group-item" ng-repeat="participation in participations">
-          <a href="#/participations/{{participation._id}}">
-            Participation du {{ participation.date_debut | xinDate: 'medium' }}
-          </a>
-      </li>
-    </ul>
-    <div ng-show="participations.length == 0" class="text-center">
-      <h3><i>Vous n'avez pas de participation pour le moment</i></h3>
-    </div>
-  </div>
   </div>
 
   <div ng-if="loading">

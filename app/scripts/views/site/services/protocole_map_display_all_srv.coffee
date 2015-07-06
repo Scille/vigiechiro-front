@@ -31,16 +31,26 @@ angular.module('protocole_map_display_all', [])
           strokeWeight: 0.5
         )
 
+      loadMap: (sites) ->
+        for site in sites or []
+          # If grille stoc
+          if site.grille_stoc
+            coordinates = site.grille_stoc.centre.coordinates
+            @displayGrilleStoc(coordinates[1], coordinates[0], site.grille_stoc.numero)
+          # If tracet
+          if site.tracet
+            path = site.tracet.chemin.coordinates
+            start = path[0]
+            end = path[path.length-1]
+            @_googleMaps.createPoint(start[0], start[1])
+            @_googleMaps.createPoint(end[0], end[1])
+            @_googleMaps.createLineString(path)
+
 
   .factory 'ProtocoleMapDisplayCarre', (GoogleMaps, ProtocoleMapDisplay) ->
     class ProtocoleMapDisplayCarre extends ProtocoleMapDisplay
       constructor: (mapDiv) ->
         super mapDiv
-
-      loadMap: ->
-        for site in @sites or []
-          coordinates = site.grille_stoc.centre.coordinates
-          @displayGrilleStoc(coordinates[1], coordinates[0], site.grille_stoc.numero)
 
 
   .factory 'ProtocoleMapDisplayRoutier', (GoogleMaps, ProtocoleMapDisplay) ->
@@ -48,27 +58,8 @@ angular.module('protocole_map_display_all', [])
       constructor: (mapDiv) ->
         super mapDiv
 
-      loadMap: ->
-        # start loading
-        @loading = true
-        for site in @sites or []
-          nbLocalites = site.localites.length
-          if nbLocalites > 0
-            start = site.localites[0].geometries.geometries[0].coordinates[0]
-            stop = site.localites[nbLocalites-1].geometries.geometries[0].coordinates[1]
-            @_googleMaps.createPoint(start[0], start[1], false, "Départ")
-            @_googleMaps.createPoint(stop[0], stop[1], false, "Arrivée")
-            @_googleMaps.createLineString([start, stop])
-        # end loading
-        @loading = false
-
 
   .factory 'ProtocoleMapDisplayPointFixe', (GoogleMaps, ProtocoleMapDisplay) ->
     class ProtocoleMapDisplayPointFixe extends ProtocoleMapDisplay
       constructor: (mapDiv) ->
         super mapDiv
-
-      loadMap: ->
-        for site in @sites or []
-          coordinates = site.grille_stoc.centre.coordinates
-          @displayGrilleStoc(coordinates[1], coordinates[0], site.grille_stoc.numero)

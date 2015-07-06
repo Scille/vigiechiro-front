@@ -9,30 +9,10 @@ do =>
       label: 'Accueil'
 
   #### @ngInject ###
-  AccueilCtrl = ($scope, Datasource) ->
-    columns =
-      [
-        field: "titre"
-        title: "Titre"
-        template: '<a href=\"\\#/sites/#: _id #\"> #: pseudo # </a>'
-      ]
-    fields =
-      titre:
-        type: "string"
+  AccueilCtrl = ($scope, Backend) ->
+    Backend.all('moi/sites').getList().then (sites) ->
+      $scope.userSites = sites.plain()
 
-    $scope.gridOptions =  Datasource.getGridReadOption('/sites', fields, columns)
-
-    columns =
-      [
-        field: "titre"
-        title: "Titre"
-        template: '<a href=\"\\#/moi/sites/#: _id #\"> #: pseudo # </a>'
-      ]
-    fields =
-      titre:
-        type: "string"
-
-    $scope.gridMesOptions =  Datasource.getGridReadOption('/moi/sites', fields, columns)
 
   angular.module('accueilViews', [])
   .config(config)

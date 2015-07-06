@@ -40,7 +40,7 @@ do =>
   ShowUtilisateurCtrl = ($scope, $route, $routeParams, Backend, Session, breadcrumbs, SessionTools) =>
     $scope.utilisateur = {}
     $scope.readOnly = false
-    if $routeParams.userId == 'moi'
+    if $routeParams.userId is 'moi'
       $scope.userBackend = Backend.one('moi')
     else
       $scope.userBackend = Backend.one('utilisateurs', $routeParams.userId)
@@ -49,9 +49,10 @@ do =>
       $scope.utilisateur = utilisateur.plain()
       breadcrumbs.options =
         'Pseudo': $scope.utilisateur.pseudo
-      $scope.readOnly = (not Session.isAdmin() and Session.getUser()._id != $scope.utilisateur._id)
+      $scope.readOnly = (not Session.isAdmin() and Session.getUser()._id isnt $scope.utilisateur._id)
+      $(window).trigger('resize')
 
-    $scope.saveUser = ->
+    $scope.saveUser = =>
       payload = SessionTools.getModifiedRessource( $scope, $scope.utilisateur)
       if (payload?)
         $scope.userBackend.patch( payload).then(

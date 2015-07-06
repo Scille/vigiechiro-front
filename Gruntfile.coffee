@@ -20,6 +20,7 @@ module.exports = (grunt) ->
 
   grunt.loadNpmTasks "grunt-protractor-runner"
   grunt.loadNpmTasks "grunt-contrib-jade"
+  grunt.loadNpmTasks "grunt-sass"
 
   # Define the configuration for all the tasks
   grunt.initConfig
@@ -47,6 +48,14 @@ module.exports = (grunt) ->
           "newer:coffee:test"
           "karma"
         ]
+
+      sass:
+        files: [
+          '<%= yeoman.app %>/styles/sass/**/*.scss'
+        ]
+        tasks: ['newer:sass:dist']
+        options:
+          livereload: true
 
       styles:
         files: ["<%= yeoman.app %>/styles/**/*.css"]
@@ -130,6 +139,13 @@ module.exports = (grunt) ->
 
       server: ".tmp"
 
+    # sass our development files into 1 stylesheet
+    sass:
+      dist:
+        options:
+          style: 'expanded'
+        files:
+          '.tmp/styles/materialism.css': '<%= yeoman.app %>/styles/sass/materialism.scss'
 
     # Add vendor prefixed styles
     autoprefixer:
@@ -366,6 +382,7 @@ module.exports = (grunt) ->
     concurrent:
       server: [
         "coffee:dist"
+        "sass:dist"
         "jade:dist"
         "copy:styles"
       ]
@@ -376,6 +393,7 @@ module.exports = (grunt) ->
       dist: [
         "coffee"
         "jade"
+        "sass"
         "copy:styles"
         "imagemin"
         "svgmin"

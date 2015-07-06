@@ -27,9 +27,40 @@ do ->
 
 
   ### @ngInject ###
-  AppCtrl = ($scope, PubSub, Session) =>
+  AppCtrl = ($scope, PubSub, Session, localStorageService) =>
     PubSub.subscribe 'user', (user) =>
       $scope.isLogged = Session.isLogged()
+
+#    $(document).arrive('.navbar-toggle', () =>
+#      $(this).sideNav({menuWidth: 260, closeOnClick: true}))
+
+    theme = localStorageService.get("theme")
+
+    if (not theme?)
+      theme =
+        color: "theme-pink"
+        template: "theme-template-dark"
+
+    $scope.theme = theme
+
+    $scope.theme_colors = [
+      'pink', 'red', 'purple', 'indigo', 'blue',
+      'light-blue', 'cyan', 'teal', 'green', 'light-green',
+      'lime', 'yellow', 'amber', 'orange', 'deep-orange'
+    ]
+
+    $scope.fillinContent = =>
+      $scope.htmlContent = 'content content'
+
+    #theme changing
+    $scope.changeColorTheme = (cls) =>
+      $scope.theme.color = cls
+
+    $scope.changeTemplateTheme = (cls) =>
+      $scope.theme.template = cls
+
+    localStorageService.set "theme", theme
+    localStorageService.bind $scope, "theme"
 
 
   ### @ngInject ###
@@ -37,23 +68,30 @@ do ->
     Session.init()
 
 
-  angular
-  .module('vigiechiroApp', ['ngAnimate',
+  window.app = angular
+  .module('vigiechiroApp', ['angular-loading-bar',
+                            'LocalStorageModule',
+                            'jcs-autoValidate',
+                            'ngAnimate',
                             'ngRoute',
-                            'ngMessages',
+                            'ngAside',
                             'ngSanitize',
-                            'ngTouch',
                             'ng-breadcrumbs',
+                            'ui.select',
+                            'ui.bootstrap',
                             'flow',
-      			                'kendo.directives',
+                            'form-control',
+                            'kendo.directives',
                             'xin_google_maps',
                             'appSettings',
+                            'xin_tag',
                             'xin_login',
                             'xin_editor',
                             'xin_pubsub',
                             'xin_tools',
                             'xin_content',
                             'xin_footer',
+                            'xin.fileUploader',
                             'xin_input',
                             'xin_session',
                             'xin_session_tools',
@@ -64,15 +102,18 @@ do ->
                             'xin_pubsub',
                             'xin_google_maps',
                             "xin_action",
-                            "xin_storage",
+                            "xin_sidebar",
                             'accueilViews',
                             'utilisateurViews',
                             'taxonViews',
                             'protocoleViews',
                             'participationViews',
                             'actualiteViews',
+                            'mgcrea.ngStrap',
+                            'smoothScroll',
+                            'monospaced.elastic', # resizable textarea
                             'donneeViews'])
   .config (config)
-  .controller( 'AppCtrl', AppCtrl)
+  .controller('AppCtrl', AppCtrl)
   .run (run)
 

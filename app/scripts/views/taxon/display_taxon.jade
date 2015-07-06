@@ -1,8 +1,11 @@
-xin-update
-.panel.panel-body(ng-if='taxon.parents && taxon.parents.length > 0')
-  h4 Taxons parents
-  ul
-    li.taxon-parent(ng-repeat='parent in taxon.parents')
-      a(href='#/taxons/{{parent._id}}') {{parent.libelle_long}}
-.panel.panel-body.panescroll#xinPaneContent
-  span(ng-bind-html='taxon.description')
+section
+  .row
+    .col-sm-12
+      div(data-bind-html-unsafe='taxon.description')
+  .row
+    .col-sm-12
+      div(ng-if='taxon.parents && taxon.parents.length > 0')
+        h4.modal-title Taxons parents:
+          span(ng-repeat='parent in taxon.parents')
+            a(href='#/taxons/{{parent._id}}') &nbsp;&nbsp;{{parent.libelle_long}}
+  xin-update

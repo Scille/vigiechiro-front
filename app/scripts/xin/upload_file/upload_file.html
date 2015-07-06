@@ -1,32 +1,97 @@
-<div dropzone class="drop row" ng-class="dragOverClass" ng-click="clickFileInput()">
-  <input type="file" class="btn hidden files-input"
-         custom-on-change="fileInputUploadFiles">
-  <center>Cliquez ou déposez vos fichiers ici</center>
+<div class="drop row" uploader="uploader"
+     over-class="drag-over" file-over
+     ng-click="clickFileInput()" directory="directory">
+  <input type="file" class="btn hidden" file-select
+         uploader="uploader">
+  <center ng-if="!directory">Cliquez ou déposez vos fichiers ici</center>
+  <center ng-if="directory">Cliquez ici</center>
 </div>
 
-<div ng-repeat="uploader in uploaders" class="form-group">
-  <div>
-    {{uploader.file.name}}
-    <div class="progress">
-      <div class="progress-bar" role="progressbar"
-           aria-valuenow="{{uploader.progress}}"
-           aria-valuemin="0" aria-valuemax="100"
-           style="width: {{uploader.progress}}%;">
-        {{uploader.progress + '%'}}
+<div ng-if="!scope.directory">
+  <div class="well" ng-show="uploader.queue.length">
+    <div class="row">
+      <div class="col-md-6">Fichiers : {{uploader.queue.length}}</div>
+      <div class="col-md-6">
+        {{uploader.transmitted_size/1024/1024 | number: 2}}/{{uploader.size/1024/1024 | number: 2}} MB
       </div>
     </div>
-    <button class="btn btn-warning btn-xs" type="button" ng-click="uploader.pause()"
-            ng-if="uploader.status == 'started'">
-      Pause
-    </button>
-    <button class="btn btn-warning btn-xs" type="button" ng-click="uploader.start()"
-            ng-if="uploader.status == 'pause'">
-      Continuer
-    </button>
-    <button class="btn btn-danger btn-xs" type="button"
-            ng-click="stopUploader(uploader)"
-            ng-if="uploader.status != 'dead' && uploader.status != 'done'">
-      Annuler
-    </button>
+    <div class="row">
+      <div class="col-md-6">Succés : {{ uploader.itemsCompleted }}</div>
+      <div class="col-md-6">Echec : {{ uploader.itemsFailed }}</div>
+    </div>
   </div>
+  <div class="alert alert-success" ng-show="uploader.directories.length">
+    Dossiers uploadés :
+    <div ng-repeat="directory in uploader.directories">
+      {{ directory }}
+    </div>
+  </div>
+  <div class="alert alert-warning" ng-show="warnings.length">
+    <div ng-repeat="warning in warnings">
+      {{ warning }}
+    </div>
+  </div>
+  <div class="alert alert-danger" ng-show="errors.filters.length">
+    <div ng-repeat="error in errors.filters">
+      {{ error }}
+    </div>
+  </div>
+  <div class="alert alert-danger" ng-show="errors.back.length">
+    <div ng-repeat="error in errors.back">
+      {{ error }}
+    </div>
+  </div>
+  <span class="help-block"
+        ng-show="participationForm.pieces_jointes.$error.filename">
+    Les fichiers suivants ne respectent pas le format attendu.
+    <br>
+    Exemple de nom de fichier : {{ fileFormat }}
+    <div ng-repeat="filename in badFilesNames">
+      {{ filename }}
+    </div>
+  </span>
+
+  <div ng-repeat="item in uploader.onProgress" class="form-group">
+    <div class="row">
+      <div class="col-md-10">{{item.file.name}}</div>
+      <div class="col-md-2">
+        {{item.file.transmitted_size/1024/1024|number:2 }}/{{ item.file.size/1024/1024|number:2 }} MB
+      </div>
+    </div>
+    <div class="row">
+      <div class="col-md-10 progress">
+        <div class="progress-bar progress-bar-striped active" role="progressbar"
+             aria-valuenow="{{item.file.transmitted_size/item.file.size*100}}"
+             aria-valuemin="0" aria-valuemax="100"
+             style="width: {{item.file.transmitted_size/item.file.size*100}}%;"
+             ng-show="item.file.transmitted_size/item.file.size*100 < 100">
+          {{ item.file.transmitted_size/item.file.size*100|number:1 }}%
+        </div>
+        <div class="progress-bar progress-bar-success" role="progressbar"
+             aria-valuenow="100"
+             aria-valuemin="0" aria-valuemax="100"
+             style="width: 100%;"
+             ng-show="item.file.transmitted_size/item.file.size*100 == 100">
+        </div>
+      </div>
+      <div class="col-md-2">
+        <button class="btn btn-danger btn-xs" type="button" ng-click="uploader.cancelOne(item)">
+          Annuler
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <button class="btn btn-primary btn-xs" type="button" ng-click="uploader.startAll()"
+          ng-show="uploader.status == 'pause'">
+    Continuer
+  </button>
+  <button class="btn btn-warning btn-xs" type="button" ng-click="uploader.pauseAll()"
+          ng-show="uploader.status == 'progress'">
+    Pause
+  </button>
+  <button class="btn btn-danger btn-xs" type="button" ng-click="uploader.cancelAll()"
+          ng-show="uploader.queue.length">
+    Tout annuler
+  </button>
 </div>

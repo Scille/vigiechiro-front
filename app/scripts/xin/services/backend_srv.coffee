@@ -26,7 +26,7 @@ angular.module('xin_backend', ['ngRoute', 'restangular', 'xin_session_tools'])
           return extractedData
         .setErrorInterceptor (response, deferred, responseHandler) ->
           if response.status == 401
-            # User is not login, notify the session about this
+            # User is not login, notify the Session about this
             SessionTools.logRequestError()
             return true
           else if response.status == 404

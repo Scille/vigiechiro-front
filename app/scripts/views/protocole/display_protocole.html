@@ -1,4 +1,10 @@
 <div class="container">
+  <div class="text-center">
+    <div class="page-header text-center">
+      <h1>{{protocole.titre}}</h1>
+    </div>
+  </div>
+
   <div class="col-md-9">
     <div class="panel panel-body">
       <span ng-bind-html="protocole.description"></span>
@@ -9,6 +15,18 @@
         Type des sites : {{ protocole.type_site }}
       </div>
     </div>
+
+    <a class="btn btn-primary" id="register-protocole"
+            ng-click="registerProtocole()"
+            ng-show="!userRegistered && !protocole.macro_protocole">
+      S'inscrire
+    </a>
+
+    <a class="btn btn-primary" id="edit-protocole"
+       ng-show="user.role == 'Administrateur'"
+       ng-href="#/protocoles/{{protocole._id}}/edition">
+       Éditer
+    </a>
 
     <div ng-if="!protocole.macro_protocole">
       <display-sites-directive protocole-id="{{protocole._id}}" type-site="{{protocole.type_site}}">
@@ -34,16 +52,5 @@
                                              protocole-id="{{ protocole._id }}">
       </list-actualites-validations-directive>
     </div>
-    <a class="btn btn-primary" id="register-protocole"
-       ng-click="registerProtocole()"
-       ng-show="!userRegistered && !protocole.macro_protocole">
-      S'inscrire
-    </a>
-
-    <a class="btn btn-primary" id="edit-protocole"
-       ng-show="user.role == 'Administrateur'"
-       ng-href="#/protocoles/{{protocole._id}}/edition">
-      Éditer
-    </a>
   </div>
 </div>
