@@ -1,0 +1,19 @@
+<div class="modal-header">
+  <h4 class="modal-title">Motif</h4>
+</div>
+
+<div class="modal-body">
+  <p>Motifs précédents :</p>
+  <div ng-repeat="motif in justification_non_aleatoire">
+    <p>{{motif}}</p>
+  </div>
+  <p class="input-group">
+  <input type="text" class="form-control" ng-model="motif" is-open="opened" show-button-bar="false" required>
+  </p>
+  <p ng-show="onError">Aucun motif inscrit.</p>
+</div>
+
+<div class="modal-footer">
+  <a class="btn btn-warning" ng-click="ok()">Valider</a>
+  <a class="btn btn-primary" ng-click="cancel()">Annuler</a>
+</div>

@@ -1,0 +1,51 @@
+.dropdown-menu.dropdown-menu-right.theme-picker.mat-grow-top-right
+  .container-fluid.m-v-15(ng-click='$event.stopPropagation()')
+    .pull-right.m-r-10
+      button.close(type='button', ng-click='$hide()') ×
+    h4.no-margin.p-t-5
+      i.md.md-filter
+      |  Theming options
+    .row.m-t-20
+      .col-md-6
+        .w300 Template themes
+        .theme-item.theme-template-default(ng-click="changeTemplateTheme('theme-template-default');")
+          .icon(ng-show="theme.template=='theme-template-default'")
+            i.md.md-check
+          .theme-sidenav
+          .theme-header
+          .theme-body
+        .theme-item.theme-template-dark(ng-click="changeTemplateTheme('theme-template-dark');")
+          .icon(ng-show="theme.template=='theme-template-dark'")
+            i.md.md-check
+          .theme-sidenav
+          .theme-header
+          .theme-body
+        .theme-item.theme-template-light(ng-click="changeTemplateTheme('theme-template-light');")
+          .icon(ng-show="theme.template=='theme-template-light'")
+            i.md.md-check
+          .theme-sidenav
+          .theme-header
+          .theme-body
+        .theme-item.theme-template-green(ng-click="changeTemplateTheme('theme-template-green');")
+          .icon(ng-show="theme.template=='theme-template-green'")
+            i.md.md-check
+          .theme-sidenav
+          .theme-header
+          .theme-body
+        .theme-item.theme-template-blue(ng-click="changeTemplateTheme('theme-template-blue');")
+          .icon(ng-show="theme.template=='theme-template-blue'")
+            i.md.md-check
+          .theme-sidenav
+          .theme-header
+          .theme-body
+      .col-md-6
+        .w300 Color themes
+        .row.gutter-10
+          .col-xs-2.col-sm-2.col-md-4.theme-colors(ng-repeat='color in theme_colors')
+            .theme-item(class='theme-{{color}}', ng-click="changeColorTheme('theme-'+color);")
+              .icon(ng-show="theme.color=='theme-'+color")
+                i.md.md-check
+              .theme-color-1
+              .theme-color-2
+              .theme-color-3
+              .theme-color-4
