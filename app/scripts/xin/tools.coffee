@@ -7,24 +7,10 @@ window.resizeContainer = =>
     dataKendoGrid = grid.data('kendoGrid')
     if (dataKendoGrid?)
       dataKendoGrid.resize()
-  section = $('.xin-heightsection100')
-  panelSubmit = $('#panelSubmit')
-  if (section? and section.length > 0 and panelSubmit?)
-    section.height( section.offset().top - panelSubmit.offset().top - 30)  # rajouter le padding
-  else
-  if (section? and section.length > 0)
-    section.height( $(window).height() - section.offset().top - 60)
-  else
-    section = $('.maincontent')
-  form = $('.xin-heightform100')
-  if (form? and form.length > 0 and section.length > 0)
-    form.height( section.height() - form.offset().top + section.offset().top)
-  tag = $('.xin-height100')
-  if (tag? and tag.length > 0 and section.length > 0)
-    tag.height( section.height() - tag.offset().top + section.offset().top)
   grid = $('.k-content')
-  if (grid? and grid.length > 0 and section.length > 0)
-    grid.css( 'height', section.height() - grid.offset().top + section.offset().top)
+  panelSubmit = $('#panelSubmit')
+  if (grid? and grid.length > 0 and panelSubmit?)
+    grid.css( 'min-height', panelSubmit.offset().top - grid.offset().top - 10)
 
 $(window).resize( ->
   window.resizeContainer()

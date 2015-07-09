@@ -62,9 +62,7 @@ do ->
     restrict: 'AE'
     priority: 20000
     replace: true
-    template: '<input>{{label}}'
-    scope:
-      label: 'bind'
+    template: '<input>'
     compile: (elem, attrs) ->
       modelName = elem.attr( 'ng-model').replace('.', '_')
       elem.attr('id', modelName)
@@ -72,28 +70,56 @@ do ->
       elem.attr('class', "form-control")
       elem.attr('ng-disabled', 'readOnly')
       elem.attr('type', 'checkbox')
+      label = elem.attr('label')
+      elem.removeAttr( 'label')
       elem.wrap( "<label></label>")
+      elem.after(label)
       elem.parent().wrap( "<div class='checkbox'></div>")
       elem.parent().parent().wrap( "<div class='form-group'></div>")
-      elem.removeAttr( 'label')
-
 
   ### @ngInject ###
   xinSelect = ->
     restrict: 'E'
+    priority: 20000
     replace: true
     transclude: true
-    template: "<select><ng-transclude></ng-transclude></select>"
-    compile: (elem, attrs) ->
-      modelName = elem.attr( 'ng-model').replace('.', '_')
-      elem.attr('id', modelName)
-      elem.attr('name', modelName)
-      elem.attr('class', "form-control")
-      elem.attr('ng-disabled', 'readOnly')
-      label = elem.attr('label')
-      elem.wrap( "<div class='form-group'></div>")
-      elem.before( "<label class='control-label'>#{label}</label>")
-      elem.removeAttr( 'label')
+    template: "<select>"
+    link: (scope, element, attrs, ctrl, transclude) ->
+      transclude (clone) ->
+        element.append(clone)
+      modelName = element.attr( 'ng-model').replace('.', '_')
+      element.attr('id', modelName)
+      element.attr('name', modelName)
+      element.attr('class', 'form-control')
+      element.attr('ng-disabled', 'readOnly')
+      element.wrap( "<div class='form-group'></div>")
+      label = element.attr('label')
+      element.removeAttr( 'label')
+      element.before( "<label class='control-label'>#{label}</label>")
+
+  ### @ngInject ###
+  xinMselect = ->
+    restrict: 'E'
+    priority: 20000
+    replace: true
+    transclude: true
+    template: "<ui-select>"
+    link: (scope, element, attrs, ctrl, transclude) ->
+      transclude (clone) ->
+        element.append(clone)
+      modelName = element.attr( 'ng-model').replace('.', '_')
+      element.attr('id', modelName)
+      element.attr('name', modelName)
+      element.attr('class', 'form-control')
+      element.attr('multiple', '')
+      element.attr('ng-disabled', 'disabled')
+      element.attr('theme', 'select2')
+      element.attr('search-enabled', 'true')
+      element.wrap( "<div class='form-group'></div>")
+      label = element.attr('label')
+      element.removeAttr( 'label')
+      element.before( "<label class='control-label'>#{label}</label>")
+
 
 
   angular.module('xin_input', [])
@@ -102,3 +128,4 @@ do ->
   .directive 'xinTextarea', xinTextarea
   .directive 'xinEmail', xinEmail
   .directive 'xinSelect', xinSelect
+  .directive 'xinMselect', xinMselect

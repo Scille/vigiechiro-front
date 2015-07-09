@@ -5,7 +5,7 @@ section
   .row
     .col-sm-12
       div(ng-if='taxon.parents && taxon.parents.length > 0')
-        h4.modal-title Taxons parents:
-          span(ng-repeat='parent in taxon.parents')
-            a(href='#/taxons/{{parent._id}}') &nbsp;&nbsp;{{parent.libelle_long}}
+        h3.modal-title Taxons parents
+        span(ng-repeat='parent in taxon.parents')
+          a(href='#/taxons/{{parent._id}}') &nbsp;&nbsp;{{parent.libelle_long}}
   xin-update

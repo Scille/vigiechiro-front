@@ -52,7 +52,7 @@ do =>
       $scope.readOnly = (not Session.isAdmin() and Session.getUser()._id isnt $scope.utilisateur._id)
       $(window).trigger('resize')
 
-    $scope.saveUser = =>
+    $scope.save = =>
       payload = SessionTools.getModifiedRessource( $scope, $scope.utilisateur)
       if (payload?)
         $scope.userBackend.patch( payload).then(

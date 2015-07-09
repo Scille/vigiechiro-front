@@ -94,3 +94,16 @@
   margin-left: 0px;
 }
 
+.k-grid-header th
+{
+  padding-left: 20px !important;
+}
+
+.k-grid td
+{
+  padding-left: 30px !important;
+}
+
+.k-grid tr.k-state-selected a {
+  color: #fff !important;
+}

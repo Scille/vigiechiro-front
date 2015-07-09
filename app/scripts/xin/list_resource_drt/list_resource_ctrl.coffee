@@ -18,7 +18,7 @@ angular.module('xin_listResource', ['ngRoute', 'angularUtils.directives.dirPagin
 
 
   .controller 'ListResourceController', ($scope, $timeout, $location, Session) ->
-    $scope.user = Session.getUser().plain()
+    $scope.user = Session.getUser()
     $scope.resources = []
     $scope.loading = true
     updateResourcesList = ->

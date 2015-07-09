@@ -97,13 +97,16 @@ do =>
     $scope.taxonsParents.init ->
       $(window).trigger('resize')
 
-    $scope.saveTaxon = =>
+    $scope.save = =>
       payload = SessionTools.getModifiedRessource( $scope, $scope.taxon)
       if (payload?)
         payload.parents = $scope.taxonsParents.dataToId($scope.taxon.parents)
         Backend.all('taxons').post(payload).then(
-          -> window.location = '#/taxons/'
+          (taxon) ->
+            window.location = '#/taxons/' + taxon._id
+          (error) -> throw error
         )
+
 
   ### @ngInject ###
   EditTaxonCtrl = ($route, $routeParams, $scope, Backend, breadcrumbs, SessionTools) =>
@@ -122,7 +125,7 @@ do =>
           'Libelle': $scope.taxon.libelle_long + ' (' + $scope.taxon.libelle_court + ')'
         $(window).trigger('resize')
 
-    $scope.saveTaxon = =>
+    $scope.save = =>
       payload = SessionTools.getModifiedRessource( $scope, $scope.taxon)
       if (payload?)
         payload.parents = $scope.taxonsParents.dataToId($scope.taxon.parents)
