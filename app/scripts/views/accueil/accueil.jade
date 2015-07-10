@@ -1,2 +1,13 @@
 section
-  list-mes-actualites-directive
+  .col-md-8
+    list-mes-actualites-directive
+  .col-md-4
+      ul.list-group
+        li.list-group-item
+          b Mes sites
+        li.list-group-item(ng-repeat='site in userSites')
+          a(href='#/sites/{{site._id}}') {{site.titre}}
+        li.list-group-item(ng-if='!userSites || userSites.length == 0')
+          | Pas de sites pour le moment, rejoignez un
+          a(ng-href='#/protocoles') protocole
+          |  pour commencer
