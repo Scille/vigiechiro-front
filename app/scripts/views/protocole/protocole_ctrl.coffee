@@ -25,7 +25,7 @@ angular.module('protocoleViews', ['ngRoute', 'ng-breadcrumbs', 'textAngular',
         controller: 'ListProtocolesController'
         label: 'Protocoles'
       .when '/protocoles/mes-protocoles',
-        templateUrl: 'scripts/views/protocole/list_protocoles.html'
+        templateUrl: 'scripts/views/protocole/list_mesprotocoles.html'
         controller: 'ListMesProtocolesController'
         label: 'Mes Protocoles'
       .when '/protocoles/nouveau',

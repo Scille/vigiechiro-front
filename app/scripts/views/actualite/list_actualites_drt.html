@@ -1,22 +1,20 @@
-<div class="panel panel-default">
-  <ul class="list-group">
-    <li class="list-group-item">
-      <b>Mes actualités</b>
-    </li>
+<ul class="list-group">
+  <li class="list-group-item">
+    <h3>Mes actualités</h3>
+  </li>
 
-    <li class="list-group-item" ng-repeat="actualite in actualites">
-        <display-actualite-directive actualite="actualite"
-                                     is-admin="isAdmin">
-        </display-actualite-directive>
-    </li>
+  <li class="list-group-item" ng-repeat="actualite in actualites">
+      <display-actualite-directive actualite="actualite"
+                                   is-admin="isAdmin">
+      </display-actualite-directive>
+  </li>
 
-    <li ng-if="!loading && (!actualites || actualites.length == 0)" class="list-group-item">
-      Pas d'actualités pour le moment
-    </li>
+  <li ng-if="!loading && (!actualites || actualites.length == 0)" class="list-group-item">
+    Pas d'actualités pour le moment
+  </li>
 
-    <li class="list-group-item" ng-show="loading">
-        <center><img src="images/spinner.gif"></img></center>
-        <center>Changement de la liste des actualités...</center>
-    </li>
-  </ul>
-</div>
+  <li class="list-group-item" ng-show="loading">
+      <center><img src="images/spinner.gif"></img></center>
+      <center>Changement de la liste des actualités...</center>
+  </li>
+</ul>

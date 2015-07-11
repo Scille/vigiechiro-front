@@ -107,3 +107,13 @@
 .k-grid tr.k-state-selected a {
   color: #fff !important;
 }
+
+.paddingleft {
+  padding-left: 10px;
+}
+
+@media (min-width: 1200px) {
+  .paddingleft {
+    padding-left: 20px;
+  }
+}

@@ -1,0 +1,14 @@
+ul.nav.nav-tabs
+  li.paddingleft
+    a(data-toggle='tab', href='#/protocoles') Protocoles
+  li.active
+    a(data-toggle='tab', href='#/protocoles/mes-protocoles') Mes Protocoles
+.tab-content.paddingleft
+  list-resource-directive(resource-backend='resourceBackend', lookup='lookup')
+    a(href='#/protocoles/{{resource._id}}')
+      | {{resource.titre}}
+    span.label.label-success.pull-right(ng-show='resource._status_registered')
+      | Inscrit
+    span.label.label-warning.pull-right(ng-show='resource._status_toValidate')
+      | En attente de validation
+xin-actions

@@ -4,7 +4,7 @@ section
   .col-md-4
       ul.list-group
         li.list-group-item
-          b Mes sites
+          h3 Mes sites
         li.list-group-item(ng-repeat='site in userSites')
           a(href='#/sites/{{site._id}}') {{site.titre}}
         li.list-group-item(ng-if='!userSites || userSites.length == 0')
