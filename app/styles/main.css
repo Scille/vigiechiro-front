@@ -122,3 +122,13 @@
 .navbar  {
   min-height: 50px !important;
 }
+
+.tab-pane {
+  padding: 15px;
+}
+
+@media (min-width: 1200px) {
+  .tab-pane {
+    padding: 30px;
+  }
+}

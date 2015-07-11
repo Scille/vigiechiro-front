@@ -32,7 +32,14 @@ do =>
       scope.updateItem = =>
         window.location = scope.hrefValue
 
+  xinRegister = ->
+    restrict: 'E'
+    replace: true
+    templateUrl: 'scripts/xin/action_drt/register.html'
+
+
   angular.module('xin_action', [])
   .directive('xinActions', xinActions)
   .directive('xinSubmit', xinSubmit)
   .directive('xinUpdate', xinUpdate)
+  .directive('xinRegister', xinRegister)

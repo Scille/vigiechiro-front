@@ -108,18 +108,18 @@ angular.module('protocoleViews', ['ngRoute', 'ng-breadcrumbs', 'textAngular',
     $scope.protocole = {}
     $scope.userRegistered = false
     $scope.user = Session.getUser()
-    breadcrumbs.options =
-      'Libelle': $routeParams.protocoleId
     Backend.one('protocoles', $routeParams.protocoleId).get().then(
       (protocole) ->
         $scope.protocole = protocole
+        breadcrumbs.options =
+          'Libelle': $scope.protocole.titre
         for protocole in $scope.user.protocoles or []
           if protocole.protocole._id is $scope.protocole._id
             $scope.userRegistered = true
             break
       (error) -> window.location = '#/404'
     )
-    $scope.registerProtocole = ->
+    $scope.registerItem = ->
       Backend.one('moi/protocoles/' + $scope.protocole._id).put().then(
         (response) ->
           Session.refreshPromise()
