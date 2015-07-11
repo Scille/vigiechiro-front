@@ -100,7 +100,6 @@ do ->
                             'xin_editor',
                             'xin_datasource',
                             'xin_pubsub',
-                            'xin_google_maps',
                             "xin_action",
                             "xin_sidebar",
                             'accueilViews',

@@ -109,11 +109,16 @@
 }
 
 .paddingleft {
-  padding-left: 10px;
+  padding-left: 20px;
 }
 
 @media (min-width: 1200px) {
   .paddingleft {
-    padding-left: 20px;
+    padding-left: 40px;
   }
+}
+
+
+.navbar  {
+  min-height: 50px !important;
 }

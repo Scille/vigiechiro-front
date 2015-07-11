@@ -24,7 +24,7 @@ angular.module('protocoleViews', ['ngRoute', 'ng-breadcrumbs', 'textAngular',
         templateUrl: 'scripts/views/protocole/list_protocoles.html'
         controller: 'ListProtocolesController'
         label: 'Protocoles'
-      .when '/protocoles/mes-protocoles',
+      .when '/mes-protocoles',
         templateUrl: 'scripts/views/protocole/list_mesprotocoles.html'
         controller: 'ListMesProtocolesController'
         label: 'Mes Protocoles'
@@ -40,29 +40,16 @@ angular.module('protocoleViews', ['ngRoute', 'ng-breadcrumbs', 'textAngular',
         controller: 'EditProtocoleController'
         label: 'Edition'
 
-  .controller 'ListProtocolesController', ($scope, $q, $location, Backend,
-                                           Session, DelayedEvent) ->
+  .controller 'ListProtocolesController', ($scope, $q, $location, Backend, Session,  DelayedEvent, PubSub) ->
     $scope.lookup = {}
-    $scope.title = "Tous les protocoles"
-    $scope.swap =
-      title: "Voir mes protocoles"
-      value: "/mes-protocoles"
-    # Filter field is trigger after 500ms of inactivity
-    delayedFilter = new DelayedEvent(500)
-    # params = $location.search()
-    # if params.where?
-    #   $scope.filterField = JSON.parse(params.where).$text.$search
-    # else
     $scope.isAdmin = Session.isAdmin()
-    $scope.filterField = ''
-    $scope.$watch 'filterField', (filterValue) ->
+    delayedFilter = new DelayedEvent(500)
+    PubSub.subscribe 'search', (filterValue) =>
       delayedFilter.triggerEvent ->
-        if filterValue? and filterValue != ''
+        if filterValue? and filterValue isnt ''
           $scope.lookup.q = filterValue
         else if $scope.lookup.q?
           delete $scope.lookup.q
-        # TODO : fix reloadOnSearch: true
-        # $location.search('where', $scope.lookup.where)
     $scope.resourceBackend = Backend.all('protocoles')
     # Wrap protocole backend to check if the user is registered (see _status_*)
     resourceBackend_getList = $scope.resourceBackend.getList
@@ -85,28 +72,15 @@ angular.module('protocoleViews', ['ngRoute', 'ng-breadcrumbs', 'textAngular',
           deferred.resolve(protocoles)
       return deferred.promise
 
-  .controller 'ListMesProtocolesController', ($scope, $q, $location, Backend,
-                                     Session, DelayedEvent) ->
+  .controller 'ListMesProtocolesController', ($scope, $q, $location, Backend, Session,  DelayedEvent, PubSub) ->
     $scope.lookup = {}
-    $scope.title = "Mes protocoles"
-    $scope.swap =
-      title: "Voir tous les protocoles"
-      value: ''
-    # Filter field is trigger after 500ms of inactivity
     delayedFilter = new DelayedEvent(500)
-    # params = $location.search()
-    # if params.where?
-    #   $scope.filterField = JSON.parse(params.where).$text.$search
-    # else
-    $scope.filterField = ''
-    $scope.$watch 'filterField', (filterValue) ->
+    PubSub.subscribe 'search', (filterValue) =>
       delayedFilter.triggerEvent ->
-        if filterValue? and filterValue != ''
+        if filterValue? and filterValue isnt ''
           $scope.lookup.q = filterValue
         else if $scope.lookup.q?
           delete $scope.lookup.q
-        # TODO : fix reloadOnSearch: true
-        # $location.search('where', $scope.lookup.where)
     $scope.resourceBackend = Backend.all('moi/protocoles')
     # Wrap protocole backend to check if the user is registered (see _status_*)
     resourceBackend_getList = $scope.resourceBackend.getList
@@ -146,7 +120,7 @@ angular.module('protocoleViews', ['ngRoute', 'ng-breadcrumbs', 'textAngular',
       (error) -> window.location = '#/404'
     )
     $scope.registerProtocole = ->
-      Backend.one('moi/protocoles/'+$scope.protocole._id).put().then(
+      Backend.one('moi/protocoles/' + $scope.protocole._id).put().then(
         (response) ->
           Session.refreshPromise()
           $route.reload()
@@ -205,10 +179,10 @@ angular.module('protocoleViews', ['ngRoute', 'ng-breadcrumbs', 'textAngular',
         payload = make_payload($scope)
       Backend.all('protocoles').post(payload).then(
         (protocole) ->
-          Backend.one('moi/protocoles/'+protocole._id).customPUT().then(
+          Backend.one('moi/protocoles/' + protocole._id).customPUT().then(
             ->
               Session.refreshPromise()
-              window.location = '#/protocoles/'+protocole._id
+              window.location = '#/protocoles/' + protocole._id
             (error) -> throw error
           )
         (error) -> throw error

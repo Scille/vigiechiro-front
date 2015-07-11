@@ -1,9 +1,9 @@
 div
   .mat-slide-right.pull-right(ng-if='showNavbarSearch')
     form.search-form.form-inline.ng-valid.pull-left(ng-show='showNavbarSearch', ng-submit='submitNavbarSearch()')
-      .form-group
+      .form-group( ng-controller='inputSearchController')
         label.sr-only(for='search-input') Search
-        input#search-input.form-control(type='text', placeholder='Search', autofocus='')
+        input#search-input.form-control(type='text', placeholder='Search', autofocus='', ng-change='change()', ng-model='searchKey')
   .pull-right
     button.btn.btn-sm.btn-link.pull-left.withoutripple(ng-click='toggleSearch()')
       i.md.md-search.f20

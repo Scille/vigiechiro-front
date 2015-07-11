@@ -22,7 +22,7 @@ do ->
     priority: 10000
     transclude: true
     replace: true
-    template: "<form class='form-floating xin-placeholders xin-heightform100' novalidate='novalidate' name='xinForm'><ng-transclude></ng-transclude></form>"
+    template: "<form class='form-floating xin-placeholders xin-heightform100' novalidate='novalidate' name='xinForm' ng-submit='save()'><ng-transclude></ng-transclude></form>"
 
 
   xinForm = =>
@@ -30,7 +30,7 @@ do ->
     priority: 10000
     transclude: true
     replace: true
-    template: "<form class='form-floating xin-placeholders' novalidate='novalidate' name='xinForm'><ng-transclude></ng-transclude></form>"
+    template: "<form class='form-floating xin-placeholders' novalidate='novalidate' name='xinForm' ng-submit='save()'><ng-transclude></ng-transclude></form>"
 
 
   angular.module('xin_tag', [])

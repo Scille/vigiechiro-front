@@ -20,13 +20,10 @@ angular.module('xin_listResource', ['ngRoute', 'angularUtils.directives.dirPagin
   .controller 'ListResourceController', ($scope, $timeout, $location, Session) ->
     $scope.user = Session.getUser()
     $scope.resources = []
-    $scope.loading = true
     updateResourcesList = ->
-      $scope.loading = true
       if $scope.resourceBackend?
         $scope.resourceBackend.getList($scope.lookup).then (items) ->
           $scope.resources = items
-          $scope.loading = false
     $scope.$watch(
       'lookup'
       ->

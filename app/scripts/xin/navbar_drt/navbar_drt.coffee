@@ -29,15 +29,17 @@ do ->
   # xin-navbar directive
   # @ngInject
   ###
-  navbarSearch = =>
+  navbarSearch = (PubSub) =>
     restrict: "A"
     templateUrl: "scripts/xin/navbar_drt/navbar-search.html"
     link: (scope, element, attrs) ->
       scope.showNavbarSearch = false
       scope.toggleSearch = ->
         scope.showNavbarSearch = not scope.showNavbarSearch
-      scope.submitNavbarSearch = ->
-        scope.showNavbarSearch = false
+        if (not scope.showNavbarSearch)
+          PubSub.publish( 'search', '')
+
+
 
   navbarScroll = ($window) =>
     restrict: "A"
@@ -49,8 +51,19 @@ do ->
         else
           navbar.removeClass "scroll"
 
+  ###*
+  # xin-navbar controller
+  # @ngInject
+  ###
+  inputSearchController = ($scope, PubSub) =>
+    $scope.change =  ->
+      PubSub.publish( 'search', $(this)[0].searchKey)
+
+
+
   angular.module('xin_navbar', [])
   .directive('xinNavbar', xinNavbar)
   .directive('navbarToggle', navbarToggle)
   .directive('navbarSearch', navbarSearch)
   .directive('navbarScroll', navbarScroll)
+  .controller('inputSearchController', inputSearchController)

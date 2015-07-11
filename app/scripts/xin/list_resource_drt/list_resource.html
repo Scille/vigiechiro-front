@@ -1,4 +1,4 @@
-<div ng-show="!loading">
+<div>
   <div ng-show="resources.length != 0">
     <ul class="list-group">
       <li class="list-group-item" dir-paginate="resource in resources | itemsPerPage: lookup.max_results"
@@ -14,7 +14,3 @@
   </div>
 </div>
 
-<div ng-if="loading">
-  <center><img src="images/spinner.gif"></center>
-  <center>Changement...</center>
-</div>
