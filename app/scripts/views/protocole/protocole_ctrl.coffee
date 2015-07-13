@@ -41,16 +41,16 @@ angular.module('protocoleViews', ['ngRoute', 'ng-breadcrumbs', 'textAngular',
         controller: 'EditProtocoleController'
         label: 'Edition'
 
-  .controller 'ListProtocolesController', ($scope, $q, $location, Backend, Session,  DelayedEvent, PubSub) ->
+  .controller 'ListProtocolesController', ($scope, $q, $location, Backend, Session,  PubSub) ->
     $scope.lookup = {}
     $scope.isAdmin = Session.isAdmin()
-    delayedFilter = new DelayedEvent(500)
     PubSub.subscribe 'search', (filterValue) =>
-      delayedFilter.triggerEvent ->
-        if filterValue? and filterValue isnt ''
-          $scope.lookup.q = filterValue
-        else if $scope.lookup.q?
-          delete $scope.lookup.q
+      if filterValue? and filterValue isnt ''
+        $scope.lookup.q = filterValue
+      else if $scope.lookup.q?
+        delete $scope.lookup.q
+        location.reload
+
     $scope.resourceBackend = Backend.all('protocoles')
     # Wrap protocole backend to check if the user is registered (see _status_*)
     resourceBackend_getList = $scope.resourceBackend.getList

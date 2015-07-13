@@ -84,7 +84,6 @@ do =>
     $scope.taxon = {}
     Backend.one('taxons', $routeParams.taxonId).get().then (taxon) ->
       $scope.taxon = taxon.plain()
-
       breadcrumbs.options =
         'Libelle': $scope.taxon.libelle_long + ' (' + $scope.taxon.libelle_court + ')'
       $(window).trigger('resize')
@@ -96,14 +95,12 @@ do =>
     $scope.taxonsParents = new TaxonsParents(Backend, $scope.taxonId)
     $scope.taxonsParents.init ->
       $(window).trigger('resize')
-
     $scope.save = =>
       payload = SessionTools.getModifiedRessource( $scope, $scope.taxon)
       if (payload?)
         payload.parents = $scope.taxonsParents.dataToId($scope.taxon.parents)
         Backend.all('taxons').post(payload).then(
-          (taxon) ->
-            window.location = '#/taxons/' + taxon._id
+          (taxon) -> window.location = '#/taxons/' + taxon._id
           (error) -> throw error
         )
 
@@ -114,7 +111,7 @@ do =>
     $scope.taxon = {}
     $scope.taxonsParents = new TaxonsParents(Backend, $scope.taxonId)
     $scope.taxonsParents.init ->
-# Force the cache control to get back the last version on the serveur
+      # Force the cache control to get back the last version on the serveur
       Backend.one('taxons', $routeParams.taxonId).get(
         {}
         {'Cache-Control': 'no-cache'}
@@ -124,7 +121,6 @@ do =>
         breadcrumbs.options =
           'Libelle': $scope.taxon.libelle_long + ' (' + $scope.taxon.libelle_court + ')'
         $(window).trigger('resize')
-
     $scope.save = =>
       payload = SessionTools.getModifiedRessource( $scope, $scope.taxon)
       if (payload?)

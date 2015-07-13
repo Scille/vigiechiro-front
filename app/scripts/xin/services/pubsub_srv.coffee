@@ -26,7 +26,7 @@ do =>
         return  unless self.subscriptions[subscription]
 
         self.subscriptions[subscription].forEach (subscriber) ->
-          subscriber data or {}
+          subscriber data
 
 
       utils:
