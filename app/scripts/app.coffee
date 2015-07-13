@@ -14,10 +14,6 @@ do ->
     $routeProvider
     .when '/',
       redirectTo: '/accueil'
-#      resolve:
-#        # @ngInject
-#        initSession: ( Session) =>
-#          return  Session.init()
     .when '/403',
       templateUrl: '403.html'
     .when '/404',
@@ -86,6 +82,7 @@ do ->
                             'appSettings',
                             'xin_tag',
                             'xin_login',
+                            'xin_placeholders',
                             'xin_editor',
                             'xin_pubsub',
                             'xin_tools',

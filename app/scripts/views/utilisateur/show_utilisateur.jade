@@ -4,12 +4,10 @@ section
       .col-sm-6
         xin-input( label='Pseudo', ng-model='utilisateur.pseudo', required='')
       .col-sm-6
-        .form-group
-          label.control-label role
-          select.form-control(ng-model='utilisateur.role', ng-disabled='!isAdmin')
-            option(value='Administrateur') Administrateur
-            option(value='Validateur') Validateur
-            option(value='Observateur') Observateur
+        xin-select.xin-placeholders( label='role', ng-model='utilisateur.role', ng-disabled='!isAdmin')
+          option(value='Administrateur') Administrateur
+          option(value='Validateur') Validateur
+          option(value='Observateur') Observateur
     .row
       .col-sm-6
         xin-input( label='Prénom', ng-model='utilisateur.prenom')

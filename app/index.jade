@@ -28,8 +28,8 @@ html.no-js
       xin-sidebar
       .main-container
         xin-navbar#header-content
-        xin-login(ng-show='isLogged == false')
-        xin-content(ng-show='isLogged')
+        xin-login
+        xin-content
         // Google Analytics: change UA-XXXXX-X to be your site's ID
         script.
           (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
@@ -115,6 +115,7 @@ html.no-js
         script(src='scripts/xin/login_drt/login_drt.js')
         script(src='scripts/xin/tag_drt/tag_drt.js')
         script(src='scripts/xin/editor_drt/editor_drt.js')
+        script(src='scripts/xin/placeholders/placeholders_drt.js')
         script(src='scripts/xin/navbar_drt/navbar_drt.js')
         script(src='scripts/xin/navbar_drt/sidebar_drt.js')
         script(src='scripts/xin/action_drt/action_drt.js')

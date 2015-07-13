@@ -14,7 +14,7 @@ do ->
 
 
   ###*
-  # xin-sidebar directive
+  # menuToggle directive
   # @ngInject
   ###
   menuToggle = ($location) ->
@@ -24,7 +24,6 @@ do ->
     scope:
       name: "@"
       icon: "@"
-
     templateUrl: "scripts/xin/navbar_drt/menu-toggle.html"
     link: (scope, element, attrs) ->
       icon = attrs.icon
@@ -38,10 +37,13 @@ do ->
           link.addClass "active"
 
       scope.isOpen = ->
-        folder = "/" + $location.path().split("/")[1]
-        folder is attrs.path
+        true
 
 
+  ###*
+  # menuLink directive
+  # @ngInject
+  ###
   menuLink = ->
     restrict: "A"
     transclude: true
@@ -50,30 +52,18 @@ do ->
       href: "@"
       icon: "@"
       name: "@"
-
     templateUrl: "scripts/xin/navbar_drt/menu-link.html"
-    controller: [ "$element", "$location", "$rootScope", ($element, $location, $rootScope) ->
+    controller: ($scope, $element, $location) ->
       @getName = (name) ->
-        if name isnt `undefined`
-          name
-        else
-          $element.find("a").text().trim()
-
-      @setBreadcrumb = (name) ->
-        $rootScope.pageTitle = @getName(name)
+        return name unless name?
+        $element.find("a").text().trim()
 
       @isSelected = (href) ->
         $location.path() is href.slice(1, href.length)
-    ]
-    link: (scope, element, attrs, linkCtrl) ->
+
+    link: (scope, element, attrs) ->
       icon = attrs.icon
       element.children().first().prepend "<i class=\"" + icon + "\"></i>&nbsp;"  if icon
-      linkCtrl.setBreadcrumb attrs.name  if linkCtrl.isSelected(attrs.href)
-      element.click ->
-        linkCtrl.setBreadcrumb attrs.name
-
-      scope.isSelected = ->
-        linkCtrl.isSelected attrs.href
 
 
   angular.module('xin_sidebar', [])

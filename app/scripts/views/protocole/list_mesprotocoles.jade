@@ -1,9 +1,4 @@
-ul.nav.nav-tabs
-  li.paddingleft
-    a(data-toggle='tab', href='#protocoles') Tous
-  li.active.paddingleft
-    a(data-toggle='tab', href='#mes-protocoles') Mes protocoles
-section
+section.xin-height100
   list-resource-directive(resource-backend='resourceBackend', lookup='lookup')
     a(href='#/protocoles/{{resource._id}}')
       | {{resource.titre}}

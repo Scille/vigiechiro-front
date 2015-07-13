@@ -24,7 +24,7 @@ angular.module('protocoleViews', ['ngRoute', 'ng-breadcrumbs', 'textAngular',
         templateUrl: 'scripts/views/protocole/list_protocoles.html'
         controller: 'ListProtocolesController'
         label: 'Protocoles'
-      .when '/mes-protocoles',
+      .when '/protocoles/mes-protocoles',
         templateUrl: 'scripts/views/protocole/list_mesprotocoles.html'
         controller: 'ListMesProtocolesController'
         label: 'Mes Protocoles'
@@ -35,6 +35,7 @@ angular.module('protocoleViews', ['ngRoute', 'ng-breadcrumbs', 'textAngular',
       .when '/protocoles/:protocoleId',
         templateUrl: 'scripts/views/protocole/display_protocole.html'
         controller: 'DisplayProtocoleController'
+        label: 'Libelle'
       .when '/protocoles/:protocoleId/edition',
         templateUrl: 'scripts/views/protocole/edit_protocole.html'
         controller: 'EditProtocoleController'

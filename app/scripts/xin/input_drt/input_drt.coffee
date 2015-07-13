@@ -84,29 +84,31 @@ do ->
     replace: true
     transclude: true
     template: "<select>"
-    link: (scope, element, attrs, ctrl, transclude) ->
-      transclude (clone) ->
-        element.append(clone)
+    compile: (element, attrs) ->
       modelName = element.attr( 'ng-model').replace('.', '_')
       element.attr('id', modelName)
       element.attr('name', modelName)
       element.attr('class', 'form-control')
       element.attr('ng-disabled', 'readOnly')
-      element.wrap( "<div class='form-group'></div>")
-      label = element.attr('label')
-      element.removeAttr( 'label')
-      element.before( "<label class='control-label'>#{label}</label>")
+      link =  (scope, element, attrs, ctrl, transclude) ->
+        transclude (clone) ->
+          element.append(clone)
+        element.wrap( "<div class='form-group'></div>")
+        label = element.attr('label')
+        element.removeAttr( 'label')
+        element.before( "<label class='control-label'>#{label}</label>")
+      return link
+
 
   ### @ngInject ###
+  ### don't works, pb double transclusion with ui-select ###
   xinMselect = ->
     restrict: 'E'
     priority: 20000
     replace: true
     transclude: true
     template: "<ui-select>"
-    link: (scope, element, attrs, ctrl, transclude) ->
-      transclude (clone) ->
-        element.append(clone)
+    compile: (element, attrs) ->
       modelName = element.attr( 'ng-model').replace('.', '_')
       element.attr('id', modelName)
       element.attr('name', modelName)
@@ -115,10 +117,14 @@ do ->
       element.attr('ng-disabled', 'disabled')
       element.attr('theme', 'select2')
       element.attr('search-enabled', 'true')
-      element.wrap( "<div class='form-group'></div>")
-      label = element.attr('label')
-      element.removeAttr( 'label')
-      element.before( "<label class='control-label'>#{label}</label>")
+      link = (scope, element, attrs, ctrl, transclude) ->
+        transclude (clone) ->
+          element.append(clone)
+        element.wrap( "<div class='form-group'></div>")
+        label = element.attr('label')
+        element.removeAttr( 'label')
+        element.before( "<label class='control-label'>#{label}</label>")
+      return link
 
 
 

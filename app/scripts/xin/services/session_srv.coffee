@@ -53,8 +53,9 @@ do =>
       logout: =>
         self.user = {}
         SessionTools.removeAuthorizationHeader()
-        Backend.one('logout').post().then(postLogout, postLogout)
-        self.connect()
+        Backend.one('logout').post().then(  ->
+          window.location('/')
+        )
 
       routeChanged: =>
         authToken = $location.search().token

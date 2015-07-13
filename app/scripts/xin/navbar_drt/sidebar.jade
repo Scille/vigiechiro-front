@@ -11,9 +11,11 @@ aside.sidebar.fixed
       .user-actions
         a.m-r-5(href='#/profil') Profile
         a(href='#/logout') Logout
-  ul(ng-cloak='')
+  ul.menu-links(ng-cloak='')
     a(menu-link='', href='#/participations/mes-participations', icon='md md-call-merge') Participation
     a(menu-link='', href='#/sites/mes-sites', icon='md md-terrain') Sites
-    a(menu-link='', href='#/protocoles', icon='md md-vpn-key') Protocoles
+    li(menu-toggle='', path='/protocoles', name='Protocoles', icon='md md-vpn-key')
+      a(href='#/protocoles') Tous les protocoles
+      a(href='#/protocoles/mes-protocoles') Mes protocoles
     a(menu-link='', href='#/taxons', icon='md md-android') Taxons
     a(menu-link='', href='#/utilisateurs', icon='md md-account-child') Utilisateurs
