@@ -1,11 +1,12 @@
 section
-  .row
-    .col-sm-12
-      div(data-bind-html-unsafe='taxon.description')
-  .row
-    .col-sm-12
-      div(ng-if='taxon.parents && taxon.parents.length > 0')
-        h3.modal-title Taxons parents
-        span(ng-repeat='parent in taxon.parents')
-          a(href='#/taxons/{{parent._id}}') &nbsp;&nbsp;{{parent.libelle_long}}
+  .panel.panel-body
+    .row
+      .col-sm-12
+        div(data-bind-html-unsafe='taxon.description')
+    .row
+      .col-sm-12
+        div(ng-if='taxon.parents && taxon.parents.length > 0')
+          h3.modal-title Taxons parents
+          span(ng-repeat='parent in taxon.parents')
+            a(href='#/taxons/{{parent._id}}') &nbsp;&nbsp;{{parent.libelle_long}}
   xin-update
