@@ -37,7 +37,7 @@
     "bootstrap-additions": "0.2.3",
     "bootstrap-css-only": "3.3.4",
     "bootstrap-sass": "3.3.4",
-    "bootstrap-validator": "0.5.3",
+    "bootstrap-validator": "0.8.1",
     "restangular": "1.5.1",
     "ng-table": "~0.5.0",
     "ng-flow": "~2.5.1",
