@@ -2,24 +2,14 @@ div(role='tabpanel')
   // Nav tabs
   ul.nav.nav-tabs(role='tablist', ng-init='actionTab=1')
     li.active.paddingleft(role='presentation')
-      a(ng-click='actionTab=1', aria-controls='home', role='tab', data-toggle='tab') Description
+      a(ng-click='actionTab=1', aria-controls='home', role='tab', data-toggle='tab') Sites
     li.paddingleft(role='presentation')
-      a(ng-click='actionTab=2', aria-controls='home', role='tab', data-toggle='tab') Sites
+      a(ng-click='actionTab=2', aria-controls='home', role='tab', data-toggle='tab') Description
     li.paddingleft(role='presentation')
       a(ng-click='actionTab=3', aria-controls='home', role='tab', data-toggle='tab') Utilisateurs à valider
   // Tab panes
   .tab-content
     .tab-pane(role='tabpanel', ng-class='{active: actionTab==1}')
-      span(ng-bind-html='protocole.description')
-      div(ng-if='!protocole.macro_protocole')
-        | Taxon : {{ protocole.taxon.libelle_long }}
-        br
-        |         Type des sites : {{ protocole.type_site }}
-      xin-register( ng-show='!userRegistered && !protocole.macro_protocole')
-        | S'inscrire
-      xin-update
-        | Editer
-    .tab-pane(role='tabpanel', ng-class='{active: actionTab==2}')
       div(ng-if='!protocole.macro_protocole')
         display-sites-directive(protocole-id='{{protocole._id}}', type-site='{{protocole.type_site}}')
         list-sites-directive(protocole-id='{{protocole._id}}')
@@ -29,5 +19,16 @@ div(role='tabpanel')
             h4.panel-title
               a(href='#/protocoles/{{protocole._id}}/nouveau-site')
                 | Nouveau Site
+    .tab-pane(role='tabpanel', ng-class='{active: actionTab==2}')
+      .panel.panel-body
+        span(ng-bind-html='protocole.description')
+        div(ng-if='!protocole.macro_protocole')
+          | Taxon : {{ protocole.taxon.libelle_long }}
+          br
+          |         Type des sites : {{ protocole.type_site }}
+        xin-register( ng-show='!userRegistered && !protocole.macro_protocole')
+          | S'inscrire
+        xin-update
+          | Editer
     .tab-pane(role='tabpanel', ng-class='{active: actionTab==3}')
       list-actualites-validations-directive(type='A_VALIDER', protocole-id='{{ protocole._id }}')

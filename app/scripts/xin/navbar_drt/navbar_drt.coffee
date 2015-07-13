@@ -31,7 +31,13 @@ do ->
   ###
   navbarSearch = (PubSub) =>
     restrict: "A"
+    scope:
+      searchKey: '@'
     templateUrl: "scripts/xin/navbar_drt/navbar-search.html"
+    controller: ($scope, $element) ->
+      $scope.change =  ->
+        a = 1
+        PubSub.publish( 'search', $(this)[0].searchKey)
     link: (scope, element, attrs) ->
       scope.showNavbarSearch = false
       scope.toggleSearch = ->
@@ -51,19 +57,10 @@ do ->
         else
           navbar.removeClass "scroll"
 
-  ###*
-  # xin-navbar controller
-  # @ngInject
-  ###
-  inputSearchController = ($scope, PubSub) =>
-    $scope.change =  ->
-      PubSub.publish( 'search', $(this)[0].searchKey)
-
-
 
   angular.module('xin_navbar', [])
   .directive('xinNavbar', xinNavbar)
   .directive('navbarToggle', navbarToggle)
   .directive('navbarSearch', navbarSearch)
   .directive('navbarScroll', navbarScroll)
-  .controller('inputSearchController', inputSearchController)
+

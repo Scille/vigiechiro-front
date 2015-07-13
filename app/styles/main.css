@@ -105,10 +105,6 @@
   .tab-pane {
     padding: 10px !important;
   }
-  .form-group {
-    margin-top: 15px !important;
-    margin-bottom: 10px !important;
-  }
   .paddingleft {
     padding-left: 10px;
   }
@@ -130,10 +126,6 @@
   .tab-pane {
     padding: 20px !important;
   }
-  .form-group {
-    margin-top: 15px !important;
-    margin-bottom: 10px !important;
-  }
   .paddingleft {
     padding-left: 20px;
   }
@@ -154,10 +146,6 @@
   }
   .tab-pane {
     padding: 30px !important;
-  }
-  .form-group {
-    margin-top: 25px !important;
-    margin-bottom: 15px !important;
   }
   .paddingleft {
     padding-left: 40px;
@@ -183,4 +171,8 @@
 
 .checkbox label {
   opacity: 1.0 !important;
+}
+
+.g-maps img {
+  max-width: none;
 }
