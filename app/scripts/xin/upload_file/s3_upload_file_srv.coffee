@@ -98,16 +98,16 @@ angular.module('xin_s3uploadFile', ['appSettings'])
       cancel: ->
         @_pause = $q.defer()
         # TODO ?
-        if @_context
+#        if @_context
           # Call backend to delete the corresponding resource
 #          Backend.all('fichiers').one(@_context.id).customDELETE('multipart/annuler').then(
 #            -> @userCallbacks.cancel?(this)
 #            (error) -> throw error
 #          )
-          Backend.all('fichiers').one(@_context.id).remove().then(
-            -> @userCallbacks.cancel?(this)
-            (error) -> console.log(error)
-          )
+#          Backend.all('fichiers').one(@_context.id).remove().then(
+#            -> @userCallbacks.cancel?(this)
+#            (error) -> console.log(error)
+#          )
         @userCallbacks.onCancel?(this)
       pause: ->
         @userCallbacks.onPause?(this)

@@ -68,7 +68,7 @@ angular.module('xin.fileUploader', ['xin_s3uploadFile'])
       elem.bind('change', onChange)
 
 
-  .factory 'FileUploader', (S3FileUploader) ->
+  .factory 'FileUploader', ($interval, S3FileUploader) ->
     class FileUploader
       constructor: () ->
         @filters = []
@@ -76,6 +76,8 @@ angular.module('xin.fileUploader', ['xin_s3uploadFile'])
         @init()
 
       init: ->
+        @interval = null
+        @previousProgress = []
         @queue = []
         @onProgress = []
         @directories = []
@@ -112,10 +114,12 @@ angular.module('xin.fileUploader', ['xin_s3uploadFile'])
             continue
           file.status = 'ready'
           file.transmitted_size = 0
+          file.sendingTry = 0
           file = new S3FileUploader(file,
             onStart: (s3File) =>
               s3File.file.status = 'progress'
-              @onProgress.push(s3File)
+              if not (s3File in @onProgress)
+                @onProgress.push(s3File)
             onProgress: (s3File, transmitted_size) =>
               s3File.file.transmitted_size = transmitted_size
               @computeTransmittedSize()
@@ -125,19 +129,17 @@ angular.module('xin.fileUploader', ['xin_s3uploadFile'])
               @removeFileOnProgress(s3File)
               @itemsCompleted++
               s3File.file.status = 'success'
-              @startOne()
+              @startNext()
             onErrorBack: (s3File, status) =>
+              console.log("errorBack", s3File)
               s3File.file.status = 'failure'
               @removeFileOnProgress(s3File)
               @itemsFailed++
-              if status?
-                console.log(status)
+              @displayError?(s3File.file.name+' '+status, 'back')
             onErrorXhr: (s3File, status) =>
+              console.log("onErrorXhr", s3File)
               s3File.file.status = 'failure'
-              @removeFileOnProgress(s3File)
-              @itemsFailed++
-              if status?
-                console.log(status)
+              @retrySending(s3File, status)
             onCancel: (s3File) =>
               s3File.file.status = 'cancel'
               @removeFileOnProgress(s3File)
@@ -146,6 +148,19 @@ angular.module('xin.fileUploader', ['xin_s3uploadFile'])
           @queue.push(file)
         @computeSize()
         @onAddingComplete?()
+
+      retrySending: (s3File) ->
+        if s3File.file.sendingTry < 3
+          @displayError?(status, 'xhr', 3)
+          s3File.file.status = 'ready'
+          s3File.file.transmitted_size = 0
+          s3File.start()
+          s3File.file.sendingTry++
+        else
+          @displayError?("Fichier annulé (3 essais passés) : "+s3File.file.name+' '+status, 'xhr')
+          @removeFileOnProgress(s3File)
+          @itemsFailed++
+          @startNext()
 
       addWarnings: (warnings) ->
         @warnings = warnings
@@ -161,22 +176,31 @@ angular.module('xin.fileUploader', ['xin_s3uploadFile'])
 
       startAll: ->
         @status = 'progress'
+        @interval = $interval(@checkUploader, 2000)
         for file in @onProgress
           file.start()
         for i in [1..@parallelUpload]
-          @startOne()
+          @startNext()
 
-      startOne: ->
-        if @status == 'pause'
+      checkUploader: =>
+        for item, index in @onProgress
+          if item in @previousProgress
+            if item.file.status == 'success'
+              @removeFileOnProgress(item)
+              @startNext()
+        @previousProgress = @onProgress.slice()
+
+      startNext: ->
+        if @status == 'pause' or @onProgress.length >= @parallelUpload
           return
-        onProgress = @onProgress.length
-        if onProgress < @parallelUpload
-          i = @itemsCompleted + onProgress
-          if i < @queue.length
+        for file, i in @queue
+          if file.file.status == 'ready'
             @queue[i].start()
+            return
 
       pauseAll: ->
         @status = 'pause'
+        $interval.cancel(@interval)
         for file in @onProgress
           file.pause()
 
@@ -187,6 +211,7 @@ angular.module('xin.fileUploader', ['xin_s3uploadFile'])
             return
 
       cancelAll: ->
+        $interval.cancel(@interval)
         for file in @queue
           if file.file.status not in ['ready', 'failure']
             file.cancel()
@@ -195,6 +220,7 @@ angular.module('xin.fileUploader', ['xin_s3uploadFile'])
 
       isAllComplete: ->
         for file in @queue
-          if not (file.file.status in ['success', 'failure', 'cancel'])
+          if file.file.status in ['ready', 'progress']
             return false
+        $interval.cancel(@interval)
         return true
