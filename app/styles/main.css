@@ -100,8 +100,13 @@
 
 @media (min-width: 768px) {
   main .main-container .main-content > section {
-    margin: 10px !important;
+    margin: 5px 10px !important;
   }
+
+  main .main-container .main-content form {
+    padding: 5px 10px !important;
+  }
+
   .tab-pane {
     padding: 10px !important;
   }
@@ -121,8 +126,13 @@
 
 @media (min-width: 1200px) {
   main .main-container .main-content > section {
-    margin: 20px !important;
+    margin: 10px 20px 5px 20px  !important;
   }
+
+  main .main-container .main-content form {
+    padding: 10px 20px 5px 20px  !important;
+  }
+
   .tab-pane {
     padding: 20px !important;
   }
@@ -142,8 +152,13 @@
 
 @media (min-width: 1800px) {
   main .main-container .main-content > section {
-    margin: 40px !important;
+    margin: 30px 40px 15px 40px !important;
   }
+
+  main .main-container .main-content form {
+    padding: 30px 40px 15px 40px !important;
+  }
+
   .tab-pane {
     padding: 30px !important;
   }
@@ -165,9 +180,6 @@
   color: #003d30 !important;
 }
 
-:not(.filled) label {
-  opacity: 0.5 !important;
-}
 
 .checkbox label {
   opacity: 1.0 !important;

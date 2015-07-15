@@ -1,16 +1,15 @@
-section
-  xin-form
-    .row
-      .col-sm-3
-        xin-input( label='Nom Francais (Latin)', ng-model='taxon.libelle_long', required='')
-      .col-sm-3
-        xin-input( label='Code', ng-model='taxon.libelle_court', required='')
-      .col-sm-6
-        .form-group
-          label.control-label Taxons Parent
-          ui-select.form-control(multiple='', ng-model='taxon.parents', ng-disabled='disabled', on-select='someFunction($item, $model)', theme="select2", search-enabled="true")
-            ui-select-match {{$item.libelle_long}}
-            ui-select-choices(repeat='taxon in taxonsParents.availableTaxons | filter:$select.search')
-              | {{taxon.libelle_long}}
-    xin-editor( k-ng-model='taxon.description')
-    xin-submit
+xin-form
+  .row
+    .col-sm-3
+      xin-input( label='Nom Francais (Latin)', ng-model='taxon.libelle_long', required='')
+    .col-sm-3
+      xin-input( label='Code', ng-model='taxon.libelle_court', required='')
+    .col-sm-6
+      .form-group
+        label.control-label Taxons Parent
+        ui-select.form-control(multiple='', ng-model='taxon.parents', ng-disabled='disabled', on-select='someFunction($item, $model)', theme="select2", search-enabled="true")
+          ui-select-match {{$item.libelle_long}}
+          ui-select-choices(repeat='taxon in taxonsParents.availableTaxons | filter:$select.search')
+            | {{taxon.libelle_long}}
+  xin-editor( k-ng-model='taxon.description')
+  xin-submit

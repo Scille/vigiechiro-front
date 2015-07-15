@@ -3,7 +3,7 @@
 window.resizeContainer = =>
   grid = $('.k-grid-content')
   if (grid? and grid.length > 0)
-    grid.height( $(window).height() - grid.offset().top)
+    grid.height( $(window).height() - grid.offset().top - 4)
     dataKendoGrid = grid.data('kendoGrid')
     if (dataKendoGrid?)
       dataKendoGrid.resize()
@@ -14,7 +14,7 @@ window.resizeContainer = =>
     if (panelSubmit? and panelSubmit.length is 1)
       grid.css( 'min-height', panelSubmit.offset().top - grid.offset().top)
     else
-      grid.css( 'min-height', $(window).height() -  grid.offset().top)
+      grid.css( 'min-height', $(window).height() -  grid.offset().top - 4)
 
   ## a revoir
   tags = $('.xin-height100')
@@ -22,7 +22,7 @@ window.resizeContainer = =>
     if (panelSubmit? and panelSubmit.length is 1)
       tags.height( panelSubmit.offset().top - tags.offset().top)
     else
-      tags.height( $(window).height() - tags.offset().top)
+      tags.height( $(window).height() - tags.offset().top - 4)
 
 
 $(window).resize( ->

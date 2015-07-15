@@ -1,32 +1,30 @@
-section
-  .panel.panel-body
-    xin-form
-      .row
-        .col-sm-6
-          xin-input( label='Pseudo', ng-model='utilisateur.pseudo', required='')
-        .col-sm-6
-          xin-select.xin-placeholders( label='role', ng-model='utilisateur.role', ng-disabled='!isAdmin')
-            option(value='Administrateur') Administrateur
-            option(value='Validateur') Validateur
-            option(value='Observateur') Observateur
-      .row
-        .col-sm-6
-          xin-input( label='Prénom', ng-model='utilisateur.prenom')
-        .col-sm-6
-          xin-input( label = 'Nom', ng-model='utilisateur.nom')
-      .row
-        .col-sm-6
-          xin-email(ng-model='utilisateur.email', required='')
-        .col-sm-6
-          xin-input( label = 'Organisation', ng-model='utilisateur.organisation')
-      .row
-        .col-sm-6
-          xin-textarea( label='Adresse', rows='4', ng-model='utilisateur.adresse')
-        .col-sm-6
-          xin-textarea( label='Commentaire', rows='4', ng-model='utilisateur.commentaire')
-      .row
-        .col-sm-6
-          xin-checkbox(label='Je participe a titre professionnel', ng-model='utilisateur.professionnel')
-        .col-sm-6
-          xin-checkbox(label="J'accepte que mes observations soit publiées sous license publique", ng-model='utilisateur.donnees_publiques')
-      xin-submit
+xin-form
+  .row
+    .col-sm-6
+      xin-input( label='Pseudo', ng-model='utilisateur.pseudo', required='')
+    .col-sm-6
+      xin-select.xin-placeholders( label='role', ng-model='utilisateur.role', ng-disabled='!isAdmin')
+        option(value='Administrateur') Administrateur
+        option(value='Validateur') Validateur
+        option(value='Observateur') Observateur
+  .row
+    .col-sm-6
+      xin-input( label='Prénom', ng-model='utilisateur.prenom')
+    .col-sm-6
+      xin-input( label = 'Nom', ng-model='utilisateur.nom')
+  .row
+    .col-sm-6
+      xin-email(ng-model='utilisateur.email', required='')
+    .col-sm-6
+      xin-input( label = 'Organisation', ng-model='utilisateur.organisation')
+  .row
+    .col-sm-6
+      xin-textarea( label='Adresse', rows='4', ng-model='utilisateur.adresse')
+    .col-sm-6
+      xin-textarea( label='Commentaire', rows='4', ng-model='utilisateur.commentaire')
+  .row
+    .col-sm-6
+      xin-checkbox(label='Je participe a titre professionnel', ng-model='utilisateur.professionnel')
+    .col-sm-6
+      xin-checkbox(label="J'accepte que mes observations soit publiées sous license publique", ng-model='utilisateur.donnees_publiques')
+  xin-submit
