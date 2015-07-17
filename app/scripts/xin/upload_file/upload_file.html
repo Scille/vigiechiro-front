@@ -41,6 +41,11 @@
       {{ error }}
     </div>
   </div>
+  <div class="alert alert-danger" ng-show="errors.xhr.length">
+    <div ng-repeat="error in errors.xhr">
+      {{ error }}
+    </div>
+  </div>
   <span class="help-block"
         ng-show="participationForm.pieces_jointes.$error.filename">
     Les fichiers suivants ne respectent pas le format attendu.

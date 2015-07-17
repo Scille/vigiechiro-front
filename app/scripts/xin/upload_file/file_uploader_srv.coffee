@@ -102,7 +102,7 @@ angular.module('xin.fileUploader', ['xin_s3uploadFile'])
         for item, index in @onProgress
           if item == file
             @onProgress.splice(index, 1)
-            break
+            return
 
       addFiles: (files) ->
         if not files.length
@@ -131,13 +131,14 @@ angular.module('xin.fileUploader', ['xin_s3uploadFile'])
               s3File.file.status = 'success'
               @startNext()
             onErrorBack: (s3File, status) =>
-              console.log("errorBack", s3File)
+              console.log("errorBack", s3File.file)
               s3File.file.status = 'failure'
               @removeFileOnProgress(s3File)
+              @startNext()
               @itemsFailed++
               @displayError?(s3File.file.name+' '+status, 'back')
             onErrorXhr: (s3File, status) =>
-              console.log("onErrorXhr", s3File)
+              console.log("onErrorXhr", s3File.file)
               s3File.file.status = 'failure'
               @retrySending(s3File, status)
             onCancel: (s3File) =>
@@ -151,13 +152,13 @@ angular.module('xin.fileUploader', ['xin_s3uploadFile'])
 
       retrySending: (s3File) ->
         if s3File.file.sendingTry < 3
-          @displayError?(status, 'xhr', 3)
+          s3File.file.sendingTry++
+          @displayError?("Echec de l'essai n°"+s3File.file.sendingTry+" du téléchargement du fichier "+s3File.file.name, 'xhr', 3)
           s3File.file.status = 'ready'
           s3File.file.transmitted_size = 0
           s3File.start()
-          s3File.file.sendingTry++
         else
-          @displayError?("Fichier annulé (3 essais passés) : "+s3File.file.name+' '+status, 'xhr')
+          @displayError?("Fichier annulé (3 essais passés) : "+s3File.file.name, 'xhr')
           @removeFileOnProgress(s3File)
           @itemsFailed++
           @startNext()
