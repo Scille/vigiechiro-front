@@ -72,6 +72,7 @@ angular.module('xin_uploadFile', ['appSettings', 'xin_s3uploadFile', 'xin.fileUp
         $scope.errors.back.push(error)
       else if type == 'xhr'
         $scope.errors.xhr.push(error)
+      $scope.$apply()
 
     uploader.onAddingComplete = ->
       if uploader.status in ['ready', 'progress']
