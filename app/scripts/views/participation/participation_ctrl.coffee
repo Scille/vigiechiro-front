@@ -144,9 +144,13 @@ angular.module('participationViews', ['ngRoute', 'textAngular', 'xin_listResourc
       )
     $scope.showLogs = ->
       $scope.logsDisplayed = not $scope.logsDisplayed
-      Backend.all('participations/'+$scope.participation._id+'/logs').getList().then (logs) ->
-        console.log(logs)
-        $scope.logs = logs
+      if not $scope.logsDisplayed
+        return
+      $scope.waitingLogs = true
+      $scope.participation.customGET('logs').then (participation) ->
+        $scope.logs = participation.logs
+        $scope.waitingLogs = false
+
 
   .directive 'displayParticipationDirective', (Backend) ->
     restrict: 'E'

@@ -72,7 +72,8 @@
         Message : {{log.message}}
       </li>
     </ul>
-    <span ng-show="!logs.length">Aucun log</span>
+    <span ng-show="!logs.length && !waitingLogs">Aucun log</span>
+    <span ng-show="waitingLogs">Chargement des Logs...</span>
   </div>
 </div>
 
