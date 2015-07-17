@@ -56,6 +56,27 @@
   </table>
 </div>
 
+<!-- Logs -->
+<div>
+  <a class="btn btn-default" href="" ng-init="showLog = false" ng-click="showLog = !showLog">
+    <span ng-show="!showLogs">Afficher les logs</span>
+    <span ng-show="showLogs">Masquer les logs</span>
+  </a>
+  <div ng-show="showLog">
+    <ul ng-show="participation.logs.length">
+      <li ng-repeat="log in participation.logs">
+        Date : {{log.date}}
+        <br>
+        Niveau : {{log.level}}
+        <br>
+        Message : {{log.message}}
+      </li>
+    </ul>
+    <span ng-show="!participation.logs || !participation.logs.length">Aucun log</span>
+  </div>
+</div>
+
+<!-- Données -->
 <a class="btn btn-primary" href="#/participations/{{participation._id}}/donnees">
   Voir les données
 </a>
