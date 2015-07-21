@@ -142,8 +142,6 @@ angular.module('participationViews', ['ngRoute', 'textAngular', 'xin_listResourc
         -> $route.reload()
         (error) -> throw error
       )
-    Backend.one('participations/'+$routeParams.participationId+'/logs').get().then (participationLogs) ->
-      $scope.logs = participationLogs.logs
 
 
   .directive 'displayParticipationDirective', (Backend) ->
