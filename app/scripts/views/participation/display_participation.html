@@ -57,25 +57,7 @@
 </div>
 
 <!-- Logs -->
-<div>
-  <a class="btn btn-default" href="" ng-click="showLogs()">
-    <span ng-show="!logsDisplayed">Afficher les logs</span>
-    <span ng-show="logsDisplayed">Masquer les logs</span>
-  </a>
-  <div ng-show="logsDisplayed">
-    <ul ng-show="logs.length">
-      <li ng-repeat="log in logs">
-        Date : {{log.date}}
-        <br>
-        Niveau : {{log.level}}
-        <br>
-        Message : {{log.message}}
-      </li>
-    </ul>
-    <span ng-show="!logs.length && !waitingLogs">Aucun log</span>
-    <span ng-show="waitingLogs">Chargement des Logs...</span>
-  </div>
-</div>
+<access-file-directive file="logs"></access-file-directive>
 
 <!-- Données -->
 <a class="btn btn-primary" href="#/participations/{{participation._id}}/donnees">

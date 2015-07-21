@@ -142,14 +142,8 @@ angular.module('participationViews', ['ngRoute', 'textAngular', 'xin_listResourc
         -> $route.reload()
         (error) -> throw error
       )
-    $scope.showLogs = ->
-      $scope.logsDisplayed = not $scope.logsDisplayed
-      if not $scope.logsDisplayed
-        return
-      $scope.waitingLogs = true
-      $scope.participation.customGET('logs').then (participation) ->
-        $scope.logs = participation.logs
-        $scope.waitingLogs = false
+    Backend.one('participations/'+$routeParams.participationId+'/logs').get().then (participationLogs) ->
+      $scope.logs = participationLogs.logs
 
 
   .directive 'displayParticipationDirective', (Backend) ->
