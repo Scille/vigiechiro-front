@@ -142,6 +142,11 @@ angular.module('participationViews', ['ngRoute', 'textAngular', 'xin_listResourc
         -> $route.reload()
         (error) -> throw error
       )
+    $scope.compute = ->
+      $scope.participation.post('compute').then(
+        (result) -> console.log("Succés")
+        (error) -> console.log(error)
+      )
 
 
   .directive 'displayParticipationDirective', (Backend) ->
