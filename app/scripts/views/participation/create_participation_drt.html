@@ -320,6 +320,38 @@
       </div>
     </div>
 
+    <div class="input-group form-group"
+         ng-class="{'has-error': participationForm.configuration.canal_expansion_temps.$invalid && !participationForm.$pristine}"
+         ng-if="participation.configuration.canal_expansion_temps != undefined">
+      <span class="input-group-addon">Canal en expansion de temps</span>
+      <select class="form-control" name="canal_expansion_temps"
+        ng-model="participation.configuration.canal_expansion_temps"
+        ng-disabled="readOnly">
+        <option value=""></option>
+        <option value="GAUCHE">Gauche</option>
+        <option value="DROITE">Droit</option>
+        <option value="ABSENT">Absent</option>
+      </select>
+    </div>
+
+    <div class="input-group form-group"
+         ng-class="{'has-error': participationForm.configuration.canal_enregistrement_direct.$invalid && !participationForm.$pristine}"
+         ng-if="participation.configuration.canal_enregistrement_direct != undefined">
+      <span class="input-group-addon">Canal en enregistrement direct</span>
+      <select class="form-control" name="canal_enregistrement_direct"
+        ng-model="participation.configuration.canal_enregistrement_direct"
+        ng-disabled="readOnly">
+        <option value=""></option>
+        <option value="GAUCHE">Gauche</option>
+        <option value="DROITE">Droit</option>
+        <option value="ABSENT">Absent</option>
+      </select>
+      <span class="help-block"
+        ng-show="submitted && canal_enregistrement_direct_error">
+        Le canal en expansion de temps et le canal en enregistrement direct doivent être tous les 2 vides ou avoir une valeur (Gauche, Droit ou Absent).
+      </span>
+    </div>
+
     <div class="input-group form-group">
       <input class="save-participation btn btn-primary" type="submit"
              ng-hide="participationForm.$pristine">

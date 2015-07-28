@@ -224,8 +224,8 @@ angular.module('participationViews', ['ngRoute', 'textAngular', 'xin_listResourc
             detecteur_enregistreur_type: ''
             micro_numero_serie: ''
             micro_type: ''
-            piste0_expansion: ''
-            piste1_expansion: ''
+            canal_expansion_temps: ''
+            canal_enregistrement_direct: ''
         else if site.protocole.type_site == 'POINT_FIXE'
           $scope.participation.configuration =
             detecteur_enregistreur_numero_serie: ''
@@ -279,9 +279,19 @@ angular.module('participationViews', ['ngRoute', 'textAngular', 'xin_listResourc
                           'micro0_position','micro0_numero_serie',
                           'micro0_hauteur', 'micro0_type',
                           'micro1_position', 'micro1_type',
-                          'micro1_numero_serie', 'micro1_hauteur']
+                          'micro1_numero_serie', 'micro1_hauteur',
+                          'canal_expansion_temps', 'canal_enregistrement_direct']
             if $scope.participation.configuration[key]?
               payload.configuration[key] = $scope.participation.configuration[key]
+      # Check canal_expansion_temps with canal_enregistrement_direct
+      if payload.configuration.canal_expansion_temps? and payload.configuration.canal_expansion_temps != ''
+        if not payload.configuration.canal_enregistrement_direct or payload.configuration.canal_enregistrement_direct == ''
+          $scope.canal_enregistrement_direct_error = true
+          return
+      else
+        if payload.configuration.canal_enregistrement_direct and payload.configuration.canal_enregistrement_direct != ''
+          $scope.canal_enregistrement_direct_error = true
+          return
       # Check files
       if not $scope.fileUploader.isAllComplete() or
          not $scope.folderUploader.isAllComplete()
