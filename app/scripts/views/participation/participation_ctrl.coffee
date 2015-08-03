@@ -126,7 +126,9 @@ angular.module('participationViews', ['ngRoute', 'textAngular', 'xin_listResourc
 
 
   .controller 'DisplayParticipationController', ($scope, $route, $routeParams,
-                                                 Backend) ->
+                                                 Backend, session) ->
+    session.getIsAdminPromise().then (isAdmin) ->
+      $scope.isAdmin = isAdmin
     Backend.one('participations', $routeParams.participationId).get().then(
       (participation) ->
         if breadcrumbsGetParticipationDefer?
@@ -143,9 +145,10 @@ angular.module('participationViews', ['ngRoute', 'textAngular', 'xin_listResourc
         (error) -> throw error
       )
     $scope.compute = ->
+      $scope.computeInfo = {}
       $scope.participation.post('compute').then(
-        (result) -> console.log("Succés")
-        (error) -> console.log(error)
+        (result) -> $route.reload()
+        (error) -> $scope.computeInfo.error = true
       )
 
 

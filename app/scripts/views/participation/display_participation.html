@@ -21,7 +21,7 @@
 
 <div class="table-responsive">
   <h4>Bilan de la participation</h4>
-  <table class="table table-striped table-condensed">
+  <table class="table table-striped table-condensed" ng-if="participation.bilan">
     <tr>
       <th>#</th>
       <th>Taxon parent</th>
@@ -56,12 +56,44 @@
   </table>
 </div>
 
-<!-- Logs -->
-<access-file-directive file="participation.logs"></access-file-directive>
+<!-- Compute info -->
+<div ng-if="participation.traitement">
+  <span ng-if="participation.traitement.etat == 'FINI'">
+    Le traitement s'est terminée le {{ participation.traitement.date_fin | xinDate: 'medium' }}
+    <br>
+    Début du traitement : {{ participation.traitement.date_debut | xinDate: 'medium' }}
+  </span>
+  <span ng-if="participation.traitement.etat == 'PLANIFIE'">
+    Le traitement de la participation est planifié.
+  </span>
+  <span ng-if="participation.traitement.etat == 'EN_COURS'">
+    Le traitement est en cours.
+    <br>
+    Début du traitement : {{ participation.traitement.date_debut | xinDate: 'medium' }}
+  </span>
+  <span ng-if="participation.traitement.etat == 'ERREUR'">
+    Le traitement a échoué.
+<!--    <br>
+    Début du traitement : {{ participation.traitement.date_debut | xinDate: 'medium' }}-->
+  </span>
+</div>
+<div ng-show="computeInfo">
+  <span class="alert alert-danger" ng-show="computeInfo.error">
+    La demande de relance de la participation a échoué.
+  </span>
+</div>
 
 <!-- Données -->
 <a class="btn btn-primary" href="#/participations/{{participation._id}}/donnees">
   Voir les données
 </a>
 
-<a class="btn btn-warning" href="" ng-click="compute()">Relancer la participation</a>
+<a class="btn btn-warning" href="" ng-click="compute()"
+   ng-if="isAdmin && (participation.traitement.etat == 'FINI' || participation.traitement.etat == 'ERREUR')">
+  Relancer la participation
+</a>
+
+<!-- Logs -->
+<span ng-if="participation.logs">
+  <access-file-directive file="participation.logs"></access-file-directive>
+</span>
