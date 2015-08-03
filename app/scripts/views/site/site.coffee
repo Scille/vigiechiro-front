@@ -179,7 +179,7 @@ angular.module('siteViews', ['ngRoute',
         if breadcrumbsGetSiteDefer?
           breadcrumbsGetSiteDefer.resolve(protocole)
           breadcrumbsGetSiteDefer = undefined
-        $scope.protocole = protocole
+        $scope.protocole = protocole.plain()
         initSiteCreation()
         createMap(angular.element('.g-maps')[0])
       (error) -> window.location = '#/404'
@@ -297,7 +297,7 @@ angular.module('siteViews', ['ngRoute',
       if not map.isValid()
         return
       payload =
-        'titre': $scope.protocoleTitre
+        'titre': undefined
         'protocole': $scope.protocole._id
         'commentaire': $scope.site.commentaire
       # If random grille stoc
@@ -316,6 +316,11 @@ angular.module('siteViews', ['ngRoute',
           if sites.plain().length
             saveLocalities(sites[0], map)
           else
+            # Set up title
+            numGrilleStoc = map.getNumGrilleStoc()
+            sixDigitGrilleStoc = '000000'.substring(0, 6-numGrilleStoc.length) + numGrilleStoc
+            payload.titre = $scope.protocole.titre+"-"+sixDigitGrilleStoc
+            # POST site
             Backend.all('sites').post(payload).then(
               (site) ->
                 saveLocalities(site, map)

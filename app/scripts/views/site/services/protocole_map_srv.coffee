@@ -343,6 +343,9 @@ angular.module('protocole_map', ['protocole_map_carre',
       getIdGrilleStoc: ->
         return @_grilleStoc.id
 
+      getNumGrilleStoc: ->
+        return @_grilleStoc.numero
+
       createCell: (lat, lng) ->
         # 1000*racine(2)
         distance = 1000 * Math.sqrt(2)
