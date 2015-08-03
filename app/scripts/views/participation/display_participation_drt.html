@@ -76,6 +76,14 @@
         Hauteur du micro 1 :
         {{ participation.configuration.micro1_hauteur }}
       </div>
+      <div ng-if="participation.configuration.canal_expansion_temps">
+        Canal en expansion de temps :
+        {{ participation.configuration.canal_expansion_temps }}
+      </div>
+      <div ng-if="participation.configuration.canal_enregistrement_direct">
+        Canal en enregistrement direct :
+        {{ participation.configuration.canal_enregistrement_direct }}
+      </div>
     </div>
 
     <div class="panel panel-default panel-body">
