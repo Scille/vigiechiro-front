@@ -7,6 +7,7 @@ angular.module('protocole_map_point_fixe', [])
       constructor: (mapDiv, @typeProtocole, @callbacks) ->
         super mapDiv, @typeProtocole, @callbacks
         @_min = 1
+        @_distanceOfInterest = 40
         @_smallGrille = []
         @_steps = [
             id: 'start'
@@ -79,7 +80,7 @@ angular.module('protocole_map_point_fixe', [])
         position = overlay.getPosition()
         for circle in @_smallGrille or []
           distance = @_googleMaps.computeDistanceBetween(circle.getCenter(), position)
-          if distance <= 25
+          if distance <= @_distanceOfInterest
             interestPoint = true
             name = circle.name
             break
@@ -163,7 +164,7 @@ angular.module('protocole_map_point_fixe', [])
           for j in [0..3]
             path = [p[i][j], p[i+1][j], p[i+1][j+1], p[i][j+1]]
             center = @_googleMaps.interpolate(path[0], path[2], 0.5)
-            circle = @_googleMaps.createCircle(center, 25, false, false)
+            circle = @_googleMaps.createCircle(center, @_distanceOfInterest, false, false)
             circle.setOptions(
               fillOpacity: 0
               fillColor: '#000000'
