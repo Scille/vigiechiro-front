@@ -16,7 +16,7 @@
              type="number" min="0" max="599"
              ng-model="site.numeroSite">
     </div>
-    <div class="alert alert-danger" ng-show="numeroError">
+    <p class="alert alert-danger" ng-show="numeroError">
       Ce numéro est déjà utilisé.
     </p>
 
@@ -119,17 +119,6 @@
               ng-model="site.commentaire" ng-disabled="readOnly"
               placeholder="Commentaire">
     </textarea>
-  </div>
-
-  <div class="checkbox" ng-show="isAdmin && observateur.registered">
-    <label>
-      <input type="checkbox" name="verrouille" ng-model="site.verrouille"
-             ng-true-value="true" ng-false-value="false">
-        Verrouillé
-    </label>
-  </div>
-  <div ng-show="isAdmin && !observateur.registered">
-    Le site ne peut pas être verrouillé car l'observateur {{observateur.pseudo}} n'est pas inscrit au protocole.
   </div>
 
   <div class="form-group">
