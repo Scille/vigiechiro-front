@@ -352,6 +352,10 @@
       </span>
     </div>
 
+    <div class="alert alert-danger" ng-show="submitError">
+      La participation n'a pas pu être sauvegardée.
+    </div>
+
     <div class="input-group form-group">
       <input class="save-participation btn btn-primary" type="submit"
              ng-hide="participationForm.$pristine">

@@ -168,6 +168,7 @@ angular.module('participationViews', ['ngRoute', 'textAngular', 'xin_listResourc
           return false
         return true
 
+
   .controller 'displayParticipationDrtController', ($scope, Backend) ->
     $scope.$watch('participation', (participation) ->
       if participation?
@@ -309,7 +310,7 @@ angular.module('participationViews', ['ngRoute', 'textAngular', 'xin_listResourc
               return
             else
               sendFiles($scope, participation)
-        (error) -> throw "Error : participation save "+error
+        (error) -> $scope.submitError = true
       )
 
 
