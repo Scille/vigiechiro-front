@@ -25,6 +25,7 @@ initEnv = ($scope, $modal, session) ->
   # all
   $scope.validLocalitesAllowed = false
   $scope.editLocalitesAllowed = false
+  $scope.mapWarnings = []
   # form
   $scope.isAdmin = false
   session.getIsAdminPromise().then (isAdmin) ->
@@ -63,9 +64,22 @@ siteCallbacks = ($scope, $timeout) ->
       $scope.mapError =
         message: error
       $timeout(-> $scope.$apply())
-    displayWarning: (warning) ->
-      $scope.mapWarning =
+    displayWarning: (warning, type = '') ->
+      exist = false
+      newWarning =
         message: warning
+        type: type
+      for warning in $scope.mapWarnings
+        if warning.message == newWarning.message
+          exist = true
+          break
+      if not exist
+        $scope.mapWarnings.push(newWarning)
+      $timeout(-> $scope.$apply())
+    hideWarning: (type) ->
+      for i in [$scope.mapWarnings.length-1..0] when $scope.mapWarnings.length > 0
+        if $scope.mapWarnings[i].type == type
+          $scope.mapWarnings.splice(i, 1)
       $timeout(-> $scope.$apply())
     updateSteps: (steps) ->
       $scope.mapError = null

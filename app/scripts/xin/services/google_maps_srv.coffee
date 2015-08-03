@@ -197,8 +197,7 @@ angular.module('xin_google_maps', [])
           return 0
         return google.maps.geometry.spherical.computeLength(overlay.getPath())
 
-      computeDistanceBetween: google.maps.geometry.spherical
-            .computeDistanceBetween
+      computeDistanceBetween: google.maps.geometry.spherical.computeDistanceBetween
 
       isLocationOnEdge: (point, latlngs, tolerance = 10e-9) ->
         poly = new google.maps.Polyline(

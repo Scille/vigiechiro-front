@@ -92,9 +92,11 @@
   <p class="bg-danger" ng-show="mapError">
     {{ mapError.message }}
   </p>
-  <p class="bg-warning" ng-show="mapWarning">
-    {{ mapWarning.message }}
-  </p>
+  <div class="alert alert-warning" ng-show="mapWarnings.length">
+    <p ng-repeat="warning in mapWarnings">
+      {{ warning.message }}
+    </p>
+  </div>
 
   <div class="help-block has-error" ng-show="false">
   </div>

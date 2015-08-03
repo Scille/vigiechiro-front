@@ -51,13 +51,20 @@ angular.module('protocole_map_carre', [])
                 @callbacks.displayError?("Nombre maximum de localités atteint.")
                 return false
               @saveOverlay(overlay)
+              @checkDistanceBetweenPoints(200)
+              # rightclick for delete overlay
               @_googleMaps.addListener(overlay, 'rightclick', (e) =>
                 @deleteOverlay(overlay)
+                @checkDistanceBetweenPoints(200)
                 if @getCountOverlays() < @_min
                   @_step = 'editLocalities'
                 else
                   @_step = 'validLocalities'
                 @updateSite()
+              )
+              # when move overlay
+              @_googleMaps.addListener(overlay, 'mouseout', (e) =>
+                @checkDistanceBetweenPoints(200)
               )
               if @getCountOverlays() >= @_min
                 @_step = 'validLocalities'
@@ -81,3 +88,23 @@ angular.module('protocole_map_carre', [])
           if parseInt(locality.name) == name
             return @setLocalityName(name + 1)
         return name+''
+
+      # Display warning if point < limit meters from another point
+      checkDistanceBetweenPoints: (limit) ->
+        overpass = false
+        for i in [0..@_localities.length-2] when i >= 0
+          if overpass
+            break
+          for j in [i+1..@_localities.length-1] when j < @_localities.length
+            firstLocality = @_localities[i]
+            secondLocality = @_localities[j]
+            if firstLocality == secondLocality
+              break
+            distance = @_googleMaps.computeDistanceBetween(firstLocality.overlay.getPosition(), secondLocality.overlay.getPosition())
+            if distance < limit
+              overpass = true
+              break
+        if overpass
+          @callbacks.displayWarning?("Attention, point à moins de 200 mètres d'un autre point.", 'PROXIMITY_POINTS')
+        else
+          @callbacks.hideWarning?('PROXIMITY_POINTS')
