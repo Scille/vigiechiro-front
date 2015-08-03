@@ -16,10 +16,10 @@ angular.module('protocole_map_carre', [])
             message: "Cliquer sur la carte pour sélection la grille stoc correspondante."
           ,
             id: 'editLocalities'
-            message: "Définir entre 5 et 13 localités à l'intérieur du carré."
+            message: "Définir entre 5 et 13 points à l'intérieur du carré."
           ,
             id: 'validLocalities'
-            message: "Valider les localités."
+            message: "Valider les points."
           ,
             id: 'end'
             message: "Cartographie achevée."
@@ -48,7 +48,7 @@ angular.module('protocole_map_carre', [])
               @callbacks.displayError?("Mauvaise forme : " + overlay.type)
             if isModified
               if @getCountOverlays() >= @_max
-                @callbacks.displayError?("Nombre maximum de localités atteint.")
+                @callbacks.displayError?("Nombre maximum de points atteint.")
                 return false
               @saveOverlay(overlay)
               @checkDistanceBetweenPoints(200)

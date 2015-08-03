@@ -16,10 +16,10 @@ angular.module('protocole_map_point_fixe', [])
             message: "Cliquer sur la carte pour sélection la grille stoc correspondante."
           ,
             id: 'editLocalities'
-            message: "Définir au moins 1 localité à l'intérieur du carré."
+            message: "Définir au moins 1 point à l'intérieur du carré."
           ,
             id: 'validLocalities'
-            message: "Valider les localités."
+            message: "Valider les points."
           ,
             id: 'end'
             message: "Cartographie achevée."
@@ -119,7 +119,7 @@ angular.module('protocole_map_point_fixe', [])
         @_googleMaps.setDrawingManagerOptions(drawingControl: true)
         if editable
           @_googleMaps.addListener(@_grilleStoc.overlay, 'rightclick', (e) =>
-            if confirm("Cette opération supprimera toutes les localités.")
+            if confirm("Cette opération supprimera tous les points.")
               @_step = 'start'
               @_grilleStoc.overlay.setMap(null)
               @_grilleStoc = {}
