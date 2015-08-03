@@ -167,8 +167,8 @@ angular.module('protocole_map_point_fixe', [])
             circle.setOptions(
               fillOpacity: 0
               fillColor: '#000000'
-              strokeWeight: 1
-              strokeOpacity: 0.2
+              strokeWeight: 2
+              strokeOpacity: 0.6
               strokeColor: '#000000'
             )
             @_smallGrille.push(circle)
