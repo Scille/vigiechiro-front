@@ -1,7 +1,8 @@
 <div class="container">
   <div class="text-center">
     <div class="page-header text-center">
-      <h3>Participation du {{ participation.date_debut | xinDate: 'medium' }}</h3>
+      <h3>Participation du {{ participation.date_debut | xinDate: 'medium' }}
+      effectuée par {{participation.observateur.pseudo}}</h3>
     </div>
   </div>
 
