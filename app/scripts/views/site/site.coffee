@@ -348,16 +348,40 @@ angular.module('siteViews', ['ngRoute',
       # If tracé
       else if $scope.protocole.type_site == 'ROUTIER'
         payload.tracet = map.getGeoJsonRoute()
-        Backend.all('sites').post(payload).then(
-          (site) ->
-            saveLocalities(site, map)
-            # If verrouille
-            if $scope.site.verrouille
-              lock(site)
-            # redirect to display site
-            window.location = '#/sites/'+site._id
-          (error) -> console.log(error)
-        )
+        if $scope.site.numeroSite? and $scope.site.numeroSite in [0..599]
+          payload.titre = $scope.protocole.titre+"-"+$scope.site.numeroSite
+          # Check if site doesn't exist
+          Backend.all('sites').getList({protocole: $routeParams.protocoleId})
+            .then (sites) ->
+              exist = false
+              for site in sites.plain() or []
+                if site.titre == payload.titre
+                  exist = true
+                  break
+              if exist
+                $scope.numeroError = true
+              else
+                Backend.all('sites').post(payload).then(
+                  (site) ->
+                    saveLocalities(site, map)
+                    # If verrouille
+                    if $scope.site.verrouille
+                      lock(site)
+                    # redirect to display site
+                    window.location = '#/sites/'+site._id
+                  (error) -> console.log(error)
+                )
+        else
+          Backend.all('sites').post(payload).then(
+            (site) ->
+              saveLocalities(site, map)
+              # If verrouille
+              if $scope.site.verrouille
+                lock(site)
+              # redirect to display site
+              window.location = '#/sites/'+site._id
+            (error) -> console.log(error)
+          )
 
 
   .controller 'EditSiteController', ($timeout, $route, $routeParams, $scope, $modal,

@@ -9,8 +9,17 @@
 </div>
 
 <div class="panel panel-default panel-body">
-
   <div ng-if="creation">
+    <div class="form-group input-group" ng-show="protocole.type_site == 'ROUTIER'">
+      <label class="input-group-addon" for="numeroSite">Numero du site (optionnel)</label>
+      <input class="form-control" name="numeroSite" id="numeroSite"
+             type="number" min="0" max="599"
+             ng-model="site.numeroSite">
+    </div>
+    <div class="alert alert-danger" ng-show="numeroError">
+      Ce numéro est déjà utilisé.
+    </p>
+
     <div ng-show="randomSelectionAllowed">
       <b>Faire un tirage aléatoire</b>
       <a class="btn btn-primary" id="random-selection-true"
