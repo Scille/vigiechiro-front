@@ -23,11 +23,11 @@
       Participation du {{ resource.date_debut | xinDate: 'medium' }}
     </a>
     <span class="label label-success pull-right"
-          ng-show="resource.observateur._id == user._id">
+          ng-show="resource.observateur && resource.observateur._id == user._id">
       Participant
     </span>
     <span class="label label-primary pull-right"
-          ng-show="resource.observateur._id != user._id">
+          ng-show="resource.observateur && resource.observateur._id != user._id">
       {{ resource.observateur.pseudo }}
     </span>
   </list-resource-directive>
