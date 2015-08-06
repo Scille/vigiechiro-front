@@ -73,6 +73,7 @@ angular.module('xin.fileUploader', ['xin_s3uploadFile'])
       constructor: () ->
         @filters = []
         @parallelUpload = 8
+        @_gzip = false
         @init()
 
       init: ->
@@ -87,6 +88,9 @@ angular.module('xin.fileUploader', ['xin_s3uploadFile'])
         @size = 0
         @transmitted_size = 0
         @status = 'ready'
+
+      setGzip: ->
+        @_gzip = true
 
       computeSize: ->
         @size = 0
@@ -104,49 +108,68 @@ angular.module('xin.fileUploader', ['xin_s3uploadFile'])
             @onProgress.splice(index, 1)
             return
 
+      _createZipFile: (file) ->
+        zip = new JSZip()
+        arrayBuffer = null
+        fileReader = new FileReader()
+        fileReader.onload = (e) =>
+          arrayBuffer = e.target.result
+          zip.file(file.name, arrayBuffer)
+          blob = zip.generate({compression: "DEFLATE", compressionOptions: {level: 1} , type: "blob", mimeType: file.type})
+          blob.name = file.name
+          @_addFilesNext(blob)
+        fileReader.readAsArrayBuffer(file)
+
       addFiles: (files) ->
-        if not files.length
+        filesLength = files.length or 0
+        if not filesLength
           return
-        length = files.length
-        for i in [0..length-1]
+        for i in [0..filesLength-1]
           file = files.pop()
           if not @checkFilters(file)
             continue
-          file.status = 'ready'
-          file.transmitted_size = 0
-          file.sendingTry = 0
-          file = new S3FileUploader(file,
-            onStart: (s3File) =>
-              s3File.file.status = 'progress'
-              if not (s3File in @onProgress)
-                @onProgress.push(s3File)
-            onProgress: (s3File, transmitted_size) =>
-              s3File.file.transmitted_size = transmitted_size
-              @computeTransmittedSize()
-            onPause: (s3File) =>
-              s3File.file.status = 'pause'
-            onSuccess: (s3File) =>
-              @removeFileOnProgress(s3File)
-              @itemsCompleted++
-              s3File.file.status = 'success'
-              @startNext()
-            onErrorBack: (s3File, status) =>
-              console.log("errorBack", s3File.file)
-              s3File.file.status = 'failure'
-              @removeFileOnProgress(s3File)
-              @startNext()
-              @itemsFailed++
-              @displayError?(s3File.file.name+' '+status, 'back')
-            onErrorXhr: (s3File, status) =>
-              console.log("onErrorXhr", s3File.file)
-              s3File.file.status = 'failure'
-              @retrySending(s3File, status)
-            onCancel: (s3File) =>
-              s3File.file.status = 'cancel'
-              @removeFileOnProgress(s3File)
-              @itemsFailed++
-          )
-          @queue.push(file)
+          if @_gzip
+            @_createZipFile(file)
+          else
+            @_addFilesNext(file)
+
+      _addFilesNext: (file) =>
+        file.status = 'ready'
+        file.transmitted_size = 0
+        file.sendingTry = 0
+        file = new S3FileUploader(file,
+          onStart: (s3File) =>
+            s3File.file.status = 'progress'
+            if not (s3File in @onProgress)
+              @onProgress.push(s3File)
+          onProgress: (s3File, transmitted_size) =>
+            s3File.file.transmitted_size = transmitted_size
+            @computeTransmittedSize()
+          onPause: (s3File) =>
+            s3File.file.status = 'pause'
+          onSuccess: (s3File) =>
+            @removeFileOnProgress(s3File)
+            @itemsCompleted++
+            s3File.file.status = 'success'
+            @startNext()
+          onErrorBack: (s3File, status) =>
+            console.log("errorBack", s3File.file)
+            s3File.file.status = 'failure'
+            @removeFileOnProgress(s3File)
+            @startNext()
+            @itemsFailed++
+            @displayError?(s3File.file.name+' '+status, 'back')
+          onErrorXhr: (s3File, status) =>
+            console.log("onErrorXhr", s3File.file)
+            s3File.file.status = 'failure'
+            @retrySending(s3File, status)
+          onCancel: (s3File) =>
+            s3File.file.status = 'cancel'
+            @removeFileOnProgress(s3File)
+            @itemsFailed++
+          , @_gzip
+        )
+        @queue.push(file)
         @computeSize()
         @onAddingComplete?()
 

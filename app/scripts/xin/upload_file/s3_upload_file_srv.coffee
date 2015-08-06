@@ -78,10 +78,11 @@ angular.module('xin_s3uploadFile', ['appSettings'])
         xhr.setRequestHeader(key, value)
       xhr.send(file)
 
+
     class S3FileUploader
       # 5Mo
       sliceSize: 5 * 1024 * 1024
-      constructor: (file, @userCallbacks) ->
+      constructor: (file, @userCallbacks, @_gzip = false) ->
         @file = file
         @_pause = $q.defer()
         @_context = undefined
@@ -97,7 +98,7 @@ angular.module('xin_s3uploadFile', ['appSettings'])
         @userCallbacks.onErrorXhr?(this, status)
       cancel: ->
         @_pause = $q.defer()
-        # TODO ?
+        # TODO
 #        if @_context
           # Call backend to delete the corresponding resource
 #          Backend.all('fichiers').one(@_context.id).customDELETE('multipart/annuler').then(
@@ -183,7 +184,10 @@ angular.module('xin_s3uploadFile', ['appSettings'])
                   @_context.part_number += 1
                   @_continueMultiPartUpload(@_context)
                 onError: (error) => @_onErrorXhr(error)
-              uploadToS3(callbacks, 'PUT', slice, response.s3_signed_url)
+              headers = {}
+              if @_gzip
+                headers["Content-Encoding"] = "gzip"
+              uploadToS3(callbacks, 'PUT', slice, response.s3_signed_url, headers)
             (error) -> throw error
           )
       _startSingleUpload: () ->
@@ -219,7 +223,11 @@ angular.module('xin_s3uploadFile', ['appSettings'])
                 contentType = 'application/ta'
               else if tac.test(@file.name)
                 contentType = 'application/tac'
-            uploadToS3(callbacks, 'PUT', @file, response.s3_signed_url,
-              {'Content-Type': contentType})
+            headers =
+              'Content-Type': contentType
+            # If compress : TODO
+            if @_gzip
+              headers["Content-Encoding"] = "gzip"
+            uploadToS3(callbacks, 'PUT', @file, response.s3_signed_url, headers)
           (error) => @_onErrorBack(error)
         )

@@ -21,6 +21,8 @@ angular.module('xin_uploadFile', ['appSettings', 'xin_s3uploadFile', 'xin.fileUp
         input[0].setAttribute('directory', '')
         input[0].setAttribute('webkitdirectory', '')
         input[0].setAttribute('mozdirectory', '')
+      if attrs.gzip?
+        scope.gzip = true
 
       scope.$watch 'regexp', (regexp) ->
         if regexp? and regexp.length
@@ -38,6 +40,10 @@ angular.module('xin_uploadFile', ['appSettings', 'xin_s3uploadFile', 'xin.fileUp
       back: []
       xhr: []
     uploader = $scope.uploader = new FileUploader()
+
+    $scope.$watch 'gzip', (gzip) ->
+      if gzip?
+        uploader.setGzip()
 
     # Remove sub-directories
     uploader.filters.push(
