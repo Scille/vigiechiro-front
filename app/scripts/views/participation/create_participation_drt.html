@@ -183,10 +183,37 @@
         <label class="input-group-addon" for="configuration.detecteur_enregistreur_type">
           Type du détecteur enregistreur
         </label>
-        <input type="text" class="form-control"
-          id="configuration.detecteur_enregistreur_type"
-          name="detecteur_enregistreur_type"
-          ng-model="participation.configuration.detecteur_enregistreur_type" ng-disabled="readOnly">
+        <select class="form-control"
+                id="configuration.detecteur_enregistreur_type"
+                name="detecteur_enregistreur_type"
+                ng-model="participation.configuration.detecteur_enregistreur_type"
+                ng-disabled="readOnly">
+          <option value=""></option>
+          <option value="SM2BAT">SM2BAT</option>
+          <option value="SM2BAT+">SM2BAT+</option>
+          <option value="EM3">EM3</option>
+          <option value="EM3+">EM3+</option>
+          <option value="SM3">SM3</option>
+          <option value="D500">D500</option>
+          <option value="Batcorder">Batcorder</option>
+          <option value="Batlogger">Batlogger</option>
+          <option value="Ultramic250k + Soundchaser">Ultramic250k + Soundchaser</option>
+          <option value="Ultramic250k + Syrinx">Ultramic250k + Syrinx</option>
+          <option value="Ultramic250k + Autre logiciel">Ultramic250k + Autre logiciel</option>
+          <option value="Ultramic200k + Soundchaser">Ultramic200k + Soundchaser</option>
+          <option value="Ultramic200k + Syrinx">Ultramic200k + Syrinx</option>
+          <option value="Ultramic200k + Autre logiciel">Ultramic200k + Autre logiciel</option>
+          <option value="Tranquility Transect + Zoom H2">Tranquility Transect + Zoom H2</option>
+          <option value="Tranquility Transect + Tascam DR05">Tranquility Transect + Tascam DR05</option>
+          <option value="Tranquility Transect + Edirol R09">Tranquility Transect + Edirol R09</option>
+          <option value="Tranquility Transect + Edirol R01">Tranquility Transect + Edirol R01</option>
+          <option value="Tranquility Transect + Autre enregistreur">Tranquility Transect + Autre enregistreur</option>
+          <option value="D240X + Zoom H2">D240X + Zoom H2</option>
+          <option value="D240X + Tascam DR05">D240X + Tascam DR05</option>
+          <option value="D240X + Edirol R09">D240X + Edirol R09</option>
+          <option value="D240X + Edirol R01">D240X + Edirol R01</option>
+          <option value="D240X + Autre enregistreur">D240X + Autre enregistreur</option>
+        </select>
       </div>
     </div>
 
@@ -211,10 +238,17 @@
         <label class="input-group-addon" for="configuration.micro_type">
           Type du micro
         </label>
-        <input type="text" class="form-control"
-          id="configuration.micro_type"
-          name="micro_type"
-          ng-model="participation.configuration.micro_type" ng-disabled="readOnly">
+        <select class="form-control"
+                id="configuration.micro_type"
+                name="micro_type"
+                ng-model="participation.configuration.micro_type"
+                ng-disabled="readOnly">
+          <option value="Micro interne">Micro interne</option>
+          <option value="SMX-US">SMX-US</option>
+          <option value="SMX-UT">SMX-UT</option>
+          <option value="SMX-U1">SMX-U1</option>
+          <option value="Autre micro externe">Autre micro externe</option>
+        </select>
       </div>
     </div>
 
@@ -250,9 +284,16 @@
         <label class="input-group-addon" for="configuration.micro0_type">
           Type du micro 0
         </label>
-        <input type="text" class="form-control" id="configuration.micro0_type"
-          name="micro0_type"
-          ng-model="participation.configuration.micro0_type" ng-disabled="readOnly">
+        <select class="form-control" id="configuration.micro0_type"
+                name="micro0_type"
+                ng-model="participation.configuration.micro0_type"
+                ng-disabled="readOnly">
+          <option value="Micro interne">Micro interne</option>
+          <option value="SMX-US">SMX-US</option>
+          <option value="SMX-UT">SMX-UT</option>
+          <option value="SMX-U1">SMX-U1</option>
+          <option value="Autre micro externe">Autre micro externe</option>
+        </select>
       </div>
     </div>
 
@@ -301,9 +342,16 @@
         <label class="input-group-addon" for="configuration.micro1_type">
           Type du micro 1
         </label>
-        <input type="text" class="form-control" id="configuration.micro1_type"
-          name="micro1_type"
-          ng-model="participation.configuration.micro1_type" ng-disabled="readOnly">
+        <select class="form-control" id="configuration.micro1_type"
+                name="micro1_type"
+                ng-model="participation.configuration.micro1_type"
+                ng-disabled="readOnly">
+          <option value="Micro interne">Micro interne</option>
+          <option value="SMX-US">SMX-US</option>
+          <option value="SMX-UT">SMX-UT</option>
+          <option value="SMX-U1">SMX-U1</option>
+          <option value="Autre micro externe">Autre micro externe</option>
+        </select>
       </div>
     </div>
 

@@ -61,6 +61,10 @@
         Numéro de série du micro 0 :
         {{ participation.configuration.micro0_numero_serie }}
       </div>
+      <div ng-if="participation.configuration.micro0_type">
+        Type du micro 0 :
+        {{ participation.configuration.micro0_type }}
+      </div>
       <div ng-if="participation.configuration.micro0_hauteur">
         Hauteur du micro 0 :
         {{ participation.configuration.micro0_hauteur }}
@@ -72,6 +76,10 @@
       <div ng-if="participation.configuration.micro1_numero_serie">
         Numéro de série du micro 1 :
         {{ participation.configuration.micro1_numero_serie }}
+      </div>
+      <div ng-if="participation.configuration.micro1_type">
+        Type du micro 1 :
+        {{ participation.configuration.micro1_type }}
       </div>
       <div ng-if="participation.configuration.micro1_hauteur">
         Hauteur du micro 1 :
