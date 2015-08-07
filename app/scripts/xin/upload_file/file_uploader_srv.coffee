@@ -72,7 +72,7 @@ angular.module('xin.fileUploader', ['xin_s3uploadFile'])
     class FileUploader
       constructor: () ->
         @filters = []
-        @parallelUpload = 8
+        @parallelUpload = 4
         @_gzip = false
         @init()
 
