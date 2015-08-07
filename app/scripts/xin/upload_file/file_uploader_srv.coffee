@@ -108,14 +108,13 @@ angular.module('xin.fileUploader', ['xin_s3uploadFile'])
             @onProgress.splice(index, 1)
             return
 
-      _createZipFile: (file) ->
-        zip = new JSZip()
+      _createGZipFile: (file) ->
         arrayBuffer = null
         fileReader = new FileReader()
         fileReader.onload = (e) =>
           arrayBuffer = e.target.result
-          zip.file(file.name, arrayBuffer)
-          blob = zip.generate({compression: "DEFLATE", compressionOptions: {level: 1} , type: "blob", mimeType: file.type})
+          gzipFile = pako.gzip(arrayBuffer)
+          blob = new Blob([gzipFile], {type: file.type})
           blob.name = file.name
           @_addFilesNext(blob)
         fileReader.readAsArrayBuffer(file)
@@ -129,7 +128,7 @@ angular.module('xin.fileUploader', ['xin_s3uploadFile'])
           if not @checkFilters(file)
             continue
           if @_gzip
-            @_createZipFile(file)
+            @_createGZipFile(file)
           else
             @_addFilesNext(file)
 
