@@ -20,15 +20,29 @@
 
   <list-resource-directive resource-backend="resourceBackend" lookup="lookup">
     <a ng-href='#/participations/{{resource._id}}'>
-      Participation du {{ resource.date_debut | xinDate: 'medium' }}
+      Participation du {{ resource.date_debut | xinDate: 'short' }}
     </a>
-    <span class="label label-success pull-right"
+    <span class="pull-right"
           ng-show="resource.observateur && resource.observateur._id == user._id">
-      Participant
+      <span class="label label-success">
+        Participant
+      </span>&nbsp;<span class="label label-primary">
+        {{resource.site.titre}}
+      </span>
     </span>
-    <span class="label label-primary pull-right"
+    <span class="pull-right"
           ng-show="resource.observateur && resource.observateur._id != user._id">
-      {{ resource.observateur.pseudo }}
+      <span class="label label-primary">
+        {{ resource.observateur.pseudo }}
+      </span>&nbsp;<span class="label label-primary">
+        {{resource.site.titre}}
+      </span>
+    </span>
+    <span class="pull-right"
+          ng-show="!resource.observateur">
+      <span class="label label-primary">
+        {{resource.site.titre}}
+      </span>
     </span>
   </list-resource-directive>
 
