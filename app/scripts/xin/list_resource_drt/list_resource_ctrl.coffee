@@ -48,7 +48,13 @@ angular.module('xin_listResource', ['ngRoute', 'angularUtils.directives.dirPagin
     scope:
       resourceBackend: '='
       lookup: '=?'
+      others: '=?'
     link: (scope, elem, attrs, ctrl, transclude) ->
+      if attrs.others
+        scope.$watch 'others', (others) ->
+            for key, value of others
+              scope[key] = value
+          , true
       if not attrs.lookup?
         scope.lookup = {}
       scope.$watch 'lookup', (lookup) ->
