@@ -17,9 +17,9 @@ makeRegExp = ($scope, type_site) ->
 sendFiles = ($scope, participation) ->
   payload =
     pieces_jointes: []
-  for file in $scope.fileUploader.queue or []
+  for file in $scope.fileUploader.itemsCompleted or []
     payload.pieces_jointes.push(file.file.id)
-  for file in $scope.folderUploader.queue or []
+  for file in $scope.folderUploader.itemsCompleted or []
     payload.pieces_jointes.push(file.file.id)
   participation.customPUT(payload, 'pieces_jointes').then(
     -> window.location = '#/participations/'+participation._id
@@ -217,7 +217,6 @@ angular.module('participationViews', ['ngRoute', 'textAngular', 'xin_listResourc
       configuration: {}
     $scope.fileUploader = []
     $scope.folderUploader = []
-    $scope.badFilesNames = []
 
     $scope.$watch 'site', (site) ->
       if site?
@@ -305,7 +304,8 @@ angular.module('participationViews', ['ngRoute', 'textAngular', 'xin_listResourc
       Backend.all('sites/'+$scope.site._id+'/participations').post(payload).then(
         (participation) ->
           Backend.one('participations', participation._id).get().then (participation) ->
-            if $scope.fileUploader.queue.length == 0 && $scope.folderUploader.length == 0
+            if $scope.fileUploader.itemsCompleted.length == 0 &&
+               $scope.folderUploader.itemsCompleted.length == 0
               window.location = '#/participations/'+participation._id
               return
             else
@@ -340,7 +340,6 @@ angular.module('participationViews', ['ngRoute', 'textAngular', 'xin_listResourc
                                                        session, Backend) ->
     $scope.fileUploader = []
     $scope.folderUploader = []
-    $scope.badFilesNames = []
 
     $scope.$watch 'participation.site.protocole.type_site', (type_site) ->
       if type_site?
@@ -413,7 +412,8 @@ angular.module('participationViews', ['ngRoute', 'textAngular', 'xin_listResourc
       $scope.participation.patch(payload).then(
         (participation) ->
           Backend.one('participations', participation._id).get().then (participation) ->
-            if $scope.fileUploader.length == 0 && $scope.folderUploader.length == 0
+            if $scope.fileUploader.itemsCompleted.length == 0 &&
+               $scope.folderUploader.itemsCompleted.length == 0
               window.location = '#/participations/'+participation._id
               return
             else

@@ -80,26 +80,6 @@ angular.module('xin_uploadFile', ['appSettings', 'xin_s3uploadFile', 'xin.fileUp
         $scope.errors.xhr.push(error)
       $scope.$apply()
 
-    uploader.onAddingComplete = ->
-      if uploader.status in ['ready', 'progress']
-        uploader.startAll()
-
-    uploader.onWhenAddingFileFailed = (item, filter) ->
-      if filter.name == "Sous-dossiers ignorés."
-        split = item.webkitRelativePath.split("/")
-        nameDirectory = "."
-        for i in [0..split.length-2]
-          nameDirectory += "/"+split[i]
-        text = "Le dossier "+nameDirectory+" a été ignoré. "+
-               filter.name
-        if $scope.errors.filters.indexOf(text) == -1
-          $scope.errors.filters.push(text)
-      else
-        text = "Le fichier "+item.name+" n'a pas pu être ajouté à la liste. "+
-               filter.name
-        $scope.errors.filters.push(text)
-      $scope.$apply()
-
     uploader.onAddingWarningsComplete = ->
       for warning in @warnings
         if $scope.directory?
@@ -110,7 +90,3 @@ angular.module('xin_uploadFile', ['appSettings', 'xin_s3uploadFile', 'xin.fileUp
 
     uploader.onCancelAllComplete = ->
       $scope.warnings = []
-      $scope.errors =
-        filters: []
-        back: []
-        xhr: []
