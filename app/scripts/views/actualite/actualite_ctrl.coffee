@@ -23,7 +23,6 @@ angular.module('actualiteViews', ['xin_backend', 'xin_session'])
 #          $scope.lookup.q = filterValue
 #        else if $scope.lookup.q?
 #          delete $scope.lookup.q
-#        # TODO : fix reloadOnSearch: true
 #        # $location.search('where', $scope.lookup.where)
 #    $scope.resourceBackend = Backend.all('actualites')
 

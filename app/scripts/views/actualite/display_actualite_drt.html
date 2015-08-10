@@ -102,20 +102,29 @@
 
 <div ng-if="actualite.action == 'NOUVELLE_PARTICIPATION'">
   {{actualite._updated | xinDate: 'medium'}} :
-  <div>
-    <span ng-if="actualite.sujet._id == user._id">
-      Vous avez
-    </span>
-    <span ng-if="actualite.sujet._id != user._id">
-      L'utilisateur
-      <a href="#/utilisateurs/{{actualite.sujet._id}}">
-        {{ actualite.sujet.pseudo }}
-      </a>
-      a
-    </span>
-    créé une
+  <br>
+  <span ng-if="actualite.sujet._id == user._id">
+    Vous avez créé une
     <a href="#/participations/{{actualite.participation._id}}">
-      participation.
+      participation
     </a>
-  </div>
+    pour le site
+    <a href="#/sites/{{actualite.participation.site}}">
+      {{actualite.participation.site}}.
+    </a>
+  </span>
+  <span ng-if="actualite.sujet._id != user._id">
+    L'utilisateur
+    <a href="#/utilisateurs/{{actualite.sujet._id}}">
+      {{ actualite.sujet.pseudo }}
+    </a>
+    a créé une
+    <a href="#/participations/{{actualite.participation._id}}">
+      participation
+    </a>.
+    pour le site
+    <a href="#/sites/{{actualite.participation.site}}">
+      {{actualite.participation.site}}.
+    </a>
+  </span>
 </div>
