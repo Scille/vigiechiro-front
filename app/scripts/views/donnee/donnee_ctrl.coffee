@@ -23,8 +23,13 @@ angular.module('donneeViews', ['ngRoute', 'xin_backend', 'xin_session',
           return breadcrumbsDefer.promise
 
 
-  .controller 'ListDonneesController', ($scope, $routeParams, Backend) ->
+  .controller 'ListDonneesController', ($scope, $routeParams, $timeout, Backend, session) ->
     $scope.participation = {}
+    $scope.others =
+      isObservateur: false
+      isValidateur: false
+      taxons: []
+    # Get participation données
     Backend.one('participations', $routeParams.participationId).get()
       .then(
         (participation) ->
@@ -32,11 +37,18 @@ angular.module('donneeViews', ['ngRoute', 'xin_backend', 'xin_session',
           if breadcrumbsGetParticipationDefer?
             breadcrumbsGetParticipationDefer.resolve(participation)
             breadcrumbsGetParticipationDefer = undefined
-
           $scope.lookup = {}
           $scope.resourceBackend = Backend.all('participations/'+$routeParams.participationId+'/donnees')
+          session.getUserPromise().then (user) ->
+            if participation.observateur._id == user._id
+              $scope.others.isObservateur = true
+            if user.role in ['Validateur', 'Administrateur']
+              $scope.others.isValidateur = true
         (error) -> window.location = '#404'
       )
+    # Get taxons list
+    Backend.all('taxons/liste').getList().then (taxons) ->
+      $scope.others.taxons = taxons.plain()
 
 
   .directive 'displayDonneeDirective', ($route, $modal, Backend) ->
@@ -44,14 +56,16 @@ angular.module('donneeViews', ['ngRoute', 'xin_backend', 'xin_session',
     templateUrl: 'scripts/views/donnee/display_donnee_drt.html'
     scope:
       donnee: '='
+      isObservateur: '='
+      isValidateur: '='
+      taxons: '='
     link: (scope, elem, attrs) ->
       scope.addPost = (index, post) ->
         payload =
           message: post
         scope.post = ''
         Backend.one('donnees', scope.donnee._id).get().then (donnee) ->
-          donnee.customPUT(payload,
-                           'observations/'+index+'/messages')
+          donnee.customPUT(payload, 'observations/'+index+'/messages')
             .then(
               -> $route.reload()
               (error) -> throw error
@@ -72,6 +86,23 @@ angular.module('donneeViews', ['ngRoute', 'xin_backend', 'xin_session',
               (error) -> throw error
             )
 
+      scope.patchValidateur = (key) ->
+        payload =
+          validateur_taxon: scope.donnee.observations[key].validateur_taxon
+          validateur_probabilite: scope.donnee.observations[key].validateur_probabilite
+        Backend.all('donnees/'+scope.donnee._id+'/observations/'+key).patch(payload).then(
+          (success) -> $route.reload()
+          (error) -> scope.patchError = true
+        )
+      scope.patchObservateur = (key) ->
+        payload =
+          observateur_taxon: scope.donnee.observations[key].observateur_taxon
+          observateur_probabilite: scope.donnee.observations[key].observateur_probabilite
+        Backend.all('donnees/'+scope.donnee._id+'/observations/'+key).patch(payload).then(
+          (success) -> $route.reload()
+          (error) -> scope.patchError = true
+        )
+
       scope.CopyToClipboard = (text) ->
         textToClipboard = text
         success = true
@@ -84,9 +115,7 @@ angular.module('donneeViews', ['ngRoute', 'xin_backend', 'xin_session',
           # Select the contents of the element
           # (the execCommand for 'copy' method works on the selection)
           SelectContent(forExecElement)
-
           supported = true
-
           # UniversalXPConnect privilege is required for clipboard access
           # in Firefox
           try
@@ -98,11 +127,11 @@ angular.module('donneeViews', ['ngRoute', 'xin_backend', 'xin_session',
             success = document.execCommand("copy", false, null)
           catch e
             success = false
-
           # remove the temporary element
           document.body.removeChild(forExecElement)
-
-        if (!success)
+        if success
+          scope.copySuccess = true
+        else
           window.prompt("Copier vers le presse-papiers: Ctrl+C, Entrer", text)
 
       CreateElementForExecCommand = (textToClipboard) ->

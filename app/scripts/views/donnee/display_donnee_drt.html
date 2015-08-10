@@ -7,7 +7,10 @@
       Copier
     </a>
 
-    <a class="btn btn-danger" ng-click="editDonnee()">Modifier</a>
+    <a class="btn btn-warning" ng-click="editDonnee()">Modifier</a>
+  </div>
+  <div class="label label-success" ng-show="copySuccess">
+    Titre copié avec succès
   </div>
 
   <div>
@@ -26,10 +29,13 @@
           <th>Confiance observateur</th>
           <th>Taxon validateur</th>
           <th>Confiance validateur</th>
+          <th>FreqM</th>
+          <th>TDeb</th>
+          <th>TFin</th>
         </tr>
       </thead>
 
-      <tbody ng-repeat="observation in donnee.observations">
+      <tbody ng-repeat="(key, observation) in donnee.observations">
         <tr>
           <td class="btn" data-toggle="collapse"
               data-target="#{{donnee.titre}}-{{$index}}">
@@ -38,10 +44,68 @@
           </td>
           <td>{{ observation.tadarida_taxon.libelle_long }}</td>
           <td>{{ observation.tadarida_probabilite }}</td>
-          <td>{{ observation.observateur_taxon }}</td>
-          <td>{{ observation.observateur_probabilite }}</td>
-          <td>{{ observation.validateur_taxon }}</td>
-          <td>{{ observation.validateur_probabilite }}</td>
+          <!-- Taxon observateur -->
+          <td>
+            <div class="input-group input-group-sm">
+              <ui-select ng-model="observation.observateur_taxon"
+                         theme="bootstrap"
+                         ng-disabled="!isObservateur"
+                         append-to-body>
+                <ui-select-match>{{$select.selected.libelle_long}}</ui-select-match>
+                <ui-select-choices repeat="taxon._id as taxon in taxons | filter: $select.search">
+                  {{taxon.libelle_long}}
+                </ui-select-choices>
+              </ui-select>
+            </div>
+          </td>
+          <!-- Confiance observateur -->
+          <td>
+            <div class="input-group input-group-sm">
+              <select class="form-control"
+                      ng-model="observation.observateur_probabilite"
+                      ng-disabled="!isObservateur">
+                <option value="SUR">Sûr</option>
+                <option value="PROBABLE">Probable</option>
+                <option value="POSSIBLE">Possible</option>
+              </select>
+              <a class="input-group-addon" href=""
+                 ng-click="patchObservateur(key)" ng-show="true">OK</a>
+            </div>
+          </td>
+          <!-- Taxon validateur -->
+          <td>
+            <div class="input-group input-group-sm">
+              <ui-select ng-model="observation.validateur_taxon"
+                         theme="bootstrap"
+                         ng-disabled="!isValidateur"
+                         append-to-body>
+                <ui-select-match>{{$select.selected.libelle_long}}</ui-select-match>
+                <ui-select-choices repeat="taxon._id as taxon in taxons | filter: $select.search">
+                  {{taxon.libelle_long}}
+                </ui-select-choices>
+              </ui-select>
+            </div>
+          </td>
+          <!-- Confiance validateur -->
+          <td>
+            <div class="input-group input-group-sm">
+              <select class="form-control"
+                      ng-model="observation.validateur_probabilite"
+                      ng-disabled="!isValidateur">
+                <option value="SUR">Sûr</option>
+                <option value="PROBABLE">Probable</option>
+                <option value="POSSIBLE">Possible</option>
+              </select>
+              <a class="input-group-addon" href=""
+                 ng-click="patchValidateur(key)" ng-show="true">OK</a>
+            </div>
+          </td>
+          <td>{{observation.frequence_mediane}}</td>
+          <td>{{observation.temps_debut}}</td>
+          <td>{{observation.temps_fin}}</td>
+        </tr>
+        <tr class="label label-danger" ng-show="patchError">
+          Echec de l'enregistrement des modifications.
         </tr>
         <tr class="collapse" id="{{donnee.titre}}-{{$index}}"><td colspan="7">
           <p><b>Autre taxon Tadarida :</b></p>
