@@ -107,31 +107,37 @@
         <tr class="label label-danger" ng-show="patchError">
           Echec de l'enregistrement des modifications.
         </tr>
-        <tr class="collapse" id="{{donnee.titre}}-{{$index}}"><td colspan="7">
+        <tr class="collapse" id="{{donnee.titre}}-{{$index}}"><td colspan="12">
           <p><b>Autre taxon Tadarida :</b></p>
           <div ng-repeat="autre in observation.tadarida_taxon_autre"
                ng-show="autre.probabilite >= observation.tadarida_probabilite/2.1">
             {{ autre.taxon.libelle_long }} : {{autre.probabilite }}
           </div>
           <p><b>Messages :</b></p>
-          <div ng-repeat="message in observation.messages"
-               ng-show="observation.messages.length">
-            Auteur : {{ message.auteur.pseudo }}
-            <br>
-            Date : {{ message.date | xinDate: 'medium' }}
-            <br>
-            Message : {{ message.message }}
-          </div>
+          <table class="table table-bordered"
+                 ng-show="observation.messages.length">
+            <tr ng-repeat="message in observation.messages">
+              <td class="">
+                Auteur :
+                <p><b>{{ message.auteur.pseudo }}</b></p>
+                Date :
+                <p><b>{{ message.date | xinDate: 'short' }}</b></p>
+              </td>
+              <td class="">
+                <p><u>Message</u> :</p>
+                <span ng-bind-html="message.message"></span>
+              </td>
+            </tr>
+          </table>
           <div ng-show="!observation.messages ||observation.messages.length == 0">
             Pas de message pour le moment.
           </div>
           <div class="form-group input-group">
-            <input class="form-control" type="text" ng-model="newPost">
-            {{ observation.newPost }}
-            <a class="input-group-addon" ng-click="addPost({{$index}}, newPost)">
-              Ajouter un message
-            </a>
-          </div>
+            <text-angular ng-model="newPost"></text-angular>
+          <div>
+          <a class="btn btn-default" href="" ng-click="addPost({{$index}}, newPost)">
+            Ajouter un message
+          </a>
         </td></tr>
       </tbody>
     </table>
