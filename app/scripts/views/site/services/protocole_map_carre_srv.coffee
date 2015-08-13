@@ -35,6 +35,9 @@ angular.module('protocole_map_carre', [])
         @updateSite()
 
       mapCallback: ->
+        onProjectionReady: =>
+          @_projectionReady = true
+          @loadMapEditContinue()
         overlayCreated: (overlay) =>
           isModified = false
           if @_step == 'selectGrilleStoc'
@@ -75,12 +78,14 @@ angular.module('protocole_map_carre', [])
             return false
 
       saveOverlay: (overlay) =>
-        localite = {}
-        localite.overlay = overlay
-        localite.name = @setLocalityName()
-        localite.overlay.setOptions({ title: localite.name })
-        localite.representatif = false
-        @_localities.push(localite)
+        locality = {}
+        locality.overlay = overlay
+        locality.name = @setLocalityName()
+        locality.overlay.setOptions({ title: locality.name })
+        locality.representatif = false
+        locality.infowindow = @_googleMaps.createInfoWindow(locality.name)
+        locality.infowindow.open(@_googleMaps.getMap(), overlay)
+        @_localities.push(locality)
 
       setLocalityName: (name = 1) ->
         used = false

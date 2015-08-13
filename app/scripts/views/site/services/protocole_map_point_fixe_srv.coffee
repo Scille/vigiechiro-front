@@ -36,6 +36,9 @@ angular.module('protocole_map_point_fixe', [])
         @updateSite()
 
       mapCallback: ->
+        onProjectionReady: =>
+          @_projectionReady = true
+          @loadMapEditContinue()
         overlayCreated: (overlay) =>
           isModified = false
           if @_step == 'selectGrilleStoc'
@@ -71,6 +74,8 @@ angular.module('protocole_map_point_fixe', [])
         locality.name = @setLocalityNameWithInterest(overlay)
         locality.overlay.setOptions({ title: locality.name })
         locality.representatif = false
+        locality.infowindow = @_googleMaps.createInfoWindow(locality.name)
+        locality.infowindow.open(@_googleMaps.getMap(), overlay)
         @_localities.push(locality)
 
       setLocalityNameWithInterest: (overlay) ->

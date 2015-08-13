@@ -111,8 +111,14 @@ angular.module('protocole_map', ['protocole_map_carre',
         @loadLocalities(site.localites)
 
       loadMapEdit: (site) ->
-        @loadGrilleStoc(site.grille_stoc)
-        @loadLocalities(site.localites)
+        @_site = site
+        @loadMapEditContinue()
+
+      loadMapEditContinue: ->
+        if not @_site? or not @_projectionReady
+          return
+        @loadGrilleStoc(@_site.grille_stoc)
+        @loadLocalities(@_site.localites)
         @validLocalities()
 
       loadGrilleStoc: (grille_stoc) ->
@@ -139,6 +145,8 @@ angular.module('protocole_map', ['protocole_map_carre',
         lng = (path.getAt(0).lng() + path.getAt(2).lng()) / 2
         @_googleMaps.setCenter(lat, lng)
         @_googleMaps.setZoom(13)
+        if @typeProtocole in ['POINT_FIXE']
+          @displaySmallGrille()
 
       loadLocalities: (localities) ->
         for locality in localities or []
@@ -146,14 +154,9 @@ angular.module('protocole_map', ['protocole_map_carre',
             name: locality.nom
             representatif: locality.representatif
           newLocality.overlay = @loadGeoJson(locality.geometries)
-          if locality.nom[0] == 'T'
-            num_secteur = parseInt(locality.nom[locality.nom.length-1])-1
-            newLocality.overlay.setOptions(
-              strokeColor: locality_colors[num_secteur]
-              zIndex: 2
-            )
-          else
-            newLocality.overlay.setOptions({ title: locality.nom })
+          newLocality.overlay.setOptions({ title: locality.nom })
+          newLocality.infowindow = @_googleMaps.createInfoWindow(locality.nom)
+          newLocality.infowindow.open(@_googleMaps.getMap(), newLocality.overlay)
           @_localities.push(newLocality)
 
       displaySites: (sites) ->
