@@ -126,6 +126,12 @@ angular.module('xin_google_maps', [])
         )
         return point
 
+      createInfoWindow: (content, zIndex = 1) ->
+        new google.maps.InfoWindow(
+          content: content
+          zIndex: zIndex
+        )
+
       createCircle: (center, radius, draggable = false, editable = false) ->
         new google.maps.Circle(
           map: @_map

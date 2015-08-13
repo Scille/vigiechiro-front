@@ -8,6 +8,19 @@ locality_colors = [
   '#FF0080'
 ]
 locBySection = 5
+section_colors = [
+  '#FF8000'
+  '#FFFF00'
+  '#80FF00'
+  '#00FF00'
+  '#00FF80'
+  '#00FFFF'
+  '#0080FF'
+  '#0000FF'
+  '#8000FF'
+  '#FF00FF'
+  '#FF0080'
+]
 
 
 angular.module('protocole_map_routier', [])
@@ -119,6 +132,8 @@ angular.module('protocole_map_routier', [])
         @_lastPoint.setTitle("Arrivée")
 
       validBounds: ->
+        if not @_route
+          return false
         if not @_firstPoint?
           routePath = @_route.getPath()
           @_firstPoint = @_googleMaps.createPoint(routePath.getAt(0).lat(), routePath.getAt(0).lng(), false)
@@ -127,7 +142,7 @@ angular.module('protocole_map_routier', [])
           @_googleMaps.addListener(@_lastPoint, 'click', @onValidOriginPoint)
           return false
         else
-          @_googleMaps.addListener(@_route, 'click', @addSectionPoint)          
+          @_googleMaps.addListener(@_route, 'click', @addSectionPoint)
           @_step = 'editSections'
           @updateSite()
           return true
@@ -307,15 +322,80 @@ angular.module('protocole_map_routier', [])
         @_googleMaps.addListener(@_route, 'click', @addSectionPoint)
         @_googleMaps.clearListeners(@_firstPoint, 'click')
         @_googleMaps.clearListeners(@_lastPoint, 'click')
+        # InfoWindow
+        @_firstPoint.infowindow = @_googleMaps.createInfoWindow("Départ")
+        @_firstPoint.infowindow.open(@_googleMaps.getMap(), @_firstPoint)
+        @_googleMaps.addListener(@_firstPoint, 'click', =>
+          @_firstPoint.infowindow.open(@_googleMaps.getMap(), @_firstPoint)
+        )
+        @_lastPoint.infowindow = @_googleMaps.createInfoWindow("Arrivée")
+        @_lastPoint.infowindow.open(@_googleMaps.getMap(), @_lastPoint)
+        @_googleMaps.addListener(@_lastPoint, 'click', =>
+          @_lastPoint.infowindow.open(@_googleMaps.getMap(), @_lastPoint)
+        )
         #
         @_step = 'editSections'
-        @updateSite()        
+        @_changeStep("Point à placer : fin tronçon 1")
 
-      # Troncons
+      _changeStep: (message) ->
+        messageOrig = "Placer les limites des tronçons de 2 km (+/-20%) sur le tracé en partant du point d'origine."
+        @_steps[2].message = messageOrig+" "+message
+        @updateSite()
+
+# @_points
       createSectionPoint: (lat, lng) ->
         point = @_googleMaps.createPoint(lat, lng)
+        # find vertex of new point
+        path = @_route.getPath()
+        nbPoints = path.getLength()
+        vertex = []
+        for key in [0..nbPoints-2]
+          currVertex = [path.getAt(key), path.getAt(key+1)]
+          vertex.push(currVertex)
+          if @_googleMaps.isLocationOnEdge(point.getPosition(), currVertex)
+            point.edge = key
+        return point
+
+      addSectionPoint: (e) =>
+        closestPoint = @_googleMaps.findClosestPointOnPath(e.latLng, @_padded_points, @_points)
+        point = @createSectionPoint(closestPoint.lat(), closestPoint.lng())
+        # Add to @_points
+        @_points.splice(@_points.length-1, 0, point)
+        # Add listeners
+        @_setPointListeners(point)
+        # Remove listeners and infwindow on previous points
+        for i in [1..@_points.length-3] when @_points.length > 3
+          @_googleMaps.clearListeners(@_points[i], 'rightclick')
+          @_points[i].setOptions({draggable: false})
+          @_points[i].infowindow.close()
+        # InfoWindow
+        numSection = Math.floor(@_points.length/2)
+        numSection =
+          current: numSection
+          next: numSection
+        position = {}
+        if @_points.length%2
+          position =
+            current: "Fin tronçon "
+            next: "début tronçon "
+          numSection.next++
+        else
+          position =
+            current: "Début tronçon "
+            next: "fin tronçon "
+        point.infowindow = @_googleMaps.createInfoWindow(position.current+numSection.current)
+        point.infowindow.open(@_googleMaps.getMap(), point)
+        @_googleMaps.addListener(point, 'click', =>
+          point.infowindow.open(@_googleMaps.getMap(), point)
+        )
+        # Up to date step
+        @_changeStep("Point à placer : "+position.next+numSection.next)
+        # Generate all sections
+        @generateSections()
+
+      _setPointListeners: (point) ->
         @_googleMaps.addListener(point, 'rightclick', (e) =>
-          @deletePoint(point)
+          @_deleteLastPoint()
         )
         point.setOptions({draggable: true})
         @_googleMaps.addListener(point, 'dragend', (e) =>
@@ -328,80 +408,20 @@ angular.module('protocole_map_routier', [])
           point.setPosition(@_googleMaps
             .findClosestPointOnPath(e.latLng, @_padded_points, @_points))
         )
-        # find vertex of new point
-        path = @_route.getPath()
-        nbPoints = path.getLength()
-        index = null
-        vertex = []
-        for key in [0..nbPoints-2]
-          currVertex = [path.getAt(key), path.getAt(key+1)]
-          vertex.push(currVertex)
-          if @_googleMaps.isLocationOnEdge(point.getPosition(), currVertex)
-            index = key
-            point.edge = key
-        if !index?
-          point.setMap(null)
-          @callbacks.displayError("Erreur : impossible de trouver la corde du nouveau point")
-          return null
-        return { latlng: point, index: index}
 
-      addSectionPoint: (e) =>
-        closestPoint = @_googleMaps.findClosestPointOnPath(e.latLng, @_padded_points, @_points)
-        sectionPoint = @createSectionPoint(closestPoint.lat(), closestPoint.lng())
-        point = sectionPoint.latlng
-        index = sectionPoint.index
-        # place point in @_points
-        path = @_route.getPath()
-        nbPoints = path.getLength()
-        vertex = []
-        for key in [0..nbPoints-2]
-          currVertex = [path.getAt(key), path.getAt(key+1)]
-          vertex.push(currVertex)
-        stop = false
-        for pt, key in @_points
-          for currVertex, keyVertex in vertex
-            if @_googleMaps.isLocationOnEdge(pt.getPosition(), currVertex)
-              if keyVertex < index
-                break
-              else if keyVertex > index
-                stop = true
-                @_points.splice(key, 0, point)
-                break
-              else
-                d1 = @_googleMaps.computeDistanceBetween(currVertex[0], point.getPosition())
-                d2 = @_googleMaps.computeDistanceBetween(currVertex[0], pt.getPosition())
-                if d1 < d2
-                  stop = true
-                  @_points.splice(key, 0, point)
-                  break
-                else
-                  break
-          if stop
-            break
+      _deleteLastPoint: ->
+        index = @_points.length-2
+        content = @_points[index].infowindow.getContent()
+        @_points[index].setMap(null)
+        @_points.splice(index, 1)
+        if index > 1
+          @_setPointListeners(@_points[index-1])
+          @_points[index-1].infowindow.open(@_googleMaps.getMap(), @_points[index-1])
+        @_changeStep("Point à placer : "+content)
         @generateSections()
 
-      deletePoint: (overlay) ->
-        for point, key in @_points
-          if point == overlay
-            point.setMap(null)
-            @_points.splice(key, 1)
-            @generateSections()
-            return
-
+# @_sections
       generateSections: ->
-        colors = [
-          '#FF8000'
-          '#FFFF00'
-          '#80FF00'
-          '#00FF00'
-          '#00FF80'
-          '#00FFFF'
-          '#0080FF'
-          '#0000FF'
-          '#8000FF'
-          '#FF00FF'
-          '#FF0080'
-        ]
         for section in @_sections
           section.setMap(null)
         @_sections = []
@@ -409,7 +429,7 @@ angular.module('protocole_map_routier', [])
         key = 0
         while (key < nbPoints-1)
           section = @generateSection(key)
-          section.setOptions({ strokeColor: colors[(key/2)%11], zIndex: 10 })
+          section.setOptions({ strokeColor: section_colors[(key/2)%11], zIndex: 10 })
           @_googleMaps.addListener(section, 'click', @addSectionPoint)
           @_sections.push(section)
           key +=2
@@ -501,8 +521,8 @@ angular.module('protocole_map_routier', [])
       editSections: ->
         @validOriginPoint()
         nb_sections = @_localities.length / locBySection
-        # rescue all points to click on
-        for i in [0..nb_sections-1]
+        # rescue all points
+        for i in [0..nb_sections-1] when nb_sections > 0
           firstSectionPoint = @_localities[i*locBySection].overlay.getPath().getAt(0)
           path = @_localities[i*locBySection+4].overlay.getPath()
           path_length = path.getLength()
@@ -513,14 +533,21 @@ angular.module('protocole_map_routier', [])
           if firstLat != @_points[0].getPosition().lat() or
              firstLng != @_points[0].getPosition().lng()
             newPoint = @createSectionPoint(firstLat, firstLng)
-            @_points.splice(@_points.length-1, 0, newPoint.latlng)
+            @_points.splice(@_points.length-1, 0, newPoint)
+            @_setCurrentInfoWindow(newPoint)
           # if end point, no point section creation
           lastLat = lastSectionPoint.lat()
           lastLng = lastSectionPoint.lng()
           if lastLat != @_points[@_points.length-1].getPosition().lat() or
              lastLng != @_points[@_points.length-1].getPosition().lng()
             newPoint = @createSectionPoint(lastLat, lastLng)
-            @_points.splice(@_points.length-1, 0, newPoint.latlng)
+            @_points.splice(@_points.length-1, 0, newPoint)
+            @_setCurrentInfoWindow(newPoint)
+        # Add listeners on last point
+        index = @_points.length-2
+        if index > 0
+          @_setPointListeners(@_points[index])
+          @_points[index].infowindow.open(@_googleMaps.getMap(), @_points[index])
         # delete localites
         for locality in @_localities
           locality.overlay.setMap(null)
@@ -528,3 +555,22 @@ angular.module('protocole_map_routier', [])
         @generateSections()
         @_step = 'editSections'
         @updateSite()
+
+      _setCurrentInfoWindow: (point) ->
+        numSection = Math.floor(@_points.length/2)
+        numSection =
+          current: numSection
+          next: numSection
+        position = {}
+        if @_points.length%2
+          position =
+            current: "Fin tronçon "
+            next: "début tronçon "
+          numSection.next++
+        else
+          position =
+            current: "Début tronçon "
+            next: "fin tronçon "
+        point.infowindow = @_googleMaps.createInfoWindow(position.current+numSection.current)
+        # Up to date step
+        @_changeStep("Point à placer : "+position.next+numSection.next)
