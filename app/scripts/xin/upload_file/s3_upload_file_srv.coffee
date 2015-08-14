@@ -209,7 +209,7 @@ angular.module('xin_s3uploadFile', ['appSettings'])
             Backend.one('fichiers', @file.id).get().then (fileBackend) =>
               fileBackend.post().then(
                 =>  @_onSuccess()
-                (error) -> @_onErrorBack(error)
+                (error) => @_onErrorBack(error)
               )
         Backend.all('fichiers').post(payload).then(
           (response) =>
