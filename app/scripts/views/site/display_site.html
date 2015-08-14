@@ -9,11 +9,8 @@
     Voir le protocole {{ site.protocole.titre }}
   </a>
 
-  <a class="btn btn-default" href="#/utilisateurs/{{site.observateur._id}}">
-    Observateur : {{ site.observateur.pseudo }}
-  </a>
-
   <div class="panel-body">
+    <p>Observateur : <b>{{ site.observateur.pseudo }}</b></p>
     <display-site-directive site="site" type-site="{{typeSite}}">
     </display-site-directive>
   </div>
