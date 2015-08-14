@@ -107,8 +107,14 @@ angular.module('protocole_map', ['protocole_map_carre',
 # Grille Stoc
       loadMapDisplay: (site) ->
         @_googleMaps.hideDrawingManager()
-        @loadGrilleStoc(site.grille_stoc)
-        @loadLocalities(site.localites)
+        @_site = site
+        @_loadMapDisplayContinue()
+
+      _loadMapDisplayContinue: ->
+        if not @_site or not @_projectionReady
+          return
+        @loadGrilleStoc(@_site.grille_stoc)
+        @loadLocalities(@_site.localites)
 
       loadMapEdit: (site) ->
         @_site = site
@@ -319,6 +325,7 @@ angular.module('protocole_map', ['protocole_map_carre',
         return result
 
       mapsCallback: ->
+        onProjectionReady: -> false
         overlayCreated: -> false
         saveOverlay: -> false
         zoomChanged: -> false

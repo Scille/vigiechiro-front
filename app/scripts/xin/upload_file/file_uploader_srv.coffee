@@ -276,7 +276,7 @@ angular.module('xin.fileUploader', ['xin_s3uploadFile'])
           @transmitted_size += file.file.transmitted_size
         @_isCheckingTransmittedSize = false
 
-      retrySending: (s3File) ->
+      _retrySending: (s3File) ->
         if s3File.file.sendingTry < 3
           s3File.file.sendingTry++
           @displayError?("Echec de l'essai n°"+s3File.file.sendingTry+" du téléchargement du fichier "+s3File.file.name, 'xhr', 3)
