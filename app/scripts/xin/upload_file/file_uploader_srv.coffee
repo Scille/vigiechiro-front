@@ -335,13 +335,10 @@ angular.module('xin.fileUploader', ['xin_s3uploadFile'])
         @_checkWarningUpload(@warningsXfailsBack, name, count)
 
       _checkWarningUpload: (dest, name, count) ->
-        find = false
         warning =
           name: name
           count: count
         for item, key in dest
-          console.log("item :", item)
-          console.log("key :", key)
           if item.name == name
             dest.splice(key, 1)
             break
