@@ -16,9 +16,12 @@
 <!-- abstract -->
 <div class="well" ng-show="uploader.itemsTotal">
   <div class="row">
-    <div class="col-md-6">Fichiers : {{uploader.itemsTotal}}</div>
-    <div class="col-md-6">
+    <div class="col-md-5">Fichiers : {{uploader.itemsTotal}}</div>
+    <div class="col-md-4">
       {{uploader.transmitted_size/1024/1024 | number: 2}}/{{uploader.size/1024/1024 | number: 2}} MB
+    </div>
+    <div class="col-md-3">
+      {{uploader.speed/1024 | number: 1}} ko/s
     </div>
   </div>
   <!-- global progress bar -->
@@ -64,28 +67,31 @@
   <!-- Items canceled -->
   <div class="alert alert-danger" ng-show="uploader.itemsCanceled.length">
     <div ng-repeat="item in uploader.itemsCanceled">
-      Fichier {{ item.file.name }} annulé.
+      Fichier {{ item.file.name }} annulé
     </div>
   </div>
   <!-- Uploads failed -->
   <div class="alert alert-danger" ng-show="uploader.itemsFailedUpload.length">
     <div ng-repeat="item in uploader.itemsFailedUpload">
-      Echec du téléchargement du fichier {{ item.file.name }}.
+      Echec du téléchargement du fichier {{ item.file.name }}
     </div>
   </div>
+  <!-- Uploads warning Back -->
+  <div class="alert alert-warning" ng-show="uploader.warningsXfailsBack.length">
+    <div ng-repeat="item in uploader.warningsXfailsBack">
+      Echec de l'essai n°{{item.count}} du téléchargement du fichier {{item.name}} vers Serveur
+    </div>
+  </div>
+  <!-- Uploads warning s3 -->
+  <div class="alert alert-warning" ng-show="uploader.warningsXfailsS3.length">
+    <div ng-repeat="item in uploader.warningsXfailsS3">
+      Echec de l'essai n°{{item.count}} du téléchargement du fichier {{item.name}} vers S3
+    </div>
+  </div>
+  <!-- global warning -->
   <div class="alert alert-warning" ng-show="warnings.length">
     <div ng-repeat="warning in warnings">
       {{ warning }}
-    </div>
-  </div>
-  <div class="alert alert-danger" ng-show="errors.back.length">
-    <div ng-repeat="error in errors.back">
-      {{ error }}
-    </div>
-  </div>
-  <div class="alert alert-danger" ng-show="errors.xhr.length">
-    <div ng-repeat="error in errors.xhr">
-      {{ error }}
     </div>
   </div>
   <div class="alert alert-success" ng-show="uploader.directories.length">
