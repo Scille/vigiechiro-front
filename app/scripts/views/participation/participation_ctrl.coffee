@@ -16,11 +16,7 @@ makeRegExp = ($scope, type_site) ->
 
 sendFiles = ($scope, participation) ->
   payload =
-    pieces_jointes: []
-  for file in $scope.fileUploader.itemsCompleted or []
-    payload.pieces_jointes.push(file.file.id)
-  for file in $scope.folderUploader.itemsCompleted or []
-    payload.pieces_jointes.push(file.file.id)
+    pieces_jointes: $scope.fileUploader.itemsCompleted.concat($scope.folderUploader.itemsCompleted)
   participation.customPUT(payload, 'pieces_jointes').then(
     -> window.location = '#/participations/'+participation._id
     -> throw "Error : PUT files"

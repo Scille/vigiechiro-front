@@ -67,25 +67,19 @@
   <!-- Items canceled -->
   <div class="alert alert-danger" ng-show="uploader.itemsCanceled.length">
     <div ng-repeat="item in uploader.itemsCanceled">
-      Fichier {{ item.file.name }} annulé
+      Fichier {{ item.name }} annulé
     </div>
   </div>
   <!-- Uploads failed -->
   <div class="alert alert-danger" ng-show="uploader.itemsFailedUpload.length">
     <div ng-repeat="item in uploader.itemsFailedUpload">
-      Echec du téléchargement du fichier {{ item.file.name }}
+      Echec du téléchargement du fichier {{ item.name }}
     </div>
   </div>
-  <!-- Uploads warning Back -->
-  <div class="alert alert-warning" ng-show="uploader.warningsXfailsBack.length">
-    <div ng-repeat="item in uploader.warningsXfailsBack">
-      Echec de l'essai n°{{item.count}} du téléchargement du fichier {{item.name}} vers Serveur
-    </div>
-  </div>
-  <!-- Uploads warning s3 -->
-  <div class="alert alert-warning" ng-show="uploader.warningsXfailsS3.length">
-    <div ng-repeat="item in uploader.warningsXfailsS3">
-      Echec de l'essai n°{{item.count}} du téléchargement du fichier {{item.name}} vers S3
+  <!-- Uploads warning -->
+  <div class="alert alert-warning" ng-show="uploader.warningsXfails.length">
+    <div ng-repeat="item in uploader.warningsXfails">
+      Echec de l'essai n°{{item.count}} du téléchargement du fichier {{item.name}}
     </div>
   </div>
   <!-- global warning -->
