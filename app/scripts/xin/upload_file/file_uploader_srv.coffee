@@ -301,7 +301,7 @@ angular.module('xin.fileUploader', ['xin_s3uploadFile'])
           s3File.file.transmitted_size = 0
           s3File.start()
         else
-          onError(s3File)
+          @_onError(s3File)
 
       _retryS3Sending: (s3File, status) ->
         if s3File.file.sendingTryS3 < 3
@@ -311,7 +311,7 @@ angular.module('xin.fileUploader', ['xin_s3uploadFile'])
           s3File.file.transmitted_size = 0
           s3File.start()
         else
-          onError(s3File)
+          @_onError(s3File)
 
       _onError: (item) ->
         error =
