@@ -7,7 +7,7 @@
       Copier
     </a>
 
-    <a class="btn btn-warning" ng-click="editDonnee()">Modifier</a>
+    <a class="btn btn-default" ng-click="editDonnee()">Commenter</a>
   </div>
   <div class="label label-success" ng-show="copySuccess">
     Titre copié avec succès
@@ -103,9 +103,6 @@
           <td>{{observation.frequence_mediane}}</td>
           <td>{{observation.temps_debut}}</td>
           <td>{{observation.temps_fin}}</td>
-        </tr>
-        <tr class="label label-danger" ng-show="patchError">
-          Echec de l'enregistrement des modifications.
         </tr>
         <tr class="collapse" id="{{donnee.titre}}-{{$index}}"><td colspan="12">
           <p><b>Autre taxon Tadarida :</b></p>
