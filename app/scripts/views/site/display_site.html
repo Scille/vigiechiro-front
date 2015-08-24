@@ -9,6 +9,11 @@
     Voir le protocole {{ site.protocole.titre }}
   </a>
 
+  <a class="btn btn-danger" href="" ng-click="delete()"
+     ng-show="isAdmin">
+    Supprimer le site
+  </a>
+
   <div class="panel-body">
     <p>Observateur : <b>{{ site.observateur.pseudo }}</b></p>
     <display-site-directive site="site" type-site="{{typeSite}}">

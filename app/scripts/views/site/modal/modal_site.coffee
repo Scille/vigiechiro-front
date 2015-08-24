@@ -23,3 +23,10 @@ angular.module('modalSiteViews', [])
       $modalInstance.close(true)
     $scope.cancel = ->
       $modalInstance.dismiss('cancel')
+
+  .controller 'ModalDeleteSiteController', ($scope, $modalInstance, site) ->
+    $scope.site = site
+    $scope.ok = ->
+      $modalInstance.close(true)
+    $scope.cancel = ->
+      $modalInstance.dismiss('cancel')

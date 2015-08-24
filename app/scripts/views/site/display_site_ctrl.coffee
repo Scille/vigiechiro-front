@@ -65,7 +65,7 @@ angular.module('displaySiteViews', ['ngRoute', 'textAngular', 'xin_backend',
     $scope.resourceBackend = Backend.all('moi/sites')
 
 
-  .controller 'DisplaySiteController', ($routeParams, $scope
+  .controller 'DisplaySiteController', ($routeParams, $scope, $modal,
                                         Backend, session) ->
     Backend.one('sites', $routeParams.siteId).get().then(
       (site) ->
@@ -83,8 +83,24 @@ angular.module('displaySiteViews', ['ngRoute', 'textAngular', 'xin_backend',
               break
       (error) -> window.location = '#/404'
     )
+
     session.getIsAdminPromise().then (isAdmin) ->
       $scope.isAdmin = isAdmin
+
+    $scope.delete = ->
+      modalInstance = $modal.open(
+        templateUrl: 'scripts/views/site/modal/delete.html'
+        controller: 'ModalDeleteSiteController'
+        resolve:
+          site: ->
+            return $scope.site
+      )
+      modalInstance.result.then () ->
+        $scope.site.remove().then(
+          () -> window.location = '#/sites'
+          (error) -> throw error
+        )
+
 
 
   .directive 'displaySiteDirective', ($route, session, protocolesFactory) ->
