@@ -16,7 +16,7 @@ angular.module('protocole_map_carre', [])
             message: "Cliquer sur la carte pour sélection la grille stoc correspondante."
           ,
             id: 'editLocalities'
-            message: "Définir entre 5 et 13 points à l'intérieur du carré."
+            message: "Définir vos points à l'intérieur du carré."
           ,
             id: 'validLocalities'
             message: "Valider les points."
