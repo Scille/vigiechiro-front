@@ -25,7 +25,7 @@ sendFiles = ($scope, participation) ->
 
 angular.module('participationViews', ['ngRoute', 'textAngular', 'xin_listResource',
                                       'xin_backend', 'xin_session', 'xin_tools',
-                                      'xin_uploadFile',
+                                      'xin_uploadFile', 'modalParticipationViews'
                                       'ui.bootstrap.datetimepicker'])
   .config ($routeProvider) ->
     $routeProvider
@@ -121,8 +121,9 @@ angular.module('participationViews', ['ngRoute', 'textAngular', 'xin_listResourc
               scope.loading = false
 
 
+
   .controller 'DisplayParticipationController', ($scope, $route, $routeParams,
-                                                 Backend, session) ->
+                                                 $modal, Backend, session) ->
     session.getIsAdminPromise().then (isAdmin) ->
       $scope.isAdmin = isAdmin
     Backend.one('participations', $routeParams.participationId).get().then(
@@ -133,6 +134,7 @@ angular.module('participationViews', ['ngRoute', 'textAngular', 'xin_listResourc
         $scope.participation = participation
       (error) -> window.location = '#/404'
     )
+
     $scope.addPost = ->
       payload =
         message: $scope.post
@@ -140,12 +142,24 @@ angular.module('participationViews', ['ngRoute', 'textAngular', 'xin_listResourc
         -> $route.reload()
         (error) -> throw error
       )
+
     $scope.compute = ->
       $scope.computeInfo = {}
       $scope.participation.post('compute').then(
         (result) -> $route.reload()
         (error) -> $scope.computeInfo.error = true
       )
+
+    $scope.delete = ->
+      modalInstance = $modal.open(
+        templateUrl: 'scripts/views/participation/modal/delete.html'
+        controller: 'ModalDeleteParticipationController'
+      )
+      modalInstance.result.then () ->
+        $scope.participation.remove().then(
+          () -> window.location = '#/participations'
+          (error) -> throw error
+        )
 
 
   .directive 'displayParticipationDirective', (Backend) ->
