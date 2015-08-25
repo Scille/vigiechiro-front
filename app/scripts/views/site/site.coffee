@@ -89,6 +89,7 @@ siteCallbacks = ($scope, $timeout) ->
         if $scope.stepId == 'start'
           $scope.validLocalitiesAllowed = false
         if $scope.stepId == 'editLocalities'
+          $scope.retrySelectionAllowed = true
           $scope.editLocalitiesAllowed = false
           $scope.validLocalitiesAllowed = false
         if $scope.stepId == 'validLocalities'
