@@ -51,6 +51,7 @@ angular.module('donneeViews', ['ngRoute', 'xin_backend', 'xin_session',
       $scope.others.taxons = taxons.plain()
 
 
+
   .directive 'displayDonneeDirective', ($route, $modal, Backend) ->
     restrict: 'E'
     templateUrl: 'scripts/views/donnee/display_donnee_drt.html'

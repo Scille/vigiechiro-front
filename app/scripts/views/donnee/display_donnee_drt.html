@@ -53,7 +53,7 @@
                          append-to-body>
                 <ui-select-match>{{$select.selected.libelle_long}}</ui-select-match>
                 <ui-select-choices repeat="taxon._id as taxon in taxons | filter: $select.search">
-                  {{taxon.libelle_long}}
+                  {{taxon.libelle_court}}
                 </ui-select-choices>
               </ui-select>
             </div>
@@ -81,7 +81,7 @@
                          append-to-body>
                 <ui-select-match>{{$select.selected.libelle_long}}</ui-select-match>
                 <ui-select-choices repeat="taxon._id as taxon in taxons | filter: $select.search">
-                  {{taxon.libelle_long}}
+                  {{taxon.libelle_court}}
                 </ui-select-choices>
               </ui-select>
             </div>
