@@ -23,8 +23,10 @@ angular.module('donneeViews', ['ngRoute', 'xin_backend', 'xin_session',
           return breadcrumbsDefer.promise
 
 
-  .controller 'ListDonneesController', ($scope, $routeParams, $timeout, Backend, session) ->
+  .controller 'ListDonneesController', ($scope, $routeParams, $timeout,
+                                        Backend, session, DelayedEvent) ->
     $scope.participation = {}
+    $scope.lookup = {}
     $scope.others =
       isObservateur: false
       isValidateur: false
@@ -37,8 +39,7 @@ angular.module('donneeViews', ['ngRoute', 'xin_backend', 'xin_session',
           if breadcrumbsGetParticipationDefer?
             breadcrumbsGetParticipationDefer.resolve(participation)
             breadcrumbsGetParticipationDefer = undefined
-          $scope.lookup = {}
-          $scope.resourceBackend = Backend.all('participations/'+$routeParams.participationId+'/donnees')
+
           session.getUserPromise().then (user) ->
             if participation.observateur._id == user._id
               $scope.others.isObservateur = true
@@ -46,9 +47,21 @@ angular.module('donneeViews', ['ngRoute', 'xin_backend', 'xin_session',
               $scope.others.isValidateur = true
         (error) -> window.location = '#404'
       )
+
     # Get taxons list
     Backend.all('taxons/liste').getList().then (taxons) ->
       $scope.others.taxons = taxons.plain()
+
+    # Filter field is trigger after 500ms of inactivity
+    delayedFilter = new DelayedEvent(500)
+    $scope.filterField = ''
+    $scope.$watch 'titre', (titre) ->
+      delayedFilter.triggerEvent ->
+        if titre? and titre != ''
+          $scope.lookup.titre = titre
+        else if $scope.lookup.titre?
+          delete $scope.lookup.titre
+    $scope.resourceBackend = Backend.all('participations/'+$routeParams.participationId+'/donnees')
 
 
 

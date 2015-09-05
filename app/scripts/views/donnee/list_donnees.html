@@ -5,6 +5,12 @@
 
   <div class="list-group">
     <div class="row">
+      <div class="col-xs-7">
+          <label for="search">Nom du fichier sans extension :</label>
+          <input ng-model="titre" class="form-control search-field"
+                 placeholder="nom du fichier">
+      </div>
+      <div class="col-xs-1"></div>
       <div class="col-xs-4">
         <label for="search">Nb de Résultats par page :</label>
         <input type="number" class="form-control max-results-field" ng-model="lookup.max_results">
