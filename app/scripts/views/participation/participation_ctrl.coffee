@@ -124,6 +124,8 @@ angular.module('participationViews', ['ngRoute', 'textAngular', 'xin_listResourc
 
   .controller 'DisplayParticipationController', ($scope, $route, $routeParams,
                                                  $modal, Backend, session) ->
+    $scope.isCsvPost = null
+
     session.getIsAdminPromise().then (isAdmin) ->
       $scope.isAdmin = isAdmin
     Backend.one('participations', $routeParams.participationId).get().then(
@@ -160,6 +162,13 @@ angular.module('participationViews', ['ngRoute', 'textAngular', 'xin_listResourc
           () -> window.location = '#/participations'
           (error) -> throw error
         )
+
+    $scope.getDonnees = ->
+      $scope.participation.post('csv').then(
+        () -> $scope.isCsvPost = true
+        (error) -> $scope.isCsvPost = false
+      )
+
 
 
   .directive 'displayParticipationDirective', (Backend) ->

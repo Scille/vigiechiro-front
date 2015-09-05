@@ -63,9 +63,9 @@
 <!-- Compute info -->
 <div ng-if="participation.traitement">
   <span ng-if="participation.traitement.etat == 'FINI'">
-    Le traitement s'est terminée le {{ participation.traitement.date_fin | xinDate: 'medium' }}
-    <br>
     Début du traitement : {{ participation.traitement.date_debut | xinDate: 'medium' }}
+    <br>
+    Le traitement s'est terminée le {{ participation.traitement.date_fin | xinDate: 'medium' }}
   </span>
   <span ng-if="participation.traitement.etat == 'PLANIFIE'">
     Le traitement de la participation est planifié.
@@ -87,17 +87,26 @@
   </span>
 </div>
 
-<!-- Données -->
-<a class="btn btn-primary" href="#/participations/{{participation._id}}/donnees">
-  Voir les données
-</a>
+<!-- Buttons -->
+<div>
+  <a class="btn btn-primary" href="#/participations/{{participation._id}}/donnees">
+    Voir les données
+  </a>
+  <a class="btn btn-primary" href="" ng-click="getDonnees()">
+    Recevoir les données par email
+  </a>
+  <a class="btn btn-warning" href="" ng-click="compute()"
+     ng-if="isAdmin && (participation.traitement.etat == 'FINI' || participation.traitement.etat == 'ERREUR')">
+    Relancer la participation
+  </a>
+  <span ng-if="participation.logs">
+    <access-file-directive file="participation.logs"></access-file-directive>
+  </span>
+</div>
 
-<a class="btn btn-warning" href="" ng-click="compute()"
-   ng-if="isAdmin && (participation.traitement.etat == 'FINI' || participation.traitement.etat == 'ERREUR')">
-  Relancer la participation
-</a>
-
-<!-- Logs -->
-<span ng-if="participation.logs">
-  <access-file-directive file="participation.logs"></access-file-directive>
-</span>
+<div class="alert alert-success" ng-show="isCsvPost">
+  Demande de réception des données par email : reçue
+</div>
+<div class="alert alert-danger" ng-show="isCsvPost == false">
+  Echec de la demande de réception des données par email
+</div>
