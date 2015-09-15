@@ -41,6 +41,7 @@ angular.module('protocole_map', ['protocole_map_carre',
         @_circleLimit = null
         @_newSelection = false
         @_grilleStoc = null
+        @_isOpportuniste = false
         # ROUTIER
         @_route = null
         @_routeLength = 0
@@ -206,10 +207,8 @@ angular.module('protocole_map', ['protocole_map_carre',
               @callbacks.displayError?("Pas de grille stoc trouvée pour "+overlay.getPosition().toString())
             cell = cells[0]
             # check if site already exist with the grille stoc
-            siteOp = false
             for site, index in @_sites
               if cell.numero == site.grille_stoc.numero
-                siteOp = true
                 modalInstance = $modal.open(
                   templateUrl: 'scripts/views/site/modal/site_opportuniste.html'
                   controller: 'ModalInstanceSiteOpportunisteController'
@@ -219,13 +218,10 @@ angular.module('protocole_map', ['protocole_map_carre',
                     if valid
                       @validAndDisplaySiteLocalities(index)
                 )
-                break
-            if siteOp
-              return
-            else
-              overlay = @createCell(cell.centre.coordinates[1],
-                                    cell.centre.coordinates[0])
-              @validNumeroGrille(overlay, cell.numero, cell._id, true)
+                return
+            overlay = @createCell(cell.centre.coordinates[1],
+                                  cell.centre.coordinates[0])
+            @validNumeroGrille(overlay, cell.numero, cell._id, true)
         )
 
       validAndDisplaySiteLocalities: (index) ->
@@ -236,6 +232,7 @@ angular.module('protocole_map', ['protocole_map_carre',
                            site.grille_stoc._id, false)
         Backend.one('sites', site._id).get().then (site) =>
           @displayLocalities(site.localites)
+        @_isOpportuniste = true
         @_step = 'editLocalities'
         @updateSite()
 
@@ -299,7 +296,7 @@ angular.module('protocole_map', ['protocole_map_carre',
           step: @_step
           loading: @loading
         if @callbacks.updateSteps?
-          @callbacks.updateSteps(steps)
+          @callbacks.updateSteps(steps, @_isOpportuniste)
 
       saveMap: ->
         result = []

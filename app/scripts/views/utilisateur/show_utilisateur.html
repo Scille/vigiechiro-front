@@ -107,6 +107,8 @@
     <div class="form-group">
         <input class="save-user btn btn-primary" type="submit" value="Sauvegarder" ng-hide="userForm.$pristine">
     </div>
-
+    <div class="alert alert-danger" ng-show="saveError">
+      Echec de l'enregistrement de l'utilisateur.
+    </div>
   </form>
 </div>

@@ -90,5 +90,5 @@ angular.module('utilisateurViews', ['ngRoute', 'xin_listResource', 'xin_tools',
         payload.role = $scope.utilisateur.role
       userBackend.patch(payload).then(
         -> $route.reload()
-        (error) -> throw "Error " + error
+        (error) -> $scope.saveError = true
       )

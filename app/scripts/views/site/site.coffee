@@ -81,7 +81,7 @@ siteCallbacks = ($scope, $timeout) ->
         if $scope.mapWarnings[i].type == type
           $scope.mapWarnings.splice(i, 1)
       $timeout(-> $scope.$apply())
-    updateSteps: (steps) ->
+    updateSteps: (steps, isOpportuniste) ->
       $scope.mapError = null
       $scope.steps = steps.steps
       $scope.stepId = steps.step
@@ -89,7 +89,10 @@ siteCallbacks = ($scope, $timeout) ->
         if $scope.stepId == 'start'
           $scope.validLocalitiesAllowed = false
         if $scope.stepId == 'editLocalities'
-          $scope.retrySelectionAllowed = true
+          if isOpportuniste
+            $scope.retrySelectionAllowed = false
+          else
+            $scope.retrySelectionAllowed = true
           $scope.editLocalitiesAllowed = false
           $scope.validLocalitiesAllowed = false
         if $scope.stepId == 'validLocalities'
