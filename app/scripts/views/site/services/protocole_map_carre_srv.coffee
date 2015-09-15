@@ -50,29 +50,42 @@ angular.module('protocole_map_carre', [])
             else
               @callbacks.displayError?("Mauvaise forme : " + overlay.type)
             if isModified
-              if @getCountOverlays() >= @_max
-                @callbacks.displayError?("Nombre maximum de points atteint.")
-                return false
-              @saveOverlay(overlay)
-              @checkDistanceBetweenPoints(200)
-              # rightclick for delete overlay
-              @_googleMaps.addListener(overlay, 'rightclick', (e) =>
-                @deleteOverlay(overlay)
-                @checkDistanceBetweenPoints(200)
-                if @getCountOverlays() < @_min
-                  @_step = 'editLocalities'
-                else
-                  @_step = 'validLocalities'
-                @updateSite()
-              )
-              # when move overlay
-              @_googleMaps.addListener(overlay, 'mouseout', (e) =>
-                @checkDistanceBetweenPoints(200)
-              )
-              if @getCountOverlays() >= @_min
+              if @_isOpportuniste
+                @saveOverlay(overlay)
+                # rightclick for delete overlay
+                @_googleMaps.addListener(overlay, 'rightclick', (e) =>
+                  @deleteOverlay(overlay)
+                  if @getCountOverlays() < 1
+                    @_step = 'editLocalities'
+                  else
+                    @_step = 'validLocalities'
+                  @updateSite()
+                )
                 @_step = 'validLocalities'
               else
-                @_step = 'editLocalities'
+                if @getCountOverlays() >= @_max
+                  @callbacks.displayError?("Nombre maximum de points atteint.")
+                  return false
+                @saveOverlay(overlay)
+                @checkDistanceBetweenPoints(200)
+                # rightclick for delete overlay
+                @_googleMaps.addListener(overlay, 'rightclick', (e) =>
+                  @deleteOverlay(overlay)
+                  @checkDistanceBetweenPoints(200)
+                  if @getCountOverlays() < @_min
+                    @_step = 'editLocalities'
+                  else
+                    @_step = 'validLocalities'
+                  @updateSite()
+                )
+                # when move overlay
+                @_googleMaps.addListener(overlay, 'mouseout', (e) =>
+                  @checkDistanceBetweenPoints(200)
+                )
+                if @getCountOverlays() >= @_min
+                  @_step = 'validLocalities'
+                else
+                  @_step = 'editLocalities'
               @updateSite()
               return true
             return false
@@ -88,7 +101,10 @@ angular.module('protocole_map_carre', [])
         @_localities.push(locality)
 
       setLocalityName: (name = 1) ->
-        used = false
+        if @_isOpportuniste
+          for locality in @_fixLocalities
+            if parseInt(locality.name) == name
+              return @setLocalityName(name + 1)
         for locality in @_localities
           if parseInt(locality.name) == name
             return @setLocalityName(name + 1)

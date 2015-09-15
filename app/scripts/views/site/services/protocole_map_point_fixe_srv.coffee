@@ -51,19 +51,32 @@ angular.module('protocole_map_point_fixe', [])
             else
               @callbacks.displayError?("Mauvaise forme : " + overlay.type)
             if isModified
-              @saveOverlay(overlay)
-              @_googleMaps.addListener(overlay, 'rightclick', (e) =>
-                @deleteOverlay(overlay)
-                if @getCountOverlays() < @_min
-                  @_step = 'editLocalities'
-                else
-                  @_step = 'validLocalities'
-                @updateSite()
-              )
-              if @getCountOverlays() >= @_min
+              if @_isOpportuniste
+                @saveOverlay(overlay)
+                # rightclick for delete overlay
+                @_googleMaps.addListener(overlay, 'rightclick', (e) =>
+                  @deleteOverlay(overlay)
+                  if @getCountOverlays() < 1
+                    @_step = 'editLocalities'
+                  else
+                    @_step = 'validLocalities'
+                  @updateSite()
+                )
                 @_step = 'validLocalities'
               else
-                @_step = 'editLocalities'
+                @saveOverlay(overlay)
+                @_googleMaps.addListener(overlay, 'rightclick', (e) =>
+                  @deleteOverlay(overlay)
+                  if @getCountOverlays() < @_min
+                    @_step = 'editLocalities'
+                  else
+                    @_step = 'validLocalities'
+                  @updateSite()
+                )
+                if @getCountOverlays() >= @_min
+                  @_step = 'validLocalities'
+                else
+                  @_step = 'editLocalities'
               @updateSite()
               return true
             return false
@@ -95,8 +108,12 @@ angular.module('protocole_map_point_fixe', [])
           return @setLocalityName()
 
       setLocalityName: (name = 1) ->
-        for localite in @_localities
-          if localite.name == 'Z'+name
+        if @_isOpportuniste
+          for locality in @_fixLocalities
+            if locality.name == 'Z'+name
+              return @setLocalityName(name + 1)
+        for locality in @_localities
+          if locality.name == 'Z'+name
             return @setLocalityName(name + 1)
         return 'Z'+name
 

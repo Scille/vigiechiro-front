@@ -32,6 +32,7 @@ angular.module('protocole_map', ['protocole_map_carre',
       constructor: (mapDiv, @typeProtocole, @callbacks) ->
         @_site = null
         @_localities = []
+        @_fixLocalities = []
         @_step = 'start'
         @_steps = []
         @_googleMaps = new GoogleMaps(mapDiv, @mapCallback())
@@ -66,9 +67,12 @@ angular.module('protocole_map', ['protocole_map_carre',
             return false
 
       clear: ->
-        for localite in @_localities
-          localite.overlay.setMap(null)
+        for locality in @_localities
+          locality.overlay.setMap(null)
         @_localities = []
+        for locality in @_fixLocalities
+          locality.overlay.setMap(null)
+        @_fixLocalities = []
         @_step = 'start'
         if @typeProtocole in ['CARRE', 'POINT_FIXE']
           @_googleMaps.setDrawingManagerOptions(
@@ -106,6 +110,9 @@ angular.module('protocole_map', ['protocole_map_carre',
         @updateSite()
 
 # Grille Stoc
+      isOpportuniste: ->
+        return @_isOpportuniste
+
       loadMapDisplay: (site) ->
         @_googleMaps.hideDrawingManager()
         @_site = site
@@ -231,22 +238,22 @@ angular.module('protocole_map', ['protocole_map_carre',
         @validNumeroGrille(site.overlay, site.grille_stoc.numero,
                            site.grille_stoc._id, false)
         Backend.one('sites', site._id).get().then (site) =>
-          @displayLocalities(site.localites)
+          @displayLocalities(site.localites, @_fixLocalities)
         @_isOpportuniste = true
-        @_step = 'editLocalities'
+        @_step = 'validLocalities'
         @updateSite()
 
-      displayLocalities: (localites) ->
-        for localite in localites or []
-          @displayLocality(localite)
+      displayLocalities: (localites, dest) ->
+        for locality in localites or []
+          @displayLocality(locality, dest)
 
-      displayLocality: (localite) ->
-        newLocalite =
-          name: localite.nom
-          representatif: localite.representatif
-        newLocalite.overlay = @loadGeoJson(localite.geometries)
-        newLocalite.overlay.setTitle(localite.nom)
-        @_localities.push(newLocalite)
+      displayLocality: (locality, dest = @_localities) ->
+        newLocality =
+          name: locality.nom
+          representatif: locality.representatif
+        newLocality.overlay = @loadGeoJson(locality.geometries)
+        newLocality.overlay.setTitle(locality.nom)
+        dest.push(newLocality)
 
       selectGrilleStoc: ->
         @_step = 'selectGrilleStoc'

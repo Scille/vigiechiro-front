@@ -124,23 +124,38 @@ siteCallbacks = ($scope, $timeout) ->
   }
 
 saveLocalities = (site, map, callbacks = {}) ->
-  site.customDELETE('localites').then(
-    ->
-      localities = map.saveMap()
-      payload =
-        localites: []
-      for localite in localities
-        tmp =
-          nom: localite.name
-          geometries: localite.geometries
-          representatif: false
-        payload.localites.push(tmp)
-      site.customPUT(payload, "localites").then(
-        -> callbacks.onSaveLocalitiesSuccess?()
-        (error) -> console.log(error)
-      )
-    (error) -> console.log(error)
-  )
+  if map.isOpportuniste()
+    localities = map.saveMap()
+    payload =
+      localites: []
+    for localite in localities
+      tmp =
+        nom: localite.name
+        geometries: localite.geometries
+        representatif: false
+      payload.localites.push(tmp)
+    site.customPUT(payload, "localites").then(
+      -> callbacks.onSaveLocalitiesSuccess?()
+      (error) -> callbacks.onSaveLocalitiesFail?(error)
+    )
+  else
+    site.customDELETE('localites').then(
+      ->
+        localities = map.saveMap()
+        payload =
+          localites: []
+        for localite in localities
+          tmp =
+            nom: localite.name
+            geometries: localite.geometries
+            representatif: false
+          payload.localites.push(tmp)
+        site.customPUT(payload, "localites").then(
+          -> callbacks.onSaveLocalitiesSuccess?()
+          (error) -> callbacks.onSaveLocalitiesFail?(error)
+        )
+      (error) -> console.log(error)
+    )
 
 lock = (site, callbacks = {}) ->
   site.patch({'verrouille': true}).then(
@@ -331,8 +346,12 @@ angular.module('siteViews', ['ngRoute',
           protocole: $scope.protocole._id
           grille_stoc: map.getIdGrilleStoc()
         Backend.all('sites').getList(check).then (sites) ->
+          callbacks =
+            onSaveLocalitiesFail: ->
+              $score.saveLocalitiesError = true
           if sites.plain().length
-            saveLocalities(sites[0], map)
+            saveLocalities(sites[0], map, callbacks)
+            window.location = '#/sites/'+sites[0]._id
           else
             # Set up title
             numGrilleStoc = map.getNumGrilleStoc()
@@ -341,7 +360,7 @@ angular.module('siteViews', ['ngRoute',
             # POST site
             Backend.all('sites').post(payload).then(
               (site) ->
-                saveLocalities(site, map)
+                saveLocalities(site, map, callbacks)
                 # If verrouille
                 if $scope.site.verrouille
                   lock(site)
@@ -435,6 +454,8 @@ angular.module('siteViews', ['ngRoute',
           callbacks =
             onSaveLocalitiesSuccess: ->
               window.location = '#/sites/'+site._id
+            onSaveLocalitiesFail: ->
+              $score.saveLocalitiesError = true
           saveLocalities(site, map, callbacks)
         (error) ->
           $scope.mapError =
