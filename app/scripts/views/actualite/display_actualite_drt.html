@@ -107,8 +107,8 @@
       participation
     </a>
     pour le site
-    <a href="#/sites/{{actualite.participation.site}}">
-      {{actualite.participation.site}}.
+    <a href="#/sites/{{actualite.site._id}}">
+      {{actualite.site.titre}}.
     </a>
   </span>
   <span ng-if="actualite.sujet._id != user._id">
@@ -120,8 +120,8 @@
       participation
     </a>.
     pour le site
-    <a href="#/sites/{{actualite.participation.site}}">
-      {{actualite.participation.site}}.
+    <a href="#/sites/{{actualite.site._id}}">
+      {{actualite.site.titre}}.
     </a>
   </span>
 </div>
