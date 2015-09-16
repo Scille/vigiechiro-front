@@ -14,6 +14,7 @@ initEnv = ($scope, $modal, session) ->
   $scope.randomSelectionAllowed = false
   $scope.validOriginAllowed = false
   $scope.retrySelectionAllowed = false
+  $scope.isRandom = false
   # random selection
   $scope.listGrilleStocOrigin = []
   $scope.listNumberUsed = []
@@ -89,7 +90,7 @@ siteCallbacks = ($scope, $timeout) ->
         if $scope.stepId == 'start'
           $scope.validLocalitiesAllowed = false
         if $scope.stepId == 'editLocalities'
-          if isOpportuniste
+          if isOpportuniste or not $scope.isRandom
             $scope.retrySelectionAllowed = false
           else
             $scope.retrySelectionAllowed = true
@@ -264,9 +265,11 @@ angular.module('siteViews', ['ngRoute',
       $scope.displaySteps = true
       $scope.randomSelectionAllowed = false
       if random
+        $scope.isRandom = true
         map.createOriginPoint()
         $scope.validOriginAllowed = true
       else
+        $scope.isRandom = false
         map.selectGrilleStoc()
 
     $scope.validOrigin = ->
