@@ -68,7 +68,7 @@
     <div class="form-group" ng-class="{'has-error': participationForm.temperature_debut.$invalid && !participationForm.$pristine}">
       <div class="input-group">
         <label class="input-group-addon" for="meteo.temperature_debut">
-          Température au début
+          Température au début (en °C)
         </label>
         <input type="number" class="form-control" id="meteo.temperature_debut" name="temperature_debut"
           ng-model="participation.meteo.temperature_debut" ng-disabled="readOnly" min="-20" max="40">
@@ -80,7 +80,7 @@
     <div class="form-group" ng-class="{'has-error': participationForm.temperature_fin.$invalid && !participationForm.$pristine}">
       <div class="input-group">
         <label class="input-group-addon" for="meteo.temperature_fin">
-          Température à la fin
+          Température à la fin (en °C)
         </label>
         <input type="number" class="form-control" id="meteo.temperature_fin" name="temperature_fin"
           ng-model="participation.meteo.temperature_fin" ng-disabled="readOnly" min="-20" max="40">
