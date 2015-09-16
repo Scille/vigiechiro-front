@@ -6,9 +6,8 @@
       Vous vous êtes
     </span>
     <span ng-if="actualite.sujet._id != user._id">
-      L'utilisateur
       <a href="#/utilisateurs/{{actualite.sujet._id}}">
-        {{ actualite.sujet.pseudo }}
+        L'utilisateur {{ actualite.sujet.pseudo }}
       </a>
       s'est
     </span>
@@ -27,9 +26,9 @@
       Votre inscription
     </span>
     <span ng-if="actualite.sujet._id != user._id">
-      L'inscription de l'utilisateur
+      L'inscription de
       <a href="#/utilisateurs/{{actualite.sujet._id}}">
-        {{ actualite.sujet.pseudo }}
+        l'utilisateur {{ actualite.sujet.pseudo }}
       </a>
     </span>
     au protocole
@@ -44,9 +43,9 @@
       Votre inscription
     </span>
     <span ng-if="actualite.sujet._id != user._id">
-      L'inscription de l'utilisateur
+      L'inscription de
       <a href="#/utilisateurs/{{actualite.sujet._id}}">
-        {{ actualite.sujet.pseudo }}
+        l'utilisateur {{ actualite.sujet.pseudo }}
       </a>
     </span>
     au protocole
@@ -66,9 +65,8 @@
       Vous avez
     </span>
     <span ng-if="actualite.sujet._id != user._id">
-      L'utilisateur
       <a href="#/utilisateurs/{{actualite.sujet._id}}">
-        {{ actualite.sujet.pseudo }}
+        L'utilisateur {{ actualite.sujet.pseudo }}
       </a>
       a
     </span>
@@ -90,9 +88,9 @@
       <a href="#/sites/{{actualite.site._id}}">
         {{ actualite.site.titre }}
       </a>
-      de l'utilisateur
+      de
       <a href="#/utilisateurs/{{actualite.sujet._id}}">
-        {{ actualite.sujet.pseudo }}
+        l'utilisateur {{ actualite.sujet.pseudo }}
       </a>
     </span>
     a été verrouillé.
@@ -114,9 +112,8 @@
     </a>
   </span>
   <span ng-if="actualite.sujet._id != user._id">
-    L'utilisateur
     <a href="#/utilisateurs/{{actualite.sujet._id}}">
-      {{ actualite.sujet.pseudo }}
+      L'utilisateur {{ actualite.sujet.pseudo }}
     </a>
     a créé une
     <a href="#/participations/{{actualite.participation._id}}">
