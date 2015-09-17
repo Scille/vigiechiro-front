@@ -90,6 +90,7 @@ angular.module('xin.fileUploader', ['xin_s3uploadFile'])
         @itemsReadyToCompress = []
         @itemsWaiting = []
         @itemsFailedFilters = []
+        @itemsFailedCompress = []
         @itemsFailedUpload = []
         @itemsCanceled = []
         @warningsXfails = []
@@ -203,11 +204,17 @@ angular.module('xin.fileUploader', ['xin_s3uploadFile'])
           if @status in ['cancel']
             return
           else
-            @_createS3File(blob)
+            if blob.size == 0
+              @_createS3File(file)
+            else
+              @_createS3File(blob, true)
             @_computeSize()
         fileReader.readAsArrayBuffer(file)
 
-      _createS3File: (file) =>
+      _createS3File: (file, gzip = false) =>
+        if file.size == 0
+          @itemsFailedCompress.push(file.name)
+          return
         file.status = 'ready'
         file.transmitted_size = 0
         file.sendingTryS3 = 0
@@ -232,7 +239,7 @@ angular.module('xin.fileUploader', ['xin_s3uploadFile'])
           onCancel: (s3File) =>
             @_removeFileUploading(s3File)
             @itemsCanceled.push({name: s3File.file.name})
-          , @_gzip
+          , gzip
         )
         @itemsReadyToUp.push(file)
 
@@ -360,13 +367,14 @@ angular.module('xin.fileUploader', ['xin_s3uploadFile'])
 
       clearErrors: ->
         @itemsFailedFilters = []
+        @itemsFailedCompress = []
         @itemsFailedUpload = []
         @itemsCanceled = []
         @warningsXfails = []
         @_computeItems()
 
       isAllComplete: ->
-        count = @itemsCompleted.length + @itemsFailedUpload.length + @itemsFailedFilters.length
+        count = @itemsCompleted.length + @itemsFailedUpload.length + @itemsFailedCompress.length + @itemsFailedFilters.length
         if count == @itemsTotal
           return true
         else

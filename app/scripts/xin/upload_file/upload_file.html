@@ -70,6 +70,12 @@
       Fichier {{ item.name }} annulé
     </div>
   </div>
+  <!-- Compression failed -->
+  <div class="alert alert-danger" ng-show="uploader.itemsFailedCompress.length">
+    <div ng-repeat="item in uploader.itemsFailedCompress">
+      Echec de la compression du fichier {{ item.name }}, fichier vide.
+    </div>
+  </div>
   <!-- Uploads failed -->
   <div class="alert alert-danger" ng-show="uploader.itemsFailedUpload.length">
     <div ng-repeat="item in uploader.itemsFailedUpload">
