@@ -16,30 +16,6 @@ angular.module('xin_listResource', ['ngRoute', 'angularUtils.directives.dirPagin
             $compile(element.contents())(scope)
         )
 
-
-  .controller 'ListResourceController', ($scope, $timeout, $location, session) ->
-    session.getUserPromise().then (user) ->
-      $scope.user = user.plain()
-    $scope.resources = []
-    $scope.loading = true
-    updateResourcesList = () ->
-      $scope.loading = true
-      if $scope.resourceBackend?
-        $scope.resourceBackend.getList($scope.lookup).then (items) ->
-          $scope.resources = items
-          $scope.loading = false
-    $scope.$watch(
-      'lookup'
-      ->
-        updateResourcesList()
-      true
-    )
-    $scope.pageChange = (newPage) ->
-      if $scope.lookup.page == newPage
-        return
-      $scope.lookup.page = newPage
-
-
   .directive 'listResourceDirective', (session, Backend) ->
     restrict: 'E'
     transclude: true
@@ -70,3 +46,27 @@ angular.module('xin_listResource', ['ngRoute', 'angularUtils.directives.dirPagin
             clone.each (index, node) ->
               if node.outerHTML?
                 scope.resourceTemplate += node.outerHTML
+
+  .controller 'ListResourceController', ($scope, $timeout, $location, session) ->
+    session.getUserPromise().then (user) ->
+      $scope.user = user.plain()
+    $scope.resources = []
+    $scope.loading = true
+    updateResourcesList = () ->
+      $scope.loading = true
+      if $scope.resourceBackend?
+        $scope.resourceBackend.getList($scope.lookup).then (items) ->
+          $scope.resources = items
+          $scope.loading = false
+    $scope.$watch('lookup', ->
+        updateResourcesList()
+      ,
+        true
+    )
+    $scope.$watch 'resourceBackend', (resourceBackend, oldValue) ->
+      if resourceBackend != oldValue
+        updateResourcesList()
+    $scope.pageChange = (newPage) ->
+      if $scope.lookup.page == newPage
+        return
+      $scope.lookup.page = newPage
