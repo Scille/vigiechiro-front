@@ -51,7 +51,7 @@
                          theme="bootstrap"
                          ng-disabled="!isObservateur"
                          append-to-body>
-                <ui-select-match>{{$select.selected.libelle_long}}</ui-select-match>
+                <ui-select-match>{{$select.selected.libelle_court}}</ui-select-match>
                 <ui-select-choices repeat="taxon._id as taxon in taxons | filter: $select.search">
                   {{taxon.libelle_court}}
                 </ui-select-choices>
@@ -79,7 +79,7 @@
                          theme="bootstrap"
                          ng-disabled="!isValidateur"
                          append-to-body>
-                <ui-select-match>{{$select.selected.libelle_long}}</ui-select-match>
+                <ui-select-match>{{$select.selected.libelle_court}}</ui-select-match>
                 <ui-select-choices repeat="taxon._id as taxon in taxons | filter: $select.search">
                   {{taxon.libelle_court}}
                 </ui-select-choices>
