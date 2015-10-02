@@ -198,7 +198,7 @@ angular.module('protocole_map_routier', [])
               @_googleMaps.setDrawingManagerOptions(
                 drawingControlOptions:
                   position: google.maps.ControlPosition.TOP_CENTER
-                  drawingModes: []
+                  drawingModes: [google.maps.drawing.OverlayType.MARKER]
                 drawingMode: ''
               )
               @addRouteRightClick()
