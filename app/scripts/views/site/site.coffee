@@ -49,6 +49,10 @@ initEnv = ($scope, $modal, session) ->
         if valid
           map.editRoute()
     )
+  $scope.extendRouteTo = 'END'
+  $scope.$watch 'extendRouteTo', (value) ->
+    if value? and map?
+      map.extendRouteTo = value
   $scope.validSections = ->
     map.validSections()
   $scope.editSections = ->
@@ -105,7 +109,10 @@ siteCallbacks = ($scope, $timeout) ->
           $scope.editLocalitiesAllowed = true
       else if $scope.protocole.type_site == 'ROUTIER'
         if $scope.stepId == 'start'
-          $scope.validRouteAllowed = true
+          if map.hasRoute()
+            $scope.validRouteAllowed = true
+          else
+            $scope.validRouteAllowed = false
           $scope.editRouteAllowed = false
           $scope.validSectionsAllowed = false
           $scope.editSectionsAllowed = false
@@ -124,7 +131,7 @@ siteCallbacks = ($scope, $timeout) ->
       $timeout(-> $scope.$apply())
   }
 
-saveLocalities = (site, map, callbacks = {}) ->
+saveLocalities = (site, callbacks = {}) ->
   if map.isOpportuniste()
     localities = map.saveMap()
     payload =
@@ -168,7 +175,8 @@ lock = (site, callbacks = {}) ->
 angular.module('siteViews', ['ngRoute',
                              'textAngular', 'ui.bootstrap',
                              'dialogs.main',
-                             'protocole_map', 'modalSiteViews'])
+                             'protocole_map', 'modalSiteViews',
+                             'frapontillo.bootstrap-switch'])
   .config ($routeProvider) ->
     $routeProvider
       .when '/protocoles/:protocoleId/nouveau-site',
@@ -224,12 +232,12 @@ angular.module('siteViews', ['ngRoute',
         $scope.site.generee_aleatoirement = false
         $scope.randomSelectionAllowed = true
       else
-        $scope.validRouteAllowed = true
         $scope.displaySteps = true
 
     createMap = (mapDiv) ->
       map = protocolesFactory(mapDiv, $scope.protocole.type_site,
-                                       siteCallbacks($scope, $timeout))
+                              siteCallbacks($scope, $timeout))
+      map.updateSite()
       # If CARRE or POINT_FIXE, display all sites already followed
       if $scope.protocole.type_site in ['CARRE', 'POINT_FIXE']
         Backend.all('protocoles/'+$scope.protocole._id+'/sites').all('grille_stoc')
@@ -353,7 +361,7 @@ angular.module('siteViews', ['ngRoute',
             onSaveLocalitiesFail: ->
               $score.saveLocalitiesError = true
           if sites.plain().length
-            saveLocalities(sites[0], map, callbacks)
+            saveLocalities(sites[0], callbacks)
             window.location = '#/sites/'+sites[0]._id
           else
             # Set up title
@@ -363,7 +371,7 @@ angular.module('siteViews', ['ngRoute',
             # POST site
             Backend.all('sites').post(payload).then(
               (site) ->
-                saveLocalities(site, map, callbacks)
+                saveLocalities(site, callbacks)
                 # If verrouille
                 if $scope.site.verrouille
                   lock(site)
@@ -389,7 +397,7 @@ angular.module('siteViews', ['ngRoute',
               else
                 Backend.all('sites').post(payload).then(
                   (site) ->
-                    saveLocalities(site, map)
+                    saveLocalities(site)
                     # If verrouille
                     if $scope.site.verrouille
                       lock(site)
@@ -400,7 +408,7 @@ angular.module('siteViews', ['ngRoute',
         else
           Backend.all('sites').post(payload).then(
             (site) ->
-              saveLocalities(site, map)
+              saveLocalities(site)
               # If verrouille
               if $scope.site.verrouille
                 lock(site)
@@ -459,7 +467,7 @@ angular.module('siteViews', ['ngRoute',
               window.location = '#/sites/'+site._id
             onSaveLocalitiesFail: ->
               $score.saveLocalitiesError = true
-          saveLocalities(site, map, callbacks)
+          saveLocalities(site, callbacks)
         (error) ->
           $scope.mapError =
             message: error

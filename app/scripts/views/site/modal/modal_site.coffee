@@ -8,6 +8,12 @@ angular.module('modalSiteViews', [])
     $scope.cancel = ->
       $modalInstance.dismiss('cancel')
 
+  .controller 'ModalDeleteRouteController', ($scope, $modalInstance) ->
+    $scope.ok = ->
+      $modalInstance.close(true)
+    $scope.cancel = ->
+      $modalInstance.dismiss('cancel')
+
   .controller 'ModalInstanceRetrySelectionController', ($scope, $modalInstance, justification_non_aleatoire) ->
     $scope.justification_non_aleatoire = justification_non_aleatoire
     $scope.ok = ->

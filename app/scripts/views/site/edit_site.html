@@ -95,7 +95,18 @@
   </ul>
 
   <div ng-show="protocole.type_site == 'ROUTIER'">
-    Longueur du tracé : <b>{{ routeLength }}</b> kilomètres.
+    <span ng-show="validRouteAllowed">
+      <label>
+        Etendre le tracé
+      </label>
+      <input bs-switch ng-model="extendRouteTo" type="checkbox"
+             switch-on-text="au début" switch-off-text="à la fin"
+             ng-true-value="'BEGIN'" ng-false-value="'END'"
+             switch-label-width="0">
+    </span>
+    <span>
+      Longueur du tracé : <b>{{ routeLength }}</b> kilomètres.
+    </span>
   </div>
 
   <p class="bg-danger" ng-show="mapError">

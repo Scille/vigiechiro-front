@@ -24,7 +24,7 @@ section_colors = [
 
 
 angular.module('protocole_map_routier', [])
-  .factory 'ProtocoleMapRoutier', ($rootScope, $timeout,
+  .factory 'ProtocoleMapRoutier', ($rootScope, $timeout, $modal,
                                    Backend, GoogleMaps, ProtocoleMap) ->
     class ProtocoleMapRoutier extends ProtocoleMap
       constructor: (mapDiv, @typeProtocole, @callbacks = {}) ->
@@ -52,7 +52,6 @@ angular.module('protocole_map_routier', [])
               google.maps.drawing.OverlayType.POLYLINE
             ]
         )
-        @updateSite()
 
       loadMapDisplay: (site) ->
         @_googleMaps.hideDrawingManager()
@@ -90,8 +89,14 @@ angular.module('protocole_map_routier', [])
         )
         @_googleMaps.fitBounds(bounds)
 
+      hasRoute: ->
+        if @_route?
+          return true
+        else
+          return false
+
       validRoute: ->
-        if !@_route?
+        if not @_route?
           @callbacks.displayError?("Pas de tracé")
           return false
         if @_routeLength < 24
@@ -100,7 +105,6 @@ angular.module('protocole_map_routier', [])
         # @_route becomes uneditable
         @_googleMaps.clearListeners(@_route, 'rightclick')
         @_route.setOptions(
-          draggable: false
           editable: false
         )
         # Pad the points array
@@ -120,6 +124,12 @@ angular.module('protocole_map_routier', [])
                 @callbacks.displayError("Certains points ne sont pas sur le tracé")
         # Update form
         @_step = 'selectOrigin'
+        @_googleMaps.setDrawingManagerOptions(
+          drawingControlOptions:
+            position: google.maps.ControlPosition.TOP_CENTER
+            drawingModes: []
+          drawingMode: ''
+        )
         @updateSite()
         return true
 
@@ -176,13 +186,10 @@ angular.module('protocole_map_routier', [])
         overlayCreated: (overlay) =>
           isModified = false
           if @_step == 'start'
-            if overlay.type != "LineString"
-              @callbacks.displayError?("Géométrie non autorisée à cette étape : "+overlay.type)
-            else if @getCountOverlays()
-              @callbacks.displayError?("Un tracé existe déjà")
-            else
+            if overlay.type == "LineString"
               isModified = true
               @_route = overlay
+              @_route.setOptions({draggable: false})
               @_routeLength = (@checkTotalLength()/1000).toFixed(1)
               @_googleMaps.addListener(@_route, 'mouseout', (e) =>
                 @_routeLength = (@checkTotalLength()/1000).toFixed(1)
@@ -194,20 +201,13 @@ angular.module('protocole_map_routier', [])
                   drawingModes: []
                 drawingMode: ''
               )
-              @_googleMaps.addListener(@_route, 'rightclick', (e) =>
-                @_route.setMap(null)
-                @_route = null
-                @_routeLength = 0
-                @_googleMaps.setDrawingManagerOptions(
-                  drawingControlOptions:
-                    position: google.maps.ControlPosition.TOP_CENTER
-                    drawingModes: [
-                      google.maps.drawing.OverlayType.POLYLINE
-                    ]
-                )
-                @updateSite()
-              )
+              @addRouteRightClick()
               @callbacks.updateLength?(@_routeLength)
+            else if overlay.type == "Point"
+              isModified = true
+              @extendRoute(overlay)
+            else
+              @callbacks.displayError?("Géométrie non autorisée à cette étape : "+overlay.type)
           else if @_step == 'editSections'
             if overlay.type != "LineString"
               @callbacks.displayError?("Géométrie non autorisée à cette étape : "+overlay.type)
@@ -220,7 +220,7 @@ angular.module('protocole_map_routier', [])
           if isModified
             @updateSite()
             return true
-          @callbacks.displayError("Impossible de créer la forme")
+          @callbacks.displayError?("Impossible de créer la forme")
           return false
 
       getGeoJsonRoute: ->
@@ -243,8 +243,49 @@ angular.module('protocole_map_routier', [])
         return route
 
       # Route
+      addRouteRightClick: ->
+        @_googleMaps.addListener(@_route, 'rightclick', (e) =>
+          if e.vertex?
+            path = @_route.getPath()
+            path.removeAt(e.vertex)
+            if path.getLength() < 2
+              @deleteRoute()
+            else
+              @_route.setPath(path)
+          else
+            modalInstance = $modal.open(
+              templateUrl: 'scripts/views/site/modal/delete_route.html'
+              controller: 'ModalDeleteRouteController'
+            )
+            modalInstance.result.then () =>
+              @deleteRoute()
+          @updateSite()
+        )
+
+      deleteRoute: ->
+        @_route.setMap(null)
+        @_route = null
+        @_routeLength = 0
+        @_googleMaps.setDrawingManagerOptions(
+          drawingControlOptions:
+            position: google.maps.ControlPosition.TOP_CENTER
+            drawingModes: [
+              google.maps.drawing.OverlayType.POLYLINE
+            ]
+        )
+        @updateSite()
+
       getRouteLength: ->
         return @_routeLength
+
+      extendRoute: (overlay) ->
+        path = @_route.getPath()
+        if @extendRouteTo == 'BEGIN'
+          path.insertAt(0, overlay.position)
+        else
+          path.push(overlay.position)
+        @_route.setPath(path)
+        overlay.setMap(null)
 
       editRoute: ->
         @_padded_points = []
@@ -269,23 +310,11 @@ angular.module('protocole_map_routier', [])
         @_googleMaps.setDrawingManagerOptions(
           drawingControlOptions:
             position: google.maps.ControlPosition.TOP_CENTER
-            drawingModes: [google.maps.drawing.OverlayType.POLYLINE]
+            drawingModes: [google.maps.drawing.OverlayType.MARKER]
         )
-        @_googleMaps.addListener(@_route, 'rightclick', (e) =>
-          @_route.setMap(null)
-          @_route = null
-          @_routeLength = 0
-          @_googleMaps.setDrawingManagerOptions(
-            drawingControlOptions:
-              position: google.maps.ControlPosition.TOP_CENTER
-              drawingModes: [
-                google.maps.drawing.OverlayType.POLYLINE
-              ]
-          )
-          @updateSite()
-        )
+        @addRouteRightClick()
         @_route.setOptions(
-          draggable: true
+          draggable: false
           editable: true
         )
         # Update form

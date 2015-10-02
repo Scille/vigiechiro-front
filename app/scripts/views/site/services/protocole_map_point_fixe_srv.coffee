@@ -33,7 +33,6 @@ angular.module('protocole_map_point_fixe', [])
             ]
         )
         @_googleMaps.setDrawingManagerOptions(drawingControl: false)
-        @updateSite()
 
       mapCallback: ->
         onProjectionReady: =>

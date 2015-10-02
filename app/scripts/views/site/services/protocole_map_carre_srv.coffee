@@ -32,7 +32,6 @@ angular.module('protocole_map_carre', [])
             ]
         )
         @_googleMaps.setDrawingManagerOptions(drawingControl: false)
-        @updateSite()
 
       mapCallback: ->
         onProjectionReady: =>

@@ -46,6 +46,7 @@ angular.module('protocole_map', ['protocole_map_carre',
         # ROUTIER
         @_route = null
         @_routeLength = 0
+        @extendRouteTo = ''
         @_firstPoint = null
         @_lastPoint = null
         @_points = []
