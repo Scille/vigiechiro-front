@@ -31,6 +31,8 @@ angular.module('donneeViews', ['ngRoute', 'xin_backend', 'xin_session',
       isObservateur: false
       isValidateur: false
       taxons: []
+    $scope.tadarida_taxon =
+      id: null
     # Get participation données
     Backend.one('participations', $routeParams.participationId).get()
       .then(
@@ -61,6 +63,12 @@ angular.module('donneeViews', ['ngRoute', 'xin_backend', 'xin_session',
           $scope.lookup.titre = titre
         else if $scope.lookup.titre?
           delete $scope.lookup.titre
+    $scope.$watch 'tadarida_taxon.id', (taxon) ->
+      delayedFilter.triggerEvent ->
+        if taxon? and taxon != ''
+          $scope.lookup.tadarida_taxon = taxon
+        else if $scope.lookup.tadarida_taxon?
+          delete $scope.lookup.tadarida_taxon
     $scope.resourceBackend = Backend.all('participations/'+$routeParams.participationId+'/donnees')
 
 

@@ -6,9 +6,9 @@
   <div class="list-group">
     <div class="row">
       <div class="col-xs-7">
-          <label for="search">Nom du fichier sans extension :</label>
-          <input ng-model="titre" class="form-control search-field"
-                 placeholder="nom du fichier">
+        <label for="search">Nom du fichier sans extension :</label>
+        <input ng-model="titre" class="form-control search-field"
+               placeholder="nom du fichier">
       </div>
       <div class="col-xs-1"></div>
       <div class="col-xs-4">
@@ -16,6 +16,30 @@
         <input type="number" class="form-control max-results-field" ng-model="lookup.max_results">
       </div>
     </div>
+    <br>
+    <div class="row">
+      <div class="col-xs-3">
+        <label for="taxon_tadarida">Taxon tadarida :</label>
+        <div class="input-group col-xs-12">
+          <ui-select ng-model="tadarida_taxon.id"
+                     theme="bootstrap"
+                     append-to-body>
+            <ui-select-match>
+              {{$select.selected.libelle_court}}
+            </ui-select-match>
+            <ui-select-choices repeat="taxon._id as taxon in others.taxons | filter: $select.search">
+              {{taxon.libelle_court}}
+            </ui-select-choices>
+          </ui-select>
+          <span class="input-group-addon"
+                ng-click="tadarida_taxon.id = null"
+                ng-show="lookup.tadarida_taxon">
+            <span class="fa fa-close"></span>
+          </span>
+        </div>
+      </div>
+    </div>
+    <br>
   </div>
 
   <list-resource-directive resource-backend="resourceBackend"
