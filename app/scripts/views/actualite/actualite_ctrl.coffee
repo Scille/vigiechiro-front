@@ -26,6 +26,7 @@ angular.module('actualiteViews', ['xin_backend', 'xin_session'])
 #        # $location.search('where', $scope.lookup.where)
 #    $scope.resourceBackend = Backend.all('actualites')
 
+
   .directive 'listMesActualitesDirective', (Backend, session) ->
     restrict: 'E'
     templateUrl: 'scripts/views/actualite/list_actualites_drt.html'
@@ -37,6 +38,7 @@ angular.module('actualiteViews', ['xin_backend', 'xin_session'])
       Backend.all('moi/actualites').getList().then (actualites) ->
         scope.actualites = actualites.plain()
         scope.loading = false
+
 
   .directive 'displayActualiteDirective', ($route, Backend, session) ->
     restrict: 'E'

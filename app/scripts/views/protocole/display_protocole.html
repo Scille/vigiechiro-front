@@ -46,7 +46,7 @@
     </div>
   </div>
 
-  <div class="col-md-3">
+  <div class="col-md-3" ng-if="user.role == 'Administrateur'">
     <div class="panel panel-default">
       <list-actualites-validations-directive type="A_VALIDER"
                                              protocole-id="{{ protocole._id }}">
