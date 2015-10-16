@@ -135,18 +135,26 @@ angular.module('displaySiteViews', ['ngRoute', 'textAngular', 'xin_backend',
       session.getUserPromise().then (user) ->
         scope.userId = user._id
       attrs.$observe 'typeSite', (typeSite) ->
-        if typeSite
-          sitesPromise = null
-          if typeSite in ["CARRE", "POINT_FIXE"]
-            sitesPromise = Backend.all('protocoles/'+scope.protocoleId+'/sites').all('grille_stoc')
-          else if typeSite == "ROUTIER"
-            sitesPromise = Backend.all('protocoles/'+scope.protocoleId+'/sites').all('tracet')
-          if sitesPromise
-            sitesPromise.getList().then (sites) ->
-                scope.sites = sites.plain()
-                mapDiv = elem.find('.g-maps')[0]
-                map = protocolesFactory(mapDiv, "ALL_"+scope.typeSite)
-                map.loadMap(sites.plain())
+        if typeSite?
+          makeRequest()
+      attrs.$observe 'protocoleId', (protocoleId) ->
+        if protocoleId?
+          makeRequest()
+      makeRequest = ->
+        if scope.typeSite == '' or scope.protocoleId == ''
+          return
+        sitesPromise = null
+        if scope.typeSite in ["CARRE", "POINT_FIXE"]
+          sitesPromise = Backend.all('protocoles/'+scope.protocoleId+'/sites').all('grille_stoc')
+        else if scope.typeSite == "ROUTIER"
+          sitesPromise = Backend.all('protocoles/'+scope.protocoleId+'/sites').all('tracet')
+        if sitesPromise
+          sitesPromise.getList().then (sites) ->
+              scope.sites = sites.plain()
+              mapDiv = elem.find('.g-maps')[0]
+              map = protocolesFactory(mapDiv, "ALL_"+scope.typeSite)
+              map.loadMap(sites.plain())
+
 
 
   .directive 'listSitesDirective', (session, Backend) ->
