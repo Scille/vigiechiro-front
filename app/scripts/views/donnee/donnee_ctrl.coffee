@@ -51,8 +51,8 @@ angular.module('donneeViews', ['ngRoute', 'xin_backend', 'xin_session',
       )
 
     # Get taxons list
-    Backend.all('taxons/liste').getList().then (taxons) ->
-      $scope.others.taxons = taxons.plain()
+    # Backend.all('taxons/liste').getList().then (taxons) ->
+    #   $scope.others.taxons = taxons.plain()
 
     # Filter field is trigger after 500ms of inactivity
     delayedFilter = new DelayedEvent(500)
@@ -70,6 +70,9 @@ angular.module('donneeViews', ['ngRoute', 'xin_backend', 'xin_session',
         else if $scope.lookup.tadarida_taxon?
           delete $scope.lookup.tadarida_taxon
     $scope.resourceBackend = Backend.all('participations/'+$routeParams.participationId+'/donnees')
+
+    $scope.updateResourcesList = (current_scope) ->
+      console.log(current_scope)
 
 
 

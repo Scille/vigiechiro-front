@@ -25,6 +25,7 @@ angular.module('xin_listResource', ['ngRoute', 'angularUtils.directives.dirPagin
       resourceBackend: '='
       lookup: '=?'
       others: '=?'
+      customUpdateResourcesList: '=?'
     link: (scope, elem, attrs, ctrl, transclude) ->
       if attrs.others
         scope.$watch 'others', (others) ->
@@ -52,20 +53,24 @@ angular.module('xin_listResource', ['ngRoute', 'angularUtils.directives.dirPagin
       $scope.user = user.plain()
     $scope.resources = []
     $scope.loading = true
+
     updateResourcesList = () ->
       $scope.loading = true
       if $scope.resourceBackend?
         $scope.resourceBackend.getList($scope.lookup).then (items) ->
           $scope.resources = items
+          $scope.customUpdateResourcesList?($scope)
           $scope.loading = false
+
     $scope.$watch('lookup', ->
-        updateResourcesList()
-      ,
-        true
+      updateResourcesList()
+    , true
     )
+
     $scope.$watch 'resourceBackend', (resourceBackend, oldValue) ->
       if resourceBackend != oldValue
         updateResourcesList()
+
     $scope.pageChange = (newPage) ->
       if $scope.lookup.page == newPage
         return
