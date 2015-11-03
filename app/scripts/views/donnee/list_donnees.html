@@ -27,7 +27,7 @@
             <ui-select-match>
               {{$select.selected.libelle_court}}
             </ui-select-match>
-            <ui-select-choices repeat="taxon._id as taxon in others.taxons | filter: $select.search">
+            <ui-select-choices repeat="taxon._id as taxon in filteredTaxons | filter: $select.search">
               {{taxon.libelle_court}}
             </ui-select-choices>
           </ui-select>
@@ -44,8 +44,7 @@
 
   <list-resource-directive resource-backend="resourceBackend"
                            lookup="lookup"
-                           others="others"
-                           custom-update-resources-list="updateResourcesList">
+                           others="others">
     <display-donnee-directive donnee="resource"
                               is-observateur="isObservateur"
                               is-validateur="isValidateur"

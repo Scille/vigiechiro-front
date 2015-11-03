@@ -47,12 +47,18 @@ angular.module('donneeViews', ['ngRoute', 'xin_backend', 'xin_session',
               $scope.others.isObservateur = true
             if user.role in ['Validateur', 'Administrateur']
               $scope.others.isValidateur = true
+
+          # Get taxons list
+          Backend.all('taxons/liste').getList().then (taxons) ->
+            $scope.others.taxons = taxons.plain()
+
+            # Get taxons list presents into list donnees
+            Backend.all("participations/#{$routeParams.participationId}/donnees/taxons/liste")
+              .getList().then (taxons) ->
+                $scope.filteredTaxons = taxons.plain()
+
         (error) -> window.location = '#404'
       )
-
-    # Get taxons list
-    # Backend.all('taxons/liste').getList().then (taxons) ->
-    #   $scope.others.taxons = taxons.plain()
 
     # Filter field is trigger after 500ms of inactivity
     delayedFilter = new DelayedEvent(500)
@@ -71,9 +77,6 @@ angular.module('donneeViews', ['ngRoute', 'xin_backend', 'xin_session',
           delete $scope.lookup.tadarida_taxon
     $scope.resourceBackend = Backend.all('participations/'+$routeParams.participationId+'/donnees')
 
-    $scope.updateResourcesList = (current_scope) ->
-      console.log(current_scope)
-
 
 
   .directive 'displayDonneeDirective', ($route, $modal, Backend) ->
@@ -85,6 +88,9 @@ angular.module('donneeViews', ['ngRoute', 'xin_backend', 'xin_session',
       isValidateur: '='
       taxons: '='
     link: (scope, elem, attrs) ->
+      scope.patchSuccess = []
+      scope.patchError = []
+
       scope.addPost = (index, post) ->
         payload =
           message: post
@@ -112,20 +118,24 @@ angular.module('donneeViews', ['ngRoute', 'xin_backend', 'xin_session',
             )
 
       scope.patchValidateur = (key) ->
+        scope.patchSuccess[key] = false
+        scope.patchError[key] = false
         payload =
           validateur_taxon: scope.donnee.observations[key].validateur_taxon
           validateur_probabilite: scope.donnee.observations[key].validateur_probabilite
         Backend.all('donnees/'+scope.donnee._id+'/observations/'+key).patch(payload).then(
-          (success) -> $route.reload()
-          (error) -> scope.patchError = true
+          (success) -> scope.patchSuccess[key] = true
+          (error) -> scope.patchError[key] = true
         )
       scope.patchObservateur = (key) ->
+        scope.patchSuccess[key] = false
+        scope.patchError[key] = false
         payload =
           observateur_taxon: scope.donnee.observations[key].observateur_taxon
           observateur_probabilite: scope.donnee.observations[key].observateur_probabilite
         Backend.all('donnees/'+scope.donnee._id+'/observations/'+key).patch(payload).then(
-          (success) -> $route.reload()
-          (error) -> scope.patchError = true
+          (success) -> scope.patchSuccess[key] = true
+          (error) -> scope.patchError[key] = true
         )
 
       scope.CopyToClipboard = (text) ->

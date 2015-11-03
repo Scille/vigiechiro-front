@@ -36,6 +36,14 @@
       </thead>
 
       <tbody ng-repeat="(key, observation) in donnee.observations">
+        <tr ng-show="patchError[key] || patchSuccess[key]"><td colspan="12">
+          <div class="label label-success" ng-show="patchSuccess[key]">
+            La donnée a bien été enregistrée.
+          </div>
+          <div class="label label-danger" ng-show="patchError[key]">
+            Echec de l'enregistrement de la donnée. Le taxon et la confiance sont obligatoires.
+          </div>
+        </td></tr>
         <tr>
           <td class="btn" data-toggle="collapse"
               data-target="#{{donnee.titre}}-{{$index}}">
