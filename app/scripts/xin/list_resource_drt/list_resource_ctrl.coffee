@@ -33,7 +33,9 @@ angular.module('xin_listResource', ['ngRoute', 'angularUtils.directives.dirPagin
               scope[key] = value
           , true
       if not attrs.lookup?
-        scope.lookup = {}
+        scope.lookup =
+          page: 1
+          max_result: 20
       scope.$watch 'lookup', (lookup) ->
         if lookup?
           scope.lookup.page = scope.lookup.page or 1
@@ -62,10 +64,11 @@ angular.module('xin_listResource', ['ngRoute', 'angularUtils.directives.dirPagin
           $scope.customUpdateResourcesList?($scope)
           $scope.loading = false
 
-    $scope.$watch('lookup', ->
+    $scope.$watch 'lookup', () ->
+      if not $scope.lookup.page?
+        return
       updateResourcesList()
     , true
-    )
 
     $scope.$watch 'resourceBackend', (resourceBackend, oldValue) ->
       if resourceBackend != oldValue
