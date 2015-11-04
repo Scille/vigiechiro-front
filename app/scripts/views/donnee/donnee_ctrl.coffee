@@ -33,6 +33,8 @@ angular.module('donneeViews', ['ngRoute', 'xin_backend', 'xin_session',
       taxons: []
     $scope.tadarida_taxon =
       id: null
+    $scope.filteredTaxons = []
+
     # Get participation données
     Backend.one('participations', $routeParams.participationId).get()
       .then(
@@ -48,17 +50,25 @@ angular.module('donneeViews', ['ngRoute', 'xin_backend', 'xin_session',
             if user.role in ['Validateur', 'Administrateur']
               $scope.others.isValidateur = true
 
+          # Get taxons list presents into bilan
+          if participation.bilan?
+            for taxon in participation.bilan.autre or []
+              $scope.filteredTaxons.push({_id: taxon.taxon._id, libelle_court: taxon.taxon.libelle_court})
+            for taxon in participation.bilan.chiropteres or []
+              $scope.filteredTaxons.push({_id: taxon.taxon._id, libelle_court: taxon.taxon.libelle_court})
+            for taxon in participation.bilan.orthopteres or []
+              $scope.filteredTaxons.push({_id: taxon.taxon._id, libelle_court: taxon.taxon.libelle_court})
+          $scope.filteredTaxons.sort(sortByLibelle)
+
           # Get taxons list
           Backend.all('taxons/liste').getList().then (taxons) ->
             $scope.others.taxons = taxons.plain()
 
-            # Get taxons list presents into list donnees
-            Backend.all("participations/#{$routeParams.participationId}/donnees/taxons/liste")
-              .getList().then (taxons) ->
-                $scope.filteredTaxons = taxons.plain()
-
         (error) -> window.location = '#404'
       )
+
+    sortByLibelle = (a, b) ->
+      return a.libelle_court.localeCompare(b.libelle_court)
 
     # Filter field is trigger after 500ms of inactivity
     delayedFilter = new DelayedEvent(500)
