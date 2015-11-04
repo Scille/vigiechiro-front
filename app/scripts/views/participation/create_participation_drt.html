@@ -139,7 +139,7 @@
       </div>
     </div>
 
-    <div class="form-group"
+    <div class="form-group" ng-if="folderAllowed"
       ng-class="{'has-error': participationForm.folder.$invalid && !participationForm.$pristine}">
       <div class="input-group">
         <span class="input-group-addon">Dossier joint</span>
