@@ -9,10 +9,7 @@ angular.module('xin.fileUploader', ['xin_s3uploadFile'])
       directory: '='
     link: (scope, elem, attrs) ->
       scope.$watch 'directory', (directory) ->
-        if directory?
-          elem[0].removeEventListener('dragover')
-          elem[0].removeEventListener('dragleave')
-        else
+        if directory? and not directory
           if attrs.overClass? and attrs.overClass != ''
             elem[0].addEventListener('dragover',
               (e) ->
@@ -36,15 +33,24 @@ angular.module('xin.fileUploader', ['xin_s3uploadFile'])
             return
           files = []
           warnings = []
-          length = e.dataTransfer.items.length
-          for i in [0..length-1]
-            entry = e.dataTransfer.items[i].webkitGetAsEntry()
-            if (entry.isFile and not scope.directory?)
-              files.push(e.dataTransfer.files[i])
-            else if (entry.isDirectory and scope.directory?)
-              console.log("Drop doesn't work for directories")
-            else
-              warnings.push(e.dataTransfer.files[i])
+          # chrome
+          if e.dataTransfer.items?
+            length = e.dataTransfer.items.length
+            for i in [0..length-1]
+              entry = e.dataTransfer.items[i].webkitGetAsEntry()
+              if (entry.isFile and not scope.directory)
+                files.push(e.dataTransfer.files[i])
+              else if (entry.isDirectory and scope.directory)
+                console.log("Drop doesn't work for directories")
+              else
+                warnings.push(e.dataTransfer.files[i])
+          # firefox
+          else if e.dataTransfer.types?
+            for file in e.dataTransfer.files or []
+              if file.size
+                files.push(file)
+              else
+                console.log("Drop doesn't work for directories")
           scope.uploader.addFiles(files)
           scope.uploader.addWarnings(warnings)
         false

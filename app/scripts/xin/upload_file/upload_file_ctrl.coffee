@@ -11,6 +11,9 @@ angular.module('xin_uploadFile', ['appSettings', 'xin_s3uploadFile', 'xin.fileUp
       regexp: '=?'
     link: (scope, elem, attrs) ->
       scope.dragOverClass = ''
+      scope.multiple = false
+      scope.directory = false
+      scope.gzip = false
       drop = elem.find('.drop')
       input = drop.find('input')
       if attrs.multiple?
@@ -42,8 +45,9 @@ angular.module('xin_uploadFile', ['appSettings', 'xin_s3uploadFile', 'xin.fileUp
     uploader = $scope.uploader = new FileUploader()
 
     $scope.$watch 'gzip', (gzip) ->
-      if gzip?
+      if gzip
         uploader.setGzip()
+    , true
 
     # Remove sub-directories
     uploader.filters.push(
@@ -82,7 +86,7 @@ angular.module('xin_uploadFile', ['appSettings', 'xin_s3uploadFile', 'xin.fileUp
 
     uploader.onAddingWarningsComplete = ->
       for warning in @warnings
-        if $scope.directory?
+        if $scope.directory
           $scope.warnings.push(warning.name+" n'est pas un dossier.")
         else
           $scope.warnings.push(warning.name+" n'est pas un fichier.")
