@@ -50,28 +50,14 @@ angular.module('protocole_map_point_fixe', [])
             else
               @callbacks.displayError?("Mauvaise forme : " + overlay.type)
             if isModified
+              @saveOverlay(overlay)
+              # rightclick for delete overlay
+              @addEventRightClick(overlay)
+              # dragend for rename
+              @addEventDragEnd(overlay)
               if @_isOpportuniste
-                @saveOverlay(overlay)
-                # rightclick for delete overlay
-                @_googleMaps.addListener(overlay, 'rightclick', (e) =>
-                  @deleteOverlay(overlay)
-                  if @getCountOverlays() < 1
-                    @_step = 'editLocalities'
-                  else
-                    @_step = 'validLocalities'
-                  @updateSite()
-                )
                 @_step = 'validLocalities'
               else
-                @saveOverlay(overlay)
-                @_googleMaps.addListener(overlay, 'rightclick', (e) =>
-                  @deleteOverlay(overlay)
-                  if @getCountOverlays() < @_min
-                    @_step = 'editLocalities'
-                  else
-                    @_step = 'validLocalities'
-                  @updateSite()
-                )
                 if @getCountOverlays() >= @_min
                   @_step = 'validLocalities'
                 else
@@ -83,11 +69,10 @@ angular.module('protocole_map_point_fixe', [])
       saveOverlay: (overlay) =>
         locality = {}
         locality.overlay = overlay
-        locality.name = @setLocalityNameWithInterest(overlay)
-        locality.overlay.setOptions({ title: locality.name })
         locality.representatif = false
-        locality.infowindow = @_googleMaps.createInfoWindow(locality.name)
-        locality.infowindow.open(@_googleMaps.getMap(), overlay)
+        overlay.title = @setLocalityNameWithInterest(overlay)
+        overlay.infowindow = @_googleMaps.createInfoWindow(overlay.title)
+        overlay.infowindow.open(@_googleMaps.getMap(), overlay)
         @_localities.push(locality)
 
       setLocalityNameWithInterest: (overlay) ->
@@ -109,12 +94,27 @@ angular.module('protocole_map_point_fixe', [])
       setLocalityName: (name = 1) ->
         if @_isOpportuniste
           for locality in @_fixLocalities
-            if locality.name == 'Z'+name
+            if locality.overlay.title == 'Z'+name
               return @setLocalityName(name + 1)
         for locality in @_localities
-          if locality.name == 'Z'+name
+          if locality.overlay.title == 'Z'+name
             return @setLocalityName(name + 1)
         return 'Z'+name
+
+      renameLocality: (overlay, latLng) ->
+        interestPoint = false
+        for circle in @_smallGrille or []
+          distance = @_googleMaps.computeDistanceBetween(circle.getCenter(), latLng)
+          if distance <= @_distanceOfInterest
+            interestPoint = true
+            overlay.title = circle.name
+            break
+        if not interestPoint
+          if overlay.title.charAt(0) == "Z"
+            return
+          else
+            overlay.title = @setLocalityName()
+        overlay.infowindow.setContent(overlay.title)
 
       validNumeroGrille: (cell, numero, id, editable = false) =>
         # remove click event on map

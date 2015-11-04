@@ -160,17 +160,15 @@ angular.module('protocole_map_routier', [])
       loadLocalities: (localities) ->
         for locality in localities or []
           newLocality =
-            name: locality.nom
             representatif: locality.representatif
           newLocality.overlay = @loadGeoJson(locality.geometries)
-          if locality.nom[0] == 'T'
+          newLocality.overlay.title = locality.nom
+          if locality.nom.charAt(0) == 'T'
             num_secteur = parseInt(locality.nom[locality.nom.length-1])-1
             newLocality.overlay.setOptions(
               strokeColor: locality_colors[num_secteur]
               zIndex: 2
             )
-          else
-            newLocality.overlay.setOptions({ title: locality.nom })
           @_localities.push(newLocality)
 
       validLocalities: ->
@@ -506,7 +504,6 @@ angular.module('protocole_map_routier', [])
           # 4 firsts localities
           for index in [1..4]
             locality = {}
-            locality.name = 'T '+(key+1)+' '+index
             localityPath = [sectionPath.getAt(0)]
             currLength = 0
             end = false
@@ -530,17 +527,18 @@ angular.module('protocole_map_routier', [])
               'zIndex': 11
             )
             locality.overlay.type = 'LineString'
+            locality.overlay.title = 'T '+(key+1)+' '+index
             locality.representatif = false
             @_localities.push(locality)
           # last locality of section
           locality = {}
-          locality.name = 'T '+(key+1)+' 5'
           locality.overlay = @_googleMaps.createLineStringWithPath(sectionPath)
           locality.overlay.setOptions(
             'strokeColor': locality_colors[index-1]
             'zIndex': 11
           )
           locality.overlay.type = 'LineString'
+          locality.overlay.title = 'T '+(key+1)+' 5'
           locality.representatif = false
           @_localities.push(locality)
         @_sections = []

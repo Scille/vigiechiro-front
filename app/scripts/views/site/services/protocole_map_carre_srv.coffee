@@ -92,20 +92,19 @@ angular.module('protocole_map_carre', [])
       saveOverlay: (overlay) =>
         locality = {}
         locality.overlay = overlay
-        locality.name = @setLocalityName()
-        locality.overlay.setOptions({ title: locality.name })
         locality.representatif = false
-        locality.infowindow = @_googleMaps.createInfoWindow(locality.name)
-        locality.infowindow.open(@_googleMaps.getMap(), overlay)
+        overlay.title = @setLocalityName()
+        overlay.infowindow = @_googleMaps.createInfoWindow(overlay.title)
+        overlay.infowindow.open(@_googleMaps.getMap(), overlay)
         @_localities.push(locality)
 
       setLocalityName: (name = 1) ->
         if @_isOpportuniste
           for locality in @_fixLocalities
-            if parseInt(locality.name) == name
+            if parseInt(locality.overlay.title) == name
               return @setLocalityName(name + 1)
         for locality in @_localities
-          if parseInt(locality.name) == name
+          if parseInt(locality.overlay.title) == name
             return @setLocalityName(name + 1)
         return name+''
 

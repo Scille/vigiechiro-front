@@ -166,12 +166,11 @@ angular.module('protocole_map', ['protocole_map_carre',
       loadLocalities: (localities) ->
         for locality in localities or []
           newLocality =
-            name: locality.nom
             representatif: locality.representatif
           newLocality.overlay = @loadGeoJson(locality.geometries)
-          newLocality.overlay.setOptions({ title: locality.nom })
-          newLocality.infowindow = @_googleMaps.createInfoWindow(locality.nom)
-          newLocality.infowindow.open(@_googleMaps.getMap(), newLocality.overlay)
+          newLocality.overlay.title = locality.nom
+          newLocality.overlay.infowindow = @_googleMaps.createInfoWindow(locality.nom)
+          newLocality.overlay.infowindow.open(@_googleMaps.getMap(), newLocality.overlay)
           @_localities.push(newLocality)
 
       displaySites: (sites) ->
@@ -250,10 +249,9 @@ angular.module('protocole_map', ['protocole_map_carre',
 
       displayLocality: (locality, dest = @_localities) ->
         newLocality =
-          name: locality.nom
           representatif: locality.representatif
         newLocality.overlay = @loadGeoJson(locality.geometries)
-        newLocality.overlay.setTitle(locality.nom)
+        newLocality.overlay.title = locality.nom
         dest.push(newLocality)
 
       selectGrilleStoc: ->
@@ -308,25 +306,25 @@ angular.module('protocole_map', ['protocole_map_carre',
 
       saveMap: ->
         result = []
-        for localite in @_localities
-          localiteToSave = {}
+        for locality in @_localities
+          localityToSave = {}
           shapetosave = {}
-          shapetosave.type = localite.overlay.type
+          shapetosave.type = locality.overlay.type
           if shapetosave.type == "Point"
-            shapetosave.coordinates = @_googleMaps.getPosition(localite.overlay)
+            shapetosave.coordinates = @_googleMaps.getPosition(locality.overlay)
           else if shapetosave.type == "Polygon"
-            shapetosave.coordinates = [ @_googleMaps.getPath(localite.overlay) ]
+            shapetosave.coordinates = [ @_googleMaps.getPath(locality.overlay) ]
           else if shapetosave.type == "LineString"
-            shapetosave.coordinates = @_googleMaps.getPath(localite.overlay)
+            shapetosave.coordinates = @_googleMaps.getPath(locality.overlay)
           else
             continue
-          localiteToSave =
-            name: localite.name
+          localityToSave =
+            name: locality.overlay.title
             geometries:
               type: 'GeometryCollection'
               geometries: [shapetosave]
             representatif: false
-          result.push(localiteToSave)
+          result.push(localityToSave)
         return result
 
       mapsCallback: ->
@@ -475,6 +473,7 @@ angular.module('protocole_map', ['protocole_map_carre',
         for locality in @_localities
           locality.overlay.setOptions({ draggable: false })
           @_googleMaps.clearListeners(locality.overlay, 'rightclick')
+          @_googleMaps.clearListeners(locality.overlay, 'dragend')
         @_step = 'end'
         @updateSite()
 
@@ -483,6 +482,7 @@ angular.module('protocole_map', ['protocole_map_carre',
         for locality in @_localities
           locality.overlay.setOptions({ draggable: true })
           @addEventRightClick(locality.overlay)
+          @addEventDragEnd(locality.overlay)
         @_step = 'validLocalities'
         @updateSite()
 
@@ -494,4 +494,9 @@ angular.module('protocole_map', ['protocole_map_carre',
           else
             @_step = 'validLocalities'
           @updateSite()
+        )
+
+      addEventDragEnd: (overlay) ->
+        @_googleMaps.addListener(overlay, 'dragend', (e) =>
+          @renameLocality?(overlay, e.latLng)
         )
