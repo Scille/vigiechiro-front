@@ -10,10 +10,19 @@ angular.module('xin.fileUploader', ['xin_s3uploadFile'])
     link: (scope, elem, attrs) ->
       scope.$watch 'directory', (directory) ->
         if directory? and not directory
+          console.log("ici")
           if attrs.overClass? and attrs.overClass != ''
+            console.log("là")
+            elem[0].addEventListener('dragenter',
+              (e) ->
+                e.preventDefault()
+                console.log("dragenter")
+              false
+            )
             elem[0].addEventListener('dragover',
               (e) ->
                 e.preventDefault()
+                console.log("dragover")
                 elem.addClass(attrs.overClass)
               false
             )
