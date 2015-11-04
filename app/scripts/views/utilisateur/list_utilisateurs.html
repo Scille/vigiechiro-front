@@ -22,9 +22,11 @@
       <span class="label label-primary pull-right" ng-show="resource.role == 'Administrateur'">
         Administrateur
       </span>
-      <span class="label label-info pull-right"
-            ng-show="resource.role == 'Validateur'">
+      <span class="label label-info pull-right" ng-show="resource.role == 'Validateur'">
         Validateur
+      </span>
+      <span class="label label-default pull-right" ng-show="resource.role == 'Observateur'">
+        Observateur
       </span>
     </a>
   </list-resource-directive>
