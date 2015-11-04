@@ -248,9 +248,12 @@ angular.module('participationViews', ['ngRoute', 'textAngular', 'xin_listResourc
   .controller 'CreateParticipationDirectiveController', ($route, $scope,
                                                          session, Backend) ->
     $scope.folderAllowed = true
-    # firefox don't support folder upload
-    firefox = navigator.userAgent.search("Firefox")
-    if firefox != -1
+    # firefox and IE don't support folder upload
+    if navigator.userAgent.search("Firefox") != -1
+      $scope.folderAllowed = false
+    else if navigator.userAgent.search("Edge") != -1
+      $scope.folderAllowed = false
+    else if navigator.userAgent.search("MSIE") != -1
       $scope.folderAllowed = false
 
     $scope.participation =
@@ -380,9 +383,12 @@ angular.module('participationViews', ['ngRoute', 'textAngular', 'xin_listResourc
   .controller 'EditParticipationDirectiveController', ($route, $scope,
                                                        session, Backend) ->
     $scope.folderAllowed = true
-    # firefox don't support folder upload
-    firefox = navigator.userAgent.search("Firefox")
-    if firefox != -1
+    # firefox and IE don't support folder upload
+    if navigator.userAgent.search("Firefox") != -1
+      $scope.folderAllowed = false
+    else if navigator.userAgent.search("Edge") != -1
+      $scope.folderAllowed = false
+    else if navigator.userAgent.search("MSIE") != -1
       $scope.folderAllowed = false
 
     $scope.fileUploader = []
