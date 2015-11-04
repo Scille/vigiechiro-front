@@ -65,7 +65,7 @@ angular.module('xin_listResource', ['ngRoute', 'angularUtils.directives.dirPagin
           $scope.loading = false
 
     $scope.$watch 'lookup', () ->
-      if not $scope.lookup.page?
+      if not $scope.lookup? or not $scope.lookup.page?
         return
       updateResourcesList()
     , true

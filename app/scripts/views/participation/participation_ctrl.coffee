@@ -125,6 +125,7 @@ angular.module('participationViews', ['ngRoute', 'textAngular', 'xin_listResourc
   .controller 'DisplayParticipationController', ($scope, $route, $routeParams,
                                                  $modal, Backend, session) ->
     $scope.isCsvPost = null
+    participationResource = null
 
     session.getIsAdminPromise().then (isAdmin) ->
       $scope.isAdmin = isAdmin
@@ -133,21 +134,36 @@ angular.module('participationViews', ['ngRoute', 'textAngular', 'xin_listResourc
         if breadcrumbsGetParticipationDefer?
           breadcrumbsGetParticipationDefer.resolve(participation)
           breadcrumbsGetParticipationDefer = undefined
-        $scope.participation = participation
+
+        participationResource = participation
+
+        $scope.participation = participation.plain()
+        if $scope.participation.bilan?
+          if $scope.participation.bilan.chiropteres?
+            $scope.participation.bilan.chiropteres.sort(sortByLibelle)
+          if $scope.participation.bilan.orthopteres?
+            $scope.participation.bilan.orthopteres.sort(sortByLibelle)
+          if $scope.participation.bilan.autre?
+            $scope.participation.bilan.autre.sort(sortByLibelle)
       (error) -> window.location = '#/404'
     )
+
+    sortByLibelle = (a, b) ->
+      taxonA = a.taxon.libelle_long
+      taxonB = b.taxon.libelle_long
+      return taxonA.localeCompare(taxonB)
 
     $scope.addPost = ->
       payload =
         message: $scope.post
-      $scope.participation.customPUT(payload, 'messages').then(
+      participationResource.customPUT(payload, 'messages').then(
         -> $route.reload()
         (error) -> throw error
       )
 
     $scope.compute = ->
       $scope.computeInfo = {}
-      $scope.participation.post('compute').then(
+      participationResource.post('compute').then(
         (result) -> $route.reload()
         (error) -> $scope.computeInfo.error = true
       )
@@ -158,13 +174,13 @@ angular.module('participationViews', ['ngRoute', 'textAngular', 'xin_listResourc
         controller: 'ModalDeleteParticipationController'
       )
       modalInstance.result.then () ->
-        $scope.participation.remove().then(
+        participationResource.remove().then(
           () -> window.location = '#/participations'
           (error) -> throw error
         )
 
     $scope.getDonnees = ->
-      $scope.participation.post('csv').then(
+      participationResource.post('csv').then(
         () -> $scope.isCsvPost = true
         (error) -> $scope.isCsvPost = false
       )
