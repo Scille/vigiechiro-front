@@ -16,12 +16,12 @@ describe 'Test taxon for observateur', ->
       taxons = $$('.list-group-item')
       expect(taxons.count()).toEqual(20)
 
-  it 'Test view taxon', ->
-    browser.setLocation('taxons').then ->
-      taxons = $$('.list-group-item')
-      taxons.get(0).element(`by`.css('a')).click().then ->
-        element(`by`.binding('taxon.libelle_long')).getText().then (value) ->
-          expect(value).toBe('Chauves-souris')
+  # it 'Test view taxon', ->
+  #   browser.setLocation('taxons').then ->
+  #     taxons = $$('.list-group-item')
+  #     taxons.get(0).element(`by`.css('a')).click().then ->
+  #       element(`by`.binding('taxon.libelle_long')).getText().then (value) ->
+  #         expect(value).toBe('Chauves-souris')
 
 
 describe 'Test taxon for administrateur', ->
