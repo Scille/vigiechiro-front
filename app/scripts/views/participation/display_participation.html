@@ -74,7 +74,7 @@
     <span ng-if="participation.traitement.timeout">
       Le traitement est anormalement long, peut-être faut-il le relancer...
     </span>
-    <span ng-if="not participation.traitement.timeout">
+    <span ng-if="!participation.traitement.timeout">
       Traitement en cours.
     </span>
     <br>
@@ -87,7 +87,7 @@
   </span>
 </div>
 <div ng-show="computeInfo">
-  <span class="alert alert-danger" ng-show="computeInfo.error">
+  <span class="label label-danger" ng-if="computeInfo.error">
     La demande de relance de la participation a échoué.
   </span>
 </div>
