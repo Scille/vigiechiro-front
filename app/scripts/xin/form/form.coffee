@@ -33,6 +33,7 @@ angular.module('xin.form', ['ui.bootstrap.datetimepicker', 'angularMoment'])
         date = moment(value)
       else if $scope.today and not firstChange
         date = moment()
+        $scope.model = date._d
       else
         firstChange = true
         return

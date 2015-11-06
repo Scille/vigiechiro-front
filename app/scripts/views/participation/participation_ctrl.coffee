@@ -278,29 +278,29 @@ angular.module('participationViews', ['ngRoute', 'textAngular', 'xin_listResourc
       )
 
     makeMeteo = (meteo = {}) ->
-      meteo.temperature_debut = meteo.temperature_debut or ""
-      meteo.temperature_fin = meteo.temperature_fin or ""
-      meteo.vent = meteo.vent or ""
-      meteo.couverture = meteo.couverture or ""
+      meteo.temperature_debut = meteo.temperature_debut
+      meteo.temperature_fin = meteo.temperature_fin
+      meteo.vent = meteo.vent
+      meteo.couverture = meteo.couverture
       return meteo
 
     makeConfiguration = (type_site, configuration = {}) ->
-      configuration.detecteur_enregistreur_numero_serie = configuration.detecteur_enregistreur_numero_serie or ''
-      configuration.detecteur_enregistreur_type = configuration.detecteur_enregistreur_type or ''
+      configuration.detecteur_enregistreur_numero_serie = configuration.detecteur_enregistreur_numero_serie
+      configuration.detecteur_enregistreur_type = configuration.detecteur_enregistreur_type
       if type_site in ['ROUTIER', 'CARRE']
-        configuration.micro_numero_serie = configuration.micro_numero_serie or ''
-        configuration.micro_type = configuration.micro_type or ''
-        configuration.canal_expansion_temps = configuration.canal_expansion_temps or ''
-        configuration.canal_enregistrement_direct = configuration.canal_enregistrement_direct or ''
+        configuration.micro_numero_serie = configuration.micro_numero_serie
+        configuration.micro_type = configuration.micro_type
+        configuration.canal_expansion_temps = configuration.canal_expansion_temps
+        configuration.canal_enregistrement_direct = configuration.canal_enregistrement_direct
       else if type_site in ['POINT_FIXE']
-        configuration.micro0_position = configuration.micro0_position or ''
-        configuration.micro0_numero_serie = configuration.micro0_numero_serie or ''
-        configuration.micro0_type = configuration.micro0_type or ''
-        configuration.micro0_hauteur = configuration.micro0_hauteur or ''
-        configuration.micro1_position = configuration.micro1_position or ''
-        configuration.micro1_numero_serie = configuration.micro1_numero_serie or ''
-        configuration.micro1_type = configuration.micro1_type or ''
-        configuration.micro1_hauteur = configuration.micro1_hauteur or ''
+        configuration.micro0_position = configuration.micro0_position
+        configuration.micro0_numero_serie = configuration.micro0_numero_serie
+        configuration.micro0_type = configuration.micro0_type
+        configuration.micro0_hauteur = configuration.micro0_hauteur
+        configuration.micro1_position = configuration.micro1_position
+        configuration.micro1_numero_serie = configuration.micro1_numero_serie
+        configuration.micro1_type = configuration.micro1_type
+        configuration.micro1_hauteur = configuration.micro1_hauteur
       return configuration
 
 
@@ -364,6 +364,8 @@ angular.module('participationViews', ['ngRoute', 'textAngular', 'xin_listResourc
               $scope.endSave.deferred()
               $scope.submitError = true
           )
+      else
+        $scope.endSave.deferred()
 
 
     sendFiles = (participation) ->
@@ -387,6 +389,7 @@ angular.module('participationViews', ['ngRoute', 'textAngular', 'xin_listResourc
     templateUrl: 'scripts/views/participation/edit_participation_drt.html'
     scope:
       participation: '='
+      typeSite: '='
       fileUploader: '='
       folderUploader: '='
     link: (scope) ->
@@ -398,3 +401,6 @@ angular.module('participationViews', ['ngRoute', 'textAngular', 'xin_listResourc
         scope.folderAllowed = false
       else if navigator.userAgent.search("MSIE") != -1
         scope.folderAllowed = false
+
+      scope.$watch 'typeSite', (type_site) ->
+        makeRegExp(scope, type_site)

@@ -18,10 +18,10 @@
       <div ng-if="isObjectEmpty(participation.meteo)">
         Aucune indication météorologique.
       </div>
-      <div ng-if="participation.meteo.temperature_debut">
+      <div ng-if="participation.meteo.temperature_debut || participation.meteo.temperature_debut == 0">
         {{ participation.meteo.temperature_debut }}°C au début de la participation.
       </div>
-      <div ng-if="participation.meteo.temperature_fin">
+      <div ng-if="participation.meteo.temperature_fin || participation.meteo.temperature_fin == 0">
         {{ participation.meteo.temperature_fin }}°C à la fin de la participation.
       </div>
       <div ng-if="participation.meteo.vent">

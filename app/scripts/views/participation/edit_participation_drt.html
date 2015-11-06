@@ -87,7 +87,7 @@
     </div>
   </div>
 
-  <div class="form-group" ng-if="folderAllowed"
+  <div class="form-group" ng-show="folderAllowed"
     ng-class="{'has-error': participationForm.folder.$invalid && !participationForm.$pristine}">
     <div class="input-group">
       <span class="input-group-addon">Dossier joint</span>
@@ -108,7 +108,7 @@
 
   <div class="form-group"
     ng-class="{'has-error': participationForm.configuration.detecteur_enregistreur_numero_serie.$invalid && !participationForm.$pristine}"
-    ng-if="participation.configuration.detecteur_enregistreur_numero_serie != undefined">
+    ng-if="true">
     <div class="input-group">
       <label class="input-group-addon" for="configuration.detecteur_enregistreur_numero_serie">
         Numéro de série du détecteur enregistreur
@@ -122,7 +122,7 @@
 
   <div class="form-group"
     ng-class="{'has-error': participationForm.configuration.detecteur_enregistreur_type.$invalid && !participationForm.$pristine}"
-    ng-if="participation.configuration.detecteur_enregistreur_type != undefined">
+    ng-if="true">
     <div class="input-group">
       <label class="input-group-addon" for="configuration.detecteur_enregistreur_type">
         Type du détecteur enregistreur
@@ -163,7 +163,7 @@
 
   <div class="form-group"
     ng-class="{'has-error': participationForm.configuration.micro_numero_serie.$invalid && !participationForm.$pristine}"
-    ng-if="participation.configuration.micro_numero_serie != undefined">
+    ng-if="typeSite == 'ROUTIER' || typeSite == 'CARRE'">
     <div class="input-group">
       <label class="input-group-addon" for="configuration.micro_numero_serie">
         Numéro de série du micro
@@ -177,7 +177,7 @@
 
   <div class="form-group"
     ng-class="{'has-error': participationForm.configuration.micro_type.$invalid && !participationForm.$pristine}"
-    ng-if="participation.configuration.micro_type != undefined">
+    ng-if="typeSite == 'ROUTIER' || typeSite == 'CARRE'">
     <div class="input-group">
       <label class="input-group-addon" for="configuration.micro_type">
         Type du micro
@@ -198,7 +198,7 @@
 
   <div class="input-group form-group"
        ng-class="{'has-error': participationForm.configuration.micro0_position.$invalid && !participationForm.$pristine}"
-       ng-if="participation.configuration.micro0_position != undefined">
+       ng-if="typeSite == 'POINT_FIXE'">
     <span class="input-group-addon">Position micro gauche</span>
     <select class="form-control" name="micro0_position"
       ng-model="participation.configuration.micro0_position"
@@ -210,7 +210,7 @@
 
   <div class="form-group"
     ng-class="{'has-error': participationForm.configuration.micro0_numero_serie.$invalid && !participationForm.$pristine}"
-    ng-if="participation.configuration.micro0_numero_serie != undefined">
+    ng-if="typeSite == 'POINT_FIXE'">
     <div class="input-group">
       <label class="input-group-addon" for="configuration.micro0_numero_serie">
         Numéro de série du micro gauche
@@ -223,7 +223,7 @@
 
   <div class="form-group"
     ng-class="{'has-error': participationForm.configuration.micro0_type.$invalid && !participationForm.$pristine}"
-    ng-if="participation.configuration.micro0_type != undefined">
+    ng-if="typeSite == 'POINT_FIXE'">
     <div class="input-group">
       <label class="input-group-addon" for="configuration.micro0_type">
         Type du micro gauche
@@ -243,7 +243,7 @@
 
   <div class="form-group"
     ng-class="{'has-error': participationForm.configuration.micro0_hauteur.$invalid && !participationForm.$pristine}"
-    ng-if="participation.configuration.micro0_hauteur != undefined">
+    ng-if="typeSite == 'POINT_FIXE'">
     <div class="input-group">
       <label class="input-group-addon" for="configuration.micro0_hauteur">
         Hauteur du micro gauche (en m)
@@ -256,7 +256,7 @@
 
   <div class="input-group form-group"
     ng-class="{'has-error': participationForm.configuration.micro1_position.$invalid && !participationForm.$pristine}"
-    ng-if="participation.configuration.micro1_position != undefined">
+    ng-if="typeSite == 'POINT_FIXE'">
     <span class="input-group-addon">Position micro droit</span>
     <select class="form-control" name="micro1_position"
       ng-model="participation.configuration.micro1_position"
@@ -268,7 +268,7 @@
 
   <div class="form-group"
     ng-class="{'has-error': participationForm.configuration.micro1_numero_serie.$invalid && !participationForm.$pristine}"
-    ng-if="participation.configuration.micro1_numero_serie != undefined">
+    ng-if="typeSite == 'POINT_FIXE'">
     <div class="input-group">
       <label class="input-group-addon" for="configuration.micro1_numero_serie">
         Numéro de série du micro droit
@@ -281,7 +281,7 @@
 
   <div class="form-group"
     ng-class="{'has-error': participationForm.configuration.micro1_type.$invalid && !participationForm.$pristine}"
-    ng-if="participation.configuration.micro1_type != undefined">
+    ng-if="typeSite == 'POINT_FIXE'">
     <div class="input-group">
       <label class="input-group-addon" for="configuration.micro1_type">
         Type du micro droit
@@ -301,7 +301,7 @@
 
   <div class="form-group"
     ng-class="{'has-error': participationForm.configuration.micro1_hauteur.$invalid && !participationForm.$pristine}"
-    ng-if="participation.configuration.micro1_hauteur != undefined">
+    ng-if="typeSite == 'POINT_FIXE'">
     <div class="input-group">
       <label class="input-group-addon" for="configuration.micro1_hauteur">
         Hauteur du micro droit (en m)
@@ -314,7 +314,7 @@
 
   <div class="input-group form-group"
        ng-class="{'has-error': participationForm.configuration.canal_expansion_temps.$invalid && !participationForm.$pristine}"
-       ng-if="participation.configuration.canal_expansion_temps != undefined">
+       ng-if="typeSite == 'ROUTIER' || typeSite == 'CARRE'">
     <span class="input-group-addon">Canal en expansion de temps</span>
     <select class="form-control" name="canal_expansion_temps"
       ng-model="participation.configuration.canal_expansion_temps"
@@ -328,7 +328,7 @@
 
   <div class="input-group form-group"
        ng-class="{'has-error': participationForm.configuration.canal_enregistrement_direct.$invalid && !participationForm.$pristine}"
-       ng-if="participation.configuration.canal_enregistrement_direct != undefined">
+       ng-if="typeSite == 'ROUTIER' || typeSite == 'CARRE'">
     <span class="input-group-addon">Canal en enregistrement direct</span>
     <select class="form-control" name="canal_enregistrement_direct"
       ng-model="participation.configuration.canal_enregistrement_direct"
