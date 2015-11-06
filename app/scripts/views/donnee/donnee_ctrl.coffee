@@ -87,6 +87,14 @@ angular.module('donneeViews', ['ngRoute', 'xin_backend', 'xin_session',
           delete $scope.lookup.tadarida_taxon
     $scope.resourceBackend = Backend.all('participations/'+$routeParams.participationId+'/donnees')
 
+    $scope.updateResourcesList = (current_scope) ->
+      for resource in current_scope.resources or []
+        if resource.observations?
+          resource.observations.sort(sortByProbabilite)
+
+    sortByProbabilite = (a, b) ->
+      return a.tadarida_probabilite < b.tadarida_probabilite
+
 
 
   .directive 'displayDonneeDirective', ($route, $modal, Backend) ->
