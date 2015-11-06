@@ -378,7 +378,7 @@ angular.module('participationViews', ['ngRoute', 'textAngular', 'xin_listResourc
         pieces_jointes: $scope.fileUploader.itemsCompleted.concat($scope.folderUploader.itemsCompleted)
 
       if not payload.pieces_jointes.length
-        window.location = '#/participations/'+participation._id
+        window.location = '#/participations/'+participationResource._id
       else
         participationResource.customPUT(payload, 'pieces_jointes').then(
           -> window.location = '#/participations/'+participationResource._id
