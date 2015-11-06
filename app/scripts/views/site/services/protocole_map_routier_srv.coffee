@@ -300,6 +300,8 @@ angular.module('protocole_map_routier', [])
         for locality in @_localities
           locality.overlay.setMap(null)
         @_localities = []
+        # disable click event to add section point
+        @_googleMaps.clearListeners(@_route, 'click')
         # @_route becomes editable
         @_googleMaps.addListener(@_route, 'mouseout', (e) =>
           @_routeLength = (@checkTotalLength()/1000).toFixed(1)
