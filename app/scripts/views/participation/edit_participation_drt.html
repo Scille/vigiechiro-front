@@ -1,5 +1,6 @@
 <div class="panel-body">
-  <div class="alert alert-danger" ng-show="">
+  <div class="alert alert-danger" ng-show="participation._errors.participation">
+    <span class="glyphicon glyphicon-exclamation-sign"></span> {{participation._errors.participation}}
   </div>
 
   <date-text-input-directive label="'Date de début'"

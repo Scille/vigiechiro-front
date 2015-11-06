@@ -241,6 +241,7 @@ angular.module('participationViews', ['ngRoute', 'textAngular', 'xin_listResourc
     $scope.folderUploader = {}
     $scope.site = null
     $scope.protocole = null
+    participationCreated = false
     # for spinner btn
     $scope.startSave = {}
     $scope.endSave = {}
@@ -351,7 +352,7 @@ angular.module('participationViews', ['ngRoute', 'textAngular', 'xin_listResourc
         if $scope.participation._id?
           # patch participation
           participationResource.patch(payload).then(
-            (participation) -> sendFiles(participation)
+            (participation) -> sendFiles()
             (error) ->
               console.log("Error : participation save "+error)
               $scope.endSave.deferred()
@@ -359,7 +360,10 @@ angular.module('participationViews', ['ngRoute', 'textAngular', 'xin_listResourc
         else
           # Post new participation
           siteResource.post('participations', payload).then(
-            (participation) -> sendFiles(participation)
+            (participation) ->
+              Backend.one("participations", participation._id).get().then (participation) ->
+                participationResource = participation
+                sendFiles()
             (error) ->
               $scope.endSave.deferred()
               $scope.submitError = true
@@ -369,16 +373,17 @@ angular.module('participationViews', ['ngRoute', 'textAngular', 'xin_listResourc
 
 
     sendFiles = (participation) ->
+      participationCreated = true
       payload =
         pieces_jointes: $scope.fileUploader.itemsCompleted.concat($scope.folderUploader.itemsCompleted)
 
       if not payload.pieces_jointes.length
         window.location = '#/participations/'+participation._id
       else
-        participation.customPUT(payload, 'pieces_jointes').then(
-          -> window.location = '#/participations/'+participation._id
+        participationResource.customPUT(payload, 'pieces_jointes').then(
+          -> window.location = '#/participations/'+participationResource._id
           ->
-            throw "Error : PUT files"
+            $scope.participation._errors.participation = "Echec de l'enregistrement des pièces jointes."
             $scope.endSave.deferred()
         )
 
