@@ -101,7 +101,7 @@
     Recevoir les données par email
   </a>
   <a class="btn btn-warning" href="" ng-click="compute()"
-     ng-if="isAdmin && (participation.traitement.etat == 'FINI' || participation.traitement.etat == 'ERREUR' || participation.traitement.timeout">
+     ng-if="isAdmin && (participation.traitement.etat == 'FINI' || participation.traitement.etat == 'ERREUR' || participation.traitement.timeout)">
     Relancer la participation
   </a>
   <span ng-if="participation.logs">
