@@ -9,7 +9,7 @@
     <!-- CDN css-->
     <!-- build:css(.) styles/vendor.css -->
     <!-- bower:css -->
-    <link rel="stylesheet" href="bower_components/bootstrap-css-only/css/bootstrap.css" />
+    <link rel="stylesheet" href="bower_components/bootstrap/dist/css/bootstrap.css" />
     <link rel="stylesheet" href="bower_components/font-awesome/css/font-awesome.css" />
     <link rel="stylesheet" href="bower_components/textAngular/src/textAngular.css" />
     <link rel="stylesheet" href="bower_components/angular-ui-select/dist/select.css" />
@@ -62,7 +62,7 @@
        ga('send', 'pageview');
     </script>
 
-    <script src='//maps.googleapis.com/maps/api/js?sensor=false&libraries=drawing,geometry'></script>
+    <script src='//maps.googleapis.com/maps/api/js?libraries=drawing,geometry'></script>
 
     <!-- build:js(.) scripts/oldieshim.js -->
     <!--[if lt IE 9]>
@@ -76,6 +76,7 @@
     <!-- bower:js -->
     <script src="bower_components/jquery/dist/jquery.js"></script>
     <script src="bower_components/angular/angular.js"></script>
+    <script src="bower_components/json3/lib/json3.min.js"></script>
     <script src="bower_components/bootstrap/dist/js/bootstrap.js"></script>
     <script src="bower_components/angular-sanitize/angular-sanitize.js"></script>
     <script src="bower_components/angular-animate/angular-animate.js"></script>
@@ -86,17 +87,17 @@
     <script src="bower_components/flow.js/dist/flow.js"></script>
     <script src="bower_components/ng-flow/dist/ng-flow.js"></script>
     <script src="bower_components/angular-utils-pagination/dirPagination.js"></script>
-    <script src="bower_components/rangy/rangy-core.js"></script>
-    <script src="bower_components/rangy/rangy-classapplier.js"></script>
-    <script src="bower_components/rangy/rangy-highlighter.js"></script>
-    <script src="bower_components/rangy/rangy-selectionsaverestore.js"></script>
-    <script src="bower_components/rangy/rangy-serializer.js"></script>
-    <script src="bower_components/rangy/rangy-textrange.js"></script>
+    <script src="bower_components/rangy-official/rangy-core.js"></script>
+    <script src="bower_components/rangy-official/rangy-classapplier.js"></script>
+    <script src="bower_components/rangy-official/rangy-highlighter.js"></script>
+    <script src="bower_components/rangy-official/rangy-selectionsaverestore.js"></script>
+    <script src="bower_components/rangy-official/rangy-serializer.js"></script>
+    <script src="bower_components/rangy-official/rangy-textrange.js"></script>
     <script src="bower_components/textAngular/src/textAngular.js"></script>
     <script src="bower_components/textAngular/src/textAngular-sanitize.js"></script>
     <script src="bower_components/textAngular/src/textAngularSetup.js"></script>
+    <script src="bower_components/rangy-official/rangy-selectionsaverestore.js"></script>
     <script src="bower_components/angular-ui-select/dist/select.js"></script>
-    <script src="bower_components/moment/moment.js"></script>
     <script src="bower_components/angular-bootstrap/ui-bootstrap-tpls.js"></script>
     <script src="bower_components/angular-translate/angular-translate.js"></script>
     <script src="bower_components/angular-dialog-service/dist/dialogs.min.js"></script>
@@ -114,6 +115,8 @@
     <script src="bower_components/angular-datatables/dist/plugins/tabletools/angular-datatables.tabletools.js"></script>
     <script src="bower_components/bootstrap-switch/dist/js/bootstrap-switch.js"></script>
     <script src="bower_components/angular-bootstrap-switch/dist/angular-bootstrap-switch.js"></script>
+    <script src="bower_components/moment/moment.js"></script>
+    <script src="bower_components/angular-moment/angular-moment.js"></script>
     <!-- endbower -->
     <script src="bower_components/moment/locale/fr.js"></script>
     <!-- endbuild -->
@@ -155,6 +158,8 @@
     <script src="scripts/xin/upload_file/upload_file_ctrl.js"></script>
     <script src="scripts/xin/upload_file/file_uploader_srv.js"></script>
     <script src="scripts/xin/list_resource_drt/list_resource_ctrl.js"></script>
+    <script src="scripts/xin/btn_spinner/btn_spinner.js"></script>
+    <script src="scripts/xin/form/form.js"></script>
     <!-- endbuild -->
   </body>
 </html>

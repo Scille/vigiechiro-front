@@ -1,11 +1,20 @@
-<a class="btn btn-primary" href="#/protocoles/{{participation.site.protocole._id}}">
-  Voir le protocole {{ participation.site.protocole.titre }}
+<a class="btn btn-primary" href="#/protocoles/{{protocole._id}}">
+  Voir le protocole {{ protocole.titre }}
 </a>
-<a class="btn btn-primary" href="#/sites/{{participation.site._id}}">
-  Voir le site {{ participation.site.titre }}
+<a class="btn btn-primary" href="#/sites/{{site._id}}">
+  Voir le site {{ site.titre }}
 </a>
 
-<div class="form-group">
-  <edit-participation-directive participation="participation">
-  </edit-participation-directive>
+<div class="alert alert-danger" ng-show="submitError">
+  La participation n'a pas pu être sauvegardée.
 </div>
+
+<edit-participation-directive participation="participation"
+                              file-uploader="fileUploader"
+                              folder-uploader="folderUploader">
+</edit-participation-directive>
+
+<sc-button class="save-participation btn btn-primary" ng-click="save()"
+           label="'Sauvegarder'" wait-for-class="fa fa-spinner fa-spin"
+           start-wait-for="startSave" cancel-wait-for="endSave">
+</sc-button>
