@@ -172,7 +172,7 @@ angular.module('participationViews', ['ngRoute', 'textAngular', 'xin_listResourc
 
     $scope.compute = ->
       $scope.computeInfo = {}
-      participationResource.post('compute').then(
+      participationResource.post('compute', {}).then(
         (result) -> $route.reload()
         (error) -> $scope.computeInfo.error = true
       )
