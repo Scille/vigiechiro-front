@@ -2,6 +2,14 @@
 
 breadcrumbsGetParticipationDefer = undefined
 
+
+traitement_is_timeout = (participation) ->
+  if not participation.traitement
+    return
+  participation.traitement.timeout = (
+    (new Date().getTime() - new Date(participation.traitement.date_debut).getTime()) > 24 * 3600 * 1000)
+
+
 makeRegExp = ($scope, type_site) ->
   patt =
     'CARRE': /^Cir.+-\d+-Pass\d+-Tron\d+-Chiro_[01]_\d+_000\.(wav|ta|tac)$/
@@ -138,6 +146,7 @@ angular.module('participationViews', ['ngRoute', 'textAngular', 'xin_listResourc
         participationResource = participation
 
         $scope.participation = participation.plain()
+        traitement_is_timeout($scope.participation)
         if $scope.participation.bilan?
           if $scope.participation.bilan.chiropteres?
             $scope.participation.bilan.chiropteres.sort(sortByLibelle)
@@ -270,6 +279,7 @@ angular.module('participationViews', ['ngRoute', 'textAngular', 'xin_listResourc
             breadcrumbsGetParticipationDefer = undefined
           participationResource = participation
           $scope.participation = participation.plain()
+          traitement_is_timeout($scope.participation)
           $scope.participation.meteo = makeMeteo($scope.participation.meteo)
           $scope.site = $scope.participation.site
           Backend.one('protocoles', $scope.site.protocole).get().then (protocole) ->
