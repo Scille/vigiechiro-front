@@ -63,14 +63,14 @@ angular.module('xin_uploadFile', ['appSettings', 'xin_s3uploadFile', 'xin.fileUp
     )
 
     $scope.addRegExpFilter = (regexp) ->
-      if regexp? and regexp.length
+      if regexp? and regexp.length > 0
         uploader.filters.push(
           name: "Format incorrect."
           fn: (item) ->
             if item.type in ['image/png', 'image/png', 'image/jpeg']
               return true
-            for reg in regexp
-              if reg.test(item.name)
+            for reg in regexp or []
+              if reg? and reg.test(item.name)
                 return true
             return false
         )
