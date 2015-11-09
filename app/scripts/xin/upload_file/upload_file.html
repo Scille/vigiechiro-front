@@ -1,16 +1,20 @@
 <!-- drop zone -->
 <div class="drop row" uploader="uploader"
      over-class="drag-over" file-over
-     ng-click="clickFileInput()" directory="directory">
+     directory="directory">
   <input type="file" class="btn hidden" file-select
-         uploader="uploader">
-  <center ng-if="!directory">
-    Cliquez ou déposez vos fichiers ici
-    <div class="label label-warning">
-      Si rien ne passe lorsque vous sélectionnez les fichiers puis confirmez, utilisez le glisser/déposer.
-    </div>
+         uploader="uploader" id="file_{{date_id}}" />
+   <center>
+    <label for="file_{{date_id}}">
+      <div ng-if="!directory">
+        Cliquez ou déposez vos fichiers ici
+        <div class="label label-warning">
+          Si rien ne passe lorsque vous sélectionnez les fichiers puis confirmez, utilisez le glisser/déposer.
+        </div>
+      </div>
+      <div ng-if="directory">Cliquez ici</div>
+    </label>
   </center>
-  <center ng-if="directory">Cliquez ici</center>
 </div>
 
 <!-- abstract -->

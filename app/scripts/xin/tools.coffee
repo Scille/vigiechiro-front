@@ -36,6 +36,16 @@ angular.module('xin_tools', [])
         defer.resolve(elem)
       return defer.promise
 
+
+  .service 'guid', ->
+    ->
+      s4 = ->
+        return Math.floor((1 + Math.random()) * 0x10000).toString(16).substring 1
+      id = s4() + s4() + '-' + s4() + '-' + s4() + '-' + s4() + '-' + s4() + s4() + s4()
+      return id
+
+
+
 window.ngInject = (v) ->
   if v instanceof Array
     func = v.pop()

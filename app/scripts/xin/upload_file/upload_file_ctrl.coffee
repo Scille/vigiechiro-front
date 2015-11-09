@@ -31,12 +31,10 @@ angular.module('xin_uploadFile', ['appSettings', 'xin_s3uploadFile', 'xin.fileUp
         if regexp? and regexp.length
           scope.addRegExpFilter(regexp)
 
-      scope.clickFileInput = ->
-        input.click()
-        return
 
 
-  .controller 'UploadFileController', ($scope, Backend, S3FileUploader, FileUploader) ->
+  .controller 'UploadFileController', ($scope, Backend, S3FileUploader, FileUploader, guid) ->
+    $scope.date_id = guid()
     $scope.warnings = []
     $scope.errors =
       filters: []
