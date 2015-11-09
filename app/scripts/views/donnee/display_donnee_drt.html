@@ -35,18 +35,18 @@
         </tr>
       </thead>
 
-      <tbody ng-repeat="(key, observation) in donnee.observations">
-        <tr ng-show="patchError[key] || patchSuccess[key]"><td colspan="12">
-          <div class="label label-success" ng-show="patchSuccess[key]">
+      <tbody ng-repeat="observation in donnee.observations">
+        <tr ng-show="patchError[observation.index] || patchSuccess[observation.index]"><td colspan="12">
+          <div class="label label-success" ng-show="patchSuccess[observation.index]">
             La donnée a bien été enregistrée.
           </div>
-          <div class="label label-danger" ng-show="patchError[key]">
+          <div class="label label-danger" ng-show="patchError[observation.index]">
             Echec de l'enregistrement de la donnée. Le taxon et la confiance sont obligatoires.
           </div>
         </td></tr>
         <tr>
           <td class="btn" data-toggle="collapse"
-              data-target="#{{donnee.titre}}-{{$index}}">
+              data-target="#{{donnee.titre}}-{{observation.index}}">
             <span class="glyphicon glyphicon-collapse-down">
             </span>
           </td>
@@ -77,7 +77,7 @@
                 <option value="POSSIBLE">Possible</option>
               </select>
               <a class="input-group-addon" href=""
-                 ng-click="patchObservateur(key)" ng-show="true">OK</a>
+                 ng-click="patchObservateur(observation.index)" ng-show="true">OK</a>
             </div>
           </td>
           <!-- Taxon validateur -->
@@ -105,14 +105,14 @@
                 <option value="POSSIBLE">Possible</option>
               </select>
               <a class="input-group-addon" href=""
-                 ng-click="patchValidateur(key)" ng-show="true">OK</a>
+                 ng-click="patchValidateur(observation.index)" ng-show="true">OK</a>
             </div>
           </td>
           <td>{{observation.frequence_mediane}}</td>
           <td>{{observation.temps_debut}}</td>
           <td>{{observation.temps_fin}}</td>
         </tr>
-        <tr class="collapse" id="{{donnee.titre}}-{{$index}}"><td colspan="12">
+        <tr class="collapse" id="{{donnee.titre}}-{{observation.index}}"><td colspan="12">
           <p><b>Autre taxon Tadarida :</b></p>
           <div ng-repeat="autre in observation.tadarida_taxon_autre"
                ng-show="autre.probabilite >= observation.tadarida_probabilite/2.1">
@@ -140,7 +140,7 @@
           <div class="form-group input-group">
             <text-angular ng-model="newPost"></text-angular>
           <div>
-          <a class="btn btn-default" href="" ng-click="addPost({{$index}}, newPost)">
+          <a class="btn btn-default" href="" ng-click="addPost({{observation.index}}, newPost)">
             Ajouter un message
           </a>
         </td></tr>

@@ -90,6 +90,8 @@ angular.module('donneeViews', ['ngRoute', 'xin_backend', 'xin_session',
     $scope.updateResourcesList = (current_scope) ->
       for resource in current_scope.resources or []
         if resource.observations?
+          for observation, key in resource.observations or []
+            observation.index = key
           resource.observations.sort(sortByProbabilite)
 
     sortByProbabilite = (a, b) ->
@@ -138,9 +140,13 @@ angular.module('donneeViews', ['ngRoute', 'xin_backend', 'xin_session',
       scope.patchValidateur = (key) ->
         scope.patchSuccess[key] = false
         scope.patchError[key] = false
+        observation = null
+        for obs in scope.donnee.observations or [] when obs.index == key
+          observation = obs
+          break
         payload =
-          validateur_taxon: scope.donnee.observations[key].validateur_taxon
-          validateur_probabilite: scope.donnee.observations[key].validateur_probabilite
+          validateur_taxon: observation.validateur_taxon
+          validateur_probabilite: observation.validateur_probabilite
         Backend.all('donnees/'+scope.donnee._id+'/observations/'+key).patch(payload).then(
           (success) -> scope.patchSuccess[key] = true
           (error) -> scope.patchError[key] = true
@@ -148,9 +154,13 @@ angular.module('donneeViews', ['ngRoute', 'xin_backend', 'xin_session',
       scope.patchObservateur = (key) ->
         scope.patchSuccess[key] = false
         scope.patchError[key] = false
+        observation = null
+        for obs in scope.donnee.observations or [] when obs.index == key
+          observation = obs
+          break
         payload =
-          observateur_taxon: scope.donnee.observations[key].observateur_taxon
-          observateur_probabilite: scope.donnee.observations[key].observateur_probabilite
+          observateur_taxon: observation.observateur_taxon
+          observateur_probabilite: observation.observateur_probabilite
         Backend.all('donnees/'+scope.donnee._id+'/observations/'+key).patch(payload).then(
           (success) -> scope.patchSuccess[key] = true
           (error) -> scope.patchError[key] = true
