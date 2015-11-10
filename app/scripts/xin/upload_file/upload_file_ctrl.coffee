@@ -26,11 +26,11 @@ angular.module('xin_uploadFile', ['appSettings', 'xin_s3uploadFile', 'xin.fileUp
         input[0].setAttribute('mozdirectory', '')
       if attrs.gzip?
         scope.gzip = true
-
-      scope.$watch 'regexp', (regexp) ->
-        if regexp? and regexp.length
-          scope.addRegExpFilter(regexp)
-
+      if attrs.regexp?
+        scope.$watch 'regexp', (regexp) ->
+          if regexp? and regexp.constructor == Array and regexp.length
+            scope.addRegExpFilter()
+        , true
 
 
   .controller 'UploadFileController', ($scope, Backend, S3FileUploader, FileUploader, guid) ->
@@ -62,18 +62,19 @@ angular.module('xin_uploadFile', ['appSettings', 'xin_s3uploadFile', 'xin.fileUp
         return true
     )
 
-    $scope.addRegExpFilter = (regexp) ->
-      if regexp? and regexp.length > 0
-        uploader.filters.push(
-          name: "Format incorrect."
-          fn: (item) ->
-            if item.type in ['image/png', 'image/png', 'image/jpeg']
+    $scope.addRegExpFilter = ->
+      for filter in uploader.filters when filter.name == "Format incorrect."
+        return
+      uploader.filters.push(
+        name: "Format incorrect."
+        fn: (item) ->
+          if item.type in ['image/png', 'image/png', 'image/jpeg']
+            return true
+          for reg in $scope.regexp
+            if reg.test(item.name)
               return true
-            for reg in regexp or []
-              if reg? and reg.test(item.name)
-                return true
-            return false
-        )
+          return false
+      )
 
     uploader.displayError = (error, type, limit = 0) ->
       if type == 'back'

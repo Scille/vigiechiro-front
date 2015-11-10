@@ -76,7 +76,7 @@ angular.module('displaySiteViews', ['ngRoute', 'textAngular', 'xin_backend',
         $scope.typeSite = site.protocole.type_site
         session.getUserPromise().then (user) ->
           $scope.userId = user._id
-          for protocole in user.protocoles
+          for protocole in user.protocoles or []
             if protocole.protocole._id == $scope.site.protocole._id
               if protocole.valide?
                 $scope.isProtocoleValid = true
