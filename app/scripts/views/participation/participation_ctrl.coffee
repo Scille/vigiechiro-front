@@ -8,10 +8,10 @@ traitement_is_timeout = (participation) ->
     return
   now = new Date().getTime()
   timeout = 24 * 3600 * 1000
-  if participation.traitement.etat == 'PLANIFIE':
+  if participation.traitement.etat == 'PLANIFIE'
     participation.traitement.timeout = (
       (now - new Date(participation.traitement.date_planification).getTime()) > timeout)
-  else if participation.traitement.etat == 'EN_COURS':
+  else if participation.traitement.etat == 'EN_COURS'
     participation.traitement.timeout = (
       (now - new Date(participation.traitement.date_debut).getTime()) > timeout)
   else
