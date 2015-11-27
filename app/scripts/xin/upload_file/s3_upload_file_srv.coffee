@@ -114,7 +114,12 @@ angular.module('xin_s3uploadFile', ['appSettings'])
         @userCallbacks.onPause?(this)
         @_pause = $q.defer()
 
-      start: () ->
+      retry: ->
+        @file.status == 'ready'
+        @file.transmitted_size = 0
+        @start()
+
+      start: ->
         @_pause.resolve()
         if @file.status == 'ready'
           @_onProgress(0, @file.size)

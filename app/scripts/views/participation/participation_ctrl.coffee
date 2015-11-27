@@ -426,4 +426,6 @@ angular.module('participationViews', ['ngRoute', 'textAngular', 'xin_listResourc
         scope.folderAllowed = false
 
       scope.$watch 'typeSite', (type_site) ->
+        if not type_site? or type_site == ""
+          return
         makeRegExp(scope, type_site)

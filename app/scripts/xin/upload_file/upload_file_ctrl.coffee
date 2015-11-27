@@ -84,12 +84,7 @@ angular.module('xin_uploadFile', ['appSettings', 'xin_s3uploadFile', 'xin.fileUp
       $scope.$apply()
 
     uploader.onAddingWarningsComplete = ->
-      for warning in @warnings
-        if $scope.directory
-          $scope.warnings.push(warning.name+" n'est pas un dossier.")
-        else
-          $scope.warnings.push(warning.name+" n'est pas un fichier.")
-      $scope.$apply()
+      $scope.warnings = @warnings
 
     uploader.onCancelAllComplete = ->
       $scope.warnings = []
