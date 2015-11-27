@@ -83,7 +83,7 @@
   <!-- Uploads failed -->
   <div class="alert alert-danger" ng-show="uploader.itemsFailedUpload.length">
     <div ng-repeat="item in uploader.itemsFailedUpload">
-      Echec du téléchargement du fichier {{ item.name }}
+      Echec du téléchargement du fichier {{ item.file.name }}
     </div>
   </div>
   <!-- Uploads warning -->

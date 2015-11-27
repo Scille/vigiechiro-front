@@ -335,7 +335,8 @@ angular.module('xin.fileUploader', ['xin_s3uploadFile'])
       _onError: (item) ->
         @_checkWarningUpload(item.file.name)
         item = @_removeFileUploading(item)
-        @itemsFailedUpload.push(item)
+        if item? and item.length
+          @itemsFailedUpload.push(item[0])
         @_checkReadyToCompress()
         @_checkReadyToUp()
 
