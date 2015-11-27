@@ -68,13 +68,11 @@
     Le traitement s'est terminée le {{ participation.traitement.date_fin | xinDate: 'medium' }}
   </span>
   <span ng-if="participation.traitement.etat == 'PLANIFIE'">
+    Traitement planifié le : {{ participation.traitement.date_planification | xinDate: 'medium' }}
     <span ng-if="participation.traitement.timeout">
+      <br>
       Le traitement est planifié depuis trop longtemps, peut-être faut-il le relancer...
     </span>
-    <span ng-if="!participation.traitement.timeout">
-      Le traitement de la participation est planifié.
-    </span>
-    Traitement planifié le : {{ participation.traitement.date_planification | xinDate: 'medium' }}
   </span>
   <span ng-if="participation.traitement.etat == 'EN_COURS'">
     <span ng-if="participation.traitement.timeout">
