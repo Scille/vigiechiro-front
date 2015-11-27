@@ -359,11 +359,12 @@ angular.module('siteViews', ['ngRoute',
           grille_stoc: map.getIdGrilleStoc()
         Backend.all('sites').getList(check).then (sites) ->
           callbacks =
+            onSaveLocalitiesSuccess: ->
+              window.location = '#/sites/'+sites[0]._id
             onSaveLocalitiesFail: ->
-              $score.saveLocalitiesError = true
+              $scope.saveLocalitiesError = true
           if sites.plain().length
             saveLocalities(sites[0], callbacks)
-            window.location = '#/sites/'+sites[0]._id
           else
             # Set up title
             numGrilleStoc = map.getNumGrilleStoc()
@@ -372,12 +373,10 @@ angular.module('siteViews', ['ngRoute',
             # POST site
             Backend.all('sites').post(payload).then(
               (site) ->
-                saveLocalities(site, callbacks)
                 # If verrouille
                 if $scope.site.verrouille
                   lock(site)
-                # redirect to display site
-                window.location = '#/sites/'+site._id
+                saveLocalities(site, callbacks)
               (error) -> console.log(error)
             )
       # If tracé
@@ -474,7 +473,7 @@ angular.module('siteViews', ['ngRoute',
             onSaveLocalitiesSuccess: ->
               window.location = '#/sites/'+site._id
             onSaveLocalitiesFail: ->
-              $score.saveLocalitiesError = true
+              $scope.saveLocalitiesError = true
           saveLocalities(site, callbacks)
         (error) ->
           $scope.mapError =
