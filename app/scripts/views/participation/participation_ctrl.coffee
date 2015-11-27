@@ -6,8 +6,16 @@ breadcrumbsGetParticipationDefer = undefined
 traitement_is_timeout = (participation) ->
   if not participation.traitement
     return
-  participation.traitement.timeout = (
-    (new Date().getTime() - new Date(participation.traitement.date_debut).getTime()) > 24 * 3600 * 1000)
+  now = new Date().getTime()
+  timeout = 24 * 3600 * 1000
+  if participation.traitement.etat == 'PLANIFIE':
+    participation.traitement.timeout = (
+      (now - new Date(participation.traitement.date_planification).getTime()) > timeout)
+  else if participation.traitement.etat == 'EN_COURS':
+    participation.traitement.timeout = (
+      (now - new Date(participation.traitement.date_debut).getTime()) > timeout)
+  else
+    participation.traitement.timeout = false
 
 
 makeRegExp = ($scope, type_site) ->
