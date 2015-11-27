@@ -152,10 +152,8 @@ angular.module('protocole_map_routier', [])
           @_googleMaps.addListener(@_lastPoint, 'click', @onValidOriginPoint)
           return false
         else
-          @_googleMaps.addListener(@_route, 'click', @addSectionPoint)
-          @_step = 'editSections'
-          @updateSite()
-          return true
+          @validOriginPoint()
+
 
       loadLocalities: (localities) ->
         for locality in localities or []
@@ -171,11 +169,16 @@ angular.module('protocole_map_routier', [])
             )
           @_localities.push(newLocality)
 
+
       validLocalities: ->
         if @_localities.length
           @_googleMaps.clearListeners(@_route, 'click')
           @_step = 'end'
           @updateSite()
+        else
+          @_step = 'editSections'
+          @_changeStep("Point à placer : fin tronçon 1")
+
 
       mapCallback: ->
         onProjectionReady: =>
@@ -338,6 +341,9 @@ angular.module('protocole_map_routier', [])
         @validOriginPoint()
 
       validOriginPoint: ->
+        for point in @_points or []
+          point.setMap(null)
+        @_points = []
         @_points.push(@_firstPoint)
         @_points.push(@_lastPoint)
         # Set titles and edge
