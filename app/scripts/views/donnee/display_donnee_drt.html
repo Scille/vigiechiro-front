@@ -118,6 +118,7 @@
                ng-show="autre.probabilite >= observation.tadarida_probabilite/2.1">
             {{ autre.taxon.libelle_long }} : {{autre.probabilite }}
           </div>
+
           <p><b>Messages :</b></p>
           <table class="table table-bordered"
                  ng-show="observation.messages.length">
@@ -134,9 +135,19 @@
               </td>
             </tr>
           </table>
-          <div ng-show="!observation.messages ||observation.messages.length == 0">
+          <div ng-show="!observation.messages || observation.messages.length == 0">
             Pas de message pour le moment.
           </div>
+
+          <div ng-show="putMessageError[observation.index] || putMessageSuccess[observation.index]">
+            <div class="label label-success" ng-show="putMessageSuccess[observation.index]">
+              Le message a bien été enregistré.
+            </div>
+            <div class="label label-danger" ng-show="putMessageError[observation.index]">
+              Echec de l'enregistrement du message.
+            </div>
+          </div>
+
           <div class="form-group input-group">
             <text-angular ng-model="newPost"></text-angular>
           <div>

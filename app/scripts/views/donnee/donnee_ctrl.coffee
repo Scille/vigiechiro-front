@@ -110,17 +110,19 @@ angular.module('donneeViews', ['ngRoute', 'xin_backend', 'xin_session',
     link: (scope, elem, attrs) ->
       scope.patchSuccess = []
       scope.patchError = []
+      scope.putMessageSuccess = []
+      scope.putMessageError = []
 
       scope.addPost = (index, post) ->
         payload =
           message: post
         scope.post = ''
-        Backend.one('donnees', scope.donnee._id).get().then (donnee) ->
-          donnee.customPUT(payload, 'observations/'+index+'/messages')
-            .then(
-              -> $route.reload()
-              (error) -> throw error
-            )
+        Backend.all("donnees/#{scope.donnee._id}/observations/#{index}/messages").customPUT(payload).then(
+          (donnee) ->
+            scope.putMessageSuccess[index] = true
+            scope.donnee.observations[index].messages = donnee.observations[index].messages
+          (error) -> scope.putMessageError[index] = true
+        )
 
       scope.editDonnee = ->
         modalInstance = $modal.open(
@@ -220,6 +222,7 @@ angular.module('donneeViews', ['ngRoute', 'xin_backend', 'xin_session',
         selection = window.getSelection()
         selection.removeAllRanges()
         selection.addRange(rangeToSelect)
+
 
 
   .controller 'ModalInstanceController', ($scope, $modalInstance, donnee) ->
