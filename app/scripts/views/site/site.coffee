@@ -172,6 +172,7 @@ lock = (site, callbacks = {}) ->
   )
 
 
+
 angular.module('siteViews', ['ngRoute',
                              'textAngular', 'ui.bootstrap',
                              'dialogs.main',
@@ -418,10 +419,12 @@ angular.module('siteViews', ['ngRoute',
           )
 
 
+
   .controller 'EditSiteController', ($timeout, $route, $routeParams, $scope, $modal,
                                      session, Backend, protocolesFactory) ->
     initEnv($scope, $modal, session)
     $scope.creation = false
+    $scope.site_orig = {}
     site = null
 
     $scope.users = []
@@ -435,6 +438,9 @@ angular.module('siteViews', ['ngRoute',
         if breadcrumbsGetSiteDefer?
           breadcrumbsGetSiteDefer.resolve($scope.site)
           breadcrumbsGetSiteDefer = undefined
+
+        angular.copy($scope.site, $scope.site_orig)
+
         $scope.protocole = site.protocole
         initSiteCreation()
         loadMap(angular.element($('.g-maps'))[0])
@@ -456,6 +462,8 @@ angular.module('siteViews', ['ngRoute',
       payload =
         'commentaire': $scope.site.commentaire
         'verrouille': $scope.site.verrouille
+      if $scope.site.titre != $scope.site_orig.titre
+        payload.titre = $scope.site.titre
       if $scope.protocole.type_site == 'ROUTIER'
         payload.tracet = map.getGeoJsonRoute()
       if $scope.isAdmin
