@@ -41,12 +41,13 @@ angular.module('utilisateurViews', ['ngRoute', 'xin_listResource', 'xin_tools',
 
 
 
-  .controller 'ShowUtilisateurController', ($scope, $route, $routeParams, Backend, session) ->
+  .controller 'ShowUtilisateurController', ($scope, $route, $routeParams, Backend, session, SETTINGS) ->
+    $scope.saveDone = {}
     $scope.utilisateur = {}
+    originUser = {}
     $scope.readOnly = false
     $scope.isAdmin = false
     userResource = undefined
-    origin_role = undefined
     userBackend = undefined
     if $routeParams.userId == 'moi'
       userBackend = Backend.one('moi')
@@ -57,9 +58,11 @@ angular.module('utilisateurViews', ['ngRoute', 'xin_listResource', 'xin_tools',
         if breadcrumbsGetUtilisateurDefer?
           breadcrumbsGetUtilisateurDefer.resolve(utilisateur)
           breadcrumbsGetUtilisateurDefer = undefined
+
         userResource = utilisateur
         $scope.utilisateur = utilisateur.plain()
-        origin_role = $scope.utilisateur.role
+        angular.copy($scope.utilisateur, originUser)
+
         session.getUserPromise().then (user) ->
           $scope.isAdmin = user.role == 'Administrateur'
           $scope.readOnly = (not $scope.isAdmin and
@@ -67,24 +70,21 @@ angular.module('utilisateurViews', ['ngRoute', 'xin_listResource', 'xin_tools',
       (error) -> window.location = '#/404'
     )
 
-    $scope.saveUser = ->
-      $scope.submitted = true
-      if (not $scope.userForm.$valid or
-          not $scope.userForm.$dirty or
-          not userResource?)
-        return
+    $scope.save = ->
       payload = {}
-      # Retrieve the modified fields from the form
-      for key, value of $scope.userForm
-        if key.charAt(0) != '$' and value.$dirty
-          payload[key] = $scope.utilisateur[key]
-      # Special handling for radio buttons
-      for field in ['professionnel', 'donnees_publiques']
-        payload[field] = $scope.utilisateur[field]
-      # Special handling for select
-      if $scope.utilisateur.role != origin_role
-        payload.role = $scope.utilisateur.role
+      $scope.saveError = false
+      for field in SETTINGS.USER_FIELDS
+        if $scope.utilisateur[field] != originUser[field]
+          payload[field] = $scope.utilisateur[field]
+      if Object.keys(payload).length == 0
+        $scope.errorMessage = "Aucune modification à sauvegarder."
+        $scope.saveError = true
+        $scope.saveDone.end?()
+        return
       userBackend.patch(payload).then(
         -> $route.reload()
-        (error) -> $scope.saveError = true
+        (error) ->
+          $scope.errorMessage = "Echec de l'enregistrement de l'utilisateur."
+          $scope.saveError = true
+          $scope.saveDone.end?()
       )

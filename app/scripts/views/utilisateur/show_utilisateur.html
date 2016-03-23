@@ -1,16 +1,15 @@
 <div class="actionbar">
   <sc-button class="btn btn-primary"
-             ng-click="saveUser()"
+             ng-click="save()"
              wait-for-class="fa fa-spinner fa-1 fa-pulse"
-             cancel-wait-for="saveEnd"
-             label: "=?"
+             cancel-wait-for="saveDone"
              label="'Sauvegarder'"
              ng-show="!readOnly">
   </sc-button>
 </div>
 
 <div class="alert alert-danger" ng-show="saveError">
-  Echec de l'enregistrement de l'utilisateur.
+  {{errorMessage}}
 </div>
 
 <div class="container">
@@ -28,7 +27,7 @@
     </span>
   </div>
 
-  <div class="form-group" ng-class="{'has-error': userForm.pseudo.$invalid && !userForm.$pristine}">
+  <div class="form-group">
     <div class="input-group">
       <label class="input-group-addon" for="pseudo">Pseudo</label>
       <input type="text" class="form-control" id="pseudo" name="pseudo"
@@ -55,7 +54,7 @@
     </div>
   </div>
 
-  <div class="form-group" ng-class="{'has-error': userForm.email.$invalid && !userForm.$pristine}">
+  <div class="form-group">
     <div class="input-group">
       <label class="input-group-addon" for="email">Email</label>
       <input type="email" class="form-control" id="email" name="email"

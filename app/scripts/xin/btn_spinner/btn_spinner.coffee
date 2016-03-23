@@ -20,6 +20,6 @@ angular.module('sc-button', [])
       )
 
       if scope.cancelWaitFor?
-        scope.cancelWaitFor.deferred = ->
+        scope.cancelWaitFor.end = ->
           elem[0].removeAttribute("disabled")
           scope.waitClass = ""
