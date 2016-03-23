@@ -37,7 +37,7 @@
     "grunt-run": "~0.3.0"
   },
   "engines": {
-    "node": ">=0.10.30"
+    "node": ">=0.10.25"
   },
   "scripts": {
     "test": "grunt test"
