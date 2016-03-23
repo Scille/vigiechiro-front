@@ -1,8 +1,8 @@
 {
   "name": "vigiechiro-app",
-  "version": "0.2.0",
+  "version": "0.2.1",
   "dependencies": {
-    "angular": "1.4.7",
+    "angular": "1.5.2",
     "json3": "3.3.1",
     "es5-shim": "3.1.0",
     "bootstrap": "3.3.2",
