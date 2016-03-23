@@ -137,3 +137,9 @@ body {
   background: #5CB85C;
   color: #fff;
 }
+
+.actionbar {
+  text-align: right;
+  border-bottom: 1px solid #C0C0C0;
+  padding-bottom: 5px;
+}

@@ -3,15 +3,8 @@
 breadcrumbsGetUtilisateurDefer = undefined
 
 
-###*
- # @ngdoc function
- # @name vigiechiroApp.controller:ShowUtilisateurCtrl
- # @description
- # # ShowUtilisateurCtrl
- # Controller of the vigiechiroApp
-###
 angular.module('utilisateurViews', ['ngRoute', 'xin_listResource', 'xin_tools',
-                                    'xin_session', 'xin_backend'])
+                                    'xin_session', 'xin_backend', 'sc-toggle-switch'])
   .config ($routeProvider) ->
     $routeProvider
       .when '/utilisateurs',
@@ -31,6 +24,8 @@ angular.module('utilisateurViews', ['ngRoute', 'xin_listResource', 'xin_tools',
               ])
             return breadcrumbsDefer.promise
 
+
+
   .controller 'ListUtilisateursController', ($scope, Backend, DelayedEvent) ->
     $scope.lookup = {}
     # Filter field is trigger after 500ms of inactivity
@@ -44,8 +39,9 @@ angular.module('utilisateurViews', ['ngRoute', 'xin_listResource', 'xin_tools',
           delete $scope.lookup.q
     $scope.resourceBackend = Backend.all('utilisateurs')
 
+
+
   .controller 'ShowUtilisateurController', ($scope, $route, $routeParams, Backend, session) ->
-    $scope.submitted = false
     $scope.utilisateur = {}
     $scope.readOnly = false
     $scope.isAdmin = false

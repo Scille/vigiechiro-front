@@ -56,6 +56,8 @@ angular
       .otherwise
         redirectTo: '/404'
 
+
+
   .directive 'navbarDirective', (evalCallDefered, $window, $rootScope, $route, SETTINGS, session)->
     restrict: 'E'
     templateUrl: 'navbar.html'

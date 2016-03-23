@@ -1,114 +1,163 @@
+<div class="actionbar">
+  <sc-button class="btn btn-primary"
+             ng-click="saveUser()"
+             wait-for-class="fa fa-spinner fa-1 fa-pulse"
+             cancel-wait-for="saveEnd"
+             label: "=?"
+             label="'Sauvegarder'"
+             ng-show="!readOnly">
+  </sc-button>
+</div>
+
+<div class="alert alert-danger" ng-show="saveError">
+  Echec de l'enregistrement de l'utilisateur.
+</div>
+
 <div class="container">
   <div class="page-header">
     <h3>{{utilisateur.pseudo}}</h3>
   </div>
 
-  <form class="simple-form" novalidate name="userForm" ng-submit="saveUser()">
+  <div class="input-group form-group">
+    <span class="input-group-addon">Rôle</span>
+      <select class="form-control" ng-model="utilisateur.role" ng-disabled="!isAdmin">
+        <option value="Administrateur">Administrateur</option>
+        <option value="Validateur">Validateur</option>
+        <option value="Observateur">Observateur</option>
+      </select>
+    </span>
+  </div>
 
-    <div class="input-group form-group">
-      <span class="input-group-addon">Rôle</span>
-        <select class="form-control" ng-model="utilisateur.role" ng-disabled="!isAdmin">
-          <option value="Administrateur">Administrateur</option>
-          <option value="Validateur">Validateur</option>
-          <option value="Observateur">Observateur</option>
-        </select>
+  <div class="form-group" ng-class="{'has-error': userForm.pseudo.$invalid && !userForm.$pristine}">
+    <div class="input-group">
+      <label class="input-group-addon" for="pseudo">Pseudo</label>
+      <input type="text" class="form-control" id="pseudo" name="pseudo"
+             ng-model="utilisateur.pseudo" ng-disabled="readOnly" required>
+    </div>
+    <span ng-show="userForm.pseudo.$error.required"
+          class="help-block has-error">Champ requis</span>
+  </div>
+
+
+  <div class="form-group">
+    <div class="input-group">
+      <label class="input-group-addon" for="prenom">Prénom</label>
+      <input type="text" class="form-control" id="prenom" name="prenom"
+             ng-model="utilisateur.prenom" ng-disabled="readOnly">
+    </div>
+  </div>
+
+  <div class="form-group">
+    <div class="input-group">
+      <label class="input-group-addon" for="nom">Nom</label>
+      <input type="text" class="form-control" id="nom" name="nom"
+             ng-model="utilisateur.nom" ng-disabled="readOnly">
+    </div>
+  </div>
+
+  <div class="form-group" ng-class="{'has-error': userForm.email.$invalid && !userForm.$pristine}">
+    <div class="input-group">
+      <label class="input-group-addon" for="email">Email</label>
+      <input type="email" class="form-control" id="email" name="email"
+             ng-model="utilisateur.email" ng-disabled="readOnly" required>
+    </div>
+    <span ng-show="userForm.email.$error.required"
+          class="help-block">Champ requis</span>
+    <span ng-show="userForm.email.$error.email"
+          class="help-block">Entrez un email valide</span>
+  </div>
+
+  <div class="form-group">
+    <div class="input-group">
+      <label class="input-group-addon" for="telephone">Téléphone</label>
+      <input type="text" class="form-control" id="telephone" name="telephone"
+             ng-model="utilisateur.telephone" ng-disabled="readOnly">
+    </div>
+  </div>
+
+  <div class="form-group">
+      <textarea rows="3" class="form-control" id="adresse" name="adresse"
+                ng-model="utilisateur.adresse" ng-disabled="readOnly"
+                placeholder="Adresse"></textarea>
+  </div>
+
+  <div class="form-group">
+    <div class="input-group">
+      <label class="input-group-addon" for="organisation">Organisation</label>
+      <input type="text" class="form-control" id="organisation" name="organisation"
+             ng-model="utilisateur.organisation" ng-disabled="readOnly">
+    </div>
+  </div>
+
+  <div class="form-group">
+    <div class="input-group">
+      <label class="input-group-addon" for="internet_speed">Je participe à titre professionnel</label>
+      <span toggle-switch-directive
+            id="internet_speed"
+            name="internet_speed"
+            ng-model="utilisateur.professionnel"
+            left-label="Non"
+            left-label-color="red"
+            left-value="false"
+            right-label="Oui"
+            right-label-color="green"
+            right-value="true"
+            switch-size="small"
+            border-color="#C0C0C0"
+            is-summarised="readOnly">
       </span>
     </div>
-
-    <div class="form-group" ng-class="{'has-error': userForm.pseudo.$invalid && !userForm.$pristine}">
-      <div class="input-group">
-        <label class="input-group-addon" for="pseudo">Pseudo</label>
-        <input type="text" class="form-control" id="pseudo" name="pseudo"
-               ng-model="utilisateur.pseudo" ng-disabled="readOnly" required>
-      </div>
-      <span ng-show="userForm.pseudo.$error.required"
-            class="help-block has-error">Champ requis</span>
-    </div>
-
-
-    <div class="form-group">
-      <div class="input-group">
-        <label class="input-group-addon" for="prenom">Prénom</label>
-        <input type="text" class="form-control" id="prenom" name="prenom"
-               ng-model="utilisateur.prenom" ng-disabled="readOnly">
-      </div>
-    </div>
-
-    <div class="form-group">
-      <div class="input-group">
-        <label class="input-group-addon" for="nom">Nom</label>
-        <input type="text" class="form-control" id="nom" name="nom"
-               ng-model="utilisateur.nom" ng-disabled="readOnly">
-      </div>
-    </div>
-
-    <div class="form-group" ng-class="{'has-error': userForm.email.$invalid && !userForm.$pristine}">
-      <div class="input-group">
-        <label class="input-group-addon" for="email">Email</label>
-        <input type="email" class="form-control" id="email" name="email"
-               ng-model="utilisateur.email" ng-disabled="readOnly" required>
-      </div>
-      <span ng-show="userForm.email.$error.required"
-            class="help-block">Champ requis</span>
-      <span ng-show="userForm.email.$error.email"
-            class="help-block">Entrez un email valide</span>
-    </div>
-
-    <div class="form-group">
-      <div class="input-group">
-        <label class="input-group-addon" for="telephone">Téléphone</label>
-        <input type="text" class="form-control" id="telephone" name="telephone"
-               ng-model="utilisateur.telephone" ng-disabled="readOnly">
-      </div>
-    </div>
-
-    <div class="form-group">
-        <textarea rows="3" class="form-control" id="adresse" name="adresse"
-                  ng-model="utilisateur.adresse" ng-disabled="readOnly"
-                  placeholder="Adresse"></textarea>
-    </div>
-
-    <div class="form-group">
-      <div class="input-group">
-        <label class="input-group-addon" for="organisation">Organisation</label>
-        <input type="text" class="form-control" id="organisation" name="organisation"
-               ng-model="utilisateur.organisation" ng-disabled="readOnly">
-      </div>
-    </div>
-
-    <div class="checkbox">
-     <div class="col-sm-1"></div>
-      <label>
-        <input type="checkbox" ng-model="utilisateur.professionnel" ng-value="true"
-               ng-checked="utilisateur.professionnel" ng-disabled="readOnly">
-        Je participe à titre professionnel
-      </label>
-    </div>
+  </div>
 
 <!--         <div class="input-group form-group">
-        <span class="input-group-addon">Tags</span>
-        <input type="text" class='form-control' name="tags" ng-model="utilisateur.tags">
-    </div> -->
+      <span class="input-group-addon">Tags</span>
+      <input type="text" class='form-control' name="tags" ng-model="utilisateur.tags">
+  </div> -->
 
-    <div class="form-group">
-        <textarea rows="3" class="form-control" id="commentaire" name="commentaire"
-                  ng-model="utilisateur.commentaire" ng-disabled="readOnly"
-                  placeholder="Commentaire"></textarea>
+  <div class="form-group">
+    <div class="input-group">
+      <label class="input-group-addon" for="internet_speed">Connexion internet</label>
+      <span toggle-switch-directive
+            id="internet_speed"
+            name="internet_speed"
+            ng-model="utilisateur.internet_speed"
+            left-label="Lente (< 20 Mbit/s)"
+            left-label-color="red"
+            left-value="false"
+            right-label="Rapide (≥ 20 Mbit/s)"
+            right-label-color="green"
+            right-value="true"
+            switch-size="small"
+            border-color="#C0C0C0"
+            is-summarised="readOnly">
+      </span>
     </div>
+  </div>
 
-    <div class="checkbox">
-      <label>
-        <input type="checkbox" ng-model="utilisateur.donnees_publiques" ng-value="true"
-               ng-checked="utilisateur.donnees_publiques" ng-disabled="readOnly">
-        J'accepte que mes observations soit publiées sous license publique
-      </label>
+  <div class="form-group">
+    <div class="input-group">
+      <label class="input-group-addon" for="internet_speed">J'accepte que mes observations soit publiées sous license publique</label>
+      <span toggle-switch-directive
+            id="internet_speed"
+            name="internet_speed"
+            ng-model="utilisateur.donnees_publiques"
+            left-label="Non"
+            left-label-color="red"
+            left-value="false"
+            right-label="Oui"
+            right-label-color="green"
+            right-value="true"
+            switch-size="small"
+            border-color="#C0C0C0"
+            is-summarised="readOnly">
+      </span>
     </div>
+  </div>
 
-    <div class="form-group">
-        <input class="save-user btn btn-primary" type="submit" value="Sauvegarder" ng-hide="userForm.$pristine">
-    </div>
-    <div class="alert alert-danger" ng-show="saveError">
-      Echec de l'enregistrement de l'utilisateur.
-    </div>
-  </form>
+  <div class="form-group">
+    <textarea rows="3" class="form-control" id="commentaire" name="commentaire"
+              ng-model="utilisateur.commentaire" ng-disabled="readOnly"
+              placeholder="Commentaire">
+    </textarea>
+  </div>
 </div>
