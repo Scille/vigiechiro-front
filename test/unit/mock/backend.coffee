@@ -80,7 +80,6 @@ class BackendMock
   resetCustomToken: ->
   all: (resource) ->
     if not @_resources[resource]?
-      console.log(resource)
       @_resources[resource] = new BackendResourceMock(resource, @_q)
     return @_resources[resource]
   one: (resource, item) ->

@@ -4,7 +4,8 @@ breadcrumbsGetUtilisateurDefer = undefined
 
 
 angular.module('utilisateurViews', ['ngRoute', 'xin_listResource', 'xin_tools',
-                                    'xin_session', 'xin_backend', 'sc-toggle-switch'])
+                                    'xin_session', 'xin_backend',
+                                    'sc-toggle-switch', 'rzModule'])
   .config ($routeProvider) ->
     $routeProvider
       .when '/utilisateurs',
@@ -49,6 +50,21 @@ angular.module('utilisateurViews', ['ngRoute', 'xin_listResource', 'xin_tools',
     $scope.isAdmin = false
     userResource = undefined
     userBackend = undefined
+
+    $scope.vitesse_connexion =
+      options:
+        stepsArray: ["< ou ~ 5 Mbit/s", "~ 10 Mbit/s", "~ 20 Mbit/s", "> 20 Mbit/s"]
+        showTicksValues: true
+        showSelectionBar: true
+        getSelectionBarColor: (value) ->
+          if value == 0
+            return 'red'
+          else if value == 1
+            return 'orange'
+          else if value == 2
+            return 'yellow'
+          return 'green'
+
     if $routeParams.userId == 'moi'
       userBackend = Backend.one('moi')
     else

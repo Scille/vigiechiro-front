@@ -18,5 +18,5 @@ angular.module('appSettings', [])
       "professionnel",
       "donnees_publiques",
       "role",
-      "connection_rapide"
+      "vitesse_connexion"
     ]

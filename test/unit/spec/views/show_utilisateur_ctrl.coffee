@@ -5,17 +5,19 @@ describe 'Controller: ShowUtilisateurController', ->
   # load the controller's module
   beforeEach module 'xin_backend'
   beforeEach module 'utilisateurViews'
+  beforeEach module 'appSettings'
 
   routeParams = {userId: '54949c201d41c868777dd6d4'}
   scope = undefined
   Backend = undefined
   httpBackend = undefined
+  SETTINGS = undefined
 
   # Initialize the controller and a mock scope
-  beforeEach inject ($q, $controller, $rootScope, _Backend_, _$httpBackend_) ->
-
+  beforeEach inject ($q, $controller, $rootScope, _Backend_, _$httpBackend_, _SETTINGS_) ->
     Backend = _Backend_
     httpBackend = _$httpBackend_
+    settings = _SETTINGS_
     spyOn(Backend, 'one').and.callThrough()
     scope = $rootScope.$new()
     session =
@@ -28,6 +30,7 @@ describe 'Controller: ShowUtilisateurController', ->
       $scope: scope
       Backend: Backend
       session: session
+      SETTINGS: settings
 
   it 'Test show utilisateur', ->
     mockToReturn =
@@ -82,7 +85,7 @@ describe 'Controller: ShowUtilisateurController', ->
     expect(scope.utilisateur).toEqual(mockToReturn)
     scope.utilisateur.email = 'john.irondick@gmail.com'
     scope.utilisateur.prenom = 'John'
-    scope.saveUser()
+    scope.save()
     httpBackend.expectPATCH(
       '/utilisateurs/54949c201d41c868777dd6d4'
         'email': 'john.irondick@gmail.com'
