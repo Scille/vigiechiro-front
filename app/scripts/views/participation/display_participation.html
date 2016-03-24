@@ -1,13 +1,51 @@
-<a class="btn btn-default" href="#/protocoles/{{participation.protocole._id}}">
-  Voir le protocole {{ participation.protocole.titre }}
-</a>
-<a class="btn btn-default" href="#/sites/{{participation.site._id}}">
-  Voir le site {{ participation.site.titre }}
-</a>
+<div class="actionbar">
+  <a class="btn btn-default" href="#/protocoles/{{participation.protocole._id}}">
+    Voir le protocole {{ participation.protocole.titre }}
+  </a>
+  <a class="btn btn-default" href="#/sites/{{participation.site._id}}">
+    Voir le site {{ participation.site.titre }}
+  </a>
+  <a class="btn btn-primary" href="#/participations/{{participation._id}}/donnees">
+    Voir les données
+  </a>
+  <a class="btn btn-primary" href="#/participations/{{participation._id}}/edition">
+    Editer la participation
+  </a>
+  <a class="btn btn-primary" href="#/participations/{{participation._id}}/telechargement">
+    Télécharger les fichiers
+  </a>
+  <sc-button class="btn btn-danger"
+             ng-click="delete()"
+             label="'Supprimer la participation'"
+             wait-for-class=""
+             cancel-wait-for="">
+  </sc-button>
+  <sc-button class="btn btn-primary"
+             ng-click="getDonnees()"
+             label="'Recevoir les données par email'"
+             wait-for-class=""
+             cancel-wait-for="">
+  </sc-button>
+  <sc-button class="btn btn-warning"
+             ng-click="compute()"
+             label="'Relancer la participation'"
+             wait-for-class=""
+             cancel-wait-for=""
+             ng-if="isAdmin && (participation.traitement.etat == 'FINI' || participation.traitement.etat == 'ERREUR' || participation.traitement.timeout)">
+  </sc-button>
+</div>
 
-<a class="btn btn-danger" href="" ng-click="delete()">
-  Supprimer la participation
-</a>
+<div class="alert alert-success" ng-show="isCsvPost">
+  Demande de réception des données par email : reçue
+</div>
+<div class="alert alert-danger" ng-show="isCsvPost == false">
+  Echec de la demande de réception des données par email
+</div>
+<div ng-show="computeInfo">
+  <span class="label label-danger" ng-if="computeInfo.error">
+    La demande de relance de la participation a échoué.
+  </span>
+</div>
 
 <display-participation-directive participation="participation">
 </display-participation-directive>
@@ -16,10 +54,6 @@
   <input class="form-control" type="text" ng-model="post">
   <a class="input-group-addon" ng-click="addPost()">Ajouter un message</a>
 </div>
-
-<a class="btn btn-primary" href="#/participations/{{participation._id}}/edition">
-  Editer la participation
-</a>
 
 <hr>
 
@@ -90,32 +124,9 @@
     Début du traitement : {{ participation.traitement.date_debut | xinDate: 'medium' }}-->
   </span>
 </div>
-<div ng-show="computeInfo">
-  <span class="label label-danger" ng-if="computeInfo.error">
-    La demande de relance de la participation a échoué.
-  </span>
-</div>
 
-<!-- Buttons -->
 <div>
-  <a class="btn btn-primary" href="#/participations/{{participation._id}}/donnees">
-    Voir les données
-  </a>
-  <a class="btn btn-primary" href="" ng-click="getDonnees()">
-    Recevoir les données par email
-  </a>
-  <a class="btn btn-warning" href="" ng-click="compute()"
-     ng-if="isAdmin && (participation.traitement.etat == 'FINI' || participation.traitement.etat == 'ERREUR' || participation.traitement.timeout)">
-    Relancer la participation
-  </a>
   <span ng-if="participation.logs">
     <access-file-directive file="participation.logs"></access-file-directive>
   </span>
-</div>
-
-<div class="alert alert-success" ng-show="isCsvPost">
-  Demande de réception des données par email : reçue
-</div>
-<div class="alert alert-danger" ng-show="isCsvPost == false">
-  Echec de la demande de réception des données par email
 </div>
