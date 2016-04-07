@@ -75,7 +75,7 @@ angular.module('xin.fileUploader', ['xin_s3uploadFile'])
       elem.bind('change', onChange)
 
 
-  .factory 'FileUploader', ($interval, S3FileUploader, Backend) ->
+  .factory 'FileUploader', ($interval, $http, S3FileUploader, Backend, SETTINGS, sessionTools) ->
     class FileUploader
       constructor: ->
         @filters = []
@@ -434,6 +434,31 @@ angular.module('xin.fileUploader', ['xin_s3uploadFile'])
             payload.mime = 'application/ta'
           else if tac.test(payload.titre)
             payload.mime = 'application/tac'
+
+
+        req = new XMLHttpRequest()
+        req.open('POST', "#{SETTINGS.API_DOMAIN}/fichiers", true)
+        req.setRequestHeader("Authorization", sessionTools.getAuthorizationHeader())
+        req.setRequestHeader("Content-Type", "application/json")
+        req.onreadystatechange = (aEvt) ->
+          if req.readyState == 4
+            console.log(req)
+        req.send(JSON.stringify(payload))
+
+        $http(
+          method: "POST"
+          url: "#{SETTINGS.API_DOMAIN}/fichiers"
+          data: payload
+          headers:
+            "Accept": "*/*"
+            "Authorization": sessionTools.getAuthorizationHeader()
+            "Content-Type": "application/json"
+        ).then(
+          (response) -> console.log(response)
+          (response) -> console.log(response)
+        )
+
+
         Backend.all('fichiers').post(payload).then(
           (response) =>
             s3File = @_createS3File(file, gzip, payload.multipart, response._id, response._etag, sliceSize, response.s3_signed_url)
