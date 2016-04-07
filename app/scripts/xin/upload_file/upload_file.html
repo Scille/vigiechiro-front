@@ -74,23 +74,18 @@
     <div class="col-xs-10 progress">
       <!-- uploaded -->
       <div class="progress-bar progress-bar-success"
-           style="width: {{uploader.itemsCompleted.length/uploader.itemsTotal*100}}%">
-        {{uploader.itemsCompleted.length}}
-      </div>
-      <!-- uploading -->
-      <div class="progress-bar progress-bar-success progress-bar-striped active"
-           style="width: {{uploader.itemsUploading.length/uploader.itemsTotal*100}}%">
-        {{uploader.itemsUploading.length}}
+           style="width: {{uploader.itemsUploaded.length/uploader.itemsWaitingUploadLength*100}}%">
+        {{uploader.itemsUploaded.length}}
       </div>
       <!-- waiting -->
       <div class="progress-bar progress-bar-warning progress-bar-striped active"
-           style="width: {{(uploader.itemsWaiting.length + uploader.itemsReadyToCompress.length)/uploader.itemsTotal*100}}%">
-        {{uploader.itemsWaiting.length + uploader.itemsReadyToCompress.length}}
+           style="width: {{(uploader.itemsWaitingUpload.length+uploader.itemsUploading.length)/uploader.itemsWaitingUploadLength*100}}%">
+        {{uploader.itemsWaitingUpload.length + uploader.itemsUploading.length}}
       </div>
       <!-- errors -->
       <div class="progress-bar progress-bar-danger"
-           style="width: {{(uploader.itemsFailedFilters.length + uploader.itemsFailedUpload.length + uploader.itemsCanceled)/uploader.itemsTotal*100}}%">
-        {{uploader.itemsFailedFilters.length + uploader.itemsFailedUpload.length + uploader.itemsCanceled}}
+           style="width: {{(uploader.itemsFailedBackend.length + uploader.itemsFailedS3.length)/uploader.itemsWaitingUploadLength*100}}%">
+        {{uploader.itemsFailedBackend.length + uploader.itemsFailedS3.length}}
       </div>
     </div>
     <div class="col-xs-2">{{uploader.speed/1024 | number: 1}} ko/s</div>

@@ -82,22 +82,19 @@ angular.module('xin_s3uploadFile', ['appSettings'])
 
 
     class S3FileUploader
-      # 5Mo
-      sliceSize: 5 * 1024 * 1024
       constructor: (file, @userCallbacks, @_gzip = false) ->
         @file = file
         @_pause = $q.defer()
-        @_context = undefined
+        @_context = null
+        @multipart = false
+        @sliceSize = 0
+        @s3_signed_url = ""
 
       _onSuccess: () ->
         @userCallbacks.onSuccess?(this)
       _onProgress: (loaded, total) ->
         @_pause.promise.then =>
           @userCallbacks.onProgress?(this, loaded)
-      _onErrorBack: (status) ->
-        @userCallbacks.onErrorBack?(this, status)
-      _onErrorXhr: (status) ->
-        @userCallbacks.onErrorXhr?(this, status)
       cancel: ->
         @_pause = $q.defer()
 # TODO
@@ -126,37 +123,20 @@ angular.module('xin_s3uploadFile', ['appSettings'])
         if @file.status == 'ready'
           @_onProgress(0, @file.size)
           # Call the backend to get back a signed S3 url
-          if @file.size < @sliceSize
-            @_startSingleUpload()
-          else
-            @_startMultiPartUpload()
-          @userCallbacks.onStart?(this)
-      _startMultiPartUpload: () ->
-        payload =
-          mime: @file.type
-          titre: @file.name
-          multipart: true
-        if payload.mime == ''
-          ta = /\.ta$/
-          tac = /\.tac$/
-          if ta.test(payload.titre)
-            payload.mime = 'application/ta'
-          else if tac.test(payload.titre)
-            payload.mime = 'application/tac'
-        # Create the file in the backend
-        Backend.all('fichiers').post(payload).then(
-          (response) =>
-            @file.id = response._id
-            @_context =
-              id: response._id
+          if @multipart
+            @file._context =
+              id: @file.id
               part_number: 1
               transmitted_size: 0
               file: @file
               parts: []
-            @_continueMultiPartUpload()
-          (error) -> throw error
-        )
-      _continueMultiPartUpload: () ->
+            @_startMultiPartUpload()
+          else
+            @_startSingleUpload()
+          @userCallbacks.onStart?(this)
+
+
+      _startMultiPartUpload: () ->
         @_pause.promise.then =>
           fileBackend = Backend.all('fichiers').one(@_context.id)
           start = (@_context.part_number - 1) * @sliceSize
@@ -197,43 +177,23 @@ angular.module('xin_s3uploadFile', ['appSettings'])
               uploadToS3(callbacks, 'PUT', slice, response.s3_signed_url, headers)
             (error) -> throw error
           )
-      _startSingleUpload: () ->
-        payload =
-          mime: @file.type
-          titre: @file.name
-          multipart: false
-        if payload.mime == ''
+
+      _startSingleUpload: ->
+        callbacks =
+          onError: (error) => @userCallbacks.onErrorXhr?(this, error)
+          onProgress: (loaded, total) => @userCallbacks.onProgress?(this, loaded)
+          onSuccess: => @userCallbacks.onSuccess?(this)
+
+        contentType = @file.type
+        if contentType == ''
           ta = /\.ta$/
           tac = /\.tac$/
-          if ta.test(payload.titre)
-            payload.mime = 'application/ta'
-          else if tac.test(payload.titre)
-            payload.mime = 'application/tac'
-        callbacks =
-          onError: (error) => @_onErrorXhr(error)
-          onProgress: (loaded, total) => @_onProgress(loaded, total)
-          onSuccess: =>
-            Backend.one('fichiers', @file.id).get().then (fileBackend) =>
-              fileBackend.post().then(
-                =>  @_onSuccess()
-                (error) => @_onErrorBack(error)
-              )
-        Backend.all('fichiers').post(payload).then(
-          (response) =>
-            etag = response._etag
-            @file.id = response._id
-            contentType = @file.type
-            if contentType == ''
-              ta = /\.ta$/
-              tac = /\.tac$/
-              if ta.test(@file.name)
-                contentType = 'application/ta'
-              else if tac.test(@file.name)
-                contentType = 'application/tac'
-            headers =
-              'Content-Type': contentType
-            if @_gzip
-              headers["Content-Encoding"] = "gzip"
-            uploadToS3(callbacks, 'PUT', @file, response.s3_signed_url, headers)
-          (error) => @_onErrorBack(error)
-        )
+          if ta.test(@file.name)
+            contentType = 'application/ta'
+          else if tac.test(@file.name)
+            contentType = 'application/tac'
+        headers =
+          'Content-Type': contentType
+        if @_gzip
+          headers["Content-Encoding"] = "gzip"
+        uploadToS3(callbacks, 'PUT', @file, @s3_signed_url, headers)
