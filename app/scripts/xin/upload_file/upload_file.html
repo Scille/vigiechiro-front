@@ -1,9 +1,9 @@
 <!-- drop zone -->
 <div class="drop row" uploader="uploader"
-     over-class="drag-over" file-over
-     directory="directory">
+     over-class="drag-over" file-over drop-error="dropError"
+     directory="directory" ng-show="uploader.status == 'inactive'">
   <input type="file" class="btn hidden" file-select
-         uploader="uploader" id="file_{{date_id}}" />
+         uploader="uploader" id="file_{{date_id}}" drop-error="dropError">
   <center>
     <label for="file_{{date_id}}">
       <div ng-if="!directory">
@@ -17,49 +17,83 @@
   </center>
 </div>
 
+<!-- drop zone error -->
+<div class="alert alert-danger" ng-show="dropError.length">
+  <div ng-repeat="error in dropError">{{error}}</div>
+</div>
+
 <!-- abstract -->
-<div class="well">
-  <div class="row">
-    <div class="col-md-5">Fichiers : {{uploader.itemsCompleted.length}}/{{uploader.itemsTotal}}</div>
-    <div class="col-md-4">
-      {{uploader.transmitted_size/1024/1024 | number: 2}}/{{uploader.size/1024/1024 | number: 2}} Mo
-    </div>
-    <div class="col-md-3">
-      {{uploader.speed/1024 | number: 1}} ko/s
+<div class="well" ng-show="uploader.status != 'inactive'">
+  <div class="row"><center><strong>{{uploader.status}}</strong></center></div>
+
+  <div class="row" ng-show="uploader.status == 'Vérification du format des noms de fichier.'">
+    <!-- filters bar -->
+    <div class="col-xs-10 progress">
+      <!-- filtered -->
+      <div class="progress-bar progress-bar-success"
+           style="width: {{uploader.itemsFiltered.length/(uploader.itemsFiltered.length+uploader.itemsWaitingFilters.length+uploader.itemsFailedFilters.length)*100}}%">
+        {{uploader.itemsFiltered.length}}
+      </div>
+      <!-- waiting -->
+      <div class="progress-bar progress-bar-warning progress-bar-striped active"
+           style="width: {{uploader.itemsWaitingFilters.length/(uploader.itemsFiltered.length+uploader.itemsWaitingFilters.length+uploader.itemsFailedFilters.length)*100}}%">
+        {{uploader.itemsWaitingFilters.length}}
+      </div>
+      <!-- errors -->
+      <div class="progress-bar progress-bar-danger"
+           style="width: {{uploader.itemsFailedFilters.length/(uploader.itemsFiltered.length+uploader.itemsWaitingFilters.length+uploader.itemsFailedFilters.length)*100}}%">
+        {{uploader.itemsFailedFilters.length}}
+      </div>
     </div>
   </div>
-  <!-- global progress bar -->
-  <div class="progress" ng-show="uploader.itemsTotal">
-    <!-- uploaded -->
-    <div class="progress-bar progress-bar-success"
-         style="width: {{uploader.itemsCompleted.length/uploader.itemsTotal*100}}%">
-      {{uploader.itemsCompleted.length}}
+
+  <div class="row" ng-if="uploader.status == 'Compression des fichiers en cours.'">
+    <!-- compress bar -->
+    <div class="col-xs-10 progress">
+      <!-- compressed -->
+      <div class="progress-bar progress-bar-success"
+           style="width: {{uploader.itemsCompressed.length/uploader.itemsToCompress*100}}%">
+        {{uploader.itemsCompressed.length}}
+      </div>
+      <!-- waiting -->
+      <div class="progress-bar progress-bar-warning progress-bar-striped active"
+           style="width: {{uploader.itemsWaitingCompressLength/uploader.itemsToCompress*100}}%">
+        {{uploader.itemsWaitingCompressLength}}
+      </div>
+      <!-- errors -->
+      <div class="progress-bar progress-bar-danger"
+           style="width: {{uploader.itemsFailedFilters.length/uploader.itemsToCompress*100}}%">
+        {{uploader.itemsFailedCompress.length}}
+      </div>
     </div>
-    <!-- uploading -->
-    <div class="progress-bar progress-bar-success progress-bar-striped active"
-         style="width: {{uploader.itemsUploading.length/uploader.itemsTotal*100}}%">
-      {{uploader.itemsUploading.length}}
+  </div>
+
+  <!-- upload bar -->
+  <div class="row" ng-show="uploader.status == 'Téléchargement des fichiers en cours.'">
+    <!-- global progress bar -->
+    <div class="col-xs-10 progress">
+      <!-- uploaded -->
+      <div class="progress-bar progress-bar-success"
+           style="width: {{uploader.itemsCompleted.length/uploader.itemsTotal*100}}%">
+        {{uploader.itemsCompleted.length}}
+      </div>
+      <!-- uploading -->
+      <div class="progress-bar progress-bar-success progress-bar-striped active"
+           style="width: {{uploader.itemsUploading.length/uploader.itemsTotal*100}}%">
+        {{uploader.itemsUploading.length}}
+      </div>
+      <!-- waiting -->
+      <div class="progress-bar progress-bar-warning progress-bar-striped active"
+           style="width: {{(uploader.itemsWaiting.length + uploader.itemsReadyToCompress.length)/uploader.itemsTotal*100}}%">
+        {{uploader.itemsWaiting.length + uploader.itemsReadyToCompress.length}}
+      </div>
+      <!-- errors -->
+      <div class="progress-bar progress-bar-danger"
+           style="width: {{(uploader.itemsFailedFilters.length + uploader.itemsFailedUpload.length + uploader.itemsCanceled)/uploader.itemsTotal*100}}%">
+        {{uploader.itemsFailedFilters.length + uploader.itemsFailedUpload.length + uploader.itemsCanceled}}
+      </div>
     </div>
-    <!-- compressed -->
-    <div class="progress-bar"
-         style="width:{{uploader.itemsReadyToUp.length/uploader.itemsTotal*100}}%">
-      {{uploader.itemsReadyToUp.length}}
-    </div>
-    <!-- compressing -->
-    <div class="progress-bar progress-bar-striped active"
-         style="width:{{uploader.itemsCompressing/uploader.itemsTotal*100}}%">
-      {{uploader.itemsCompressing}}
-    </div>
-    <!-- errors -->
-    <div class="progress-bar progress-bar-danger"
-         style="width: {{(uploader.itemsFailedFilters.length + uploader.itemsFailedUpload.length + uploader.itemsCanceled)/uploader.itemsTotal*100}}%">
-      {{uploader.itemsFailedFilters.length + uploader.itemsFailedUpload.length + uploader.itemsCanceled}}
-    </div>
-    <!-- other -->
-    <div class="progress-bar progress-bar-warning"
-         style="width: {{(uploader.itemsWaiting.length + uploader.itemsReadyToCompress.length)/uploader.itemsTotal*100}}%">
-      {{uploader.itemsWaiting.length + uploader.itemsReadyToCompress.length}}
-    </div>
+    <div class="col-xs-2">{{uploader.speed/1024 | number: 1}} ko/s</div>
   </div>
 
   <!-- Filters errors -->

@@ -30,6 +30,7 @@ angular.module('xin_s3uploadFile', ['appSettings'])
         btn.tooltip()
 
 
+
   .directive 'accessPhotoDirective', (SETTINGS, Backend) ->
     restrict: 'E'
     template: '<img ng-src="{{s3_signed_url}}"</img><span ng-show="onError">{{error}}</span>'
@@ -49,6 +50,7 @@ angular.module('xin_s3uploadFile', ['appSettings'])
         # Photo is not available, notify it to the user
         scope.onError = true
         scope.error = "Cette image n'est pas disponible en ligne"
+
 
 
   .service 'S3FileUploader', ($q, Backend) ->

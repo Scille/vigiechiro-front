@@ -8,12 +8,11 @@ angular.module('xin_uploadFile', ['appSettings', 'xin_s3uploadFile', 'xin.fileUp
     controller: 'UploadFileController'
     scope:
       uploader: '=?'
-      regexp: '=?'
     link: (scope, elem, attrs) ->
       scope.dragOverClass = ''
       scope.multiple = false
       scope.directory = false
-      scope.gzip = false
+
       drop = elem.find('.drop')
       input = drop.find('input')
       if attrs.multiple?
@@ -24,16 +23,10 @@ angular.module('xin_uploadFile', ['appSettings', 'xin_s3uploadFile', 'xin.fileUp
         input[0].setAttribute('directory', '')
         input[0].setAttribute('webkitdirectory', '')
         input[0].setAttribute('mozdirectory', '')
-      if attrs.gzip?
-        scope.gzip = true
-      if attrs.regexp?
-        scope.$watch 'regexp', (regexp) ->
-          if regexp? and regexp.constructor == Array and regexp.length
-            scope.addRegExpFilter()
-        , true
 
 
   .controller 'UploadFileController', ($scope, Backend, S3FileUploader, FileUploader, guid) ->
+    $scope.dropError = []
     $scope.date_id = guid()
     $scope.warnings = []
     $scope.errors =
@@ -41,11 +34,8 @@ angular.module('xin_uploadFile', ['appSettings', 'xin_s3uploadFile', 'xin.fileUp
       back: []
       xhr: []
     uploader = $scope.uploader = new FileUploader()
-
-    $scope.$watch 'gzip', (gzip) ->
-      if gzip
-        uploader.setGzip()
-    , true
+    uploader.refresh = ->
+      $scope.$apply()
 
     # Remove sub-directories
     uploader.filters.push(
@@ -61,20 +51,6 @@ angular.module('xin_uploadFile', ['appSettings', 'xin_s3uploadFile', 'xin.fileUp
               uploader.directories.push(nameDirectory)
         return true
     )
-
-    $scope.addRegExpFilter = ->
-      for filter in uploader.filters when filter.name == "Format incorrect."
-        return
-      uploader.filters.push(
-        name: "Format incorrect."
-        fn: (item) ->
-          if item.type in ['image/png', 'image/png', 'image/jpeg']
-            return true
-          for reg in $scope.regexp
-            if reg.test(item.name)
-              return true
-          return false
-      )
 
     uploader.displayError = (error, type, limit = 0) ->
       if type == 'back'

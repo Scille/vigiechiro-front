@@ -1,5 +1,9 @@
+<div class="spinner" ng-show="participationWaiting">
+    <i class="fa fa-5x fa-spinner fa-pulse"></i>
+</div>
+
 <div class="actionbar">
-  <a class="btn btn-default" href="" ng-click="redirect()">
+  <a class="btn btn-default" href="#/participations/{{participation._id}}">
     Voir la participation
   </a>
 </div>
@@ -29,7 +33,9 @@
     <div class="input-group">
       <span class="input-group-addon">Fichiers joints</span>
       <div style="padding-right: 1em; border-left: 1px solid #ccc">
-        <upload-file-directive uploader="fileUploader" regexp="regexp" gzip multiple>
+        <upload-file-directive uploader="fileUploader"
+                               callback-success="backendSuccess" callback-error="backendError"
+                               multiple>
         </upload-file-directive>
       </div>
     </div>
@@ -39,9 +45,32 @@
     <div class="input-group">
       <span class="input-group-addon">Dossier joint</span>
       <div style="padding-right: 1em; border-left: 1px solid #ccc">
-        <upload-file-directive uploader="folderUploader" regexp="regexp" gzip directory>
+        <upload-file-directive uploader="folderUploader"
+                               callback-success="backendSuccess" callback-error="backendError"
+                               directory>
         </upload-file-directive>
       </div>
+    </div>
+  </div>
+</div>
+
+
+<div class="row">
+  <div class="col-xs-4 alert alert-success" ng-show="success.length">
+    <div ng-repeat="file in success">
+      {{file}}
+    </div>
+  </div>
+
+  <div class="col-xs-4 alert alert-warning" ng-show="warning.length">
+    <div ng-repeat="file in warning">
+      {{file}}
+    </div>
+  </div>
+
+  <div class="col-xs-4 alert alert-danger" ng-show="danger.length">
+    <div ng-repeat="file in danger">
+      {{file}}
     </div>
   </div>
 </div>

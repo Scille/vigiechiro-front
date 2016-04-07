@@ -23,7 +23,7 @@ angular.module('uploadParticipationViews', ['ngRoute', 'xin_listResource',
   .config ($routeProvider) ->
     $routeProvider
       .when '/participations/:participationId/telechargement',
-        templateUrl: 'scripts/views/upload/upload.html'
+        templateUrl: 'scripts/views/participation_upload/upload.html'
         controller: 'AddParticipationFilesController'
         breadcrumbs: ngInject ($q, $filter) ->
           breadcrumbsDefer = $q.defer()
@@ -39,12 +39,24 @@ angular.module('uploadParticipationViews', ['ngRoute', 'xin_listResource',
 
 
   .controller 'AddParticipationFilesController', ($scope, $routeParams, Backend, session) ->
+    $scope.participationWaiting = true
+
+    user = null
     participationResource = null
     $scope.participation = null
     $scope.fileUploader = {}
     $scope.folderUploader = {}
-    # for upload
-    $scope.connection_fast = 0
+
+    # waiting env
+    waitingSession = true
+    waitingParticipation = true
+    waitingFileUploader = true
+    waitingFolderUploader = true
+
+    # summary
+    $scope.success = []
+    $scope.warning = []
+    $scope.danger = []
 
     $scope.folderAllowed = true
     # firefox and IE don't support folder upload
@@ -56,13 +68,16 @@ angular.module('uploadParticipationViews', ['ngRoute', 'xin_listResource',
       $scope.folderAllowed = false
 
     # user for web connection fast
-    session.getUserPromise().then (user) ->
-      $scope.connection_fast = user.vitesse_connexion or 0
-      console.log("TODO : check user right for this participation")
+    session.getUserPromise().then (userPromise) ->
+      user = userPromise
+      waitingSession = false
+      checkEnv()
 
     # get participation
     Backend.one("participations", $routeParams.participationId).get().then(
       (participation) ->
+        $scope.participationWaiting = false
+
         if breadcrumbsGetParticipationDefer?
           breadcrumbsGetParticipationDefer.resolve(participation)
           breadcrumbsGetParticipationDefer = undefined
@@ -71,9 +86,60 @@ angular.module('uploadParticipationViews', ['ngRoute', 'xin_listResource',
         $scope.participation = participation.plain()
 
         makeRegExp($scope, participation.protocole.type_site)
+        waitingParticipation = false
+        checkEnv()
 
       (error) -> window.location = "#/404"
     )
+
+
+    $scope.$watch 'fileUploader', (value) ->
+      if not waitingFileUploader
+        return
+      if value.constructor.name == "FileUploader"
+        waitingFileUploader = false
+        checkEnv()
+
+    $scope.$watch 'folderUploader', (value) ->
+      if not waitingFolderUploader
+        return
+      if value.constructor.name == "FileUploader"
+        waitingFolderUploader = false
+        checkEnv()
+
+    checkEnv = ->
+      if not waitingSession and not waitingParticipation and
+         not waitingFileUploader and not waitingFolderUploader
+        $scope.fileUploader.gzip = true
+        $scope.fileUploader.autostart = true
+        $scope.fileUploader.connectionSpeed = user.vitesse_connexion or 0
+        $scope.folderUploader.gzip = true
+        $scope.folderUploader.autostart = true
+        $scope.folderUploader.connectionSpeed = user.vitesse_connexion or 0
+        addRegExpFilter($scope.fileUploader, $scope.regexp)
+        addRegExpFilter($scope.folderUploader, $scope.regexp)
+
+
+    addRegExpFilter = (uploader, regexp) ->
+      for filter in uploader.filters when filter.name == "Format incorrect."
+        return
+      uploader.filters.push(
+        name: "Format incorrect."
+        fn: (item) ->
+          if item.type in ['image/png', 'image/png', 'image/jpeg']
+            return true
+          for reg in regexp
+            if reg.test(item.name)
+              return true
+          return false
+      )
+
+    $scope.backendSuccess = ->
+      console.log("backendSuccess")
+
+
+    $scope.backendError = ->
+      console.log("backendError")
 
 
     $scope.redirect = ->
@@ -82,21 +148,13 @@ angular.module('uploadParticipationViews', ['ngRoute', 'xin_listResource',
          not $scope.folderUploader.isAllComplete()
         $scope.participationForm.pieces_jointes = {$error: {uploading: true}}
         error = true
-
-      window.location = "#/participations/#{participationResource._id}"
-
-
-    sendFiles = (participation) ->
-      participationCreated = true
-      payload =
-        pieces_jointes: $scope.fileUploader.itemsCompleted.concat($scope.folderUploader.itemsCompleted)
-
-      if not payload.pieces_jointes.length
-        window.location = '#/participations/'+participationResource._id
       else
-        participationResource.customPUT(payload, 'pieces_jointes').then(
-          -> window.location = '#/participations/'+participationResource._id
-          ->
-            $scope.participation._errors.participation = "Echec de l'enregistrement des pièces jointes."
-            $scope.endSave.deferred()
-        )
+        window.location = "#/participations/#{participationResource._id}"
+
+
+    compute = ->
+      $scope.computeInfo = {}
+      participationResource.post('compute', {}).then(
+        (result) -> $route.reload()
+        (error) -> $scope.computeInfo.error = true
+      )
