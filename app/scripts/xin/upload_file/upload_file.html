@@ -84,8 +84,8 @@
       </div>
       <!-- errors -->
       <div class="progress-bar progress-bar-danger"
-           style="width: {{(uploader.itemsFailedBackend.length + uploader.itemsFailedS3.length)/uploader.itemsWaitingUploadLength*100}}%">
-        {{uploader.itemsFailedBackend.length + uploader.itemsFailedS3.length}}
+           style="width: {{(uploader.itemsWarning.length + uploader.itemsFailed.length)/uploader.itemsWaitingUploadLength*100}}%">
+        {{uploader.itemsWarning.length + uploader.itemsFailed.length}}
       </div>
     </div>
     <div class="col-xs-2">{{uploader.speed/1024 | number: 1}} ko/s</div>

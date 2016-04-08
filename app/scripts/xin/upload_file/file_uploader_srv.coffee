@@ -219,11 +219,9 @@ angular.module('xin.fileUploader', ['xin_s3uploadFile'])
         fileReader.readAsArrayBuffer(file)
 
 
-      _createS3File: (file, gzip, multipart, id, etag, sliceSize, s3_signed_url) =>
+      _createS3File: (file, gzip, multipart, sliceSize) =>
         file.transmitted_size = 0
         file.sendingTryS3 = 0
-        file.id = id
-        file.etag = etag
         file.status = "ready"
         file = new S3FileUploader(file,
           onStart: (s3File) =>
@@ -252,7 +250,6 @@ angular.module('xin.fileUploader', ['xin_s3uploadFile'])
             @itemsCanceled.push({name: s3File.file.name})
           , gzip
         )
-        file.s3_signed_url = s3_signed_url
         file.multipart = multipart
         file.sliceSize = sliceSize
         return file
@@ -405,17 +402,22 @@ angular.module('xin.fileUploader', ['xin_s3uploadFile'])
           else if tac.test(payload.titre)
             payload.mime = 'application/tac'
 
+        s3File = @_createS3File(file, gzip, payload.multipart, sliceSize)
+        @itemsUploading.push(s3File)
         Backend.all('fichiers').post(payload).then(
           (response) =>
-            s3File = @_createS3File(file, gzip, payload.multipart, response._id, response._etag, sliceSize, response.s3_signed_url)
-            @itemsUploading.push(s3File)
+            s3File.file.id = response._id
+            s3File.file.etag = response._etag
+            s3File.s3_signed_url = response.s3_signed_url
             s3File.start()
           (error) =>
+            fileArray = @_removeFileUploading(s3File)
             if error.status == 422
               if error.data? and error.data._errors? and error.data._errors.s3_id?
                 if error.data._errors.s3_id.search("is not unique") != -1
-                  @itemsWarning.push("Le fichier #{file.name} existe déjà dans cette participation.")
+                  @itemsWarning.push("Le fichier #{fileArray.file.name} existe déjà dans cette participation.")
+                  @_uploadStart()
                   return
-            @itemsFailed.push("Echec de l'insertion en base du fichier #{file.name}.")
+            @itemsFailed.push("Echec de l'insertion en base du fichier #{fileArray.file.name}.")
             @_uploadStart()
         )
