@@ -436,27 +436,27 @@ angular.module('xin.fileUploader', ['xin_s3uploadFile'])
             payload.mime = 'application/tac'
 
 
-        req = new XMLHttpRequest()
-        req.open('POST', "#{SETTINGS.API_DOMAIN}/fichiers", true)
-        req.setRequestHeader("Authorization", sessionTools.getAuthorizationHeader())
-        req.setRequestHeader("Content-Type", "application/json")
-        req.onreadystatechange = (aEvt) ->
-          if req.readyState == 4
-            console.log(req)
-        req.send(JSON.stringify(payload))
 
-        $http(
-          method: "POST"
-          url: "#{SETTINGS.API_DOMAIN}/fichiers"
-          data: payload
-          headers:
-            "Accept": "*/*"
-            "Authorization": sessionTools.getAuthorizationHeader()
-            "Content-Type": "application/json"
-        ).then(
-          (response) -> console.log(response)
-          (response) -> console.log(response)
-        )
+        # req = new XMLHttpRequest()
+        # req.open('POST', "#{SETTINGS.API_DOMAIN}/fichiers", true)
+        # req.setRequestHeader("Authorization", sessionTools.getAuthorizationHeader())
+        # req.setRequestHeader("Content-Type", "application/json")
+        # req.onreadystatechange = (aEvt) ->
+        #   if req.readyState == 4
+        #     console.log(req)
+        # req.send(JSON.stringify(payload))
+        #
+        # $http(
+        #   method: "POST"
+        #   url: "#{SETTINGS.API_DOMAIN}/fichiers"
+        #   data: payload
+        #   headers:
+        #     "Authorization": sessionTools.getAuthorizationHeader()
+        #     "Content-Type": "application/json"
+        # ).then(
+        #   (response) -> console.log(response)
+        #   (response) -> console.log(response)
+        # )
 
 
         Backend.all('fichiers').post(payload).then(
