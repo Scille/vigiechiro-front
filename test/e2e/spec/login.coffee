@@ -101,15 +101,15 @@ describe 'Test once logged', ->
     userStatus.element(`by`.binding("user.pseudo")).getText().then (name) ->
       expect(name).toBe('Observateur Name')
 
-  it 'Test history', ->
-    browser.setLocation('/taxons').then ->
-      browser.getLocationAbsUrl().then (url) -> expect(url).toBe("/taxons")
-      taxons = element.all(`by`.repeater('resource in resources'))
-      taxons.get(0).element(`by`.css('a')).click().then ->
-        browser.setLocation('/protocoles').then ->
-          expect(browser.getLocationAbsUrl()).toBe("/protocoles")
-          browser.navigate().back().then ->
-            browser.navigate().back().then ->
-              expect(browser.getLocationAbsUrl()).toBe("/taxons")
-              browser.navigate().back().then ->
-                expect(browser.getLocationAbsUrl()).toBe("/accueil")
+  # it 'Test history', ->
+  #   browser.setLocation('/taxons').then ->
+  #     browser.getLocationAbsUrl().then (url) -> expect(url).toBe("/taxons")
+  #     taxons = element.all(`by`.repeater('resource in resources'))
+  #     taxons.get(0).element(`by`.css('a')).click().then ->
+  #       browser.setLocation('/protocoles').then ->
+  #         expect(browser.getLocationAbsUrl()).toBe("/protocoles")
+  #         browser.navigate().back().then ->
+  #           browser.navigate().back().then ->
+  #             expect(browser.getLocationAbsUrl()).toBe("/taxons")
+  #             browser.navigate().back().then ->
+  #               expect(browser.getLocationAbsUrl()).toBe("/accueil")

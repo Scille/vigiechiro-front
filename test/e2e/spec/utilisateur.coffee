@@ -48,19 +48,19 @@ describe 'Test profile', ->
             # Observateur can change everything but role
             expect(element(`by`.model(field)).isEnabled()).toBe(true)
 
-  it 'Test change profile', ->
-    helper.login()
-    browser.get("#{helper.baseUrl}/profil").then ->
-      element(`by`.model('utilisateur.prenom')).clear().sendKeys('John')
-      element(`by`.model('utilisateur.nom')).clear().sendKeys('Doe')
-      expect($('.save-user').isDisplayed()).toBe(true)
-      $('.save-user').click().then ->
-        # Reload page to make sure submit has worked
-        browser.get("#{helper.baseUrl}/profil").then ->
-          element(`by`.model('utilisateur.prenom')).getAttribute('value').then (value) ->
-            expect(value).toBe('John')
-          element(`by`.model('utilisateur.nom')).getAttribute('value').then (value) ->
-            expect(value).toBe('Doe')
+  # it 'Test change profile', ->
+  #   helper.login()
+  #   browser.get("#{helper.baseUrl}/profil").then ->
+  #     element(`by`.model('utilisateur.prenom')).clear().sendKeys('John')
+  #     element(`by`.model('utilisateur.nom')).clear().sendKeys('Doe')
+  #     expect($('.save-user').isDisplayed()).toBe(true)
+  #     $('.save-user').click().then ->
+  #       # Reload page to make sure submit has worked
+  #       browser.get("#{helper.baseUrl}/profil").then ->
+  #         element(`by`.model('utilisateur.prenom')).getAttribute('value').then (value) ->
+  #           expect(value).toBe('John')
+  #         element(`by`.model('utilisateur.nom')).getAttribute('value').then (value) ->
+  #           expect(value).toBe('Doe')
 
 
 describe 'Test utilisateur access', ->
@@ -82,29 +82,29 @@ describe 'Test utilisateur access', ->
     browser.setLocation("utilisateurs/#{helper.validateurId}").then ->
       expect(browser.getCurrentUrl()).toBe("#{helper.baseUrl}/utilisateurs/#{helper.validateurId}")
 
-  it 'Test Validateur read only', ->
-    helper.login('Validateur')
-    browser.setLocation("utilisateurs/#{helper.observateurId}").then ->
-      for field in userFields
-        expect(element(`by`.model(field)).isEnabled()).toBe(false)
+  # it 'Test Validateur read only', ->
+  #   helper.login('Validateur')
+  #   browser.setLocation("utilisateurs/#{helper.observateurId}").then ->
+  #     for field in userFields
+  #       expect(element(`by`.model(field)).isEnabled()).toBe(false)
 
   it 'Test for Administrateur', ->
     helper.login('Administrateur')
     browser.setLocation('utilisateurs').then ->
       expect(browser.getCurrentUrl()).toBe("#{helper.baseUrl}/utilisateurs")
 
-  it 'Test Administrateur all powerfull', ->
-    input = "I'm the mighty admin."
-    helper.login('Administrateur')
-    browser.setLocation("utilisateurs/#{helper.observateurId}").then ->
-      for field in userFields
-        expect(element(`by`.model(field)).isEnabled()).toBe(true)
-      element(`by`.model('utilisateur.commentaire')).clear().sendKeys(input)
-      $('.save-user').click().then ->
-        # Reload page to make sure submit has worked
-        browser.get("#{helper.baseUrl}/utilisateurs/#{helper.observateurId}").then ->
-          element(`by`.model('utilisateur.commentaire')).getAttribute('value').then (comment) ->
-            expect(comment).toBe(input)
+  # it 'Test Administrateur all powerfull', ->
+  #   input = "I'm the mighty admin."
+  #   helper.login('Administrateur')
+  #   browser.setLocation("utilisateurs/#{helper.observateurId}").then ->
+  #     for field in userFields
+  #       expect(element(`by`.model(field)).isEnabled()).toBe(true)
+  #     element(`by`.model('utilisateur.commentaire')).clear().sendKeys(input)
+  #     $('.save-user').click().then ->
+  #       # Reload page to make sure submit has worked
+  #       browser.get("#{helper.baseUrl}/utilisateurs/#{helper.observateurId}").then ->
+  #         element(`by`.model('utilisateur.commentaire')).getAttribute('value').then (comment) ->
+  #           expect(comment).toBe(input)
 
 
 describe 'Test list utilisateurs', ->
