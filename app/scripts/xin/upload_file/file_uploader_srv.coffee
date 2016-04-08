@@ -75,7 +75,7 @@ angular.module('xin.fileUploader', ['xin_s3uploadFile'])
       elem.bind('change', onChange)
 
 
-  .factory 'FileUploader', ($interval, $http, S3FileUploader, Backend, SETTINGS, sessionTools) ->
+  .factory 'FileUploader', ($interval, $http, S3FileUploader, Backend) ->
     class FileUploader
       constructor: ->
         @filters = []
@@ -83,37 +83,34 @@ angular.module('xin.fileUploader', ['xin_s3uploadFile'])
         @_parallelUpload = 2
         @_parallelGZip = 4
         @_waitingGZip = 8
-        @init()
+        @_init()
         @interval = null
         @status = 'inactive'
         @autostart = false
         @connectionSpeed = 0
         @lien_participation = ""
 
-      init: ->
+      _init: ->
         # list for filtering
         @itemsWaitingFilters = []
         @itemsFiltered = []
-        @itemsFailedFilters = []
         # list for compressing
         @itemsToCompress = 0
         @itemsWaitingCompressLength = 0
         @itemsWaitingCompress = []
         @itemsCompressed = []
-        @itemsFailedCompress = []
         # list for uploading
         @itemsWaitingUploadLength = 0
         @itemsWaitingUpload = []
         @itemsUploading = []
+        # list of point end
         @itemsUploaded = []
-        @itemsFailedBackend = []
-        @itemsFailedS3 = []
+        @itemsWarning = []
+        @itemsFailed = []
         #
         @itemsCanceled = []
         #
         @warningsXfails = []
-        # list of warning texts
-        @warnings = []
         #
         @size = 0
         @_sizeUpload = 0
@@ -128,31 +125,17 @@ angular.module('xin.fileUploader', ['xin_s3uploadFile'])
 
 
       addFiles: (files) ->
+        @_init()
         if files.length
           @itemsWaitingFilters = files
           if @autostart
             @_start()
 
 
-      _checkReadyToUp: ->
-        console.log("TODO")
-        # if @_isCheckingReadyToUp or @status in ['pause']
-        #   return
-        # @_isCheckingReadyToUp = true
-        # count = @itemsWaitingUpload.length
-        # for i in [0..count-1] when count > 0
-        #   if @itemsUploading.length < @_parallelUpload
-        #     file = @itemsWaitingUpload.pop()
-        #     @_startUpload(file)
-        #   else
-        #     break
-        # @_isCheckingReadyToUp = false
-
-
       _checkUploader: =>
         if @status in ['pause', 'cancel']
           return
-        @_checkReadyToUp()
+        @_uploadStart()
         @_computeSize()
         @_computeSpeed()
 
@@ -191,7 +174,8 @@ angular.module('xin.fileUploader', ['xin_s3uploadFile'])
       _compressProceed: (file) ->
         if file?
           if file.size == 0
-            @itemsFailedCompress.push(file)
+            console.log("TODO")
+            @itemsFailed.push(file)
             @_compressProceed(@itemsWaitingCompress.pop())
           else
             @_createGZipFile(file, @_compressFileComplete)
@@ -210,17 +194,6 @@ angular.module('xin.fileUploader', ['xin_s3uploadFile'])
           size += file.file.size
         @size = size
         @_isCheckingSize = false
-
-
-      _computeTransmittedSize: ->
-        if @_isCheckingTransmittedSize
-          return
-        @_isCheckingTransmittedSize = true
-        transmitted_size = @_sizeUpload
-        for file in @itemsUploading
-          transmitted_size += file.file.transmitted_size
-        @transmitted_size = transmitted_size
-        @_isCheckingTransmittedSize = false
 
 
       _computeSpeed: ->
@@ -259,10 +232,15 @@ angular.module('xin.fileUploader', ['xin_s3uploadFile'])
             s3File.file.status = 'progress'
           onProgress: (s3File, transmitted_size) =>
             s3File.file.transmitted_size = transmitted_size
-            @_computeTransmittedSize()
           onPause: (s3File) =>
             s3File.file.status = 'pause'
-          onSuccess: (s3File) => @_onSuccess(s3File)
+          onSuccess: (s3File) =>
+            Backend.one('fichiers', s3File.file.id).get().then (fileBackend) =>
+              fileBackend.post().then () =>
+                fileArray = @_removeFileUploading(s3File)
+                if fileArray?
+                  @itemsUploaded.push(fileArray.file.name)
+                @_uploadStart()
           onErrorBack: (s3File, status) =>
             s3File.file.status = 'failure'
             @_retryBackSending(s3File, status)
@@ -294,14 +272,6 @@ angular.module('xin.fileUploader', ['xin_s3uploadFile'])
         @_compress()
 
 
-      _onSuccess: (item) ->
-        Backend.one('fichiers', item.file.id).get().then (fileBackend) =>
-          fileBackend.post().then () =>
-            fileArray = @_removeFileUploading(item)
-            @itemsUploaded.push(fileArray)
-            @_sizeUpload += item.file.size
-            @_checkReadyToUp()
-
       _start: ->
         @_filter()
 
@@ -313,7 +283,7 @@ angular.module('xin.fileUploader', ['xin_s3uploadFile'])
       _removeFileUploading: (file) ->
         for item, index in @itemsUploading
           if item.file.name == file.file.name
-            return @itemsUploading.splice(index, 1)
+            return @itemsUploading.splice(index, 1)[0]
 
 
       _retryS3Sending: (s3File, status) ->
@@ -332,7 +302,7 @@ angular.module('xin.fileUploader', ['xin_s3uploadFile'])
         if item? and item.length
           @itemsFailedUpload.push(item[0])
         @_checkReadyToCompress()
-        @_checkReadyToUp()
+        @_uploadWaiting()
 
       _checkWarningUpload: (name, count = 0) ->
         warning =
@@ -347,15 +317,6 @@ angular.module('xin.fileUploader', ['xin_s3uploadFile'])
         if count
           @warningsXfails.push(warning)
 
-      addWarnings: (warnings) ->
-        @warnings = warnings
-        @onAddingWarningsComplete?()
-
-      startAll: ->
-        @status = 'progress'
-        for file in @itemsUploading
-          file.start()
-        @_checkUploader()
 
       pauseAll: ->
         @status = 'pause'
@@ -371,11 +332,7 @@ angular.module('xin.fileUploader', ['xin_s3uploadFile'])
         @onCancelAllComplete?()
 
       clearErrors: ->
-        @itemsFailedFilters = []
-        @itemsFailedCompress = []
-        @itemsFailedUpload = []
-        @itemsCanceled = []
-        @warningsXfails = []
+        @itemsFailed = []
 
 
       _onFilterError: (item, filter) ->
@@ -389,7 +346,7 @@ angular.module('xin.fileUploader', ['xin_s3uploadFile'])
         else
           text = "Le fichier "+item.name+" n'a pas pu être ajouté à la liste. "+
                  filter.name
-        @itemsFailedFilters.push(text)
+        @itemsFailed.push(text)
 
 
       retryErrors: ->
@@ -397,7 +354,14 @@ angular.module('xin.fileUploader', ['xin_s3uploadFile'])
           item.file.sendingTryS3 = 0
         @itemsReadyToUp = @itemsReadyToUp.concat(@itemsFailedUpload)
         @itemsFailedUpload = []
-        @_checkReadyToUp()
+        @_uploadWaiting()
+
+
+      startAll: ->
+        @status = 'progress'
+        for file in @itemsUploading
+          file.start()
+        @_checkUploader()
 
 
       _upload: ->
@@ -405,10 +369,15 @@ angular.module('xin.fileUploader', ['xin_s3uploadFile'])
         @itemsWaitingUpload = @itemsCompressed
         @itemsWaitingUploadLength = @itemsWaitingUpload.length
         @interval = $interval(@_checkUploader, 10000)
-        if @itemsWaitingUpload.length
+        @_uploadStart()
+
+
+      _uploadStart: ->
+        while @itemsWaitingUpload.length and @itemsUploading.length <= @connectionSpeed
           @_uploadBackend(@itemsWaitingUpload.pop())
-        else
+        if not @itemsWaitingUpload.length and not @itemsUploading.length
           @status = "inactive"
+          console.log("TODO")
 
 
       _uploadBackend: (file) ->
@@ -435,36 +404,17 @@ angular.module('xin.fileUploader', ['xin_s3uploadFile'])
           else if tac.test(payload.titre)
             payload.mime = 'application/tac'
 
-
-
-        # req = new XMLHttpRequest()
-        # req.open('POST', "#{SETTINGS.API_DOMAIN}/fichiers", true)
-        # req.setRequestHeader("Authorization", sessionTools.getAuthorizationHeader())
-        # req.setRequestHeader("Content-Type", "application/json")
-        # req.onreadystatechange = (aEvt) ->
-        #   if req.readyState == 4
-        #     console.log(req)
-        # req.send(JSON.stringify(payload))
-        #
-        # $http(
-        #   method: "POST"
-        #   url: "#{SETTINGS.API_DOMAIN}/fichiers"
-        #   data: payload
-        #   headers:
-        #     "Authorization": sessionTools.getAuthorizationHeader()
-        #     "Content-Type": "application/json"
-        # ).then(
-        #   (response) -> console.log(response)
-        #   (response) -> console.log(response)
-        # )
-
-
         Backend.all('fichiers').post(payload).then(
           (response) =>
             s3File = @_createS3File(file, gzip, payload.multipart, response._id, response._etag, sliceSize, response.s3_signed_url)
             @itemsUploading.push(s3File)
             s3File.start()
           (error) =>
-            console.log(error)
-            @itemsFailedBackend.push(file)
+            if error.status == 422
+              if error.data? and error.data._errors? and error.data._errors.s3_id?
+                if error.data._errors.s3_id.search("is not unique") != -1
+                  @itemsWarning.push("Le fichier #{file.name} existe déjà dans cette participation.")
+                  return
+            @itemsFailed.push("Echec de l'insertion en base du fichier #{file.name}.")
+            @_uploadStart()
         )

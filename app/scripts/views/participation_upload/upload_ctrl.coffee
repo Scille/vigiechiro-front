@@ -136,13 +136,6 @@ angular.module('uploadParticipationViews', ['ngRoute', 'xin_listResource',
           return false
       )
 
-    $scope.backendSuccess = ->
-      console.log("backendSuccess")
-
-
-    $scope.backendError = ->
-      console.log("backendError")
-
 
     $scope.redirect = ->
       # Check files

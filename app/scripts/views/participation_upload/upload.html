@@ -34,7 +34,6 @@
       <span class="input-group-addon">Fichiers joints</span>
       <div style="padding-right: 1em; border-left: 1px solid #ccc">
         <upload-file-directive uploader="fileUploader"
-                               callback-success="backendSuccess" callback-error="backendError"
                                multiple>
         </upload-file-directive>
       </div>
@@ -46,7 +45,6 @@
       <span class="input-group-addon">Dossier joint</span>
       <div style="padding-right: 1em; border-left: 1px solid #ccc">
         <upload-file-directive uploader="folderUploader"
-                               callback-success="backendSuccess" callback-error="backendError"
                                directory>
         </upload-file-directive>
       </div>
@@ -56,21 +54,47 @@
 
 
 <div class="row">
-  <div class="col-xs-4 alert alert-success" ng-show="success.length">
-    <div ng-repeat="file in success">
-      {{file}}
+  <div class="col-xs-4 alert alert-success" ng-show="fileUploader.itemsUploaded.length">
+    <div><strong>{{fileUploader.itemsUploaded.length}}</strong></div>
+    <div ng-repeat="message in fileUploader.itemsUploaded">
+      {{message}}
     </div>
   </div>
 
-  <div class="col-xs-4 alert alert-warning" ng-show="warning.length">
-    <div ng-repeat="file in warning">
-      {{file}}
+  <div class="col-xs-4 alert alert-warning" ng-show="fileUploader.itemsWarning.length">
+    <div><strong>{{fileUploader.itemsWarning.length}}</strong></div>
+    <div ng-repeat="message in fileUploader.itemsWarning">
+      {{message}}
     </div>
   </div>
 
-  <div class="col-xs-4 alert alert-danger" ng-show="danger.length">
-    <div ng-repeat="file in danger">
-      {{file}}
+  <div class="col-xs-4 alert alert-danger" ng-show="fileUploader.itemsFailed.length">
+    <div><strong>{{fileUploader.itemsFailed.length}}</strong></div>
+    <div ng-repeat="message in fileUploader.itemsFailed">
+      {{message}}
+    </div>
+  </div>
+</div>
+
+<div class="row" ng-show="folderAllowed">
+  <div class="col-xs-4 alert alert-success" ng-show="folderUploader.itemsUploaded.length">
+    <div><strong>{{folderUploader.itemsUploaded.length}}</strong></div>
+    <div ng-repeat="message in folderUploader.itemsUploaded">
+      {{message}}
+    </div>
+  </div>
+
+  <div class="col-xs-4 alert alert-warning" ng-show="folderUploader.itemsWarning.length">
+    <div><strong>{{folderUploader.itemsWarning.length}}</strong></div>
+    <div ng-repeat="message in folderUploader.itemsWarning">
+      {{message}}
+    </div>
+  </div>
+
+  <div class="col-xs-4 alert alert-danger" ng-show="folderUploader.itemsFailed.length">
+    <div><strong>{{folderUploader.itemsFailed.length}}</strong></div>
+    <div ng-repeat="message in folderUploader.itemsFailed">
+      {{message}}
     </div>
   </div>
 </div>
