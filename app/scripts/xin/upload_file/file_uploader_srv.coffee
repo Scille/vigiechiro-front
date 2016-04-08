@@ -80,15 +80,12 @@ angular.module('xin.fileUploader', ['xin_s3uploadFile'])
       constructor: ->
         @filters = []
         @gzip = false
-        @_parallelUpload = 2
-        @_parallelGZip = 4
-        @_waitingGZip = 8
-        @_init()
         @interval = null
         @status = 'inactive'
         @autostart = false
-        @connectionSpeed = 1
+        @connectionSpeed = 2
         @lien_participation = ""
+        @_init()
 
       _init: ->
         # list for filtering
@@ -118,10 +115,6 @@ angular.module('xin.fileUploader', ['xin_s3uploadFile'])
         @_transmittedSizePrevious = 0
         @speed = 0
         @_startTime = 0
-
-
-      allCompleted: ->
-        console.log("TODO: allComplete")
 
 
       addFiles: (files) ->
@@ -370,12 +363,12 @@ angular.module('xin.fileUploader', ['xin_s3uploadFile'])
 
 
       _uploadStart: ->
-        while @itemsWaitingUpload.length and @itemsUploading.length <= @connectionSpeed
+        while @itemsWaitingUpload.length and @itemsUploading.length < @connectionSpeed
           @_uploadBackend(@itemsWaitingUpload.pop())
         if not @itemsWaitingUpload.length and not @itemsUploading.length
           @status = "inactive"
           clearInterval(@interval)
-          console.log("TODO")
+          @allComplete?()
 
 
       _uploadBackend: (file) ->

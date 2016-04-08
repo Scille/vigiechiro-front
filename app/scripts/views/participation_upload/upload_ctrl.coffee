@@ -113,19 +113,20 @@ angular.module('uploadParticipationViews', ['ngRoute', 'xin_listResource',
         waitingFolderUploader = false
         checkEnv()
 
+
     checkEnv = ->
       if not waitingSession and not waitingParticipation and
          not waitingFileUploader and not waitingFolderUploader
         $scope.fileUploader.lien_participation = $scope.participation._id
         $scope.fileUploader.gzip = true
         $scope.fileUploader.autostart = true
-        $scope.fileUploader.connectionSpeed = user.vitesse_connexion or 0
         $scope.folderUploader.lien_participation = $scope.participation._id
         $scope.folderUploader.gzip = true
         $scope.folderUploader.autostart = true
-        $scope.folderUploader.connectionSpeed = user.vitesse_connexion or 0
         addRegExpFilter($scope.fileUploader, $scope.regexp)
         addRegExpFilter($scope.folderUploader, $scope.regexp)
+        $scope.fileUploader.allComplete = compute
+        $scope.folderUploader.allComplete = compute
 
 
     addRegExpFilter = (uploader, regexp) ->
@@ -143,19 +144,8 @@ angular.module('uploadParticipationViews', ['ngRoute', 'xin_listResource',
       )
 
 
-    $scope.redirect = ->
-      # Check files
-      if not $scope.fileUploader.isAllComplete() or
-         not $scope.folderUploader.isAllComplete()
-        $scope.participationForm.pieces_jointes = {$error: {uploading: true}}
-        error = true
-      else
-        window.location = "#/participations/#{participationResource._id}"
-
-
     compute = ->
-      $scope.computeInfo = {}
       participationResource.post('compute', {}).then(
-        (result) -> $route.reload()
-        (error) -> $scope.computeInfo.error = true
+        (result) -> window.location = "#/participations/#{participationResource._id}"
+        (error) -> window.location = "#/participations/#{participationResource._id}"
       )
