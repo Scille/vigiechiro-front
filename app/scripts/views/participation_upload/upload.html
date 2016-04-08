@@ -8,18 +8,6 @@
   </a>
 </div>
 
-<div class="alert alert-danger" ng-show="participation._errors.participation">
-  <span class="glyphicon glyphicon-exclamation-sign"></span> {{participation._errors.participation}}
-</div>
-<div class="alert alert-danger"
-  ng-show="submitted && participationForm.pieces_jointes.$error.uploading">
-  Le transfert des pièces jointes n'est pas terminé
-</div>
-<span class="help-block"
-  ng-show="submitted && participationForm.folder.$error.uploading">
-  Le transfert des pièces jointes n'est pas terminé
-</span>
-
 <div class="panel-body">
   <div class="text-center">
     <div class="page-header text-center">
@@ -28,13 +16,18 @@
     </div>
   </div>
 
+  <div class="form-group input-group">
+    <span class="input-group-addon">Nombre de fichiers téléchargés en parallèle (2~20)</span>
+    <input class="form-control" type="number"
+           ng-model="connectionSpeed" min="2" max="20">
+  </div>
+
   <div class="alert alert-warning">Exemple de nom de fichier : {{fileFormatExemple}}</div>
   <div class="form-group">
     <div class="input-group">
       <span class="input-group-addon">Fichiers joints</span>
       <div style="padding-right: 1em; border-left: 1px solid #ccc">
         <upload-file-directive uploader="fileUploader"
-                               callback-success="backendSuccess" callback-error="backendError"
                                multiple>
         </upload-file-directive>
       </div>
@@ -46,7 +39,6 @@
       <span class="input-group-addon">Dossier joint</span>
       <div style="padding-right: 1em; border-left: 1px solid #ccc">
         <upload-file-directive uploader="folderUploader"
-                               callback-success="backendSuccess" callback-error="backendError"
                                directory>
         </upload-file-directive>
       </div>
@@ -56,21 +48,47 @@
 
 
 <div class="row">
-  <div class="col-xs-4 alert alert-success" ng-show="success.length">
-    <div ng-repeat="file in success">
-      {{file}}
+  <div class="col-xs-4 alert alert-success" ng-show="fileUploader.itemsUploaded.length">
+    <div><strong>{{fileUploader.itemsUploaded.length}}</strong></div>
+    <div ng-repeat="message in fileUploader.itemsUploaded">
+      {{message}}
     </div>
   </div>
 
-  <div class="col-xs-4 alert alert-warning" ng-show="warning.length">
-    <div ng-repeat="file in warning">
-      {{file}}
+  <div class="col-xs-4 alert alert-warning" ng-show="fileUploader.itemsWarning.length">
+    <div><strong>{{fileUploader.itemsWarning.length}}</strong></div>
+    <div ng-repeat="message in fileUploader.itemsWarning">
+      {{message}}
     </div>
   </div>
 
-  <div class="col-xs-4 alert alert-danger" ng-show="danger.length">
-    <div ng-repeat="file in danger">
-      {{file}}
+  <div class="col-xs-4 alert alert-danger" ng-show="fileUploader.itemsFailed.length">
+    <div><strong>{{fileUploader.itemsFailed.length}}</strong></div>
+    <div ng-repeat="message in fileUploader.itemsFailed">
+      {{message}}
+    </div>
+  </div>
+</div>
+
+<div class="row" ng-show="folderAllowed">
+  <div class="col-xs-4 alert alert-success" ng-show="folderUploader.itemsUploaded.length">
+    <div><strong>{{folderUploader.itemsUploaded.length}}</strong></div>
+    <div ng-repeat="message in folderUploader.itemsUploaded">
+      {{message}}
+    </div>
+  </div>
+
+  <div class="col-xs-4 alert alert-warning" ng-show="folderUploader.itemsWarning.length">
+    <div><strong>{{folderUploader.itemsWarning.length}}</strong></div>
+    <div ng-repeat="message in folderUploader.itemsWarning">
+      {{message}}
+    </div>
+  </div>
+
+  <div class="col-xs-4 alert alert-danger" ng-show="folderUploader.itemsFailed.length">
+    <div><strong>{{folderUploader.itemsFailed.length}}</strong></div>
+    <div ng-repeat="message in folderUploader.itemsFailed">
+      {{message}}
     </div>
   </div>
 </div>
