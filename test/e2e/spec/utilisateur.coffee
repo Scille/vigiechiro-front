@@ -123,8 +123,8 @@ describe 'Test list utilisateurs', ->
     $(".search-field").sendKeys('observateur')
     expect($$('.list-group-item').count()).toEqual(1)
 
-  it 'Test result per page', ->
-    $(".max-results-field")
-      .clear()
-      .sendKeys('2')
-    expect($$('.list-group-item').count()).toEqual(2)
+  # it 'Test result per page', ->
+  #   $(".max-results-field")
+  #     .clear()
+  #     .sendKeys('2')
+  #   expect($$('.list-group-item').count()).toEqual(2)
