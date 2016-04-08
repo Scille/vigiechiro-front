@@ -367,7 +367,7 @@ angular.module('xin.fileUploader', ['xin_s3uploadFile'])
           @_uploadBackend(@itemsWaitingUpload.pop())
         if not @itemsWaitingUpload.length and not @itemsUploading.length
           @status = "inactive"
-          clearInterval(@interval)
+          $interval.cancel(@interval)
           @allComplete?()
 
 
