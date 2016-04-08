@@ -87,7 +87,7 @@ angular.module('xin.fileUploader', ['xin_s3uploadFile'])
         @interval = null
         @status = 'inactive'
         @autostart = false
-        @connectionSpeed = 0
+        @connectionSpeed = 1
         @lien_participation = ""
 
       _init: ->
@@ -114,7 +114,7 @@ angular.module('xin.fileUploader', ['xin_s3uploadFile'])
         #
         @size = 0
         @_sizeUpload = 0
-        @transmitted_size = 0
+        @_transmitted_size = 0
         @_transmittedSizePrevious = 0
         @speed = 0
         @_startTime = 0
@@ -174,8 +174,7 @@ angular.module('xin.fileUploader', ['xin_s3uploadFile'])
       _compressProceed: (file) ->
         if file?
           if file.size == 0
-            console.log("TODO")
-            @itemsFailed.push(file)
+            @itemsFailed.push("Le fichier #{file.name} est vide.")
             @_compressProceed(@itemsWaitingCompress.pop())
           else
             @_createGZipFile(file, @_compressFileComplete)
@@ -199,10 +198,9 @@ angular.module('xin.fileUploader', ['xin_s3uploadFile'])
       _computeSpeed: ->
         time = new Date()
         diffTime = (time - @_startTime) / 1000
-        diffSize = @transmitted_size - @_transmittedSizePrevious
         @_startTime = time
-        @_transmittedSizePrevious = @transmitted_size
-        @speed = diffSize / diffTime
+        @speed = @_transmitted_size / diffTime
+        @_transmitted_size = 0
 
 
       _createGZipFile: (file, callback) ->
@@ -231,10 +229,12 @@ angular.module('xin.fileUploader', ['xin_s3uploadFile'])
           onStart: (s3File) =>
             s3File.file.status = 'progress'
           onProgress: (s3File, transmitted_size) =>
+            @_transmitted_size += (transmitted_size - s3File.file.transmitted_size)
             s3File.file.transmitted_size = transmitted_size
           onPause: (s3File) =>
             s3File.file.status = 'pause'
           onSuccess: (s3File) =>
+            @_transmitted_size += (s3File.file.size - s3File.file.transmitted_size)
             Backend.one('fichiers', s3File.file.id).get().then (fileBackend) =>
               fileBackend.post().then () =>
                 fileArray = @_removeFileUploading(s3File)
@@ -377,6 +377,7 @@ angular.module('xin.fileUploader', ['xin_s3uploadFile'])
           @_uploadBackend(@itemsWaitingUpload.pop())
         if not @itemsWaitingUpload.length and not @itemsUploading.length
           @status = "inactive"
+          clearInterval(@interval)
           console.log("TODO")
 
 

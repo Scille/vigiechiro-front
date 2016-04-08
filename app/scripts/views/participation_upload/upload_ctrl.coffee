@@ -46,6 +46,7 @@ angular.module('uploadParticipationViews', ['ngRoute', 'xin_listResource',
     $scope.participation = null
     $scope.fileUploader = {}
     $scope.folderUploader = {}
+    $scope.connectionSpeed = 2
 
     # waiting env
     waitingSession = true
@@ -91,6 +92,11 @@ angular.module('uploadParticipationViews', ['ngRoute', 'xin_listResource',
 
       (error) -> window.location = "#/404"
     )
+
+    $scope.$watch 'connectionSpeed', (value) ->
+      if value? and value >= 2 and value <= 20
+        $scope.fileUploader.connectionSpeed = value
+        $scope.folderUploader.connectionSpeed = value
 
 
     $scope.$watch 'fileUploader', (value) ->
