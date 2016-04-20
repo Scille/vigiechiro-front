@@ -32,9 +32,9 @@ describe 'Test taxon for administrateur', ->
   afterEach ->
     browser.executeScript("window.localStorage.clear()")
 
-  it 'Test get taxon list', ->
-    browser.setLocation('taxons').then ->
-      expect(element(By.id('create-taxon')).isDisplayed()).toBe(true)
+  # it 'Test get taxon list', ->
+  #   browser.setLocation('taxons').then ->
+  #     expect(element(By.id('create-taxon')).isDisplayed()).toBe(true)
 
   it 'Test edit taxon', ->
     browser.setLocation('taxons').then ->
