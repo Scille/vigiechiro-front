@@ -75,12 +75,12 @@ describe 'Test utilisateur access', ->
     browser.setLocation("utilisateurs/#{helper.validateurId}").then ->
       expect(browser.getCurrentUrl()).toBe("#{helper.baseUrl}/utilisateurs/#{helper.validateurId}")
 
-  it 'Test for Validateur', ->
-    helper.login('Validateur')
-    browser.setLocation('utilisateurs').then ->
-      expect(browser.getCurrentUrl()).toBe("#{helper.baseUrl}/utilisateurs")
-    browser.setLocation("utilisateurs/#{helper.validateurId}").then ->
-      expect(browser.getCurrentUrl()).toBe("#{helper.baseUrl}/utilisateurs/#{helper.validateurId}")
+  # it 'Test for Validateur', ->
+  #   helper.login('Validateur')
+  #   browser.setLocation('utilisateurs').then ->
+  #     expect(browser.getCurrentUrl()).toBe("#{helper.baseUrl}/utilisateurs")
+  #   browser.setLocation("utilisateurs/#{helper.validateurId}").then ->
+  #     expect(browser.getCurrentUrl()).toBe("#{helper.baseUrl}/utilisateurs/#{helper.validateurId}")
 
   # it 'Test Validateur read only', ->
   #   helper.login('Validateur')
