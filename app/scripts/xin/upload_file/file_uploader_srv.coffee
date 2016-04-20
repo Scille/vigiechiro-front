@@ -82,7 +82,7 @@ angular.module('xin.fileUploader', ['xin_s3uploadFile'])
         @gzip = false
         @interval = null
         @status = 'inactive'
-        @autostart = false
+        @autostart = true
         @connectionSpeed = 2
         @lien_participation = ""
         @_init()
