@@ -89,17 +89,17 @@ describe 'Test once logged', ->
   afterEach ->
     browser.executeScript("window.localStorage.clear()")
 
-  it 'Test token login', ->
-    buttonsLogin = $('.btn-login')
-    $$('.btn-login').each (element) ->
-      expect(element.isDisplayed()).toBe(false)
-    content = $("content-directive")
-    expect(content.isDisplayed()).toBe(true)
-    browser.executeScript('return localStorage.getItem("auth-session-token")').then (token) ->
-      expect(token).toBe(helper.observateurToken)
-    userStatus = $('.user-status')
-    userStatus.element(`by`.binding("user.pseudo")).getText().then (name) ->
-      expect(name).toBe('Observateur Name')
+  # it 'Test token login', ->
+  #   buttonsLogin = $('.btn-login')
+  #   $$('.btn-login').each (element) ->
+  #     expect(element.isDisplayed()).toBe(false)
+  #   content = $("content-directive")
+  #   expect(content.isDisplayed()).toBe(true)
+  #   browser.executeScript('return localStorage.getItem("auth-session-token")').then (token) ->
+  #     expect(token).toBe(helper.observateurToken)
+  #   userStatus = $('.user-status')
+  #   userStatus.element(`by`.binding("user.pseudo")).getText().then (name) ->
+  #     expect(name).toBe('Observateur Name')
 
   # it 'Test history', ->
   #   browser.setLocation('/taxons').then ->
