@@ -45,9 +45,5 @@ angular.module('xin_uploadFile', ['appSettings', 'xin_s3uploadFile', 'xin.fileUp
           split = item.webkitRelativePath.split("/")
           if split.length > 2
             return false
-          else
-            nameDirectory = split[0]
-            if uploader.directories.indexOf(nameDirectory) == -1
-              uploader.directories.push(nameDirectory)
         return true
     )

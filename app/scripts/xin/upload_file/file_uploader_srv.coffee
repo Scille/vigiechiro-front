@@ -355,7 +355,7 @@ angular.module('xin.fileUploader', ['xin_s3uploadFile'])
 
 
       _upload: ->
-        @status = "Téléchargement des fichiers en cours."
+        @status = "Upload des fichiers en cours."
         @itemsWaitingUpload = @itemsCompressed
         @itemsWaitingUploadLength = @itemsWaitingUpload.length
         @interval = $interval(@_checkUploader, 10000)
