@@ -117,10 +117,10 @@ angular.module('uploadParticipationViews', ['ngRoute', 'xin_listResource',
     checkEnv = ->
       if not waitingSession and not waitingParticipation and
          not waitingFileUploader and not waitingFolderUploader
-        $scope.fileUploader.lien_participation = $scope.participation._id
+        $scope.fileUploader.lien_participation = $routeParams.participationId
         $scope.fileUploader.gzip = true
         $scope.fileUploader.autostart = true
-        $scope.folderUploader.lien_participation = $scope.participation._id
+        $scope.folderUploader.lien_participation = $routeParams.participationId
         $scope.folderUploader.gzip = true
         $scope.folderUploader.autostart = true
         addRegExpFilter($scope.fileUploader, $scope.regexp)
