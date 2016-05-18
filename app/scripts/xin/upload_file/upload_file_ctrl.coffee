@@ -33,12 +33,12 @@ angular.module('xin_uploadFile', ['appSettings', 'xin_s3uploadFile', 'xin.fileUp
       filters: []
       back: []
       xhr: []
-    uploader = $scope.uploader = new FileUploader()
-    uploader.refresh = ->
+
+    $scope.uploader.refresh = ->
       $scope.$apply()
 
     # Remove sub-directories
-    uploader.filters.push(
+    $scope.uploader.filters.push(
       name: "Sous-dossiers ignorés."
       fn: (item) ->
         if item.webkitRelativePath? and item.webkitRelativePath != ''

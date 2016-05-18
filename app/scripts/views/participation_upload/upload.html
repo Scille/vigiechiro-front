@@ -3,6 +3,13 @@
 </div>
 
 <div class="actionbar">
+  <sc-button class="btn btn-success"
+             ng-click="compute()"
+             label="'Lancer la participation'"
+             wait-for-class="fa fa-spinner"
+             cancel-wait-for=""
+             ng-disabled="!finish">
+  </sc-button>
   <a class="btn btn-default" href="#/participations/{{participation._id}}">
     Voir la participation
   </a>

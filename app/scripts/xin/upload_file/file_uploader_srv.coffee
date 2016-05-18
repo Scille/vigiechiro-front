@@ -82,7 +82,6 @@ angular.module('xin.fileUploader', ['xin_s3uploadFile'])
         @gzip = false
         @interval = null
         @status = 'inactive'
-        @autostart = true
         @connectionSpeed = 2
         @lien_participation = ""
         @_init()
@@ -121,8 +120,7 @@ angular.module('xin.fileUploader', ['xin_s3uploadFile'])
         @_init()
         if files.length
           @itemsWaitingFilters = files
-          if @autostart
-            @_start()
+          @_start()
 
 
       _checkUploader: =>
@@ -153,6 +151,7 @@ angular.module('xin.fileUploader', ['xin_s3uploadFile'])
           @itemsToCompress = @itemsWaitingCompress.length
           @itemsWaitingCompressLength = @itemsToCompress
           @status = "Compression des fichiers en cours."
+          @refresh?()
           @_compressProceed(@itemsWaitingCompress.pop())
         else
           @itemsCompressed = @itemsFiltered
@@ -250,6 +249,7 @@ angular.module('xin.fileUploader', ['xin_s3uploadFile'])
 
       _filter: ->
         @status = "Vérification du format des noms de fichier."
+        @refresh?()
         while @itemsWaitingFilters.length
           file = @itemsWaitingFilters.pop()
           pass = true
@@ -337,6 +337,7 @@ angular.module('xin.fileUploader', ['xin_s3uploadFile'])
           text = "Le fichier "+item.name+" n'a pas pu être ajouté à la liste. "+
                  filter.name
         @itemsFailed.push(text)
+        @refresh?()
 
 
       retryErrors: ->
@@ -356,6 +357,7 @@ angular.module('xin.fileUploader', ['xin_s3uploadFile'])
 
       _upload: ->
         @status = "Upload des fichiers en cours."
+        @refresh?()
         @itemsWaitingUpload = @itemsCompressed
         @itemsWaitingUploadLength = @itemsWaitingUpload.length
         @interval = $interval(@_checkUploader, 10000)
