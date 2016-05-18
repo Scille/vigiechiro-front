@@ -401,7 +401,6 @@ angular.module('protocole_map_routier', [])
         # Remove listeners and infwindow on previous points
         for i in [1..@_points.length-3] when @_points.length > 3
           @_googleMaps.clearListeners(@_points[i], 'rightclick')
-          @_points[i].setOptions({draggable: false})
           @_points[i].infowindow.close()
         # InfoWindow
         numSection = Math.floor(@_points.length/2)
