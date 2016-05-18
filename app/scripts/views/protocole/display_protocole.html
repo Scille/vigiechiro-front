@@ -1,3 +1,11 @@
+<div class="actionbar">
+  <a class="btn btn-primary save-user"
+     href="#/protocoles/{{protocole._id}}/nouveau-site"
+     ng-show="userRegistered">
+    Nouveau Site
+  </a>
+</div>
+
 <div class="container">
   <div class="text-center">
     <div class="page-header text-center">
@@ -33,16 +41,6 @@
       </display-sites-directive>
       <list-sites-directive protocole-id="{{protocole._id}}">
       </list-sites-directive>
-      <hr>
-      <div class="panel panel-default" ng-show="userRegistered">
-        <div class="panel-heading" role="tab" id="headingOne">
-          <h4 class="panel-title">
-            <a href="#/protocoles/{{protocole._id}}/nouveau-site">
-              Nouveau Site
-            </a>
-          </h4>
-        </div>
-      </div>
     </div>
   </div>
 

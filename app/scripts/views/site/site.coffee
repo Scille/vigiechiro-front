@@ -208,6 +208,7 @@ angular.module('siteViews', ['ngRoute',
           return breadcrumbsDefer.promise
 
 
+
   .controller 'CreateSiteController', ($timeout, $route, $scope, $routeParams,
                                        $modal,
                                        session, Backend, protocolesFactory) ->
@@ -338,7 +339,7 @@ angular.module('siteViews', ['ngRoute',
             map.validOrigin($scope.listGrilleStocOrigin[number])
       )
 
-    $scope.saveSite = ->
+    $scope.save = ->
       if not map.isValid()
         return
       payload =
@@ -455,7 +456,7 @@ angular.module('siteViews', ['ngRoute',
                               siteCallbacks($scope, $timeout))
       map.loadMapEdit($scope.site)
 
-    $scope.saveSite = ->
+    $scope.save = ->
       if not map.isValid()
         return
       payload =

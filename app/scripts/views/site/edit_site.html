@@ -1,3 +1,17 @@
+<div class="actionbar">
+  <sc-button class="btn btn-primary save-user"
+             ng-click="save()"
+             wait-for-class="fa fa-spinner fa-1 fa-pulse"
+             cancel-wait-for="saveDone"
+             label="'Sauvegarder'">
+  </sc-button>
+</div>
+
+<div class="alert alert-danger" ng-show="saveError">
+  {{errorMessage}}
+</div>
+
+
 <div class="text-center">
   <div class="page-header text-center">
     <h3>{{site.titre}}</h3>
@@ -9,19 +23,6 @@
 </div>
 
 <div class="panel panel-default panel-body">
-  <!-- <div ng-if="!creation && isAdmin && protocole.type_site == 'ROUTIER'">
-    <div class="form-group input-group">
-      <label class="input-group-addon" for="titre">Titre du site</label>
-      <input type="text" class="form-control" id="titre"
-             ng-model="site.titre">
-      <div class="input-group-addon alert-warning" ng-if="site.titre != site_orig.titre">
-        <i class="fa fa-lg fa-pencil"></i>
-      </div>
-    </div>
-    <div class="alert alert-danger" ng-show="site._errors.titre">
-      <span class="glyphicon glyphicon-exclamation-sign"></span> {{site._errors.titre}} Error
-    </div>
-  </div> -->
 
   <div ng-if="creation">
     <div class="form-group input-group" ng-show="protocole.type_site == 'ROUTIER'">
@@ -144,9 +145,5 @@
               ng-model="site.commentaire" ng-disabled="readOnly"
               placeholder="Commentaire">
     </textarea>
-  </div>
-
-  <div class="form-group">
-    <a class="save-user btn btn-primary" href="" ng-click="saveSite()">Sauvegarder</a>
   </div>
 </div>
