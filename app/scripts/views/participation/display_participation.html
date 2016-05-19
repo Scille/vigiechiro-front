@@ -28,6 +28,13 @@
   </sc-button>
   <sc-button class="btn btn-warning"
              ng-click="compute()"
+             label="'Lancer la participation'"
+             wait-for-class=""
+             cancel-wait-for=""
+             ng-if="isAdmin && !participation.traitement">
+  </sc-button>
+  <sc-button class="btn btn-warning"
+             ng-click="compute()"
              label="'Relancer la participation'"
              wait-for-class=""
              cancel-wait-for=""
