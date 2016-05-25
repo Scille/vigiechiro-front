@@ -30,28 +30,8 @@
   </div>
 
   <div class="alert alert-warning">Exemple de nom de fichier : {{fileFormatExemple}}</div>
-  <div class="form-group">
-    <div class="input-group">
-      <span class="input-group-addon">Fichiers joints</span>
-      <div style="padding-right: 1em; border-left: 1px solid #ccc">
-        <upload-file-directive uploader="fileUploader"
-                               multiple>
-        </upload-file-directive>
-      </div>
-    </div>
-  </div>
 
-  <div class="form-group" ng-show="folderAllowed">
-    <div class="input-group">
-      <span class="input-group-addon">Dossier joint</span>
-      <div style="padding-right: 1em; border-left: 1px solid #ccc">
-        <upload-file-directive uploader="folderUploader"
-                               directory>
-        </upload-file-directive>
-      </div>
-    </div>
-  </div>
-</div>
+  <xin-dropzone lien-participation="{{participation._id}}">{{participation._id}}</xin-dropzone>
 
 
 <div class="row">

@@ -17,7 +17,7 @@ makeRegExp = ($scope, type_site) ->
 
 
 
-angular.module('uploadParticipationViews', ['ngRoute', 'xin_listResource',
+angular.module('uploadParticipationViews', ['ngRoute', 'xin_listResource', 'xin.dropzone',
                                             'xin_backend', 'xin_session', 'xin_tools',
                                             'xin_uploadFile'])
   .config ($routeProvider) ->
