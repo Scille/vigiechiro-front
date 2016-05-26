@@ -16,7 +16,7 @@ angular.module('xin_uploadFile', ['appSettings', 'xin.fileUploader'])
       scope.elem = elem
 
 
-  .controller 'UploadFileController', ($scope, SETTINGS, Backend, Uploader) ->
+  .controller 'UploadFileController', ($q, $scope, SETTINGS, Backend, Uploader) ->
       # 5Mo
       sliceSize = 5 * 1024 * 1024
 
@@ -45,70 +45,83 @@ angular.module('xin_uploadFile', ['appSettings', 'xin.fileUploader'])
           if split.length > 2
             if $scope.warningFiles?
               $scope.warningFiles.push("Sous-dossier : #{file.fullPath}")
-              $scope.refresh?()
-            return done("Erreur : sous-dossier")
+            done("Erreur : sous-dossier")
+            $scope.refresh?()
+            return
         # test regex
         if file.type not in ['image/png', 'image/png', 'image/jpeg']
           if not $scope.regex.test(file.name)
             if $scope.warningFiles?
               $scope.warningFiles.push("Nom de fichier invalide : #{file.name}")
-              $scope.refresh?()
-            return done("Erreur : mauvais nom de fichier #{file.name}")
+            done("Erreur : mauvais nom de fichier #{file.name}")
+            $scope.refresh?()
+            return
         # test empty file
         if file.size == 0
           if $scope.errorFiles?
             $scope.errorFiles.push("#{file.name} : Fichier vide")
-            $scope.refresh?()
-          return done("Erreur : fichier vide")
-        # Compression
-        createGZipFile(file).then(
-          (blob) ->
-            console.log(file)
-            console.log(blob)
-            file.postData = []
-            payload =
-              mime: file.type
-              titre: file.name
-              multipart: false
-            if $scope.lienParticipation?
-              payload.lien_participation = $scope.lienParticipation
-            if payload.mime == ''
-              ta = /\.ta$/
-              tac = /\.tac$/
-              if ta.test(payload.titre)
-                payload.mime = 'application/ta'
-              else if tac.test(payload.titre)
-                payload.mime = 'application/tac'
+          done("Erreur : fichier vide")
+          $scope.refresh?()
+          return
 
-            Backend.all('fichiers').post(payload).then(
-              (response) ->
-                  file.custom_status = 'ready'
-                  file.postData = response
-                  # $(file.previewTemplate).addClass('uploading')
-                  done()
-              (error) ->
-                file.custom_status = 'rejected'
-                msg = JSON.stringify(error.data)
-                if $scope.errorFiles?
-                  $scope.errorFiles.push(msg)
-                  $scope.refresh?()
-                done("Erreur a l'upload : #{msg}")
-            )
+        compressed = $q.defer()
+        registered = $q.defer()
+        # Register the file to the backend
+        file.postData = null
+        payload =
+          mime: file.type
+          titre: file.name
+          multipart: false
+        if $scope.lienParticipation?
+          payload.lien_participation = $scope.lienParticipation
+        if payload.mime == ''
+          ta = /\.ta$/
+          tac = /\.tac$/
+          if ta.test(payload.titre)
+            payload.mime = 'application/ta'
+            file.type = 'application/ta'
+          else if tac.test(payload.titre)
+            payload.mime = 'application/tac'
+            file.type = 'application/tac'
+        Backend.all('fichiers').post(payload).then(
+          (response) ->
+            file.custom_status = 'ready'
+            file.postData = response
+            registered.resolve()
+          (error) ->
+            file.custom_status = 'rejected'
+            msg = JSON.stringify(error.data)
+            if $scope.errorFiles?
+              $scope.errorFiles.push(msg)
+            registered.reject("Erreur a l'upload : #{msg}")
+        )
+        # Compress the file
+        createGZipFile(file.data).then(
+          (blob) ->
+            file.data = blob
+            compressed.resolve()
           (error) ->
             if $scope.errorFiles?
               $scope.errorFiles.push(error)
-              $scope.refresh?()
+            compressed.reject(error)
+        )
+        $q.all([compressed.promise, registered.promise]).then(
+          (results) -> done()
+          (error) ->
             done(error)
+            # $scope.refresh?()
         )
 
 
-      onSending = (file, xhr, formData) ->
-        console.log(file, xhr, formData)
+      onSending = (file, formData) ->
         formData.append('key', file.postData.s3_id)
         formData.append('acl', 'private')
         formData.append('AWSAccessKeyId', file.postData.s3_aws_access_key_id)
         formData.append('Policy', file.postData.s3_policy)
         formData.append('Signature', file.postData.s3_signature)
+        formData.append('Content-Encoding', 'gzip')
+        formData.append('Content-Type', file.type)
+
 
       onComplete = (file) ->
         if file.postData?

@@ -48,7 +48,7 @@ angular.module('xin.fileUploader', [])
         @method = config.method or "post"
         @parallelUploads = config.parallelUploads or 5
         @accept = config.accept or null
-        @sending = config.accept or null
+        @sending = config.sending or null
         @complete = config.complete or null
         @queuedFiles = []
         @processingFiles = []
@@ -98,20 +98,25 @@ angular.module('xin.fileUploader', [])
         @_checkQueuedFiles()
 
       _checkQueuedFiles: ->
-        if not @queuedFiles.length and @processingFiles.length
+        if not @queuedFiles.length and not @processingFiles.length
           @status = 'inactive'
         else
           while @queuedFiles.length and @processingFiles.length < @parallelUploads
             file = @queuedFiles.shift()
+            file =
+              data: file
+              type: file.type
+              name: file.name
+              fullPath: file.fullPath
+              status: "accepting"
             @processingFiles.push(file)
             @_accept(file)
 
       _accept: (file) ->
-        file = {file: file}
         _acceptCallback = (error = null) =>
           if error?
             for processFile, i in @processingFiles
-              if angular.equals(file, processFile)
+              if file.fullPath == processFile.fullPath
                 @processingFiles.splice(i, 1)
                 break
             @_checkQueuedFiles()
@@ -121,7 +126,31 @@ angular.module('xin.fileUploader', [])
 
 
       _sending: (file) ->
-        console.log(file)
+        formData = new FormData()
+        @sending(file, formData)
+        xhr = new XMLHttpRequest()
+        xhr.open(@method, @url, true)
+        xhr.onload = ->
+          if xhr.status == 200
+            console.log("Success", xhr)
+            # callbacks.onSuccess?(xhr)
+          else
+            console.log("Error", xhr)
+            # callbacks.onError?('Upload error: ' + xhr.status)
+        xhr.onerror = ->
+          console.log("Error")
+          # callbacks.onError?('XHR error.')
+        # Some browser do not have the .upload property
+        progressObj = xhr.upload ? xhr
+        progressObj.onprogress = (e) ->
+          console.log("onprogress", e)
+          # if e.lengthComputable
+          #   callbacks.onProgress?(e.loaded, e.total)
+        # for key, value of headers
+        #   xhr.setRequestHeader(key, value)
+        formData.append('file', file.data, file.name)
+        xhr.send(formData)
+
 
       # _checkUploader: =>
       #   if @status in ['pause', 'cancel']
