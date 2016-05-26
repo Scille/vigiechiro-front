@@ -58,7 +58,7 @@ angular.module('xin.dropzone', ['appSettings', 'xin_backend'])
         )
 
       scope.dropzoneConfig =
-        url: 'https://vigiechiro.s3.amazonaws.com/'
+        url: SETTINGS.S3_BUCKET_URL
         method: "post"
         autoProcessQueue: true
         clickable: true
