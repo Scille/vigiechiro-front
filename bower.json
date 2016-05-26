@@ -22,7 +22,8 @@
     "angular-bootstrap-switch": "0.4.1",
     "angular-moment": "0.10.3",
     "lodash": "3.10.1",
-    "sc-toggle-switch": "1.0.6"
+    "sc-toggle-switch": "1.0.6",
+    "dropzone": "4.3.0"
   },
   "devDependencies": {
     "angular-mocks": "1.5.2"
