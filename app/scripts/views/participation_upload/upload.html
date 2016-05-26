@@ -23,7 +23,7 @@
     </div>
   </div>
 
-  <div class="form-group input-group">
+  <div class="form-group input-group" ng-if="false">
     <span class="input-group-addon">Nombre de fichiers uploadés en parallèle (2~20)</span>
     <input class="form-control" type="number"
            ng-model="connectionSpeed" min="2" max="20">
@@ -31,50 +31,25 @@
 
   <div class="alert alert-warning">Exemple de nom de fichier : {{fileFormatExemple}}</div>
 
-  <xin-dropzone lien-participation="{{participation._id}}">{{participation._id}}</xin-dropzone>
-
-
-<div class="row">
-  <div class="col-xs-4 alert alert-success" ng-show="fileUploader.itemsUploaded.length">
-    <div><strong>{{fileUploader.itemsUploaded.length}}</strong></div>
-    <div ng-repeat="message in fileUploader.itemsUploaded">
-      {{message}}
-    </div>
-  </div>
-
-  <div class="col-xs-4 alert alert-warning" ng-show="fileUploader.itemsWarning.length">
-    <div><strong>{{fileUploader.itemsWarning.length}}</strong></div>
-    <div ng-repeat="message in fileUploader.itemsWarning">
-      {{message}}
-    </div>
-  </div>
-
-  <div class="col-xs-4 alert alert-danger" ng-show="fileUploader.itemsFailed.length">
-    <div><strong>{{fileUploader.itemsFailed.length}}</strong></div>
-    <div ng-repeat="message in fileUploader.itemsFailed">
-      {{message}}
-    </div>
-  </div>
+  <xin-dropzone lien-participation="{{participation._id}}"
+                regex="regexp"
+                warning-files="warning"
+                error-files="danger"
+                refresh="refresh">
+  </xin-dropzone>
 </div>
 
-<div class="row" ng-show="folderAllowed">
-  <div class="col-xs-4 alert alert-success" ng-show="folderUploader.itemsUploaded.length">
-    <div><strong>{{folderUploader.itemsUploaded.length}}</strong></div>
-    <div ng-repeat="message in folderUploader.itemsUploaded">
+<div class="row">
+  <div class="col-xs-6 alert alert-warning" ng-show="warning.length">
+    <div><strong>{{warning.length}}</strong></div>
+    <div ng-repeat="message in warning">
       {{message}}
     </div>
   </div>
 
-  <div class="col-xs-4 alert alert-warning" ng-show="folderUploader.itemsWarning.length">
-    <div><strong>{{folderUploader.itemsWarning.length}}</strong></div>
-    <div ng-repeat="message in folderUploader.itemsWarning">
-      {{message}}
-    </div>
-  </div>
-
-  <div class="col-xs-4 alert alert-danger" ng-show="folderUploader.itemsFailed.length">
-    <div><strong>{{folderUploader.itemsFailed.length}}</strong></div>
-    <div ng-repeat="message in folderUploader.itemsFailed">
+  <div class="col-xs-6 alert alert-danger" ng-show="danger.length">
+    <div><strong>{{danger.length}}</strong></div>
+    <div ng-repeat="message in danger">
       {{message}}
     </div>
   </div>

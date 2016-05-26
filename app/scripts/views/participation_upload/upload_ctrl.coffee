@@ -12,14 +12,13 @@ makeRegExp = ($scope, type_site) ->
     'CARRE': 'Cir270-2009-Pass1-Tron1-Chiro_0_00265_000.wav'
     'POINT_FIXE': 'Car170517-2014-Pass1-C1-OB-1_20140702_224038_761.wav'
     'ROUTIER': 'Cir270-2009-Pass1-Tron1-Chiro_0_00265_000.wav'
-  $scope.regexp = [patt[type_site]]
+  $scope.regexp = patt[type_site]
   $scope.fileFormatExemple = exemples[type_site]
 
 
 
 angular.module('uploadParticipationViews', ['ngRoute', 'xin_listResource', 'xin.dropzone',
-                                            'xin_backend', 'xin_session', 'xin_tools',
-                                            'xin_uploadFile'])
+                                            'xin_backend', 'xin_session', 'xin_tools'])
   .config ($routeProvider) ->
     $routeProvider
       .when '/participations/:participationId/telechargement',
@@ -39,16 +38,16 @@ angular.module('uploadParticipationViews', ['ngRoute', 'xin_listResource', 'xin.
 
 
   .controller 'AddParticipationFilesController', ($scope, $routeParams, Backend,
-                                                  session, FileUploader) ->
+                                                  session) ->
     $scope.participationWaiting = true
 
     user = null
     participationResource = null
     $scope.participation = null
-    $scope.fileUploader = new FileUploader()
-    $scope.folderUploader = new FileUploader()
-    $scope.connectionSpeed = 2
-    $scope.finish = false
+    # $scope.fileUploader = new FileUploader()
+    # $scope.folderUploader = new FileUploader()
+    # $scope.connectionSpeed = 2
+    $scope.finish = true
 
     # waiting env
     waitingSession = true
@@ -59,20 +58,6 @@ angular.module('uploadParticipationViews', ['ngRoute', 'xin_listResource', 'xin.
     $scope.warning = []
     $scope.danger = []
 
-    $scope.folderAllowed = true
-    # firefox and IE don't support folder upload
-    if navigator.userAgent.search("Firefox") != -1
-      $scope.folderAllowed = false
-    else if navigator.userAgent.search("Edge") != -1
-      $scope.folderAllowed = false
-    else if navigator.userAgent.search("MSIE") != -1
-      $scope.folderAllowed = false
-
-    # user for web connection fast
-    session.getUserPromise().then (userPromise) ->
-      user = userPromise
-      waitingSession = false
-      checkEnv()
 
     # get participation
     Backend.one("participations", $routeParams.participationId).get().then(
@@ -87,8 +72,8 @@ angular.module('uploadParticipationViews', ['ngRoute', 'xin_listResource', 'xin.
         $scope.participation = participation.plain()
 
         makeRegExp($scope, participation.protocole.type_site)
-        waitingParticipation = false
-        checkEnv()
+        # waitingParticipation = false
+        # checkEnv()
 
       (error) -> window.location = "#/404"
     )
@@ -99,35 +84,8 @@ angular.module('uploadParticipationViews', ['ngRoute', 'xin_listResource', 'xin.
         $scope.folderUploader.connectionSpeed = value
 
 
-    checkEnv = ->
-      if not waitingSession and not waitingParticipation
-        $scope.fileUploader.lien_participation = $routeParams.participationId
-        $scope.fileUploader.gzip = true
-        $scope.fileUploader.autostart = true
-        $scope.folderUploader.lien_participation = $routeParams.participationId
-        $scope.folderUploader.gzip = true
-        $scope.folderUploader.autostart = true
-        addRegExpFilter($scope.fileUploader, $scope.regexp)
-        addRegExpFilter($scope.folderUploader, $scope.regexp)
-        $scope.fileUploader.allComplete = ->
-          $scope.finish = true
-        $scope.folderUploader.allComplete = ->
-          $scope.finish = true
-
-
-    addRegExpFilter = (uploader, regexp) ->
-      for filter in uploader.filters when filter.name == "Format incorrect."
-        return
-      uploader.filters.push(
-        name: "Format incorrect."
-        fn: (item) ->
-          if item.type in ['image/png', 'image/png', 'image/jpeg']
-            return true
-          for reg in regexp
-            if reg.test(item.name)
-              return true
-          return false
-      )
+    $scope.refresh = ->
+      $scope.$apply()
 
 
     $scope.compute = ->
