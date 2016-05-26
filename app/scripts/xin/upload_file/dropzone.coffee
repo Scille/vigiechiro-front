@@ -18,6 +18,7 @@ angular.module('xin.dropzone', ['appSettings', 'xin_backend'])
       sliceSize = 5 * 1024 * 1024
       scope.lienParticipation = attrs.lienParticipation
 
+
       createGZipFile = (file) ->
         $q (resolve, reject) ->
           arrayBuffer = null
@@ -58,55 +59,62 @@ angular.module('xin.dropzone', ['appSettings', 'xin_backend'])
             scope.errorFiles.push("#{file.name} : Fichier vide")
             scope.refresh?()
           return done("Erreur : fichier vide")
-        # Compression
+
+        compressed = $q.defer()
+        registered = $q.defer()
+        # Register the file to the backend
+        file.postData = null
+        payload =
+          mime: file.type
+          titre: file.name
+          multipart: false
+        if scope.lienParticipation?
+          payload.lien_participation = scope.lienParticipation
+        if payload.mime == ''
+          ta = /\.ta$/
+          tac = /\.tac$/
+          if ta.test(payload.titre)
+            payload.mime = 'application/ta'
+          else if tac.test(payload.titre)
+            payload.mime = 'application/tac'
+        Backend.all('fichiers').post(payload).then(
+          (response) ->
+              file.custom_status = 'ready'
+              file.postData = response
+              registered.resolve()
+          (error) ->
+            file.custom_status = 'rejected'
+            msg = JSON.stringify(error.data)
+            if scope.errorFiles?
+              scope.errorFiles.push(msg)
+              scope.refresh?()
+            registered.reject("Erreur a l'upload : #{msg}")
+        )
+        # Compress the file
         createGZipFile(file).then(
           (blob) ->
-            console.log(file)
-            console.log(blob)
-            file.postData = []
-            payload =
-              mime: file.type
-              titre: file.name
-              multipart: false
-            if scope.lienParticipation?
-              payload.lien_participation = scope.lienParticipation
-            if payload.mime == ''
-              ta = /\.ta$/
-              tac = /\.tac$/
-              if ta.test(payload.titre)
-                payload.mime = 'application/ta'
-              else if tac.test(payload.titre)
-                payload.mime = 'application/tac'
-
-            Backend.all('fichiers').post(payload).then(
-              (response) ->
-                  file.custom_status = 'ready'
-                  file.postData = response
-                  # $(file.previewTemplate).addClass('uploading')
-                  done()
-              (error) ->
-                file.custom_status = 'rejected'
-                msg = JSON.stringify(error.data)
-                if scope.errorFiles?
-                  scope.errorFiles.push(msg)
-                  scope.refresh?()
-                done("Erreur a l'upload : #{msg}")
-            )
+            file.data = blob
+            compressed.resolve()
           (error) ->
             if scope.errorFiles?
               scope.errorFiles.push(error)
               scope.refresh?()
-            done(error)
+            compressed.reject(error)
+        )
+        $q.all([compressed.promise, registered.promise]).then(
+          (results) -> done()
+          (error) -> done(error)
         )
 
 
       onSending = (file, xhr, formData) ->
-        console.log(file, xhr, formData)
         formData.append('key', file.postData.s3_id)
         formData.append('acl', 'private')
         formData.append('AWSAccessKeyId', file.postData.s3_aws_access_key_id)
         formData.append('Policy', file.postData.s3_policy)
         formData.append('Signature', file.postData.s3_signature)
+        formData.append('Content-Encoding', 'gzip')
+
 
       onComplete = (file) ->
         if file.postData?
@@ -118,6 +126,7 @@ angular.module('xin.dropzone', ['appSettings', 'xin_backend'])
               throw error
           )
         dropzone.removeFile(file)
+
 
       scope.dropzoneConfig =
         url: SETTINGS.S3_BUCKET_URL

@@ -18,12 +18,12 @@
     <link rel="stylesheet" href="bower_components/angular-datatables/dist/plugins/bootstrap/datatables.bootstrap.css" />
     <link rel="stylesheet" href="bower_components/bootstrap-switch/dist/css/bootstrap3/bootstrap-switch.css" />
     <link rel="stylesheet" href="bower_components/sc-toggle-switch/release/css/toggle_switch.css" />
-    <link rel="stylesheet" href="bower_components/dropzone/dist/min/dropzone.min.css" />
     <!-- endbower -->
     <!-- endbuild -->
     <!-- build:css(.tmp) styles/main.css -->
-    <link rel="stylesheet" href="styles/datetimepicker.css" />
-    <link rel="stylesheet" href="styles/main.css">
+    <link rel="stylesheet" href="styles/main.css" />
+    <link rel="stylesheet" href="vendors/datetimepicker/datetimepicker.css" />
+    <link rel="stylesheet" href="vendors/dropzone/dropzone.css" />
     <!-- endbuild -->
   </head>
 
@@ -123,7 +123,6 @@
     <script src="bower_components/angular-moment/angular-moment.js"></script>
     <script src="bower_components/sc-toggle-switch/release/scripts/toggle_switch.js"></script>
     <script src="bower_components/sc-toggle-switch/release/scripts/populate_template_cache.js"></script>
-    <script src="bower_components/dropzone/dist/min/dropzone.min.js"></script>
     <!-- endbower -->
     <script src="bower_components/moment/locale/fr.js"></script>
     <!-- endbuild -->
@@ -131,7 +130,8 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/angular-i18n/1.2.15/angular-locale_fr-fr.js"></script>
 
     <!-- build:js({.tmp,app}) scripts/scripts.js -->
-    <script src="scripts/datetimepicker.js"></script>
+    <script src="vendors/datetimepicker/datetimepicker.js"></script>
+    <script src="vendors/dropzone/dropzone.js"></script>
 
     <script src="scripts/app.js"></script>
     <script src="scripts/settings.js"></script>
