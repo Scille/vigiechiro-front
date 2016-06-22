@@ -16,12 +16,10 @@ module.exports = (config) ->
       'bower_components/angular/angular.js'
       'bower_components/angular-mocks/angular-mocks.js'
       'bower_components/angular-animate/angular-animate.js'
-      'bower_components/angular-cookies/angular-cookies.js'
-      'bower_components/angular-resource/angular-resource.js'
       'bower_components/angular-route/angular-route.js'
       'bower_components/angular-sanitize/angular-sanitize.js'
       'bower_components/angular-touch/angular-touch.js'
-      'bower_components/lodash/dist/lodash.compat.js'
+      'bower_components/lodash/lodash.min.js'
       'bower_components/restangular/dist/restangular.js'
       'bower_components/flow.js/dist/flow.js'
       'bower_components/ng-flow/dist/ng-flow.js'
@@ -29,7 +27,7 @@ module.exports = (config) ->
       'app/**/*.coffee'
       'test/unit/mock/**/*.coffee'
       'test/unit/spec/**/*.coffee'
-    ],
+    ]
 
     # list of files / patterns to exclude
     exclude: []
@@ -49,9 +47,7 @@ module.exports = (config) ->
     # - Safari (only Mac)
     # - PhantomJS
     # - IE (only Windows)
-    browsers: [
-      'PhantomJS'
-    ]
+    browsers: ['PhantomJS']
 
     # Which plugins to enable
     plugins: [
@@ -75,3 +71,7 @@ module.exports = (config) ->
     # proxies: '/': 'http://localhost:9000/'
     # URL root prevent conflicts with the site root
     # urlRoot: '_karma_'
+
+    phantomjsLauncher:
+      # Have phantomjs exit if a ResourceError is encountered (useful if karma exits without killing phantom)
+      exitOnResourceError: true
