@@ -2,10 +2,11 @@
   <div class="input-group">
     <div class="input-group-addon">
       <div class="dropdown">
-        <span class="dropdown-toggle toggle-select_date_{{date_id}}" id="dLabel_date_{{date_id}}"
-              data-toggle="dropdown" data-target="#" style="cursor: pointer;">
+        <a href="" class="dropdown-toggle toggle-select_date_{{date_id}}"
+           id="dLabel_date_{{date_id}}"
+           data-toggle="dropdown">
           <i class="fa fa-lg fa-calendar"></i> {{label}}
-        </span>
+        </a>
         <ul class="dropdown-menu" role="menu" aria-labelledby="dLabel_date_{{date_id}}">
           <datetimepicker
             data-ng-model="model"

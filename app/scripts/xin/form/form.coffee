@@ -58,9 +58,3 @@ angular.module('xin.form', ['ui.bootstrap.datetimepicker', 'angularMoment'])
             error_text += errorString
         $scope.error = error_text
     , true
-
-
-  # <span ng-show="submitted && participationForm.date_fin.$error.$invalid"
-  #       class="help-block has-error">
-  #   Date invalide
-  # </span>
