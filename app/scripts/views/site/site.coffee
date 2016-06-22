@@ -175,7 +175,6 @@ lock = (site, callbacks = {}) ->
 
 angular.module('siteViews', ['ngRoute',
                              'textAngular', 'ui.bootstrap',
-                             'dialogs.main',
                              'protocole_map', 'modalSiteViews',
                              'frapontillo.bootstrap-switch'])
   .config ($routeProvider) ->
