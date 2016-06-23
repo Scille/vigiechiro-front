@@ -18,18 +18,6 @@ traitement_is_timeout = (participation) ->
     participation.traitement.timeout = false
 
 
-makeRegExp = ($scope, type_site) ->
-  patt =
-    'CARRE': /^Cir.+-\d+-Pass\d+-Tron\d+-Chiro_[01]_\d+_000\.(wav|ta|tac)$/
-    'POINT_FIXE': /^Car.+-\d+-Pass\d+-([A-H][12]|Z[1-9][0-9]*)-.*[01]_\d+_\d+_\d+\.(wav|ta|tac)$/
-    'ROUTIER': /^Cir.+-\d+-Pass\d+-Tron\d+-Chiro_[01]_\d+_\d{3}\.(wav|ta|tac)$/
-  exemples =
-    'CARRE': 'Cir270-2009-Pass1-Tron1-Chiro_0_00265_000.wav'
-    'POINT_FIXE': 'Car170517-2014-Pass1-C1-OB-1_20140702_224038_761.wav'
-    'ROUTIER': 'Cir270-2009-Pass1-Tron1-Chiro_0_00265_000.wav'
-  $scope.regexp = [patt[type_site]]
-  $scope.fileFormatExemple = exemples[type_site]
-
 
 angular.module('participationViews', ['ngRoute', 'textAngular', 'xin_listResource',
                                       'xin_backend', 'xin_session', 'xin_tools',
@@ -250,18 +238,15 @@ angular.module('participationViews', ['ngRoute', 'textAngular', 'xin_listResourc
 
 
 
-  .controller 'EditParticipationController', ($scope, $routeParams, Backend) ->
+  .controller 'EditParticipationController', ($scope, $route, $routeParams, Backend) ->
     participationResource = null
     siteResource = null
     $scope.participation = null
-    $scope.fileUploader = {}
-    $scope.folderUploader = {}
     $scope.site = null
     $scope.protocole = null
     participationCreated = false
     # for spinner btn
-    $scope.startSave = {}
-    $scope.endSave = {}
+    $scope.saveDone = {}
 
     # Nouvelle participation
     if $routeParams.siteId?
@@ -324,7 +309,6 @@ angular.module('participationViews', ['ngRoute', 'textAngular', 'xin_listResourc
 
 
     $scope.save = ->
-      $scope.startSave.deferred()
       $scope.participation._errors = {}
       error = false
       payload = {}
@@ -370,40 +354,23 @@ angular.module('participationViews', ['ngRoute', 'textAngular', 'xin_listResourc
         if $scope.participation._id?
           # patch participation
           participationResource.patch(payload).then(
-            (participation) -> sendFiles()
+            (participation) -> $route.reload()
             (error) ->
               console.log("Error : participation save "+error)
-              $scope.endSave.deferred()
+              $scope.saveDone.end()
           )
         else
           # Post new participation
           siteResource.post('participations', payload).then(
             (participation) ->
-              Backend.one("participations", participation._id).get().then (participation) ->
-                participationResource = participation
-                sendFiles()
+              window.location = "#/participations/#{participation._id}"
             (error) ->
-              $scope.endSave.deferred()
+              console.log("Error : participation save "+error)
               $scope.submitError = true
+              $scope.saveDone.end()
           )
       else
-        $scope.endSave.deferred()
-
-
-    sendFiles = (participation) ->
-      participationCreated = true
-      payload =
-        pieces_jointes: $scope.fileUploader.itemsCompleted.concat($scope.folderUploader.itemsCompleted)
-
-      if not payload.pieces_jointes.length
-        window.location = '#/participations/'+participationResource._id
-      else
-        participationResource.customPUT(payload, 'pieces_jointes').then(
-          -> window.location = '#/participations/'+participationResource._id
-          ->
-            $scope.participation._errors.participation = "Echec de l'enregistrement des pièces jointes."
-            $scope.endSave.deferred()
-        )
+        $scope.saveDone.end()
 
 
 

@@ -30,7 +30,8 @@ angular
     'siteViews'
     'participationViews',
     'actualiteViews',
-    'donneeViews'
+    'donneeViews',
+    'uploadParticipationViews'
   ])
 
   .run (Backend, SETTINGS) ->

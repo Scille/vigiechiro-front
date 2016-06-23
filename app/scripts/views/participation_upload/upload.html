@@ -1,0 +1,55 @@
+<div class="spinner" ng-show="participationWaiting">
+    <i class="fa fa-5x fa-spinner fa-pulse"></i>
+</div>
+
+<div class="actionbar">
+  <sc-button class="btn btn-success"
+             ng-click="compute()"
+             label="'Lancer la participation'"
+             wait-for-class="fa fa-spinner"
+             cancel-wait-for="">
+  </sc-button>
+  <a class="btn btn-default" href="#/participations/{{participation._id}}">
+    Voir la participation
+  </a>
+</div>
+
+<div class="panel-body">
+  <div class="text-center">
+    <div class="page-header text-center">
+      <h3>Participation du {{ participation.date_debut | xinDate: 'medium' }}
+      effectuée par {{participation.observateur.pseudo}}</h3>
+    </div>
+  </div>
+
+  <div class="form-group input-group" ng-if="false">
+    <span class="input-group-addon">Nombre de fichiers uploadés en parallèle (2~20)</span>
+    <input class="form-control" type="number"
+           ng-model="connectionSpeed" min="2" max="20">
+  </div>
+
+  <div class="alert alert-warning">Exemple de nom de fichier : {{fileFormatExemple}}</div>
+
+  <upload-file-directive lien-participation="{{participation._id}}"
+                         regex="regexp"
+                         warning-files="filesWarning"
+                         error-files="filesFailed"
+                         refresh="refresh">
+  </upload-file-directive>
+</div>
+
+<div>
+  <div class="alert alert-warning" ng-show="filesWarning.length">
+    <div><strong>{{filesWarning.length}}</strong></div>
+    <div ng-repeat="message in filesWarning">
+      {{message}}
+    </div>
+  </div>
+
+  <div class="alert alert-danger" ng-show="filesFailed.length">
+    <div><strong>{{filesFailed.length}}</strong></div>
+    <div ng-repeat="message in filesFailed">
+      {{message}}
+    </div>
+  </div>
+</div>

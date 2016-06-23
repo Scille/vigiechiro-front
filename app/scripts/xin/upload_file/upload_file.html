@@ -1,144 +1,60 @@
 <!-- drop zone -->
-<div class="drop row" uploader="uploader"
-     over-class="drag-over" file-over
-     directory="directory">
-  <input type="file" class="btn hidden" file-select
-         uploader="uploader" id="file_{{date_id}}" />
+<div class="drop row"
+     uploader="uploader">
+  <input type="file"
+         class="hidden"
+         uploader="uploader"
+         multiple>
   <center>
-    <label for="file_{{date_id}}">
-      <div ng-if="!directory">
-        Cliquez ou déposez vos fichiers ici
-        <div class="label label-warning">
-          Si rien ne passe lorsque vous sélectionnez les fichiers puis confirmez, utilisez le glisser/déposer.
-        </div>
-      </div>
-      <div ng-if="directory">Cliquez ici</div>
-    </label>
+    <div><strong>Cliquez ou déposez vos fichiers ici</strong></div>
+    <div>
+      Le dépôt de dossier fonctionne sous Chrome uniquement
+    </div>
+    <div class="label label-warning">
+      Si rien ne passe lorsque vous sélectionnez les fichiers puis confirmez, utilisez le glisser/déposer.
+    </div>
   </center>
 </div>
 
+<!-- drop zone error -->
+<div class="alert alert-danger" ng-show="dropError.length">
+  <div ng-repeat="error in dropError">{{error}}</div>
+</div>
+
 <!-- abstract -->
-<div class="well">
+<div class="well" ng-show="uploader.status == 'active'">
   <div class="row">
-    <div class="col-md-5">Fichiers : {{uploader.itemsCompleted.length}}/{{uploader.itemsTotal}}</div>
-    <div class="col-md-4">
-      {{uploader.transmitted_size/1024/1024 | number: 2}}/{{uploader.size/1024/1024 | number: 2}} Mo
+    <div class="col-xs-6">
+      Nombre de fichiers dans la queue : {{uploader.queuedFiles.length}}
     </div>
-    <div class="col-md-3">
-      {{uploader.speed/1024 | number: 1}} ko/s
-    </div>
-  </div>
-  <!-- global progress bar -->
-  <div class="progress" ng-show="uploader.itemsTotal">
-    <!-- uploaded -->
-    <div class="progress-bar progress-bar-success"
-         style="width: {{uploader.itemsCompleted.length/uploader.itemsTotal*100}}%">
-      {{uploader.itemsCompleted.length}}
-    </div>
-    <!-- uploading -->
-    <div class="progress-bar progress-bar-success progress-bar-striped active"
-         style="width: {{uploader.itemsUploading.length/uploader.itemsTotal*100}}%">
-      {{uploader.itemsUploading.length}}
-    </div>
-    <!-- compressed -->
-    <div class="progress-bar"
-         style="width:{{uploader.itemsReadyToUp.length/uploader.itemsTotal*100}}%">
-      {{uploader.itemsReadyToUp.length}}
-    </div>
-    <!-- compressing -->
-    <div class="progress-bar progress-bar-striped active"
-         style="width:{{uploader.itemsCompressing/uploader.itemsTotal*100}}%">
-      {{uploader.itemsCompressing}}
-    </div>
-    <!-- errors -->
-    <div class="progress-bar progress-bar-danger"
-         style="width: {{(uploader.itemsFailedFilters.length + uploader.itemsFailedUpload.length + uploader.itemsCanceled)/uploader.itemsTotal*100}}%">
-      {{uploader.itemsFailedFilters.length + uploader.itemsFailedUpload.length + uploader.itemsCanceled}}
-    </div>
-    <!-- other -->
-    <div class="progress-bar progress-bar-warning"
-         style="width: {{(uploader.itemsWaiting.length + uploader.itemsReadyToCompress.length)/uploader.itemsTotal*100}}%">
-      {{uploader.itemsWaiting.length + uploader.itemsReadyToCompress.length}}
+    <div class="col-xs-6">
+      Vitesse d'upload : {{uploader.speed/1024 | number: 1}} ko/s
     </div>
   </div>
-
-  <!-- Filters errors -->
-  <div class="alert alert-danger" ng-show="uploader.itemsFailedFilters.length">
-    <div ng-repeat="error in uploader.itemsFailedFilters">
-      {{ error }}
+  <!-- upload bar -->
+  <div class="row">
+    <!-- global progress bar -->
+    <div class="col-xs-10 progress">
+      <!-- uploaded -->
+      <div class="progress-bar progress-bar-success"
+           style="width: {{uploader.itemsUploaded.length/uploader.itemsWaitingUploadLength*100}}%">
+        {{uploader.itemsUploaded.length}}
+      </div>
+      <!-- waiting -->
+      <div class="progress-bar progress-bar-warning progress-bar-striped active"
+           style="width: {{(uploader.itemsWaitingUpload.length+uploader.itemsUploading.length)/uploader.itemsWaitingUploadLength*100}}%">
+        {{uploader.itemsWaitingUpload.length + uploader.itemsUploading.length}}
+      </div>
+      <!-- errors -->
+      <div class="progress-bar progress-bar-danger"
+           style="width: {{(uploader.itemsWarning.length + uploader.itemsFailed.length)/uploader.itemsWaitingUploadLength*100}}%">
+        {{uploader.itemsWarning.length + uploader.itemsFailed.length}}
+      </div>
     </div>
-  </div>
-  <!-- Items canceled -->
-  <div class="alert alert-danger" ng-show="uploader.itemsCanceled.length">
-    <div ng-repeat="item in uploader.itemsCanceled">
-      Fichier {{ item.name }} annulé
-    </div>
-  </div>
-  <!-- Compression failed -->
-  <div class="alert alert-danger" ng-show="uploader.itemsFailedCompress.length">
-    <div ng-repeat="item in uploader.itemsFailedCompress">
-      Echec de la compression du fichier {{ item.name }}, fichier vide.
-    </div>
-  </div>
-  <!-- Uploads failed -->
-  <div class="alert alert-danger" ng-show="uploader.itemsFailedUpload.length">
-    <div ng-repeat="item in uploader.itemsFailedUpload">
-      Echec du téléchargement du fichier {{ item.file.name }}
-    </div>
-  </div>
-  <!-- Uploads warning -->
-  <div class="alert alert-warning" ng-show="uploader.warningsXfails.length">
-    <div ng-repeat="item in uploader.warningsXfails">
-      Echec de l'essai n°{{item.count}} du téléchargement du fichier {{item.name}}
-    </div>
-  </div>
-  <!-- global warning -->
-  <div class="alert alert-warning" ng-show="warnings.length">
-    <div ng-repeat="warning in warnings">
-      {{ warning }}
-    </div>
-  </div>
-  <div class="alert alert-success" ng-show="uploader.directories.length">
-    Dossiers uploadés :
-    <div ng-repeat="directory in uploader.directories">
-      {{ directory }}
-    </div>
+    <div class="col-xs-2"></div>
   </div>
 </div>
 
-<div ng-repeat="item in uploader.itemsUploading" class="form-group">
-  <div class="row">
-    <div class="col-md-9">{{item.file.name}}</div>
-    <div class="col-md-3">
-      {{item.file.transmitted_size/1024/1024|number:2 }}/{{ item.file.size/1024/1024|number:2 }} Mo
-    </div>
-  </div>
-  <div class="row">
-    <div class="col-md-9 progress">
-      <div class="progress-bar progress-bar-striped active" role="progressbar"
-           aria-valuenow="{{item.file.transmitted_size/item.file.size*100}}"
-           aria-valuemin="0" aria-valuemax="100"
-           style="width: {{item.file.transmitted_size/item.file.size*100}}%;"
-           ng-show="item.file.transmitted_size/item.file.size*100 < 100">
-        {{ item.file.transmitted_size/item.file.size*100|number:1 }}%
-      </div>
-      <div class="progress-bar progress-bar-success" role="progressbar"
-           aria-valuenow="100"
-           aria-valuemin="0" aria-valuemax="100"
-           style="width: 100%;"
-           ng-show="item.file.transmitted_size/item.file.size*100 == 100">
-      </div>
-    </div>
-    <div class="col-md-3">
-      <button class="btn btn-warning btn-xs" type="button" ng-click="item.retry()">
-        Relancer
-      </button>
-      <button class="btn btn-danger btn-xs" type="button" ng-click="item.cancel()">
-        Annuler
-      </button>
-    </div>
-  </div>
-</div>
 
 <button class="btn btn-primary btn-xs" type="button" ng-click="uploader.startAll()"
         ng-show="uploader.status == 'pause'">
@@ -151,12 +67,4 @@
 <button class="btn btn-danger btn-xs" type="button" ng-click="uploader.cancelAll()"
         ng-show="uploader.itemsTotal">
   Tout annuler
-</button>
-<button class="btn btn-primary btn-xs" type="button" ng-click="uploader.clearErrors()"
-        ng-show="uploader.itemsFailedFilters.length || uploader.itemsFailedUpload.length">
-  Effacer les erreurs
-</button>
-<button class="btn btn-primary btn-xs" type="button" ng-click="uploader.retryErrors()"
-        ng-show="uploader.itemsFailedFilters.length || uploader.itemsFailedUpload.length">
-  Re-télécharger les fichiers échoués
 </button>

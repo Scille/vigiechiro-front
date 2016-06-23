@@ -15,7 +15,9 @@
                               folder-uploader="folderUploader">
 </edit-participation-directive>
 
-<sc-button class="save-participation btn btn-primary" ng-click="save()"
-           label="'Sauvegarder'" wait-for-class="fa fa-spinner fa-spin"
-           start-wait-for="startSave" cancel-wait-for="endSave">
+<sc-button class="save-participation btn btn-primary"
+           ng-click="save()"
+           label="'Sauvegarder'"
+           wait-for-class="fa fa-spinner fa-1 fa-pulse"
+           cancel-wait-for="saveDone">
 </sc-button>
