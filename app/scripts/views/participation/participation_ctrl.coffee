@@ -22,7 +22,7 @@ traitement_is_timeout = (participation) ->
 angular.module('participationViews', ['ngRoute', 'textAngular', 'xin_listResource',
                                       'xin_backend', 'xin_session', 'xin_tools',
                                       'xin_uploadFile', 'xin.form', 'modalParticipationViews',
-                                      'sc-button'])
+                                      'sc-button', 'xin_s3uploadFile'])
   .config ($routeProvider) ->
     $routeProvider
       .when '/participations',

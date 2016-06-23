@@ -51,6 +51,8 @@ angular.module('xin.fileUploader', [])
         @sending = config.sending or null
         @progressing = config.progressing or null
         @complete = config.complete or null
+        @nb_success = 0
+        @validating = 0
         @queuedFiles = []
         @processingFiles = []
         @warningFiles = []
@@ -103,10 +105,12 @@ angular.module('xin.fileUploader', [])
         @_checkQueuedFiles()
 
       _checkQueuedFiles: ->
-        if not @queuedFiles.length and not @processingFiles.length
-          @status = 'inactive'
+        if not @queuedFiles.length and not @processingFiles.length and not @validating
+          @status = 'finish'
         else
-          while @queuedFiles.length and @processingFiles.length < @parallelUploads
+          while @queuedFiles.length and
+                (@processingFiles.length+@validating) < @parallelUploads
+            @validating += 1
             file = @queuedFiles.shift()
             file =
               data: file
@@ -115,23 +119,21 @@ angular.module('xin.fileUploader', [])
               fullPath: file.fullPath
               status: "accepting"
               bytesSent: 0
-            @processingFiles.push(file)
             @_accept(file)
 
       _accept: (file) ->
         _acceptCallback = (error_type = null, error = null) =>
           if error?
-            for processFile, i in @processingFiles
-              if file.fullPath == processFile.fullPath
-                @processingFiles.splice(i, 1)
-                file.message = error
-                if error_type == "error"
-                  @errorFiles.push(file)
-                else
-                  @warningFiles.push(file)
-                break
+            file.message = error
+            if error_type == "error"
+              @errorFiles.push(file)
+            else
+              @warningFiles.push(file)
+            @validating += -1
             @_checkQueuedFiles()
           else
+            @processingFiles.push(file)
+            @validating += -1
             @_sending(file)
         @accept(file, _acceptCallback)
 
@@ -159,10 +161,6 @@ angular.module('xin.fileUploader', [])
 
 
       _finished: (file, xhr) ->
-        for processFile, i in @processingFiles
-          if file.fullPath == processFile.fullPath
-            @processingFiles.splice(i, 1)
-        @_checkQueuedFiles()
         @complete?(file)
 
 
@@ -173,20 +171,41 @@ angular.module('xin.fileUploader', [])
 
 
       _onProgress: (file, e) ->
-        @transmitted_size = e.loaded - file.bytesSent
+        @transmitted_size += e.loaded - file.bytesSent
         file.bytesSent = e.loaded
         @_computeSpeed()
+        @progressing?()
 
 
       _computeSpeed: ->
         time = new Date()
         diffTime = (time - @start_time) / 1000
-        if diffTime < 2
+        if diffTime < 4
           return
-        @_startTime = time
+        @start_time = time
         @speed = @transmitted_size / diffTime
         @transmitted_size = 0
-        @progressing?()
+
+
+      removeFile: (file, error = null) ->
+        for processFile, i in @processingFiles
+          if processFile? and file.fullPath == processFile.fullPath
+            @processingFiles.splice(i, 1)
+        if error?
+          @errorFiles.push(file)
+        else
+          @nb_success += 1
+        @_checkQueuedFiles()
+
+
+      getNbFiles: ->
+        result = @nb_success +
+                 @validating +
+                 @queuedFiles.length +
+                 @processingFiles.length +
+                 @warningFiles.length +
+                 @errorFiles.length
+        return result
 
 
       startAll: ->
@@ -199,94 +218,3 @@ angular.module('xin.fileUploader', [])
 
       cancelAll: ->
         console.log("TODO")
-
-      # _checkUploader: =>
-      #   if @status in ['pause', 'cancel']
-      #     return
-      #   @_uploadStart()
-      #   @_computeSize()
-      #   @_computeSpeed()
-      #
-      # _checkWaiting: ->
-      #   if @_isCheckingWaiting or @status in ['pause']
-      #     return
-      #   @_isCheckingWaiting = true
-      #   count = @itemsWaitingFilters.length
-      #   for i in [0..count-1] when count > 0
-      #     file = @itemsWaitingFilters.shift()
-      #     if @_checkFilters(file)
-      #       if @gzip
-      #         @itemsReadyToCompress.push(file)
-      #       else
-      #         @_createS3File(file)
-      #   @_isCheckingWaiting = false
-      #
-
-      # _removeFileUploading: (file) ->
-      #   for item, index in @itemsUploading
-      #     if item.file.name == file.file.name
-      #       return @itemsUploading.splice(index, 1)[0]
-      #
-      #
-      # _retryS3Sending: (s3File, status) ->
-      #   if s3File.file.sendingTryS3 < 2
-      #     s3File.file.sendingTryS3++
-      #     @_checkWarningUpload(s3File.file.name, s3File.file.sendingTryS3)
-      #     s3File.file.status = 'ready'
-      #     s3File.file.transmitted_size = 0
-      #     s3File.start()
-      #   else
-      #     @_onError(s3File)
-      #
-      # _onError: (item) ->
-      #   @_checkWarningUpload(item.file.name)
-      #   item = @_removeFileUploading(item)
-      #   if item? and item.length
-      #     @itemsFailedUpload.push(item[0])
-      #   @_checkReadyToCompress()
-      #   @_uploadWaiting()
-      #
-      # _checkWarningUpload: (name, count = 0) ->
-      #   warning =
-      #     name: name
-      #     count: count
-      #   length = @warningsXfails.length-1
-      #   for i in [0..length] when length >= 0
-      #     item = @warningsXfails[i]
-      #     if item.name == name
-      #       @warningsXfails.splice(i, 1)
-      #       break
-      #   if count
-      #     @warningsXfails.push(warning)
-      #
-      #
-      # pauseAll: ->
-      #   @status = 'pause'
-      #   for file in @itemsUploading
-      #     file.pause()
-      #
-      # cancelAll: ->
-      #   @status = 'cancel'
-      #   for file in @itemsUploading
-      #     if file?
-      #       file.cancel()
-      #   @init()
-      #   @onCancelAllComplete?()
-      #
-      # clearErrors: ->
-      #   @itemsFailed = []
-      #
-      #
-      # retryErrors: ->
-      #   for item in @itemsFailedUpload or []
-      #     item.file.sendingTryS3 = 0
-      #   @itemsReadyToUp = @itemsReadyToUp.concat(@itemsFailedUpload)
-      #   @itemsFailedUpload = []
-      #   @_uploadWaiting()
-      #
-      #
-      # startAll: ->
-      #   @status = 'progress'
-      #   for file in @itemsUploading
-      #     file.start()
-      #   @_checkUploader()

@@ -18,6 +18,7 @@ angular.module('xin_uploadFile', ['appSettings', 'xin.fileUploader'])
                                        Backend, Uploader) ->
       # 5Mo
       sliceSize = 5 * 1024 * 1024
+      uploader = null
 
       createGZipFile = (file) ->
         $q (resolve, reject) ->
@@ -119,16 +120,18 @@ angular.module('xin_uploadFile', ['appSettings', 'xin.fileUploader'])
         if file.postData?
           Backend.one('fichiers', file.postData._id).post().then(
             (response) ->
+              uploader.removeFile(file)
+              $scope.refresh?()
             (error) ->
-              file.custom_status = 'rejected'
-              uploader.errorFiles.push(file)
+              uploader.removeFile(file, "Erreur finition fichier : #{file.name}")
+              $scope.refresh?()
           )
 
 
       uploaderConfig =
         url: SETTINGS.S3_BUCKET_URL
         method: "post"
-        parallelUploads: 5
+        parallelUploads: 10
         accept: onAccept
         sending: onSending
         progressing: onProgress

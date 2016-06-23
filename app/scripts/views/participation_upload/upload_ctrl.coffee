@@ -38,8 +38,8 @@ angular.module('uploadParticipationViews', ['ngRoute', 'xin_listResource',
 
 
 
-  .controller 'AddParticipationFilesController', ($scope, $routeParams, Backend,
-                                                  session) ->
+  .controller 'AddParticipationFilesController', ($scope, $routeParams, $timeout,
+                                                  Backend, session) ->
     participationResource = null
     $scope.participation = null
     # $scope.connectionSpeed = 2
@@ -66,7 +66,9 @@ angular.module('uploadParticipationViews', ['ngRoute', 'xin_listResource',
     #     $scope.folderUploader.connectionSpeed = value
 
     $scope.refresh = ->
-      $scope.$apply()
+      $timeout(->
+        $scope.$apply()
+      )
 
     $scope.compute = ->
       participationResource.post('compute', {}).then(
