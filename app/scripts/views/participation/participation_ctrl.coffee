@@ -344,12 +344,6 @@ angular.module('participationViews', ['ngRoute', 'textAngular', 'xin_listResourc
           $scope.canal_enregistrement_direct_error = true
           error = true
 
-      # Check files
-      if not $scope.fileUploader.isAllComplete() or
-         not $scope.folderUploader.isAllComplete()
-        $scope.participationForm.pieces_jointes = {$error: {uploading: true}}
-        error = true
-
       if not error
         if $scope.participation._id?
           # patch participation
@@ -380,19 +374,3 @@ angular.module('participationViews', ['ngRoute', 'textAngular', 'xin_listResourc
     scope:
       participation: '='
       typeSite: '='
-      fileUploader: '='
-      folderUploader: '='
-    link: (scope) ->
-      scope.folderAllowed = true
-      # firefox and IE don't support folder upload
-      if navigator.userAgent.search("Firefox") != -1
-        scope.folderAllowed = false
-      else if navigator.userAgent.search("Edge") != -1
-        scope.folderAllowed = false
-      else if navigator.userAgent.search("MSIE") != -1
-        scope.folderAllowed = false
-
-      scope.$watch 'typeSite', (type_site) ->
-        if not type_site? or type_site == ""
-          return
-        makeRegExp(scope, type_site)
