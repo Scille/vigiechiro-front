@@ -165,9 +165,8 @@ angular.module('xin.fileUploader', [])
 
 
       _errorProcessing: (file, xhr) ->
-        console.log("TODO")
-        console.log(file)
-        @_checkQueuedFiles()
+        error = xhr
+        @removeFile(file, error)
 
 
       _onProgress: (file, e) ->
