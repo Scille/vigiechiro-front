@@ -47,24 +47,41 @@
       </div>
       <!-- errors -->
       <div class="progress-bar progress-bar-danger"
-           style="width: {{(uploader.itemsWarning.length + uploader.itemsFailed.length)/uploader.itemsWaitingUploadLength*100}}%">
-        {{uploader.itemsWarning.length + uploader.itemsFailed.length}}
+           style="width: {{(uploader.warningFiles.length + uploader.errorFiles.length)/uploader.itemsWaitingUploadLength*100}}%">
+        {{uploader.warningFiles.length + uploader.errorFiles.length}}
       </div>
     </div>
     <div class="col-xs-2"></div>
   </div>
 </div>
 
+<div>
+  <button class="btn btn-primary btn-xs" type="button" ng-click="uploader.startAll()"
+          ng-show="uploader.status == 'pause'">
+    Continuer
+  </button>
+  <button class="btn btn-warning btn-xs" type="button" ng-click="uploader.pauseAll()"
+          ng-show="uploader.status != 'pause' && (uploader.itemsWaiting.length || uploader.itemsReadyToCompress.length || uploader.itemsCompressing || uploader.itemsReadyToUp.length || uploader.itemsUploading.length)">
+    Pause
+  </button>
+  <button class="btn btn-danger btn-xs" type="button" ng-click="uploader.cancelAll()"
+          ng-show="uploader.itemsTotal">
+    Tout annuler
+  </button>
+</div>
 
-<button class="btn btn-primary btn-xs" type="button" ng-click="uploader.startAll()"
-        ng-show="uploader.status == 'pause'">
-  Continuer
-</button>
-<button class="btn btn-warning btn-xs" type="button" ng-click="uploader.pauseAll()"
-        ng-show="uploader.status != 'pause' && (uploader.itemsWaiting.length || uploader.itemsReadyToCompress.length || uploader.itemsCompressing || uploader.itemsReadyToUp.length || uploader.itemsUploading.length)">
-  Pause
-</button>
-<button class="btn btn-danger btn-xs" type="button" ng-click="uploader.cancelAll()"
-        ng-show="uploader.itemsTotal">
-  Tout annuler
-</button>
+<div>
+  <div class="alert alert-warning" ng-show="uploader.warningFiles.length">
+    <div><strong>{{uploader.warningFiles.length}}</strong></div>
+    <div ng-repeat="file in uploader.warningFiles">
+      {{file.message}}
+    </div>
+  </div>
+
+  <div class="alert alert-danger" ng-show="uploader.errorFiles.length">
+    <div><strong>{{uploader.errorFiles.length}}</strong></div>
+    <div ng-repeat="file in uploader.errorFiles">
+      {{file.message}}
+    </div>
+  </div>
+</div>

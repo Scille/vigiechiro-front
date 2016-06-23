@@ -52,6 +52,8 @@ angular.module('xin.fileUploader', [])
         @complete = config.complete or null
         @queuedFiles = []
         @processingFiles = []
+        @warningFiles = []
+        @errorFiles = []
         @speed = 0
         # @_init()
 
@@ -113,11 +115,16 @@ angular.module('xin.fileUploader', [])
             @_accept(file)
 
       _accept: (file) ->
-        _acceptCallback = (error = null) =>
+        _acceptCallback = (error_type = null, error = null) =>
           if error?
             for processFile, i in @processingFiles
               if file.fullPath == processFile.fullPath
                 @processingFiles.splice(i, 1)
+                file.message = error
+                if error_type == "error"
+                  @errorFiles.push(file)
+                else
+                  @warningFiles.push(file)
                 break
             @_checkQueuedFiles()
           else
@@ -151,6 +158,17 @@ angular.module('xin.fileUploader', [])
         formData.append('file', file.data, file.name)
         xhr.send(formData)
 
+
+      startAll: ->
+        console.log("TODO")
+
+
+      pauseAll: ->
+        console.log("TODO")
+
+
+      cancelAll: ->
+        console.log("TODO")
 
       # _checkUploader: =>
       #   if @status in ['pause', 'cancel']

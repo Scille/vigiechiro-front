@@ -9,8 +9,6 @@ angular.module('xin_uploadFile', ['appSettings', 'xin.fileUploader'])
     scope:
       lienParticipation: '@'
       regex: '=?'
-      warningFiles: '=?'
-      errorFiles: '=?'
       refresh: '=?'
     link: (scope, elem, attrs) ->
       scope.elem = elem
@@ -44,24 +42,24 @@ angular.module('xin_uploadFile', ['appSettings', 'xin.fileUploader'])
         if file.fullPath?
           split = file.fullPath.split("/")
           if split.length > 2
-            if $scope.warningFiles?
-              $scope.warningFiles.push("Sous-dossier : #{file.fullPath}")
-            done("Erreur : sous-dossier")
+            # if $scope.warningFiles?
+            #   $scope.warningFiles.push("Sous-dossier : #{file.fullPath}")
+            done("warning", "Sous-dossier : #{file.fullPath}")
             $scope.refresh?()
             return
         # test regex
         if file.type not in ['image/png', 'image/png', 'image/jpeg']
           if not $scope.regex.test(file.name)
-            if $scope.warningFiles?
-              $scope.warningFiles.push("Nom de fichier invalide : #{file.name}")
-            done("Erreur : mauvais nom de fichier #{file.name}")
+            # if $scope.warningFiles?
+            #   $scope.warningFiles.push("Nom de fichier invalide : #{file.name}")
+            done("warning", "Nom de fichier invalide : #{file.name}")
             $scope.refresh?()
             return
         # test empty file
         if file.size == 0
-          if $scope.errorFiles?
-            $scope.errorFiles.push("#{file.name} : Fichier vide")
-          done("Erreur : fichier vide")
+          # if $scope.errorFiles?
+          #   $scope.errorFiles.push("#{file.name} : Fichier vide")
+          done("error", "#{file.name} : Fichier vide")
           $scope.refresh?()
           return
 
@@ -92,8 +90,8 @@ angular.module('xin_uploadFile', ['appSettings', 'xin.fileUploader'])
           (error) ->
             file.custom_status = 'rejected'
             msg = JSON.stringify(error.data)
-            if $scope.errorFiles?
-              $scope.errorFiles.push(msg)
+            # if $scope.errorFiles?
+            #   $scope.errorFiles.push(msg)
             registered.reject("Erreur a l'upload : #{msg}")
         )
         # Compress the file
@@ -102,15 +100,17 @@ angular.module('xin_uploadFile', ['appSettings', 'xin.fileUploader'])
             file.data = blob
             compressed.resolve()
           (error) ->
-            if $scope.errorFiles?
-              $scope.errorFiles.push(error)
+            # if $scope.errorFiles?
+            #   $scope.errorFiles.push(error)
             compressed.reject(error)
         )
         $q.all([compressed.promise, registered.promise]).then(
-          (results) -> done()
+          (results) ->
+            done()
+            $scope.refresh?()
           (error) ->
-            done(error)
-            # $scope.refresh?()
+            done("error", error)
+            $scope.refresh?()
         )
 
 

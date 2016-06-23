@@ -32,24 +32,6 @@
 
   <upload-file-directive lien-participation="{{participation._id}}"
                          regex="regexp"
-                         warning-files="filesWarning"
-                         error-files="filesFailed"
                          refresh="refresh">
   </upload-file-directive>
-</div>
-
-<div>
-  <div class="alert alert-warning" ng-show="filesWarning.length">
-    <div><strong>{{filesWarning.length}}</strong></div>
-    <div ng-repeat="message in filesWarning">
-      {{message}}
-    </div>
-  </div>
-
-  <div class="alert alert-danger" ng-show="filesFailed.length">
-    <div><strong>{{filesFailed.length}}</strong></div>
-    <div ng-repeat="message in filesFailed">
-      {{message}}
-    </div>
-  </div>
 </div>

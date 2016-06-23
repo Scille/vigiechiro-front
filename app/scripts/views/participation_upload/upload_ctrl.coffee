@@ -44,10 +44,6 @@ angular.module('uploadParticipationViews', ['ngRoute', 'xin_listResource',
     $scope.participation = null
     # $scope.connectionSpeed = 2
 
-    # summary
-    $scope.filesWarning = []
-    $scope.filesFailed = []
-
     # get participation
     Backend.one("participations", $routeParams.participationId).get().then(
       (participation) ->
