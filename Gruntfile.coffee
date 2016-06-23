@@ -6,26 +6,26 @@
 # use this if you want to recursively match all subfolders:
 # 'test/spec/**/*.js'
 module.exports = (grunt) ->
-  
+
   # Load grunt tasks automatically
   require("load-grunt-tasks") grunt
-  
+
   # Time how long tasks take. Can help when optimizing build times
   require("time-grunt") grunt
-  
+
   # Configurable paths for the application
   appConfig =
     app: require("./bower.json").appPath or "app"
     dist: "dist"
 
   grunt.loadNpmTasks "grunt-protractor-runner"
-  
+
   # Define the configuration for all the tasks
   grunt.initConfig
-    
+
     # Project settings
     yeoman: appConfig
-    
+
     # Watches files for changes and runs tasks based on the changed files
     watch:
       bower:
@@ -47,7 +47,7 @@ module.exports = (grunt) ->
         files: ["<%= yeoman.app %>/styles/**/*.css"]
         tasks: [
           "newer:copy:styles"
-          "autoprefixer"
+          "postcss"
         ]
 
       gruntfile:
@@ -64,7 +64,7 @@ module.exports = (grunt) ->
           "<%= yeoman.app %>/images/**/*.{png,jpg,jpeg,gif,webp,svg}"
         ]
 
-    
+
     # The actual grunt server settings
     connect:
       options:
@@ -99,17 +99,7 @@ module.exports = (grunt) ->
           open: true
           base: "<%= yeoman.dist %>"
 
-    
-    # Make sure code styles are up to par and there are no obvious mistakes
-    jshint:
-      options:
-        jshintrc: ".jshintrc"
-        reporter: require("jshint-stylish")
 
-      all:
-        src: ["Gruntfile.js"]
-
-    
     # Empties folders to start fresh
     clean:
       dist:
@@ -126,9 +116,11 @@ module.exports = (grunt) ->
 
 
     # Add vendor prefixed styles
-    autoprefixer:
+    postcss:
       options:
-        browsers: ["last 1 version"]
+        processors: [
+          require('autoprefixer')({browsers: ["last 1 version"]})
+        ]
 
       dist:
         files: [
@@ -138,14 +130,14 @@ module.exports = (grunt) ->
           dest: ".tmp/styles/"
         ]
 
-    
+
     # Automatically inject Bower components into the app
     wiredep:
       app:
         src: ["<%= yeoman.app %>/index.html"]
         ignorePath: /\.\.\//
 
-    
+
     # Compiles CoffeeScript to JavaScript
     coffee:
       options:
@@ -170,7 +162,7 @@ module.exports = (grunt) ->
           ext: ".js"
         ]
 
-    
+
     # Renames files for browser caching purposes
     filerev:
       dist:
@@ -181,7 +173,7 @@ module.exports = (grunt) ->
           "<%= yeoman.dist %>/styles/fonts/*"
         ]
 
-    
+
     # Reads HTML for usemin blocks to enable smart builds that automatically
     # concat, minify and revision files. Creates configurations in memory so
     # additional tasks can operate on them
@@ -200,7 +192,7 @@ module.exports = (grunt) ->
 
             post: {}
 
-    
+
     # Performs rewrites based on filerev and the useminPrepare configuration
     usemin:
       html: ["<%= yeoman.dist %>/**/*.html"]
@@ -211,7 +203,7 @@ module.exports = (grunt) ->
           "<%= yeoman.dist %>/images"
         ]
 
-    
+
     # The following *-min tasks will produce minified files in the dist folder
     # By default, your `index.html`'s <!-- Usemin block --> will take care of
     # minification. These next options are pre-configured if you do not wish
@@ -277,7 +269,7 @@ module.exports = (grunt) ->
           dest: "<%= yeoman.dist %>"
         ]
 
-    
+
     # ng-annotate tries to make the code safe for minification automatically
     # by using the Angular long form for dependency injection.
     ngAnnotate:
@@ -292,13 +284,13 @@ module.exports = (grunt) ->
           dest: ".tmp/concat/scripts"
         ]
 
-    
+
     # Replace Google CDN references
     cdnify:
       dist:
         html: ["<%= yeoman.dist %>/*.html"]
 
-    
+
     # Copies remaining files to places other tasks can use
     copy:
       dist:
@@ -343,7 +335,7 @@ module.exports = (grunt) ->
         dest: ".tmp/styles/"
         src: "**/*.css"
 
-    
+
     # Run some tasks in parallel to speed up the build process
     concurrent:
       server: [
@@ -361,7 +353,7 @@ module.exports = (grunt) ->
         "svgmin"
       ]
 
-    
+
     # Test settings
     karma:
       options:
@@ -373,7 +365,7 @@ module.exports = (grunt) ->
       server:
         singleRun: false
 
-    
+
     # E2e test settings
     protractor:
       options:
@@ -399,7 +391,7 @@ module.exports = (grunt) ->
       "clean:server"
       "wiredep"
       "concurrent:server"
-      "autoprefixer"
+      "postcss"
       "connect:livereload"
       "watch"
     ]
@@ -411,7 +403,7 @@ module.exports = (grunt) ->
   grunt.registerTask "test", [
     "clean:server"
     "concurrent:test"
-    "autoprefixer"
+    "postcss"
     "connect:test"
     "karma:unit"
   ]
@@ -425,7 +417,7 @@ module.exports = (grunt) ->
   grunt.registerTask "test-server", [
     "clean:server"
     "concurrent:test"
-    "autoprefixer"
+    "postcss"
     "connect:test"
     "karma:server"
   ]
@@ -435,7 +427,7 @@ module.exports = (grunt) ->
     "wiredep"
     "useminPrepare"
     "concurrent:dist"
-    "autoprefixer"
+    "postcss"
     "concat"
     "ngAnnotate"
     "copy:dist"
@@ -448,7 +440,6 @@ module.exports = (grunt) ->
   ]
 
   grunt.registerTask "default", [
-    "newer:jshint"
     "test"
     "build"
   ]
