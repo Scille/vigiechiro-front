@@ -2,7 +2,7 @@
 
 
 angular.module('xin.fileUploader', [])
-  .factory 'Uploader', ($interval, $http, Backend) ->
+  .factory 'Uploader', ($http, Backend) ->
     class Uploader
       constructor: (elem, config) ->
         self = this
@@ -49,11 +49,14 @@ angular.module('xin.fileUploader', [])
         @parallelUploads = config.parallelUploads or 5
         @accept = config.accept or null
         @sending = config.sending or null
+        @progressing = config.progressing or null
         @complete = config.complete or null
         @queuedFiles = []
         @processingFiles = []
         @warningFiles = []
         @errorFiles = []
+        @start_time = 0
+        @transmitted_size = 0
         @speed = 0
         # @_init()
 
@@ -111,6 +114,7 @@ angular.module('xin.fileUploader', [])
               name: file.name
               fullPath: file.fullPath
               status: "accepting"
+              bytesSent: 0
             @processingFiles.push(file)
             @_accept(file)
 
@@ -137,26 +141,52 @@ angular.module('xin.fileUploader', [])
         @sending(file, formData)
         xhr = new XMLHttpRequest()
         xhr.open(@method, @url, true)
-        xhr.onload = ->
-          if xhr.status == 200
-            console.log("Success", xhr)
-            # callbacks.onSuccess?(xhr)
+        xhr.onload = (e) =>
+          return unless xhr.readyState is 4
+          if xhr.status in [200, 204]
+            @_finished file, xhr
           else
-            console.log("Error", xhr)
-            # callbacks.onError?('Upload error: ' + xhr.status)
+            @_errorProcessing file, xhr
         xhr.onerror = ->
-          console.log("Error")
-          # callbacks.onError?('XHR error.')
+          @_errorProcessing file
         # Some browser do not have the .upload property
         progressObj = xhr.upload ? xhr
-        progressObj.onprogress = (e) ->
-          console.log("onprogress", e)
-          # if e.lengthComputable
-          #   callbacks.onProgress?(e.loaded, e.total)
-        # for key, value of headers
-        #   xhr.setRequestHeader(key, value)
+        progressObj.onprogress = (e) =>
+          @_onProgress file, e
+        xhr.setRequestHeader('Content-Encoding', 'gzip')
         formData.append('file', file.data, file.name)
         xhr.send(formData)
+
+
+      _finished: (file, xhr) ->
+        for processFile, i in @processingFiles
+          if file.fullPath == processFile.fullPath
+            @processingFiles.splice(i, 1)
+        @_checkQueuedFiles()
+        @complete?(file)
+
+
+      _errorProcessing: (file, xhr) ->
+        console.log("TODO")
+        console.log(file)
+        @_checkQueuedFiles()
+
+
+      _onProgress: (file, e) ->
+        @transmitted_size = e.loaded - file.bytesSent
+        file.bytesSent = e.loaded
+        @_computeSpeed()
+
+
+      _computeSpeed: ->
+        time = new Date()
+        diffTime = (time - @start_time) / 1000
+        if diffTime < 2
+          return
+        @_startTime = time
+        @speed = @transmitted_size / diffTime
+        @transmitted_size = 0
+        @progressing?()
 
 
       startAll: ->
@@ -191,103 +221,7 @@ angular.module('xin.fileUploader', [])
       #         @_createS3File(file)
       #   @_isCheckingWaiting = false
       #
-      #
-      # _computeSize: ->
-      #   if @_isCheckingSize
-      #     return
-      #   @_isCheckingSize = true
-      #   size = @_sizeUpload
-      #   for file in @itemsUploading
-      #     size += file.file.size
-      #   for file in @itemsWaitingUpload
-      #     size += file.file.size
-      #   @size = size
-      #   @_isCheckingSize = false
-      #
-      #
-      # _computeSpeed: ->
-      #   time = new Date()
-      #   diffTime = (time - @_startTime) / 1000
-      #   @_startTime = time
-      #   @speed = @_transmitted_size / diffTime
-      #   @_transmitted_size = 0
-      #
-      #
-      # _createGZipFile: (file, callback) ->
-      #   @itemsCompressing++
-      #   arrayBuffer = null
-      #   fileReader = new FileReader()
-      #   fileReader.onload = (e) =>
-      #     arrayBuffer = e.target.result
-      #     gzipFile = pako.gzip(arrayBuffer)
-      #     blob = new Blob([gzipFile], {type: file.type})
-      #     blob.name = file.name
-      #     if blob.size == 0
-      #       callback?(file)
-      #     else
-      #       callback?({file: blob, gzip: true})
-      #   fileReader.readAsArrayBuffer(file)
-      #
-      #
-      # _createS3File: (file, gzip, multipart, sliceSize) =>
-      #   file.transmitted_size = 0
-      #   file.sendingTryS3 = 0
-      #   file.status = "ready"
-      #   file = new S3FileUploader(file,
-      #     onStart: (s3File) =>
-      #       s3File.file.status = 'progress'
-      #     onProgress: (s3File, transmitted_size) =>
-      #       @_transmitted_size += (transmitted_size - s3File.file.transmitted_size)
-      #       s3File.file.transmitted_size = transmitted_size
-      #     onPause: (s3File) =>
-      #       s3File.file.status = 'pause'
-      #     onSuccess: (s3File) =>
-      #       @_transmitted_size += (s3File.file.size - s3File.file.transmitted_size)
-      #       Backend.one('fichiers', s3File.file.id).get().then (fileBackend) =>
-      #         fileBackend.post().then () =>
-      #           fileArray = @_removeFileUploading(s3File)
-      #           if fileArray?
-      #             @itemsUploaded.push(fileArray.file.name)
-      #           @_uploadStart()
-      #     onErrorBack: (s3File, status) =>
-      #       s3File.file.status = 'failure'
-      #       @_retryBackSending(s3File, status)
-      #     onErrorXhr: (s3File, status) =>
-      #       s3File.file.status = 'failure'
-      #       @_retryS3Sending(s3File, status)
-      #     onCancel: (s3File) =>
-      #       @_removeFileUploading(s3File)
-      #       @itemsCanceled.push({name: s3File.file.name})
-      #     , gzip
-      #   )
-      #   file.multipart = multipart
-      #   file.sliceSize = sliceSize
-      #   return file
-      #
-      #
-      # _filter: ->
-      #   @status = "Vérification du format des noms de fichier."
-      #   @refresh?()
-      #   while @itemsWaitingFilters.length
-      #     file = @itemsWaitingFilters.pop()
-      #     pass = true
-      #     for filter in @filters
-      #       if not filter.fn(file)
-      #         @_onFilterError(file, filter)
-      #         pass = false
-      #     if pass
-      #       @itemsFiltered.push(file)
-      #   @_compress()
-      #
-      #
-      # _start: ->
-      #   @_filter()
-      #
-      # _startUpload: (file) ->
-      #   file.start()
-      #   @itemsUploading.push(file)
-      #
-      #
+
       # _removeFileUploading: (file) ->
       #   for item, index in @itemsUploading
       #     if item.file.name == file.file.name
@@ -343,21 +277,6 @@ angular.module('xin.fileUploader', [])
       #   @itemsFailed = []
       #
       #
-      # _onFilterError: (item, filter) ->
-      #   if filter.name == "Sous-dossiers ignorés."
-      #     split = item.webkitRelativePath.split("/")
-      #     nameDirectory = "."
-      #     for i in [0..split.length-2]
-      #       nameDirectory += "/"+split[i]
-      #     text = "Le dossier "+nameDirectory+" a été ignoré. "+
-      #            filter.name
-      #   else
-      #     text = "Le fichier "+item.name+" n'a pas pu être ajouté à la liste. "+
-      #            filter.name
-      #   @itemsFailed.push(text)
-      #   @refresh?()
-      #
-      #
       # retryErrors: ->
       #   for item in @itemsFailedUpload or []
       #     item.file.sendingTryS3 = 0
@@ -371,66 +290,3 @@ angular.module('xin.fileUploader', [])
       #   for file in @itemsUploading
       #     file.start()
       #   @_checkUploader()
-      #
-      #
-      # _upload: ->
-      #   @status = "Upload des fichiers en cours."
-      #   @refresh?()
-      #   @itemsWaitingUpload = @itemsCompressed
-      #   @itemsWaitingUploadLength = @itemsWaitingUpload.length
-      #   @interval = $interval(@_checkUploader, 10000)
-      #   @_uploadStart()
-      #
-      #
-      # _uploadStart: ->
-      #   while @itemsWaitingUpload.length and @itemsUploading.length < @connectionSpeed
-      #     @_uploadBackend(@itemsWaitingUpload.pop())
-      #   if not @itemsWaitingUpload.length and not @itemsUploading.length
-      #     @status = "inactive"
-      #     $interval.cancel(@interval)
-      #     @allComplete?()
-      #
-      #
-      # _uploadBackend: (file) ->
-      #   if not file?
-      #     return
-      #   gzip = false
-      #   if file.gzip? and file.gzip
-      #     gzip = true
-      #     file = file.file
-      #   # 5Mo
-      #   sliceSize = 5 * 1024 * 1024
-      #   payload =
-      #     mime: file.type
-      #     titre: file.name
-      #     multipart: false
-      #     lien_participation: @lien_participation
-      #   if file.size > sliceSize
-      #     payload.multipart = true
-      #   if payload.mime == ''
-      #     ta = /\.ta$/
-      #     tac = /\.tac$/
-      #     if ta.test(payload.titre)
-      #       payload.mime = 'application/ta'
-      #     else if tac.test(payload.titre)
-      #       payload.mime = 'application/tac'
-      #
-      #   s3File = @_createS3File(file, gzip, payload.multipart, sliceSize)
-      #   @itemsUploading.push(s3File)
-      #   Backend.all('fichiers').post(payload).then(
-      #     (response) =>
-      #       s3File.file.id = response._id
-      #       s3File.file.etag = response._etag
-      #       s3File.s3_signed_url = response.s3_signed_url
-      #       s3File.start()
-      #     (error) =>
-      #       fileArray = @_removeFileUploading(s3File)
-      #       if error.status == 422
-      #         if error.data? and error.data._errors? and error.data._errors.s3_id?
-      #           if error.data._errors.s3_id.search("is not unique") != -1
-      #             @itemsWarning.push("Le fichier #{fileArray.file.name} existe déjà dans cette participation.")
-      #             @_uploadStart()
-      #             return
-      #       @itemsFailed.push("Echec de l'insertion en base du fichier #{fileArray.file.name}.")
-      #       @_uploadStart()
-      #   )

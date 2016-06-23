@@ -42,23 +42,17 @@ angular.module('xin_uploadFile', ['appSettings', 'xin.fileUploader'])
         if file.fullPath?
           split = file.fullPath.split("/")
           if split.length > 2
-            # if $scope.warningFiles?
-            #   $scope.warningFiles.push("Sous-dossier : #{file.fullPath}")
             done("warning", "Sous-dossier : #{file.fullPath}")
             $scope.refresh?()
             return
         # test regex
         if file.type not in ['image/png', 'image/png', 'image/jpeg']
           if not $scope.regex.test(file.name)
-            # if $scope.warningFiles?
-            #   $scope.warningFiles.push("Nom de fichier invalide : #{file.name}")
             done("warning", "Nom de fichier invalide : #{file.name}")
             $scope.refresh?()
             return
         # test empty file
         if file.size == 0
-          # if $scope.errorFiles?
-          #   $scope.errorFiles.push("#{file.name} : Fichier vide")
           done("error", "#{file.name} : Fichier vide")
           $scope.refresh?()
           return
@@ -90,8 +84,6 @@ angular.module('xin_uploadFile', ['appSettings', 'xin.fileUploader'])
           (error) ->
             file.custom_status = 'rejected'
             msg = JSON.stringify(error.data)
-            # if $scope.errorFiles?
-            #   $scope.errorFiles.push(msg)
             registered.reject("Erreur a l'upload : #{msg}")
         )
         # Compress the file
@@ -100,14 +92,11 @@ angular.module('xin_uploadFile', ['appSettings', 'xin.fileUploader'])
             file.data = blob
             compressed.resolve()
           (error) ->
-            # if $scope.errorFiles?
-            #   $scope.errorFiles.push(error)
             compressed.reject(error)
         )
         $q.all([compressed.promise, registered.promise]).then(
           (results) ->
             done()
-            $scope.refresh?()
           (error) ->
             done("error", error)
             $scope.refresh?()
@@ -120,20 +109,21 @@ angular.module('xin_uploadFile', ['appSettings', 'xin.fileUploader'])
         formData.append('AWSAccessKeyId', file.postData.s3_aws_access_key_id)
         formData.append('Policy', file.postData.s3_policy)
         formData.append('Signature', file.postData.s3_signature)
-        formData.append('Content-Encoding', 'gzip')
-        formData.append('Content-Type', file.type)
+
+
+      onProgress = ->
+        $scope.refresh?()
 
 
       onComplete = (file) ->
         if file.postData?
           Backend.one('fichiers', file.postData._id).post().then(
             (response) ->
-              console.log(response)
             (error) ->
               file.custom_status = 'rejected'
-              throw error
+              uploader.errorFiles.push(file)
           )
-        dropzone.removeFile(file)
+
 
       uploaderConfig =
         url: SETTINGS.S3_BUCKET_URL
@@ -141,6 +131,7 @@ angular.module('xin_uploadFile', ['appSettings', 'xin.fileUploader'])
         parallelUploads: 5
         accept: onAccept
         sending: onSending
+        progressing: onProgress
         complete: onComplete
 
       $scope.$watch 'elem', (value) ->
