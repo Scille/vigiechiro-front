@@ -110,6 +110,7 @@ angular.module('xin_uploadFile', ['appSettings', 'xin.fileUploader'])
         formData.append('AWSAccessKeyId', file.postData.s3_aws_access_key_id)
         formData.append('Policy', file.postData.s3_policy)
         formData.append('Signature', file.postData.s3_signature)
+        formData.append('Content-Encoding', 'gzip')
 
 
       onProgress = ->

@@ -155,7 +155,7 @@ angular.module('xin.fileUploader', [])
         progressObj = xhr.upload ? xhr
         progressObj.onprogress = (e) =>
           @_onProgress file, e
-        xhr.setRequestHeader('Content-Encoding', 'gzip')
+        # xhr.setRequestHeader('Content-Encoding', 'gzip')
         formData.append('file', file.data, file.name)
         xhr.send(formData)
 
