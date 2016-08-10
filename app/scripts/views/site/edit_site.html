@@ -43,12 +43,18 @@
     </div>
   </div>
 
-  <div class="form-group input-group" ng-if="!creation && isAdmin">
-    <span class="input-group-addon">Observateur</span>
-    <select class="form-control" name="observateur"
-            ng-model="site.observateur._id"
-            ng-options="user._id as user.pseudo for user in users track by user._id">
-    </select>
+  <div class="form-group" ng-if="!creation && isAdmin">
+    <div class="input-group">
+      <label class="input-group-addon" for="observateur">Observateur</label>
+      <ui-select id="observateur" name="observateur"
+                 ng-model="site.observateur._id" theme="bootstrap"
+                 ng-disabled="disabled">
+        <ui-select-match>{{$select.selected.pseudo}}</ui-select-match>
+        <ui-select-choices repeat="user._id as user in users | filter: $select.search">
+          {{user.pseudo}} ({{user.email}})
+        </ui-select-choices>
+      </ui-select>
+    </div>
   </div>
 
   <ul class="list-group" ng-show="displaySteps">

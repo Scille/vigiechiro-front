@@ -420,8 +420,15 @@ angular.module('siteViews', ['ngRoute',
     site = null
 
     $scope.users = []
-    Backend.all('utilisateurs').getList().then (users) ->
-      $scope.users = users.plain()
+    getUsers = (page) ->
+      payload =
+        page: page
+        max_results: 50
+      Backend.all('utilisateurs').getList(payload).then (users) ->
+        $scope.users = $scope.users.concat(users.plain())
+        if users._meta.page*users._meta.max_results < users._meta.total
+          getUsers(page+1)
+    getUsers(1)
 
     Backend.one('sites', $routeParams.siteId).get().then(
       (siteResult) ->
