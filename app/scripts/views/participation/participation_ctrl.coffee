@@ -181,10 +181,15 @@ angular.module('participationViews', ['ngRoute', 'textAngular', 'xin_listResourc
           (error) -> throw error
         )
 
+    $scope.getEmailDone = {}
     $scope.getDonnees = ->
       participationResource.post('csv').then(
-        () -> $scope.isCsvPost = true
-        (error) -> $scope.isCsvPost = false
+        () ->
+          $scope.isCsvPost = true
+          $scope.getEmailDone.end?()
+        (error) ->
+          $scope.isCsvPost = false
+          $scope.getEmailDone.end?()
       )
 
 
