@@ -103,9 +103,14 @@
   <a class="btn btn-primary" href="#/participations/{{participation._id}}/donnees">
     Voir les données
   </a>
-  <a class="btn btn-primary" href="" ng-click="getDonnees()">
-    Recevoir les données par email
-  </a>
+
+  <sc-button class="btn btn-primary"
+             ng-click="getDonnees()"
+             wait-for-class="fa fa-spinner fa-1 fa-pulse"
+             cancel-wait-for="getEmailDone"
+             label="'Recevoir les données par email'">
+  </sc-button>
+
   <a class="btn btn-warning" href="" ng-click="compute()"
      ng-if="isAdmin && (participation.traitement.etat == 'FINI' || participation.traitement.etat == 'ERREUR' || participation.traitement.timeout)">
     Relancer la participation

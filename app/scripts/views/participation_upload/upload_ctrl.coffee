@@ -5,7 +5,7 @@ breadcrumbsGetParticipationDefer = undefined
 
 makeRegExp = ($scope, type_site) ->
   patt =
-    'CARRE': /^Cir.+-\d+-Pass\d+-Tron\d+-Chiro_[01]_\d+_000\.(wav|ta|tac)$/
+    'CARRE': /^Cir.+-\d+-Pass\d+-Tron\d+-Chiro_[01]_\d+_\d{3}\.(wav|ta|tac)$/
     'POINT_FIXE': /^Car.+-\d+-Pass\d+-([A-H][12]|Z[1-9][0-9]*)-.*[01]_\d+_\d+_\d+\.(wav|ta|tac)$/
     'ROUTIER': /^Cir.+-\d+-Pass\d+-Tron\d+-Chiro_[01]_\d+_\d{3}\.(wav|ta|tac)$/
   exemples =

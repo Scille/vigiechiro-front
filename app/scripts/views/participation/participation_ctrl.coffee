@@ -110,21 +110,6 @@ angular.module('participationViews', ['ngRoute', 'textAngular', 'xin_listResourc
     $scope.resourceBackend = Backend.all('moi/participations')
 
 
-  .directive 'listParticipationsDirective', (session, Backend) ->
-    restrict: 'E'
-    templateUrl: 'scripts/views/participation/list_participations_drt.html'
-    scope:
-      siteId: '@'
-    link: (scope, elem, attrs) ->
-      scope.loading = true
-      attrs.$observe 'siteId', (siteId) ->
-        if siteId
-          Backend.all('sites/'+siteId+'/participations').getList()
-            .then (participations) ->
-              scope.participations = participations.plain()
-              scope.loading = false
-
-
 
   .controller 'DisplayParticipationController', ($scope, $route, $routeParams,
                                                  $modal, Backend, session) ->
@@ -184,10 +169,15 @@ angular.module('participationViews', ['ngRoute', 'textAngular', 'xin_listResourc
           (error) -> throw error
         )
 
+    $scope.getEmailDone = {}
     $scope.getDonnees = ->
       participationResource.post('csv').then(
-        () -> $scope.isCsvPost = true
-        (error) -> $scope.isCsvPost = false
+        () ->
+          $scope.isCsvPost = true
+          $scope.getEmailDone.end?()
+        (error) ->
+          $scope.isCsvPost = false
+          $scope.getEmailDone.end?()
       )
 
 
@@ -351,7 +341,7 @@ angular.module('participationViews', ['ngRoute', 'textAngular', 'xin_listResourc
             (participation) -> $route.reload()
             (error) ->
               console.log("Error : participation save "+error)
-              $scope.saveDone.end()
+              $scope.saveDone.end?()
           )
         else
           # Post new participation
@@ -360,11 +350,12 @@ angular.module('participationViews', ['ngRoute', 'textAngular', 'xin_listResourc
               window.location = "#/participations/#{participation._id}"
             (error) ->
               console.log("Error : participation save "+error)
+              $scope.saveDone.end?()
               $scope.submitError = true
               $scope.saveDone.end()
           )
       else
-        $scope.saveDone.end()
+        $scope.saveDone.end?()
 
 
 

@@ -67,6 +67,12 @@ angular.module('displaySiteViews', ['ngRoute', 'textAngular', 'xin_backend',
 
   .controller 'DisplaySiteController', ($routeParams, $scope, $modal,
                                         Backend, session) ->
+    $scope.participationsLookup = {}
+    $scope.participationsResource = Backend.all("sites/#{$routeParams.siteId}/participations")
+
+    session.getIsAdminPromise().then (isAdmin) ->
+      $scope.isAdmin = isAdmin
+
     Backend.one('sites', $routeParams.siteId).get().then(
       (site) ->
         if breadcrumbsGetSiteDefer?
@@ -83,9 +89,6 @@ angular.module('displaySiteViews', ['ngRoute', 'textAngular', 'xin_backend',
               break
       (error) -> window.location = '#/404'
     )
-
-    session.getIsAdminPromise().then (isAdmin) ->
-      $scope.isAdmin = isAdmin
 
     $scope.delete = ->
       modalInstance = $modal.open(

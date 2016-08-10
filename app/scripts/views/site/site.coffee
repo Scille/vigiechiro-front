@@ -5,6 +5,7 @@ breadcrumbsGetSiteDefer = undefined
 map = null
 
 initEnv = ($scope, $modal, session) ->
+  $scope.saveDone = {}
   $scope.resetFormAllowed = false
   # site
   $scope.site =
@@ -337,8 +338,9 @@ angular.module('siteViews', ['ngRoute',
             map.validOrigin($scope.listGrilleStocOrigin[number])
       )
 
-    $scope.saveSite = ->
+    $scope.save = ->
       if not map.isValid()
+        $scope.saveDone.end?()
         return
       payload =
         'titre': undefined
@@ -350,6 +352,12 @@ angular.module('siteViews', ['ngRoute',
         payload.justification_non_aleatoire = ''
         for justification in justification_non_aleatoire
           payload.justification_non_aleatoire += justification+'\n'
+      callback_factory = (site) ->
+        onSaveLocalitiesSuccess: ->
+          window.location = '#/sites/'+site._id
+        onSaveLocalitiesFail: ->
+          $scope.saveLocalitiesError = true
+          $scope.saveDone.end?()
       # If grille stoc
       if $scope.protocole.type_site in ['POINT_FIXE', 'CARRE']
         payload.grille_stoc = map.getIdGrilleStoc()
@@ -357,13 +365,8 @@ angular.module('siteViews', ['ngRoute',
           protocole: $scope.protocole._id
           grille_stoc: map.getIdGrilleStoc()
         Backend.all('sites').getList(check).then (sites) ->
-          callbacks =
-            onSaveLocalitiesSuccess: ->
-              window.location = '#/sites/'+sites[0]._id
-            onSaveLocalitiesFail: ->
-              $scope.saveLocalitiesError = true
           if sites.plain().length
-            saveLocalities(sites[0], callbacks)
+            saveLocalities(sites[0], callback_factory(sites[0]))
           else
             # Set up title
             numGrilleStoc = map.getNumGrilleStoc()
@@ -375,8 +378,8 @@ angular.module('siteViews', ['ngRoute',
                 # If verrouille
                 if $scope.site.verrouille
                   lock(site)
-                saveLocalities(site, callbacks)
-              (error) -> console.log(error)
+                saveLocalities(site, callback_factory(site))
+              (error) -> throw error
             )
       # If tracé
       else if $scope.protocole.type_site == 'ROUTIER'
@@ -394,27 +397,18 @@ angular.module('siteViews', ['ngRoute',
               if exist
                 $scope.numeroError = true
               else
-                Backend.all('sites').post(payload).then(
-                  (site) ->
-                    saveLocalities(site)
-                    # If verrouille
-                    if $scope.site.verrouille
-                      lock(site)
-                    # redirect to display site
-                    window.location = '#/sites/'+site._id
-                  (error) -> console.log(error)
-                )
+                saveSiteRoutier(payload, callback_factory)
         else
-          Backend.all('sites').post(payload).then(
-            (site) ->
-              saveLocalities(site)
-              # If verrouille
-              if $scope.site.verrouille
-                lock(site)
-              # redirect to display site
-              window.location = '#/sites/'+site._id
-            (error) -> console.log(error)
-          )
+          saveSiteRoutier(payload, callback_factory)
+
+    saveSiteRoutier = (payload, callback_factory) ->
+      Backend.all('sites').post(payload).then(
+        (site) ->
+          saveLocalities(site, callback_factory(site))
+        (error) ->
+          $scope.saveDone.end?()
+          throw error
+      )
 
 
 
@@ -426,8 +420,15 @@ angular.module('siteViews', ['ngRoute',
     site = null
 
     $scope.users = []
-    Backend.all('utilisateurs').getList().then (users) ->
-      $scope.users = users.plain()
+    getUsers = (page) ->
+      payload =
+        page: page
+        max_results: 50
+      Backend.all('utilisateurs').getList(payload).then (users) ->
+        $scope.users = $scope.users.concat(users.plain())
+        if users._meta.page*users._meta.max_results < users._meta.total
+          getUsers(page+1)
+    getUsers(1)
 
     Backend.one('sites', $routeParams.siteId).get().then(
       (siteResult) ->
@@ -454,8 +455,9 @@ angular.module('siteViews', ['ngRoute',
                               siteCallbacks($scope, $timeout))
       map.loadMapEdit($scope.site)
 
-    $scope.saveSite = ->
+    $scope.save = ->
       if not map.isValid()
+        $scope.saveDone.end?()
         return
       payload =
         'commentaire': $scope.site.commentaire
@@ -473,8 +475,10 @@ angular.module('siteViews', ['ngRoute',
               window.location = '#/sites/'+site._id
             onSaveLocalitiesFail: ->
               $scope.saveLocalitiesError = true
+              $scope.saveDone.end?()
           saveLocalities(site, callbacks)
         (error) ->
           $scope.mapError =
             message: error
+          $scope.saveDone.end?()
       )

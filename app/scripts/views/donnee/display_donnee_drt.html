@@ -3,7 +3,7 @@
     <b>{{ donnee.titre }}</b>
 
     <a class="btn btn-default"
-       ng-click="CopyToClipboard('{{donnee.titre}}')">
+       ng-click="CopyToClipboard(donnee.titre)">
       Copier
     </a>
 
@@ -151,7 +151,7 @@
           <div class="form-group input-group">
             <text-angular ng-model="newPost"></text-angular>
           <div>
-          <a class="btn btn-default" href="" ng-click="addPost({{observation.index}}, newPost)">
+          <a class="btn btn-default" href="" ng-click="addPost(observation.index, newPost)">
             Ajouter un message
           </a>
         </td></tr>

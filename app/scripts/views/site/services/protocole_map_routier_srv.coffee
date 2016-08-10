@@ -287,6 +287,8 @@ angular.module('protocole_map_routier', [])
           path.push(overlay.position)
         @_route.setPath(path)
         overlay.setMap(null)
+        @_routeLength = (@checkTotalLength()/1000).toFixed(1)
+        @callbacks.updateLength?(@_routeLength)
 
       editRoute: ->
         @_padded_points = []
@@ -401,7 +403,6 @@ angular.module('protocole_map_routier', [])
         # Remove listeners and infwindow on previous points
         for i in [1..@_points.length-3] when @_points.length > 3
           @_googleMaps.clearListeners(@_points[i], 'rightclick')
-          @_points[i].setOptions({draggable: false})
           @_points[i].infowindow.close()
         # InfoWindow
         numSection = Math.floor(@_points.length/2)
@@ -427,6 +428,24 @@ angular.module('protocole_map_routier', [])
         @_changeStep("Point à placer : "+position.next+numSection.next)
         # Generate all sections
         @generateSections()
+
+      _setMovePointListener: (point) ->
+        point.setOptions({draggable: true})
+        @_googleMaps.addListener(point, 'dragend', (e) =>
+          point.setPosition(@_googleMaps
+            .findClosestPointOnPath(e.latLng, @_padded_points, @_points))
+          @updatePointPosition(point)
+          @generateSections()
+        )
+        @_googleMaps.addListener(point, 'drag', (e) =>
+          point.setPosition(@_googleMaps
+            .findClosestPointOnPath(e.latLng, @_padded_points, @_points))
+        )
+
+      _setDeletePointListener: (point) ->
+        @_googleMaps.addListener(point, 'rightclick', (e) =>
+          @_deleteLastPoint()
+        )
 
       _setPointListeners: (point) ->
         @_googleMaps.addListener(point, 'rightclick', (e) =>
@@ -578,10 +597,14 @@ angular.module('protocole_map_routier', [])
             newPoint = @createSectionPoint(lastLat, lastLng)
             @_points.splice(@_points.length-1, 0, newPoint)
             @_setCurrentInfoWindow(newPoint)
-        # Add listeners on last point
+        # Add move listener on all points (except first and last)
+        for point, i in @_points or []
+          if i != 0 and i != @_points.length-1
+            @_setMovePointListener(point)
+        # Add delete listener on last point
         index = @_points.length-2
         if index > 0
-          @_setPointListeners(@_points[index])
+          @_setDeletePointListener(@_points[index])
           @_points[index].infowindow.open(@_googleMaps.getMap(), @_points[index])
         # delete localites
         for locality in @_localities
