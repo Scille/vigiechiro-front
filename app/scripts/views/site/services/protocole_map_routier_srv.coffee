@@ -429,6 +429,24 @@ angular.module('protocole_map_routier', [])
         # Generate all sections
         @generateSections()
 
+      _setMovePointListener: (point) ->
+        point.setOptions({draggable: true})
+        @_googleMaps.addListener(point, 'dragend', (e) =>
+          point.setPosition(@_googleMaps
+            .findClosestPointOnPath(e.latLng, @_padded_points, @_points))
+          @updatePointPosition(point)
+          @generateSections()
+        )
+        @_googleMaps.addListener(point, 'drag', (e) =>
+          point.setPosition(@_googleMaps
+            .findClosestPointOnPath(e.latLng, @_padded_points, @_points))
+        )
+
+      _setDeletePointListener: (point) ->
+        @_googleMaps.addListener(point, 'rightclick', (e) =>
+          @_deleteLastPoint()
+        )
+
       _setPointListeners: (point) ->
         @_googleMaps.addListener(point, 'rightclick', (e) =>
           @_deleteLastPoint()
@@ -579,10 +597,14 @@ angular.module('protocole_map_routier', [])
             newPoint = @createSectionPoint(lastLat, lastLng)
             @_points.splice(@_points.length-1, 0, newPoint)
             @_setCurrentInfoWindow(newPoint)
-        # Add listeners on last point
+        # Add move listener on all points (except first and last)
+        for point, i in @_points or []
+          if i != 0 and i != @_points.length-1
+            @_setMovePointListener(point)
+        # Add delete listener on last point
         index = @_points.length-2
         if index > 0
-          @_setPointListeners(@_points[index])
+          @_setDeletePointListener(@_points[index])
           @_points[index].infowindow.open(@_googleMaps.getMap(), @_points[index])
         # delete localites
         for locality in @_localities
