@@ -350,6 +350,11 @@ angular.module('siteViews', ['ngRoute',
         payload.justification_non_aleatoire = ''
         for justification in justification_non_aleatoire
           payload.justification_non_aleatoire += justification+'\n'
+      callback_factory = (site) ->
+        onSaveLocalitiesSuccess: ->
+          window.location = '#/sites/'+site._id
+        onSaveLocalitiesFail: ->
+          $scope.saveLocalitiesError = true
       # If grille stoc
       if $scope.protocole.type_site in ['POINT_FIXE', 'CARRE']
         payload.grille_stoc = map.getIdGrilleStoc()
@@ -357,11 +362,6 @@ angular.module('siteViews', ['ngRoute',
           protocole: $scope.protocole._id
           grille_stoc: map.getIdGrilleStoc()
         Backend.all('sites').getList(check).then (sites) ->
-          callback_factory = (site) ->
-            onSaveLocalitiesSuccess: ->
-              window.location = '#/sites/'+site._id
-            onSaveLocalitiesFail: ->
-              $scope.saveLocalitiesError = true
           if sites.plain().length
             saveLocalities(sites[0], callback_factory(sites[0]))
           else
@@ -394,27 +394,16 @@ angular.module('siteViews', ['ngRoute',
               if exist
                 $scope.numeroError = true
               else
-                Backend.all('sites').post(payload).then(
-                  (site) ->
-                    saveLocalities(site)
-                    # If verrouille
-                    if $scope.site.verrouille
-                      lock(site)
-                    # redirect to display site
-                    window.location = '#/sites/'+site._id
-                  (error) -> console.log(error)
-                )
+                saveSiteRoutier(payload, callback_factory)
         else
-          Backend.all('sites').post(payload).then(
-            (site) ->
-              saveLocalities(site)
-              # If verrouille
-              if $scope.site.verrouille
-                lock(site)
-              # redirect to display site
-              window.location = '#/sites/'+site._id
-            (error) -> console.log(error)
-          )
+          saveSiteRoutier(payload, callback_factory)
+
+    saveSiteRoutier = (payload, callback_factory) ->
+      Backend.all('sites').post(payload).then(
+        (site) ->
+          saveLocalities(site, callback_factory(site))
+        (error) -> throw error
+      )
 
 
 

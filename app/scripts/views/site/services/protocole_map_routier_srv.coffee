@@ -287,6 +287,8 @@ angular.module('protocole_map_routier', [])
           path.push(overlay.position)
         @_route.setPath(path)
         overlay.setMap(null)
+        @_routeLength = (@checkTotalLength()/1000).toFixed(1)
+        @callbacks.updateLength?(@_routeLength)
 
       editRoute: ->
         @_padded_points = []
@@ -401,7 +403,6 @@ angular.module('protocole_map_routier', [])
         # Remove listeners and infwindow on previous points
         for i in [1..@_points.length-3] when @_points.length > 3
           @_googleMaps.clearListeners(@_points[i], 'rightclick')
-          @_points[i].setOptions({draggable: false})
           @_points[i].infowindow.close()
         # InfoWindow
         numSection = Math.floor(@_points.length/2)
