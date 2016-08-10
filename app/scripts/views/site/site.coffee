@@ -337,7 +337,7 @@ angular.module('siteViews', ['ngRoute',
             map.validOrigin($scope.listGrilleStocOrigin[number])
       )
 
-    $scope.saveSite = ->
+    $scope.save = ->
       if not map.isValid()
         return
       payload =
@@ -357,13 +357,13 @@ angular.module('siteViews', ['ngRoute',
           protocole: $scope.protocole._id
           grille_stoc: map.getIdGrilleStoc()
         Backend.all('sites').getList(check).then (sites) ->
-          callbacks_factory = (site) ->
+          callback_factory = (site) ->
             onSaveLocalitiesSuccess: ->
               window.location = '#/sites/'+site._id
             onSaveLocalitiesFail: ->
               $scope.saveLocalitiesError = true
           if sites.plain().length
-            saveLocalities(sites[0], callbacks_factory(sites[0]))
+            saveLocalities(sites[0], callback_factory(sites[0]))
           else
             # Set up title
             numGrilleStoc = map.getNumGrilleStoc()
@@ -375,7 +375,7 @@ angular.module('siteViews', ['ngRoute',
                 # If verrouille
                 if $scope.site.verrouille
                   lock(site)
-                saveLocalities(site, callbacks_factory(site))
+                saveLocalities(site, callback_factory(site))
               (error) -> throw error
             )
       # If tracé
@@ -454,7 +454,7 @@ angular.module('siteViews', ['ngRoute',
                               siteCallbacks($scope, $timeout))
       map.loadMapEdit($scope.site)
 
-    $scope.saveSite = ->
+    $scope.save = ->
       if not map.isValid()
         return
       payload =
