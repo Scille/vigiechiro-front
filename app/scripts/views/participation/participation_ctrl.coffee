@@ -20,7 +20,7 @@ traitement_is_timeout = (participation) ->
 
 makeRegExp = ($scope, type_site) ->
   patt =
-    'CARRE': /^Cir.+-\d+-Pass\d+-Tron\d+-Chiro_[01]_\d+_000\.(wav|ta|tac)$/
+    'CARRE': /^Cir.+-\d+-Pass\d+-Tron\d+-Chiro_[01]_\d+_\d{3}\.(wav|ta|tac)$/
     'POINT_FIXE': /^Car.+-\d+-Pass\d+-([A-H][12]|Z[1-9][0-9]*)-.*[01]_\d+_\d+_\d+\.(wav|ta|tac)$/
     'ROUTIER': /^Cir.+-\d+-Pass\d+-Tron\d+-Chiro_[01]_\d+_\d{3}\.(wav|ta|tac)$/
   exemples =
@@ -120,21 +120,6 @@ angular.module('participationViews', ['ngRoute', 'textAngular', 'xin_listResourc
         else if $scope.lookup.q?
           delete $scope.lookup.q
     $scope.resourceBackend = Backend.all('moi/participations')
-
-
-  .directive 'listParticipationsDirective', (session, Backend) ->
-    restrict: 'E'
-    templateUrl: 'scripts/views/participation/list_participations_drt.html'
-    scope:
-      siteId: '@'
-    link: (scope, elem, attrs) ->
-      scope.loading = true
-      attrs.$observe 'siteId', (siteId) ->
-        if siteId
-          Backend.all('sites/'+siteId+'/participations').getList()
-            .then (participations) ->
-              scope.participations = participations.plain()
-              scope.loading = false
 
 
 

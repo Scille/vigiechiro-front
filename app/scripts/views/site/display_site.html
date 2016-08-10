@@ -25,8 +25,15 @@
   </div>
 
   <div class="panel-body">
-    <list-participations-directive site-id="{{site._id}}">
-    </list-participations-directive>
+    <div class="page-header">
+      <h3>Mes participations</h3>
+    </div>
+    <list-resource-directive resource-backend="participationsResource"
+                             lookup="participationsLookup">
+      <a href="#/participations/{{resource._id}}">
+        Participation du {{ resource.date_debut | xinDate: 'medium' }}
+      </a>
+    </list-resource-directive>
   </div>
 
   <a class="btn btn-primary" href="#/sites/{{site._id}}/nouvelle-participation"
