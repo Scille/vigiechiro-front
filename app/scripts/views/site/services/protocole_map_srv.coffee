@@ -43,6 +43,7 @@ angular.module('protocole_map', ['protocole_map_carre',
         @_newSelection = false
         @_grilleStoc = null
         @_isOpportuniste = false
+        @_is_getting_grille_stoc = false
         # ROUTIER
         @_route = null
         @_routeLength = 0
@@ -88,6 +89,9 @@ angular.module('protocole_map', ['protocole_map_carre',
         if @_grilleStoc?
           @_grilleStoc.overlay.setMap(null)
           @_grilleStoc = null
+        for cell in @_smallGrille or []
+          cell.setMap(null)
+        @_smallGrille = null
         # ROUTIER
         if @_route?
           @_route.setMap(null)
@@ -203,15 +207,20 @@ angular.module('protocole_map', ['protocole_map_carre',
 
       # Get grille_stoc where user creates point on the map
       getGrilleStoc: (overlay) ->
+        if @_is_getting_grille_stoc
+          return
+        @_is_getting_grille_stoc = true
         payload =
           lng: overlay.getPosition().lng()
           lat: overlay.getPosition().lat()
           r: 1500
         Backend.one('grille_stoc/cercle').get(payload).then(
           (grille_stoc) =>
+            @_is_getting_grille_stoc = false
             cells = grille_stoc.plain()._items
             if !cells.length
               @callbacks.displayError?("Pas de grille stoc trouvée pour "+overlay.getPosition().toString())
+              return
             cell = cells[0]
             # check if site already exist with the grille stoc
             for site, index in @_sites
