@@ -245,8 +245,7 @@ angular.module('participationViews', ['ngRoute', 'textAngular', 'xin_listResourc
     $scope.protocole = null
     participationCreated = false
     # for spinner btn
-    $scope.startSave = {}
-    $scope.endSave = {}
+    $scope.saveDone = {}
 
     # Nouvelle participation
     if $routeParams.siteId?
@@ -309,7 +308,6 @@ angular.module('participationViews', ['ngRoute', 'textAngular', 'xin_listResourc
 
 
     $scope.save = ->
-      $scope.startSave.deferred()
       $scope.participation._errors = {}
       error = false
       payload = {}
@@ -358,7 +356,7 @@ angular.module('participationViews', ['ngRoute', 'textAngular', 'xin_listResourc
             (participation) -> sendFiles()
             (error) ->
               console.log("Error : participation save "+error)
-              $scope.endSave.deferred()
+              $scope.saveDone.end?()
           )
         else
           # Post new participation
@@ -368,11 +366,11 @@ angular.module('participationViews', ['ngRoute', 'textAngular', 'xin_listResourc
                 participationResource = participation
                 sendFiles()
             (error) ->
-              $scope.endSave.deferred()
+              $scope.saveDone.end?()
               $scope.submitError = true
           )
       else
-        $scope.endSave.deferred()
+        $scope.saveDone.end?()
 
 
     sendFiles = (participation) ->
@@ -387,7 +385,7 @@ angular.module('participationViews', ['ngRoute', 'textAngular', 'xin_listResourc
           -> window.location = '#/participations/'+participationResource._id
           ->
             $scope.participation._errors.participation = "Echec de l'enregistrement des pièces jointes."
-            $scope.endSave.deferred()
+            $scope.saveDone.end?()
         )
 
 

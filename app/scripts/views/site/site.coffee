@@ -5,6 +5,7 @@ breadcrumbsGetSiteDefer = undefined
 map = null
 
 initEnv = ($scope, $modal, session) ->
+  $scope.saveDone = {}
   $scope.resetFormAllowed = false
   # site
   $scope.site =
@@ -339,6 +340,7 @@ angular.module('siteViews', ['ngRoute',
 
     $scope.save = ->
       if not map.isValid()
+        $scope.saveDone.end?()
         return
       payload =
         'titre': undefined
@@ -355,6 +357,7 @@ angular.module('siteViews', ['ngRoute',
           window.location = '#/sites/'+site._id
         onSaveLocalitiesFail: ->
           $scope.saveLocalitiesError = true
+          $scope.saveDone.end?()
       # If grille stoc
       if $scope.protocole.type_site in ['POINT_FIXE', 'CARRE']
         payload.grille_stoc = map.getIdGrilleStoc()
@@ -402,7 +405,9 @@ angular.module('siteViews', ['ngRoute',
       Backend.all('sites').post(payload).then(
         (site) ->
           saveLocalities(site, callback_factory(site))
-        (error) -> throw error
+        (error) ->
+          $scope.saveDone.end?()
+          throw error
       )
 
 
@@ -445,6 +450,7 @@ angular.module('siteViews', ['ngRoute',
 
     $scope.save = ->
       if not map.isValid()
+        $scope.saveDone.end?()
         return
       payload =
         'commentaire': $scope.site.commentaire
@@ -462,8 +468,10 @@ angular.module('siteViews', ['ngRoute',
               window.location = '#/sites/'+site._id
             onSaveLocalitiesFail: ->
               $scope.saveLocalitiesError = true
+              $scope.saveDone.end?()
           saveLocalities(site, callbacks)
         (error) ->
           $scope.mapError =
             message: error
+          $scope.saveDone.end?()
       )
