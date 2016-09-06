@@ -85,7 +85,7 @@ angular.module('xin_uploadFile', ['appSettings', 'xin.fileUploader'])
           (error) ->
             file.custom_status = 'rejected'
             msg = JSON.stringify(error.data)
-            registered.reject("Erreur a l'upload : #{msg}")
+            registered.reject("Erreur à l'upload : #{msg}")
         )
         # Compress the file
         createGZipFile(file.data).then(
