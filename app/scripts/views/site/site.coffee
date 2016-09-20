@@ -132,39 +132,22 @@ siteCallbacks = ($scope, $timeout) ->
       $timeout(-> $scope.$apply())
   }
 
+
 saveLocalities = (site, callbacks = {}) ->
-  if map.isOpportuniste()
-    localities = map.saveMap()
-    payload =
-      localites: []
-    for localite in localities
-      tmp =
-        nom: localite.name
-        geometries: localite.geometries
-        representatif: false
-      payload.localites.push(tmp)
-    site.customPUT(payload, "localites").then(
-      -> callbacks.onSaveLocalitiesSuccess?()
-      (error) -> callbacks.onSaveLocalitiesFail?(error)
-    )
-  else
-    site.customDELETE('localites').then(
-      ->
-        localities = map.saveMap()
-        payload =
-          localites: []
-        for localite in localities
-          tmp =
-            nom: localite.name
-            geometries: localite.geometries
-            representatif: false
-          payload.localites.push(tmp)
-        site.customPUT(payload, "localites").then(
-          -> callbacks.onSaveLocalitiesSuccess?()
-          (error) -> callbacks.onSaveLocalitiesFail?(error)
-        )
-      (error) -> console.log(error)
-    )
+  localities = map.saveMap()
+  payload =
+    localites: []
+  for localite in localities
+    tmp =
+      nom: localite.name
+      geometries: localite.geometries
+      representatif: false
+    payload.localites.push(tmp)
+  site.customPUT(payload, "localites").then(
+    -> callbacks.onSaveLocalitiesSuccess?()
+    (error) -> callbacks.onSaveLocalitiesFail?(error)
+  )
+
 
 lock = (site, callbacks = {}) ->
   site.patch({'verrouille': true}).then(
