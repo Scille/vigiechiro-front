@@ -1,9 +1,7 @@
 {
   "name": "vigiechiroapp",
   "version": "0.0.0",
-  "dependencies": {
-    "angular-bootstrap-datetimepicker": "1.1.2"
-  },
+  "dependencies": {},
   "devDependencies": {
     "coffee-script": "1.9.2",
     "grunt": "0.4.5",
