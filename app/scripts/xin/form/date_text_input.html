@@ -2,7 +2,7 @@
   <div class="input-group">
     <div class="input-group-addon">
       <div class="dropdown">
-        <a href="" class="dropdown-toggle toggle-select_date_{{date_id}}"
+        <a href="" class="dropdown-toggle"
            id="dLabel_date_{{date_id}}"
            data-toggle="dropdown">
           <i class="fa fa-lg fa-calendar"></i> {{label}}
@@ -12,7 +12,6 @@
             data-ng-model="model"
             data-on-set-time="onTimeSet(newDate, oldDate)"
             data-datetimepicker-config="{
-              dropdownSelector: '.toggle-select_date_{{date_id}}',
               startView : 'year',
               minuteStep: 5}">
           </datetimepicker>

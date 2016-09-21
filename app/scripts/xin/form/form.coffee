@@ -2,7 +2,7 @@
 
 
 angular.module('xin.form', ['ui.bootstrap.datetimepicker', 'angularMoment'])
-  .directive 'dateTextInputDirective', ->
+  .directive 'dateTextInputDirective', (guid) ->
     restrict: 'E'
     templateUrl: 'scripts/xin/form/date_text_input.html'
     controller: 'DateTextInputController'
@@ -11,15 +11,19 @@ angular.module('xin.form', ['ui.bootstrap.datetimepicker', 'angularMoment'])
       model: '=?'
       error: '=?'
     link: (scope, elem, attrs) ->
+      scope.date_id = guid()
       scope.today = false
       if attrs.today?
         scope.today = true
 
-  .controller 'DateTextInputController', ($scope, guid) ->
-    $scope.date_id = guid()
+  .controller 'DateTextInputController', ($scope) ->
     $scope.textDate = ""
     $scope.originTextDate = ""
     firstChange = false
+
+    $scope.onTimeSet = (newDate, oldDate) ->
+      $("#dLabel_date_#{$scope.date_id}").dropdown('toggle')
+      return true
 
     $scope.$watch 'model', (value) ->
       $scope.textDate = ''
