@@ -19,7 +19,8 @@
   <a class="input-group-addon" ng-click="addPost()">Ajouter un message</a>
 </div>
 
-<a class="btn btn-primary" href="#/participations/{{participation._id}}/edition">
+<a class="btn btn-primary" href="#/participations/{{participation._id}}/edition"
+   ng-if="isAdmin || participation.observateur._id == user._id">
   Editer la participation
 </a>
 

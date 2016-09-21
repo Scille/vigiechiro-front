@@ -10,6 +10,18 @@ Netcat (nc) pour debian
 sudo apt-get install netcat-openbsd
 ```
 
+Curl pour debian
+```
+sudo apt-get install curl
+```
+
+Pour installer Nodejs et npm : [https://nodejs.org/en/download/package-manager/](https://nodejs.org/en/download/package-manager/)
+
+Installation de bower et grunt
+```
+sudo npm install -g grunt-cli bower
+```
+
 Tests end-to-end
 ```
 sudo npm install -g protractor

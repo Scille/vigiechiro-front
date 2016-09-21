@@ -116,8 +116,14 @@ angular.module('participationViews', ['ngRoute', 'textAngular', 'xin_listResourc
     $scope.isCsvPost = null
     participationResource = null
 
+    $scope.user = {}
+    session.getUserPromise().then (user) ->
+      $scope.user = user
+
+    $scope.isAdmin = false
     session.getIsAdminPromise().then (isAdmin) ->
       $scope.isAdmin = isAdmin
+
     Backend.one('participations', $routeParams.participationId).get().then(
       (participation) ->
         if breadcrumbsGetParticipationDefer?

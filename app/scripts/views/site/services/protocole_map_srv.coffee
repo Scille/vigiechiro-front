@@ -313,27 +313,37 @@ angular.module('protocole_map', ['protocole_map_carre',
         if @callbacks.updateSteps?
           @callbacks.updateSteps(steps, @_isOpportuniste)
 
+      exportLocality: (locality) ->
+        format_locality = {}
+        shapetosave = {}
+        shapetosave.type = locality.overlay.type
+        if shapetosave.type == "Point"
+          shapetosave.coordinates = @_googleMaps.getPosition(locality.overlay)
+        else if shapetosave.type == "Polygon"
+          shapetosave.coordinates = [ @_googleMaps.getPath(locality.overlay) ]
+        else if shapetosave.type == "LineString"
+          shapetosave.coordinates = @_googleMaps.getPath(locality.overlay)
+        else
+          return null
+        format_locality =
+          name: locality.overlay.title
+          geometries:
+            type: 'GeometryCollection'
+            geometries: [shapetosave]
+          representatif: false
+        return format_locality
+
       saveMap: ->
         result = []
+        if @_fixLocalities? and @_fixLocalities.length
+          for locality in @_fixLocalities
+            format_locality = @exportLocality(locality)
+            if format_locality?
+              result.push(@exportLocality(locality))
         for locality in @_localities
-          localityToSave = {}
-          shapetosave = {}
-          shapetosave.type = locality.overlay.type
-          if shapetosave.type == "Point"
-            shapetosave.coordinates = @_googleMaps.getPosition(locality.overlay)
-          else if shapetosave.type == "Polygon"
-            shapetosave.coordinates = [ @_googleMaps.getPath(locality.overlay) ]
-          else if shapetosave.type == "LineString"
-            shapetosave.coordinates = @_googleMaps.getPath(locality.overlay)
-          else
-            continue
-          localityToSave =
-            name: locality.overlay.title
-            geometries:
-              type: 'GeometryCollection'
-              geometries: [shapetosave]
-            representatif: false
-          result.push(localityToSave)
+          format_locality = @exportLocality(locality)
+          if format_locality?
+            result.push(@exportLocality(locality))
         return result
 
       mapsCallback: ->
