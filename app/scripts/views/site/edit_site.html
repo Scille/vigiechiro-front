@@ -24,6 +24,10 @@
       Ce numéro est déjà utilisé.
     </p>
 
+    <div ng-show="randomSelectionAllowed && loading" style="text-align: center;">
+      <span class="fa fa-spinner fa-5x fa-pulse"></span>
+    </div>
+
     <div ng-show="randomSelectionAllowed && !loading">
       <b>Faire un tirage aléatoire</b>
       <a class="btn btn-primary" id="random-selection-true"
