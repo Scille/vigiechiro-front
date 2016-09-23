@@ -196,6 +196,7 @@ angular.module('siteViews', ['ngRoute',
                                        session, Backend, protocolesFactory) ->
     initEnv($scope, $modal, session)
     $scope.creation = true
+    $scope.loading = false
     # map variables
     sites = []
     justification_non_aleatoire = []
@@ -224,10 +225,20 @@ angular.module('siteViews', ['ngRoute',
       map.updateSite()
       # If CARRE or POINT_FIXE, display all sites already followed
       if $scope.protocole.type_site in ['CARRE', 'POINT_FIXE']
-        Backend.all('protocoles/'+$scope.protocole._id+'/sites').all('grille_stoc')
-          .getList().then (sitesResult) ->
-            sites = sitesResult.plain()
+        getExistingSites(1)
+
+    getExistingSites = (page) ->
+      $scope.loading = true
+      Backend.all("protocoles/#{$scope.protocole._id}/sites").all('grille_stoc')
+        .getList({page: page, max_results: 20}).then (sitesResult) ->
+          tmp = sitesResult.plain()
+          if tmp.length
+            sites = sites.concat(tmp)
+            getExistingSites(page+1)
+          else
+            $scope.loading = false
             map.displaySites(sites)
+
 
     $scope.resetForm = ->
       if not confirm("Cette opération supprimera toute la carte.")

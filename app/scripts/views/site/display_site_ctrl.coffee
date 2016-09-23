@@ -135,6 +135,8 @@ angular.module('displaySiteViews', ['ngRoute', 'textAngular', 'xin_backend',
       protocoleId: '@'
       typeSite: '@'
     link: (scope, elem, attrs) ->
+      sites = []
+      scope.loading = true
       session.getUserPromise().then (user) ->
         scope.userId = user._id
       attrs.$observe 'typeSite', (typeSite) ->
@@ -148,16 +150,24 @@ angular.module('displaySiteViews', ['ngRoute', 'textAngular', 'xin_backend',
           return
         sitesPromise = null
         if scope.typeSite in ["CARRE", "POINT_FIXE"]
-          sitesPromise = Backend.all('protocoles/'+scope.protocoleId+'/sites').all('grille_stoc')
+          sitesPromise = Backend.all("protocoles/#{scope.protocoleId}/sites").all('grille_stoc')
         else if scope.typeSite == "ROUTIER"
-          sitesPromise = Backend.all('protocoles/'+scope.protocoleId+'/sites').all('tracet')
+          sitesPromise = Backend.all("protocoles/#{scope.protocoleId}/sites").all('tracet')
+        getSites(sitesPromise, 1)
+      getSites = (sitesPromise, page) ->
         if sitesPromise
-          sitesPromise.getList().then (sites) ->
-              scope.sites = sites.plain()
-              mapDiv = elem.find('.g-maps')[0]
-              map = protocolesFactory(mapDiv, "ALL_"+scope.typeSite)
-              map.loadMap(sites.plain())
-
+          sitesPromise.getList({page: page, max_results: 20}).then (result) ->
+            tmp = result.plain()
+            if tmp.length
+              sites = sites.concat(tmp)
+              getSites(sitesPromise, page+1)
+            else
+              scope.loading = false
+              loadMap(sites)
+      loadMap = (sites) ->
+        mapDiv = elem.find('.g-maps')[0]
+        map = protocolesFactory(mapDiv, "ALL_"+scope.typeSite)
+        map.loadMap(sites)
 
 
   .directive 'listSitesDirective', (session, Backend) ->
