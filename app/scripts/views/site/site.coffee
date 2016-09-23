@@ -225,10 +225,10 @@ angular.module('siteViews', ['ngRoute',
       map.updateSite()
       # If CARRE or POINT_FIXE, display all sites already followed
       if $scope.protocole.type_site in ['CARRE', 'POINT_FIXE']
+        $scope.loading = true
         getExistingSites(1)
 
     getExistingSites = (page) ->
-      $scope.loading = true
       Backend.all("protocoles/#{$scope.protocole._id}/sites").all('grille_stoc')
         .getList({page: page, max_results: 20}).then (sitesResult) ->
           tmp = sitesResult.plain()
