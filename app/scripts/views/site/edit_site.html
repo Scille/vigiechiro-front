@@ -24,7 +24,7 @@
       Ce numéro est déjà utilisé.
     </p>
 
-    <div ng-show="randomSelectionAllowed">
+    <div ng-show="randomSelectionAllowed" ng-show="!loading">
       <b>Faire un tirage aléatoire</b>
       <a class="btn btn-primary" id="random-selection-true"
          ng-click="randomSelection(true)">
