@@ -5,16 +5,15 @@ breadcrumbsGetParticipationDefer = undefined
 
 makeRegExp = ($scope, type_site) ->
   patt =
-    'CARRE': /^Cir.+-\d+-Pass\d+-Tron\d+-Chiro_[01]_\d+_\d{3}\.(wav|ta|tac)$/
-    'POINT_FIXE': /^Car.+-\d+-Pass\d+-([A-H][12]|Z[1-9][0-9]*)-.*[01]_\d+_\d+_\d+\.(wav|ta|tac)$/
-    'ROUTIER': /^Cir.+-\d+-Pass\d+-Tron\d+-Chiro_[01]_\d+_\d{3}\.(wav|ta|tac)$/
+    'CARRE': /^Cir.+-\d+-Pass\d+-Tron\d+-Chiro_([01]_)?\d+_\d{3}\.(wav|ta|tac)$/
+    'POINT_FIXE': /^Car.+-\d+-Pass\d+-([A-H][12]|Z[1-9][0-9]*)-.*_\d+_\d+_\d+\.(wav|ta|tac)$/
+    'ROUTIER': /^Cir.+-\d+-Pass\d+-Tron\d+-Chiro_([01]_)?\d+_\d{3}\.(wav|ta|tac)$/
   exemples =
     'CARRE': 'Cir270-2009-Pass1-Tron1-Chiro_0_00265_000.wav'
     'POINT_FIXE': 'Car170517-2014-Pass1-C1-OB-1_20140702_224038_761.wav'
     'ROUTIER': 'Cir270-2009-Pass1-Tron1-Chiro_0_00265_000.wav'
   $scope.regexp = patt[type_site]
   $scope.fileFormatExemple = exemples[type_site]
-
 
 
 angular.module('uploadParticipationViews', ['ngRoute', 'xin_listResource',
