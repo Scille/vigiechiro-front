@@ -51,7 +51,11 @@ angular.module('xin.fileUploader', [])
         @sending = config.sending or null
         @progressing = config.progressing or null
         @complete = config.complete or null
-        @nb_success = 0
+        @nb_success = 0 # used by progressbar
+        @nb_failure = 0 # used by progressbar
+        @nb_waiting = 0 # used by progressbar
+        @nb_total = 0 # used by progressbar
+        @nb_not_unique = 0 # used by message warning
         @validating = 0
         @queuedFiles = []
         @processingFiles = []
@@ -102,6 +106,8 @@ angular.module('xin.fileUploader', [])
       addFile: (file) ->
         @status = 'active'
         @queuedFiles.push(file)
+        @nb_total++
+        @nb_waiting++
         @_checkQueuedFiles()
 
       _checkQueuedFiles: ->
@@ -110,7 +116,7 @@ angular.module('xin.fileUploader', [])
         else
           while @queuedFiles.length and
                 (@processingFiles.length+@validating) < @parallelUploads
-            @validating += 1
+            @validating++
             file = @queuedFiles.shift()
             file =
               data: file
@@ -123,17 +129,23 @@ angular.module('xin.fileUploader', [])
 
       _accept: (file) ->
         _acceptCallback = (error_type = null, error = null) =>
+          @validating--
           if error?
+            @nb_failure++
+            @nb_waiting--
             file.message = error
-            if error_type == "error"
+            if typeof(error) == "object" and error.data? and error.data._errors? and
+               error.data._errors.s3_id? and
+               error.data._errors.s3_id.indexOf("is not unique") != -1
+              @nb_not_unique++
+              file = null
+            else if error_type == "error"
               @errorFiles.push(file)
             else
               @warningFiles.push(file)
-            @validating += -1
             @_checkQueuedFiles()
           else
             @processingFiles.push(file)
-            @validating += -1
             @_sending(file)
         @accept(file, _acceptCallback)
 
@@ -187,24 +199,17 @@ angular.module('xin.fileUploader', [])
 
 
       removeFile: (file, error = null) ->
+        @nb_waiting--
         for processFile, i in @processingFiles
           if processFile? and file.fullPath == processFile.fullPath
             @processingFiles.splice(i, 1)
         if error?
           @errorFiles.push(file)
+          @nb_failure++
         else
-          @nb_success += 1
+          @nb_success++
+          file = null
         @_checkQueuedFiles()
-
-
-      getNbFiles: ->
-        result = @nb_success +
-                 @validating +
-                 @queuedFiles.length +
-                 @processingFiles.length +
-                 @warningFiles.length +
-                 @errorFiles.length
-        return result
 
 
       startAll: ->

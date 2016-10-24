@@ -22,7 +22,23 @@
 </div>
 
 <!-- abstract -->
-<div class="well" ng-show="uploader.status != 'inactive'">
+{{uploader.nb_total}}
+<div class="well">
+  <!-- <div>
+    <button class="btn btn-primary btn-xs" type="button" ng-click="uploader.startAll()"
+            ng-show="uploader.status == 'pause'">
+      Continuer
+    </button>
+    <button class="btn btn-warning btn-xs" type="button" ng-click="uploader.pauseAll()"
+            ng-show="uploader.status != 'pause' && (uploader.itemsWaiting.length || uploader.itemsReadyToCompress.length || uploader.itemsCompressing || uploader.itemsReadyToUp.length || uploader.itemsUploading.length)">
+      Pause
+    </button>
+    <button class="btn btn-danger btn-xs" type="button" ng-click="uploader.cancelAll()"
+            ng-show="uploader.itemsTotal">
+      Tout annuler
+    </button>
+  </div> -->
+
   <div class="row">
     <div class="col-xs-6">
       Nombre de fichiers dans la queue : {{uploader.queuedFiles.length}}
@@ -35,18 +51,18 @@
   <div class="progress">
     <!-- uploaded -->
     <div class="progress-bar progress-bar-success"
-         style="width: {{uploader.nb_success/uploader.getNbFiles()*100}}%">
+         style="width: {{uploader.nb_success/uploader.nb_total*100}}%">
       {{uploader.nb_success}}
-    </div>
-    <!-- waiting -->
-    <div class="progress-bar progress-bar-warning progress-bar-striped active"
-         style="width: {{(uploader.queuedFiles.length + uploader.validating + uploader.processingFiles.length)/uploader.getNbFiles()*100}}%">
-      {{uploader.queuedFiles.length + uploader.validating + uploader.processingFiles.length}}
     </div>
     <!-- errors -->
     <div class="progress-bar progress-bar-danger"
-         style="width: {{(uploader.warningFiles.length + uploader.errorFiles.length)/uploader.getNbFiles()*100}}%">
-      {{uploader.warningFiles.length + uploader.errorFiles.length}}
+         style="width: {{uploader.nb_failure/uploader.nb_total*100}}%">
+      {{uploader.nb_failure}}
+    </div>
+    <!-- waiting -->
+    <div class="progress-bar progress-bar-warning progress-bar-striped active"
+         style="width: {{uploader.nb_waiting/uploader.nb_total*100}}%">
+      {{uploader.nb_waiting}}
     </div>
   </div>
 
@@ -71,32 +87,26 @@
 </div>
 
 <div>
-  <button class="btn btn-primary btn-xs" type="button" ng-click="uploader.startAll()"
-          ng-show="uploader.status == 'pause'">
-    Continuer
-  </button>
-  <button class="btn btn-warning btn-xs" type="button" ng-click="uploader.pauseAll()"
-          ng-show="uploader.status != 'pause' && (uploader.itemsWaiting.length || uploader.itemsReadyToCompress.length || uploader.itemsCompressing || uploader.itemsReadyToUp.length || uploader.itemsUploading.length)">
-    Pause
-  </button>
-  <button class="btn btn-danger btn-xs" type="button" ng-click="uploader.cancelAll()"
-          ng-show="uploader.itemsTotal">
-    Tout annuler
-  </button>
-</div>
+  <div class="alert alert-warning" ng-show="uploader.nb_not_unique || uploader.warningFiles.length">
+    <div ng-show="uploader.nb_not_unique">Nombre de fichier déjà uploadé :
+      <strong>{{uploader.nb_not_unique}}</strong>
+    </div>
 
-<div>
-  <div class="alert alert-warning" ng-show="uploader.warningFiles.length">
-    <div><strong>{{uploader.warningFiles.length}}</strong></div>
-    <div ng-repeat="file in uploader.warningFiles">
-      {{file.message}}
+    <div ng-show="uploader.warningFiles.length">
+      <div><strong>{{uploader.warningFiles.length}}</strong></div>
+      <div ng-repeat="file in uploader.warningFiles">
+        {{file.message}}
+      </div>
     </div>
   </div>
 
   <div class="alert alert-danger" ng-show="uploader.errorFiles.length">
-    <div><strong>{{uploader.errorFiles.length}}</strong></div>
-    <div ng-repeat="file in uploader.errorFiles">
-      {{file.message}}
+    <div>Nombre de ficher en erreur :
+      <strong>{{uploader.errorFiles.length}}</strong>
     </div>
+  <!-- <button class="btn btn-danger btn-xs" type="button" ng-click="uploader.cancelAll()"
+          ng-show="uploader.itemsTotal">
+    Relancer les fichiers en erreur
+  </button> -->
   </div>
 </div>

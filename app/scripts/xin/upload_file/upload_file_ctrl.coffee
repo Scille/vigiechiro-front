@@ -30,7 +30,7 @@ angular.module('xin_uploadFile', ['appSettings', 'xin.fileUploader'])
             blob = new Blob([gzipFile], {type: file.type})
             blob.name = file.name
             if blob.size == 0
-              reject("#{file.name} : Fichier vide arpès compression")
+              reject("#{file.name} : Fichier vide après compression")
             else if blob.size > sliceSize
               reject("#{file.name} : Fichier compressé de taille > 5Mo")
             else
@@ -84,8 +84,7 @@ angular.module('xin_uploadFile', ['appSettings', 'xin.fileUploader'])
             registered.resolve()
           (error) ->
             file.custom_status = 'rejected'
-            msg = JSON.stringify(error.data)
-            registered.reject("Erreur à l'upload : #{msg}")
+            registered.reject(error)
         )
         # Compress the file
         createGZipFile(file.data).then(
