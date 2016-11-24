@@ -22,7 +22,6 @@
 </div>
 
 <!-- abstract -->
-{{uploader.nb_total}}
 <div class="well">
   <!-- <div>
     <button class="btn btn-primary btn-xs" type="button" ng-click="uploader.startAll()"
@@ -41,7 +40,7 @@
 
   <div class="row">
     <div class="col-xs-6">
-      Nombre de fichiers dans la queue : {{uploader.queuedFiles.length}}
+      Nombre de fichiers restant : <b>{{uploader.nb_waiting}}</b>
     </div>
     <div class="col-xs-6">
       Vitesse d'upload : {{uploader.speed/1024 | number: 1}} ko/s
@@ -53,6 +52,11 @@
     <div class="progress-bar progress-bar-success"
          style="width: {{uploader.nb_success/uploader.nb_total*100}}%">
       {{uploader.nb_success}}
+    </div>
+    <!-- errors -->
+    <div class="progress-bar progress-bar-warning"
+         style="width: {{uploader.nb_warning/uploader.nb_total*100}}%">
+      {{uploader.nb_warning}}
     </div>
     <!-- errors -->
     <div class="progress-bar progress-bar-danger"
@@ -88,14 +92,14 @@
 
 <div>
   <div class="alert alert-warning" ng-show="uploader.nb_not_unique || uploader.warningFiles.length">
-    <div ng-show="uploader.nb_not_unique">Nombre de fichier déjà uploadé :
+    <div ng-show="uploader.nb_not_unique">Nombre de fichiers déjà uploadés :
       <strong>{{uploader.nb_not_unique}}</strong>
     </div>
 
     <div ng-show="uploader.warningFiles.length">
       <div><strong>{{uploader.warningFiles.length}}</strong></div>
-      <div ng-repeat="file in uploader.warningFiles">
-        {{file.message}}
+      <div ng-repeat="message in uploader.warningFiles">
+        {{message}}
       </div>
     </div>
   </div>
@@ -104,6 +108,11 @@
     <div>Nombre de ficher en erreur :
       <strong>{{uploader.errorFiles.length}}</strong>
     </div>
+    <div ng-repeat="file in uploader.errorFiles">
+      {{file.motif}}
+    </div>
+
+
   <!-- <button class="btn btn-danger btn-xs" type="button" ng-click="uploader.cancelAll()"
           ng-show="uploader.itemsTotal">
     Relancer les fichiers en erreur
