@@ -11,6 +11,11 @@
       Participation terminée le {{ participation.date_fin | xinDate: 'medium' }}
     </div>
 
+    <div class="panel panel-default panel-body"
+         ng-if="participation.point && participation.point != ''">
+      Point {{ participation.point }}
+    </div>
+
     <div ng-bind-html="participation.commentaire"></div>
 
     <div class="panel panel-default panel-body">

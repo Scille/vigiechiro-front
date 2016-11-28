@@ -68,6 +68,20 @@
               placeholder="Commentaire"></textarea>
   </div>
 
+  <div class="form-group" ng-if="typeSite == 'POINT_FIXE'">
+    <div class="input-group">
+      <label class="input-group-addon">
+        Point du site
+      </label>
+      <select class="form-control"
+              ng-model="participation.point" ng-disabled="readOnly">
+        <option ng-repeat="locality in localities" value="{{locality}}">
+          {{locality}}
+        </option>
+      </select>
+    </div>
+  </div>
+
   <div class="form-group"
        ng-class="{'has-error': participationForm.configuration.detecteur_enregistreur_numero_serie.$invalid && !participationForm.$pristine}"
        ng-if="true">
