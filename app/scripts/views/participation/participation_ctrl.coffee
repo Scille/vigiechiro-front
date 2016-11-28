@@ -337,6 +337,7 @@ angular.module('participationViews', ['ngRoute', 'textAngular', 'xin_listResourc
           $scope.participation._errors.date_fin = "La date de fin ne peut pas être plus récente que celle de début."
         else
           payload.date_fin = date_fin.toGMTString()
+      payload.point = $scope.participation.point or null
       # commentaire
       payload.commentaire = $scope.participation.commentaire
       # météo
@@ -407,9 +408,16 @@ angular.module('participationViews', ['ngRoute', 'textAngular', 'xin_listResourc
     scope:
       participation: '='
       typeSite: '='
+      site: '='
       fileUploader: '='
       folderUploader: '='
     link: (scope) ->
+      scope.localities = []
+      scope.$watch 'site', (site) ->
+        if site? and site.localites?
+          for localite in site.localites
+            scope.localities.push(localite.nom)
+
       scope.folderAllowed = true
       # firefox and IE don't support folder upload
       if navigator.userAgent.search("Firefox") != -1
