@@ -322,7 +322,7 @@ angular.module('participationViews', ['ngRoute', 'textAngular', 'xin_listResourc
           $scope.participation._errors.date_fin = "La date de fin ne peut pas être plus récente que celle de début."
         else
           payload.date_fin = date_fin.toGMTString()
-      payload.point = $scope.participation.point or null
+      payload.point = $scope.participation.point or undefined
       # commentaire
       payload.commentaire = $scope.participation.commentaire
       # météo
