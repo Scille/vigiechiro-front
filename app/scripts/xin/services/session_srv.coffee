@@ -24,7 +24,15 @@ angular.module('xin_session', ['xin_storage', 'xin_backend'])
           deferred = $q.defer()
           deferred.reject()
           @_userPromise = deferred.promise
-      @getUserPromise = => @_userPromise
+
+      @updateUserPromise = =>
+        @_userPromise = Backend.one("moi").get({}, {"Cache-Control": "no-cache"})
+
+      @getUserPromise = =>
+        if not @_userPromise?
+          @updateUserPromise()
+        return @_userPromise
+
       @getIsAdminPromise = =>
         deferred = $q.defer()
         @_userPromise.then(
@@ -49,8 +57,7 @@ angular.module('xin_session', ['xin_storage', 'xin_backend'])
           $window.location.reload()
         # Error or success on backend logout, we delete the session token
         Backend.one('logout').post().then(postLogout, postLogout)
-    Session.refreshPromise()
-    return Session
+
 
 angular.module('xin_session_tools', ['xin_storage'])
   .factory 'sessionTools', ($window, storage) ->
