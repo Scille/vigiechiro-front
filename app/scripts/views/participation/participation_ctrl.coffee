@@ -344,7 +344,8 @@ angular.module('participationViews', ['ngRoute', 'textAngular', 'xin_listResourc
         if $scope.participation._id?
           # patch participation
           participationResource.patch(payload).then(
-            (participation) -> $route.reload()
+            (participation) ->
+              window.location = "#/participations/#{participation._id}"
             (error) ->
               console.log("Error : participation save "+error)
               $scope.saveDone.end?()
