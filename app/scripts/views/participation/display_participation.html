@@ -85,13 +85,22 @@
     <br>
     Début du traitement : {{ participation.traitement.date_debut | xinDate: 'medium' }}
   </span>
+  <span ng-if="participation.traitement.etat == 'RETRY'">
+    Début du traitement : {{ participation.traitement.date_debut | xinDate: 'medium' }}
+    <br>
+    Le traitement a échoué pour la {{ participation.traitement.retry_count }}ème fois, il a
+    été automatiquement réessayé et est en cours de traitement...
+    <div class="well">
+      {{ participation.traitement.message }}
+    </div>
+  </span>
   <span ng-if="participation.traitement.etat == 'ERREUR'">
+    Début du traitement : {{ participation.traitement.date_debut | xinDate: 'medium' }}
+    <br>
     Le traitement a échoué.
     <div class="well">
       {{ participation.traitement.message }}
     </div>
-<!--    <br>
-    Début du traitement : {{ participation.traitement.date_debut | xinDate: 'medium' }}-->
   </span>
 </div>
 <div ng-show="computeInfo">
