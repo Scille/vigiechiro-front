@@ -136,6 +136,7 @@ angular.module('displaySiteViews', ['ngRoute', 'textAngular', 'xin_backend',
       typeSite: '@'
     link: (scope, elem, attrs) ->
       sites = []
+      map = null
       scope.loading = true
       session.getUserPromise().then (user) ->
         scope.userId = user._id
@@ -148,6 +149,8 @@ angular.module('displaySiteViews', ['ngRoute', 'textAngular', 'xin_backend',
       makeRequest = ->
         if scope.typeSite == '' or scope.protocoleId == ''
           return
+        mapDiv = elem.find('.g-maps')[0]
+        map = protocolesFactory(mapDiv, "ALL_"+scope.typeSite)
         sitesPromise = null
         if scope.typeSite in ["CARRE", "POINT_FIXE"]
           sitesPromise = Backend.all("protocoles/#{scope.protocoleId}/sites").all('grille_stoc')
@@ -156,17 +159,14 @@ angular.module('displaySiteViews', ['ngRoute', 'textAngular', 'xin_backend',
         getSites(sitesPromise, 1)
       getSites = (sitesPromise, page) ->
         if sitesPromise
-          sitesPromise.getList({page: page, max_results: 20}).then (result) ->
-            tmp = result.plain()
-            if tmp.length
-              sites = sites.concat(tmp)
+          sitesPromise.getList({page: page, max_results: 100}).then (result) ->
+            sites = sites.concat(result.plain())
+            if result._meta.page * result._meta.max_results < result._meta.total
               getSites(sitesPromise, page+1)
             else
               scope.loading = false
               loadMap(sites)
       loadMap = (sites) ->
-        mapDiv = elem.find('.g-maps')[0]
-        map = protocolesFactory(mapDiv, "ALL_"+scope.typeSite)
         map.loadMap(sites)
 
 
