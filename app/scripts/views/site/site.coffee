@@ -230,7 +230,7 @@ angular.module('siteViews', ['ngRoute',
 
     getExistingSites = (page) ->
       Backend.all("protocoles/#{$scope.protocole._id}/sites").all('grille_stoc')
-        .getList({page: page, max_results: 100}).then (sitesResult) ->
+        .getList({page: page, max_results: 2000}).then (sitesResult) ->
           sites = sites.concat(sitesResult.plain())
           if sitesResult._meta.page * sitesResult._meta.max_results < sitesResult._meta.total
             getExistingSites(page+1)
