@@ -159,7 +159,7 @@ angular.module('displaySiteViews', ['ngRoute', 'textAngular', 'xin_backend',
         getSites(sitesPromise, 1)
       getSites = (sitesPromise, page) ->
         if sitesPromise
-          sitesPromise.getList({page: page, max_results: 100}).then (result) ->
+          sitesPromise.getList({page: page, max_results: 2000}).then (result) ->
             sites = sites.concat(result.plain())
             if result._meta.page * result._meta.max_results < result._meta.total
               getSites(sitesPromise, page+1)
