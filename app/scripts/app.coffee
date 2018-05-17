@@ -11,6 +11,8 @@
 ###
 angular
   .module('vigiechiroApp', [
+    'angulartics',
+    'angulartics.google.analytics',
     'ngAnimate',
     'ngRoute',
     'ngSanitize',
@@ -30,7 +32,8 @@ angular
     'siteViews'
     'participationViews',
     'actualiteViews',
-    'donneeViews'
+    'donneeViews',
+    'uploadParticipationViews'
   ])
 
   .run (Backend, SETTINGS) ->
