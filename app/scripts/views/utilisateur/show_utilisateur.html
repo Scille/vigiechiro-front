@@ -96,11 +96,11 @@
                   placeholder="Commentaire"></textarea>
     </div>
 
-    <div class="checkbox">
+    <div class="checkbox" ng-if="isAdmin">
       <label>
         <input type="checkbox" ng-model="utilisateur.donnees_publiques" ng-value="true"
                ng-checked="utilisateur.donnees_publiques" ng-disabled="readOnly">
-        J'accepte que mes observations soit publiées sous license publique
+        Observations publiées sous license publique
       </label>
     </div>
 
