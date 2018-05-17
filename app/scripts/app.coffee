@@ -56,7 +56,7 @@ angular
       .otherwise
         redirectTo: '/404'
 
-  .directive 'navbarDirective', (evalCallDefered, $window, $rootScope, $route, SETTINGS, session)->
+  .directive 'navbarDirective', (evalCallDefered, $window, $rootScope, $route, SETTINGS, session, Backend)->
     restrict: 'E'
     templateUrl: 'navbar.html'
     scope: {}
@@ -84,6 +84,14 @@ angular
       session.getUserPromise().then(
         (user) ->
           $scope.user = user
+          if not user.charte_acceptee
+            $('#charteModal').modal({'keyboard': false, 'backdrop': false})
+            $scope.acceptCharte = ->
+              Backend.one('moi').patch({'charte_acceptee': true}).then(
+                -> $('#charteModal').modal('hide')
+                (error) -> $scope.charteModalSaveError = true
+              )
+
           # Disable the spinner waiting for angular
           angular.element('.waiting-for-angular').hide()
         ->
