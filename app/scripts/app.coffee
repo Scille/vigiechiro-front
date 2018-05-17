@@ -1,14 +1,6 @@
 'use strict'
 
 
-###*
- # @ngdoc overview
- # @name vigiechiroApp
- # @description
- # # vigiechiroApp
- #
- # Main module of the application.
-###
 angular
   .module('vigiechiroApp', [
     'ngAnimate',
@@ -30,7 +22,8 @@ angular
     'siteViews'
     'participationViews',
     'actualiteViews',
-    'donneeViews'
+    'donneeViews',
+    'uploadParticipationViews'
   ])
 
   .run (Backend, SETTINGS) ->
