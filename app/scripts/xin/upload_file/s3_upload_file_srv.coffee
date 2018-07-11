@@ -80,9 +80,9 @@ angular.module('xin_s3uploadFile', ['appSettings'])
 
 
     class S3FileUploader
-      # 5Mo
-      sliceSize: 5 * 1024 * 1024
-      constructor: (file, @userCallbacks, @_gzip = false) ->
+      # 50 Mo
+      sliceSize: 50 * 1024 * 1024
+      constructor: (@participationId, file, @userCallbacks) ->
         @file = file
         @_pause = $q.defer()
         @_context = undefined
@@ -94,21 +94,10 @@ angular.module('xin_s3uploadFile', ['appSettings'])
           @userCallbacks.onProgress?(this, loaded)
       _onErrorBack: (status) ->
         @userCallbacks.onErrorBack?(this, status)
-      _onErrorXhr: (status) ->
+      _onErrorS3: (status) ->
         @userCallbacks.onErrorXhr?(this, status)
       cancel: ->
         @_pause = $q.defer()
-# TODO
-#        if @_context
-          # Call backend to delete the corresponding resource
-#          Backend.all('fichiers').one(@_context.id).customDELETE('multipart/annuler').then(
-#            -> @userCallbacks.cancel?(this)
-#            (error) -> throw error
-#          )
-#          Backend.all('fichiers').one(@_context.id).remove().then(
-#            -> @userCallbacks.cancel?(this)
-#            (error) -> console.log(error)
-#          )
         @userCallbacks.onCancel?(this)
       pause: ->
         @userCallbacks.onPause?(this)
@@ -122,9 +111,8 @@ angular.module('xin_s3uploadFile', ['appSettings'])
       start: ->
         @_pause.resolve()
         if @file.status == 'ready'
-          @_onProgress(0, @file.size)
           # Call the backend to get back a signed S3 url
-          if @file.size < @sliceSize
+          if @file.data.size < @sliceSize
             @_startSingleUpload()
           else
             @_startMultiPartUpload()
@@ -134,13 +122,6 @@ angular.module('xin_s3uploadFile', ['appSettings'])
           mime: @file.type
           titre: @file.name
           multipart: true
-        if payload.mime == ''
-          ta = /\.ta$/
-          tac = /\.tac$/
-          if ta.test(payload.titre)
-            payload.mime = 'application/ta'
-          else if tac.test(payload.titre)
-            payload.mime = 'application/tac'
         # Create the file in the backend
         Backend.all('fichiers').post(payload).then(
           (response) =>
@@ -188,27 +169,27 @@ angular.module('xin_s3uploadFile', ['appSettings'])
                   )
                   @_context.part_number += 1
                   @_continueMultiPartUpload(@_context)
-                onError: (error) => @_onErrorXhr(error)
+                onError: (error) => @_onErrorS3(error)
               headers = {}
               if @_gzip
                 headers["Content-Encoding"] = "gzip"
               uploadToS3(callbacks, 'PUT', slice, response.s3_signed_url, headers)
             (error) -> throw error
           )
+
       _startSingleUpload: () ->
         payload =
           mime: @file.type
           titre: @file.name
           multipart: false
+          lien_participation: @participationId
         if payload.mime == ''
-          ta = /\.ta$/
-          tac = /\.tac$/
-          if ta.test(payload.titre)
+          if payload.titre.endsWith('.ta')
             payload.mime = 'application/ta'
-          else if tac.test(payload.titre)
+          else if payload.titre.endsWith('.tac')
             payload.mime = 'application/tac'
         callbacks =
-          onError: (error) => @_onErrorXhr(error)
+          onError: (error) => @_onErrorS3(error)
           onProgress: (loaded, total) => @_onProgress(loaded, total)
           onSuccess: =>
             Backend.one('fichiers', @file.id).get().then (fileBackend) =>
@@ -218,20 +199,55 @@ angular.module('xin_s3uploadFile', ['appSettings'])
               )
         Backend.all('fichiers').post(payload).then(
           (response) =>
-            etag = response._etag
+            # etag = response._etag
             @file.id = response._id
             contentType = @file.type
             if contentType == ''
-              ta = /\.ta$/
-              tac = /\.tac$/
-              if ta.test(@file.name)
+              if @file.name.endsWith('.ta')
                 contentType = 'application/ta'
-              else if tac.test(@file.name)
+              else if @file.name.endsWith('.tac')
                 contentType = 'application/tac'
             headers =
               'Content-Type': contentType
-            if @_gzip
+            if @file.gzip
               headers["Content-Encoding"] = "gzip"
+            console.log(response)
             uploadToS3(callbacks, 'PUT', @file, response.s3_signed_url, headers)
           (error) => @_onErrorBack(error)
         )
+
+    # onSending = (file, formData) ->
+    #   console.log(file)
+    #   console.log(file.postData)
+    #   formData.append('key', file.postData.s3_id)
+    #   formData.append('acl', 'private')
+    #   formData.append('AWSAccessKeyId', file.postData.s3_aws_access_key_id)
+    #   formData.append('Policy', file.postData.s3_policy)
+    #   formData.append('Signature', file.postData.s3_signature)
+    #   formData.append('Content-Encoding', 'gzip')
+    #   formData.append('Content-Type', file.type)
+
+        # formData = new FormData()
+        # # @sending(file, formData)
+        # xhr = new XMLHttpRequest()
+        # xhr.open(@method, @url, true)
+        # xhr.onload = ->
+        #   if xhr.status == 200
+        #     console.log("Success", xhr)
+        #     # callbacks.onSuccess?(xhr)
+        #   else
+        #     console.log("Error", xhr)
+        #     # callbacks.onError?('Upload error: ' + xhr.status)
+        # xhr.onerror = ->
+        #   console.log("Error")
+        #   # callbacks.onError?('XHR error.')
+        # # Some browser do not have the .upload property
+        # progressObj = xhr.upload ? xhr
+        # progressObj.onprogress = (e) ->
+        #   console.log("onprogress", e)
+        #   # if e.lengthComputable
+        #   #   callbacks.onProgress?(e.loaded, e.total)
+        #   # for key, value of headers
+        #   #   xhr.setRequestHeader(key, value)
+        # formData.append('file', file.data, file.name)
+        # xhr.send(formData)

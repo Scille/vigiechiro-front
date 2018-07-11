@@ -1,90 +1,67 @@
-<div class="actionbar">
-  <a class="btn btn-default" href="#/protocoles/{{participation.protocole._id}}">
-    Voir le protocole {{ participation.protocole.titre }}
-  </a>
-  <a class="btn btn-default" href="#/sites/{{participation.site._id}}">
-    Voir le site {{ participation.site.titre }}
-  </a>
-  <a class="btn btn-primary" href="#/participations/{{participation._id}}/donnees">
-    Voir les données
-  </a>
-  <a class="btn btn-default" href="#/participations/{{participation._id}}/edition"
-     ng-if="isAdmin || participation.observateur._id == user._id">
-    Editer la participation
-  </a>
-  <a class="btn btn-primary" href="#/participations/{{participation._id}}/telechargement">
-    Uploader les fichiers
-  </a>
-  <sc-button
-    class="btn btn-primary"
-    ng-click="getDonnees()"
-    wait-for-class="fa fa-spinner fa-1 fa-pulse"
-    cancel-wait-for="getEmailDone"
-    label="'Recevoir les données par email'">
-  </sc-button>
-  <sc-button
-    class="btn btn-warning"
-    ng-if="isAdmin && (participation.traitement.etat == 'FINI' || participation.traitement.etat == 'ERREUR' || participation.traitement.timeout)"
-    ng-click="compute()"
-    label="'Relancer la participation'">
-  </sc-button>
-  <sc-button
-    class="btn btn-danger"
-    ng-click="delete()"
-    wait-for-class="fa fa-spinner fa-1 fa-pulse"
-    label="'Supprimer la participation'">
-  </sc-button>
-</div>
-
-<div>
-  <div ng-show="computeInfo">
-    <span class="label label-danger" ng-if="computeInfo.error">
-      La demande de relance de la participation a échoué.
-    </span>
-  </div>
-  <div class="alert alert-success" ng-show="isCsvPost">
-    Demande de réception des données par email : reçue
-  </div>
-  <div class="alert alert-danger" ng-show="isCsvPost == false">
-    Echec de la demande de réception des données par email
-  </div>
-</div>
+<a class="btn btn-default"
+   href="#/protocoles/{{participation.protocole._id}}">
+  Voir le protocole {{ participation.protocole.titre }}
+</a>
+<a class="btn btn-default"
+   href="#/sites/{{participation.site._id}}">
+  Voir le site {{ participation.site.titre }}
+</a>
+<a class="btn btn-danger"
+   href=""
+   ng-click="delete()">
+  Supprimer la participation
+</a>
+<a class="btn btn-primary"
+   href="#/participations/{{participation._id}}/telechargement"
+   ng-if="isAdmin || participation.observateur._id == user._id">
+  Uploader les fichiers
+</a>
 
 <display-participation-directive participation="participation">
 </display-participation-directive>
 
 <div class="form-group input-group">
-  <input class="form-control" type="text" ng-model="post">
-  <a class="input-group-addon" ng-click="addPost()">Ajouter un message</a>
+  <input class="form-control"
+         type="text"
+         ng-model="post">
+  <a class="input-group-addon"
+     ng-click="addPost()">Ajouter un message</a>
 </div>
+
+<a class="btn btn-default"
+   href="#/participations/{{participation._id}}/edition"
+   ng-if="isAdmin || participation.observateur._id == user._id">
+  Editer la participation
+</a>
 
 <hr>
 
 <div class="table-responsive">
   <h4>Bilan de la participation</h4>
-  <table class="table table-striped table-condensed" ng-if="participation.bilan">
+  <table class="table table-striped table-condensed"
+         ng-if="participation.bilan">
     <tr>
       <th>#</th>
       <th>Taxon parent</th>
       <th>Nom</th>
       <th>Nb contact min</th>
       <th>Nb de contact probable</th>
-    <tr ng-show="participation.bilan.chiropteres"
-        ng-repeat="line in participation.bilan.chiropteres">
-      <td>{{$index+1}}</td>
-      <td>Chiroptères</td>
-      <td>{{line.taxon.libelle_long}}</td>
-      <td>{{line.nb_contact_min}}</td>
-      <td>{{line.nb_contact_max}}</td>
-    </tr>
-    <tr ng-show="participation.bilan.orthopteres"
-        ng-repeat="line in participation.bilan.orthopteres">
-      <td>{{$index+1}}</td>
-      <td>Orthopteres</td>
-      <td>{{line.taxon.libelle_long}}</td>
-      <td>{{line.nb_contact_min}}</td>
-      <td>{{line.nb_contact_max}}</td>
-    </tr>
+      <tr ng-show="participation.bilan.chiropteres"
+          ng-repeat="line in participation.bilan.chiropteres">
+        <td>{{$index+1}}</td>
+        <td>Chiroptères</td>
+        <td>{{line.taxon.libelle_long}}</td>
+        <td>{{line.nb_contact_min}}</td>
+        <td>{{line.nb_contact_max}}</td>
+      </tr>
+      <tr ng-show="participation.bilan.orthopteres"
+          ng-repeat="line in participation.bilan.orthopteres">
+        <td>{{$index+1}}</td>
+        <td>Orthopteres</td>
+        <td>{{line.taxon.libelle_long}}</td>
+        <td>{{line.nb_contact_min}}</td>
+        <td>{{line.nb_contact_max}}</td>
+      </tr>
     </tr>
     <tr ng-show="participation.bilan.autre"
         ng-repeat="line in participation.bilan.autre">
@@ -101,14 +78,12 @@
 <div ng-if="participation.traitement">
   <span ng-if="participation.traitement.etat == 'FINI'">
     Début du traitement : {{ participation.traitement.date_debut | xinDate: 'medium' }}
-    <br>
-    Le traitement s'est terminée le {{ participation.traitement.date_fin | xinDate: 'medium' }}
+    <br> Le traitement s'est terminée le {{ participation.traitement.date_fin | xinDate: 'medium' }}
   </span>
   <span ng-if="participation.traitement.etat == 'PLANIFIE'">
     Traitement planifié le : {{ participation.traitement.date_planification | xinDate: 'medium' }}
     <span ng-if="participation.traitement.timeout">
-      <br>
-      Le traitement est planifié depuis trop longtemps, peut-être faut-il le relancer...
+      <br> Le traitement est planifié depuis trop longtemps, peut-être faut-il le relancer...
     </span>
   </span>
   <span ng-if="participation.traitement.etat == 'EN_COURS'">
@@ -118,28 +93,60 @@
     <span ng-if="!participation.traitement.timeout">
       Traitement en cours.
     </span>
-    <br>
-    Début du traitement : {{ participation.traitement.date_debut | xinDate: 'medium' }}
+    <br> Début du traitement : {{ participation.traitement.date_debut | xinDate: 'medium' }}
   </span>
   <span ng-if="participation.traitement.etat == 'RETRY'">
     Début du traitement : {{ participation.traitement.date_debut | xinDate: 'medium' }}
-    <br>
-    Le traitement a échoué pour la {{ participation.traitement.retry_count }}ème fois, il a
-    été automatiquement réessayé et est en cours de traitement...
+    <br> Le traitement a échoué pour la {{ participation.traitement.retry_count }}ème fois, il a été automatiquement réessayé
+    et est en cours de traitement...
     <div class="well">
       {{ participation.traitement.message }}
     </div>
   </span>
   <span ng-if="participation.traitement.etat == 'ERREUR'">
     Début du traitement : {{ participation.traitement.date_debut | xinDate: 'medium' }}
-    <br>
-    Le traitement a échoué.
+    <br> Le traitement a échoué.
     <div class="well">
       {{ participation.traitement.message }}
     </div>
   </span>
 </div>
+<div ng-show="computeInfo">
+  <span class="label label-danger"
+        ng-if="computeInfo.error">
+    La demande de relance de la participation a échoué.
+  </span>
+</div>
 
-<div ng-if="participation.logs">
-  <access-file-directive file="participation.logs"></access-file-directive>
+<!-- Buttons -->
+<div>
+  <a class="btn btn-primary"
+     href="#/participations/{{participation._id}}/donnees">
+    Voir les données
+  </a>
+  <sc-button class="btn btn-primary"
+             ng-click="getDonnees()"
+             wait-for-class="fa fa-spinner fa-1 fa-pulse"
+             cancel-wait-for="getEmailDone"
+             label="'Recevoir les données par email'">
+  </sc-button>
+  <sc-button class="btn btn-warning"
+             ng-if="isAdmin && (participation.traitement.etat == 'FINI' || participation.traitement.etat == 'ERREUR' || participation.traitement.timeout)"
+
+             ng-click="compute()"
+             cancel-wait-for="computeDone"
+             label="'Relancer la participation'">
+  </sc-button>
+  <span ng-if="participation.logs">
+    <access-file-directive file="participation.logs"></access-file-directive>
+  </span>
+</div>
+
+<div class="alert alert-success"
+     ng-show="isCsvPost">
+  Demande de réception des données par email : reçue
+</div>
+<div class="alert alert-danger"
+     ng-show="isCsvPost == false">
+  Echec de la demande de réception des données par email
 </div>

@@ -6,4 +6,3 @@ angular.module('appSettings', [])
     API_DOMAIN: 'http://localhost:8080'
     FRONT_DOMAIN: 'http://localhost:9000'
     BASE_TITLE: 'Vigiechiro'
-    S3_BUCKET_URL: 'https://vigiechiro.s3.amazonaws.com/'
