@@ -5,9 +5,9 @@ breadcrumbsGetParticipationDefer = undefined
 
 makeRegExp = ($scope, type_site) ->
   patt =
-    'CARRE': /^Cir.-\d-Pass\d-Tron\d-Chiro_[01]_\d_000\.(wav|ta|tac)$/
-    'POINT_FIXE': /^Car.-\d-Pass\d-([A-H][12]|Z[1-9][0-9]*)-.*[01]_\d_\d_\d\.(wav|ta|tac)$/
-    'ROUTIER': /^Cir.-\d-Pass\d-Tron\d-Chiro_[01]_\d_\d{3}\.(wav|ta|tac)$/
+    'CARRE': /^Cir.+-\d{4}-Pass\d{1,2}-Tron\d{1,2}-Chiro_([01]_)?\d+_\d{3}\.(wav|ta|tac)(.zip)?$/
+    'POINT_FIXE': /^Car.+-\d{4}-Pass\d{1,2}-([A-H][12]|Z[1-9][0-9]*)-.*_\d{8}_\d{6}_\d{3}\.(wav|ta|tac)(.zip)?$/
+    'ROUTIER': /^Cir.+-\d{4}-Pass\d{1,2}-Tron\d{1,2}-Chiro_([01]_)?\d+_\d{3}\.(wav|ta|tac)(.zip)?$/
   exemples =
     'CARRE': 'Cir270-2009-Pass1-Tron1-Chiro_0_00265_000.wav'
     'POINT_FIXE': 'Car170517-2014-Pass1-C1-OB-1_20140702_224038_761.wav'
@@ -40,7 +40,6 @@ angular.module('uploadParticipationViews', ['ngRoute', 'xin_listResource',
                                                   session) ->
     participationResource = null
     $scope.participation = null
-    # $scope.connectionSpeed = 2
 
     # summary
     $scope.filesWarning = []
@@ -62,16 +61,15 @@ angular.module('uploadParticipationViews', ['ngRoute', 'xin_listResource',
       (error) -> window.location = "#/404"
     )
 
-    # $scope.$watch 'connectionSpeed', (value) ->
-    #   if value? and value >= 2 and value <= 20
-    #     $scope.fileUploader.connectionSpeed = value
-    #     $scope.folderUploader.connectionSpeed = value
+    # $scope.refresh = ->
+    #   $scope.$apply()
 
-    $scope.refresh = ->
-      $scope.$apply()
-
+    $scope.computeDone = {}
     $scope.compute = ->
+      $scope.computeInfo = {}
       participationResource.post('compute', {}).then(
         (result) -> window.location = "#/participations/#{participationResource._id}"
-        (error) -> window.location = "#/participations/#{participationResource._id}"
+        (error) ->
+          $scope.computeInfo.error = true
+          $scope.computeDone.end?()
       )

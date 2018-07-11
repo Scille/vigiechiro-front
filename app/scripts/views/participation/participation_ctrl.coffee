@@ -156,11 +156,14 @@ angular.module('participationViews', ['ngRoute', 'textAngular', 'xin_listResourc
         (error) -> throw error
       )
 
+    $scope.computeDone = {}
     $scope.compute = ->
       $scope.computeInfo = {}
       participationResource.post('compute', {}).then(
         (result) -> $route.reload()
-        (error) -> $scope.computeInfo.error = true
+        (error) ->
+          $scope.computeInfo.error = true
+          $scope.computeDone.end?()
       )
 
     $scope.delete = ->

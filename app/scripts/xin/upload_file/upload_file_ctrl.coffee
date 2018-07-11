@@ -7,84 +7,100 @@ angular.module('xin_uploadFile', ['appSettings', 'xin_s3uploadFile', 'xin.fileUp
     templateUrl: 'scripts/xin/upload_file/upload_file.html'
     controller: 'UploadFileController'
     scope:
-      uploader: '=?'
-      regexp: '=?'
+      lienParticipation: '@'
+      regex: '=?'
+      warningFiles: '=?'
+      errorFiles: '=?'
+      refresh: '=?'
     link: (scope, elem, attrs) ->
-      scope.dragOverClass = ''
-      scope.multiple = false
-      scope.directory = false
-      scope.gzip = false
-      drop = elem.find('.drop')
-      input = drop.find('input')
-      if attrs.multiple?
-        scope.multiple = true
-        input[0].setAttribute('multiple', '')
-      if attrs.directory?
-        scope.directory = true
-        input[0].setAttribute('directory', '')
-        input[0].setAttribute('webkitdirectory', '')
-        input[0].setAttribute('mozdirectory', '')
-      if attrs.gzip?
-        scope.gzip = true
-      if attrs.regexp?
-        scope.$watch 'regexp', (regexp) ->
-          if regexp? and regexp.constructor == Array and regexp.length
-            scope.addRegExpFilter()
-        , true
+      scope.elem = elem
+      # if attrs.directory?
+      #   scope.directory = true
+      #   input[0].setAttribute('directory', '')
+      #   input[0].setAttribute('webkitdirectory', '')
+      #   input[0].setAttribute('mozdirectory', '')
 
 
-  .controller 'UploadFileController', ($scope, Backend, S3FileUploader, FileUploader, guid) ->
-    $scope.date_id = guid()
-    $scope.warnings = []
-    $scope.errors =
-      filters: []
-      back: []
-      xhr: []
-    uploader = $scope.uploader = new FileUploader()
+  .controller 'UploadFileController', ($scope, Backend, S3FileUploader, Uploader, guid) ->
 
-    $scope.$watch 'gzip', (gzip) ->
-      if gzip
-        uploader.setGzip()
-    , true
-
-    # Remove sub-directories
-    uploader.filters.push(
-      name: "Sous-dossiers ignorés."
-      fn: (item) ->
-        if item.webkitRelativePath? and item.webkitRelativePath != ''
-          split = item.webkitRelativePath.split("/")
-          if split.length > 2
-            return false
+    createGZipFile = (file) ->
+      return new Promise((resolve, reject) ->
+        arrayBuffer = null
+        fileReader = new FileReader()
+        fileReader.onload = (e) =>
+          arrayBuffer = e.target.result
+          gzipFile = pako.gzip(arrayBuffer)
+          blob = new Blob([gzipFile], {type: file.type})
+          blob.name = file.name
+          if blob.size == 0
+            resolve({file: file, gzip: false})
           else
-            nameDirectory = split[0]
-            if uploader.directories.indexOf(nameDirectory) == -1
-              uploader.directories.push(nameDirectory)
-        return true
-    )
-
-    $scope.addRegExpFilter = ->
-      for filter in uploader.filters when filter.name == "Format incorrect."
-        return
-      uploader.filters.push(
-        name: "Format incorrect."
-        fn: (item) ->
-          if item.type in ['image/png', 'image/png', 'image/jpeg']
-            return true
-          for reg in $scope.regexp
-            if reg.test(item.name)
-              return true
-          return false
+            resolve({file: blob, gzip: true})
+        fileReader.readAsArrayBuffer(file)
       )
 
-    uploader.displayError = (error, type, limit = 0) ->
-      if type == 'back'
-        $scope.errors.back.push(error)
-      else if type == 'xhr'
-        $scope.errors.xhr.push(error)
-      $scope.$apply()
+    refreshScope = ->
+      $scope.$apply();
 
-    uploader.onAddingWarningsComplete = ->
-      $scope.warnings = @warnings
+    onAccept = (file, done) ->
+      # test fullPath for subdirectory
+      if file.fullPath?
+        split = file.fullPath.split("/")
+        if split.length > 2
+          $scope.uploader.warnings.push("Sous-dossier : #{file.fullPath}")
+        done("Erreur : sous-dossier")
+        $scope.$apply()
+        return
+      # test regex
+      if file.type not in ['image/png', 'image/png', 'image/jpeg']
+        if not $scope.regex.test(file.name)
+          $scope.uploader.warnings.push("Nom de fichier invalide : #{file.name}")
+          done("Erreur : mauvais nom de fichier #{file.name}")
+          $scope.$apply()
+          return
+      # test empty file
+      if file.size == 0
+        $scope.uploader.warnings.push("#{file.name} : Fichier vide")
+        done("Erreur : fichier vide")
+        $scope.$apply()
+        return
 
-    uploader.onCancelAllComplete = ->
-      $scope.warnings = []
+      createGZipFile(file.data).then(
+        (result) ->
+          file.data = result.file
+          file.gzip = result.gzip
+          $scope.$apply()
+          done()
+        (error) ->
+          $scope.uploader.errors.push(error)
+          console.error(error)
+          $scope.$apply()
+          done(error)
+      )
+
+    onComplete = (file) ->
+      console.log('onComplete')
+
+    uploaderConfig = {
+      participationId: $scope.lienParticipation
+      parallelUploads: 5,
+      refreshScope: refreshScope,
+      accept: onAccept,
+      # sending: onSending,
+      complete: onComplete
+    }
+    $scope.$watch 'elem', (value) ->
+      $scope.uploader = uploader = new Uploader($scope.elem[0].children[0], uploaderConfig)
+
+    # uploader.displayError = (error, type, limit = 0) ->
+    #   if type == 'back'
+    #     $scope.errors.back.push(error)
+    #   else if type == 'xhr'
+    #     $scope.errors.xhr.push(error)
+    #   $scope.$apply()
+
+    # uploader.onAddingWarningsComplete = ->
+    #   $scope.warnings = @warnings
+
+    # uploader.onCancelAllComplete = ->
+    #   $scope.warnings = []
