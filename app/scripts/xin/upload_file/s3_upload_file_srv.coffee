@@ -76,7 +76,7 @@ angular.module('xin_s3uploadFile', ['appSettings'])
           callbacks.onProgress?(e.loaded, e.total)
       for key, value of headers or {}
         xhr.setRequestHeader(key, value)
-      xhr.send(file)
+      xhr.send(file.data)
 
 
     class S3FileUploader
@@ -112,16 +112,24 @@ angular.module('xin_s3uploadFile', ['appSettings'])
         @_pause.resolve()
         if @file.status == 'ready'
           # Call the backend to get back a signed S3 url
-          if @file.data.size < @sliceSize
-            @_startSingleUpload()
-          else
-            @_startMultiPartUpload()
+          @_startSingleUpload()
+          # Disabled multipart
+          # if @file.data.size < @sliceSize
+          #   @_startSingleUpload()
+          # else
+          #   @_startMultiPartUpload()
           @userCallbacks.onStart?(this)
       _startMultiPartUpload: () ->
         payload =
           mime: @file.type
           titre: @file.name
           multipart: true
+          lien_participation: @participationId
+        if payload.mime == ''
+          if payload.titre.endsWith('.ta')
+            payload.mime = 'application/ta'
+          else if payload.titre.endsWith('.tac')
+            payload.mime = 'application/tac'
         # Create the file in the backend
         Backend.all('fichiers').post(payload).then(
           (response) =>
@@ -133,7 +141,7 @@ angular.module('xin_s3uploadFile', ['appSettings'])
               file: @file
               parts: []
             @_continueMultiPartUpload()
-          (error) -> throw error
+          (error) => @_onErrorBack(error)
         )
       _continueMultiPartUpload: () ->
         @_pause.promise.then =>
@@ -174,7 +182,7 @@ angular.module('xin_s3uploadFile', ['appSettings'])
               if @_gzip
                 headers["Content-Encoding"] = "gzip"
               uploadToS3(callbacks, 'PUT', slice, response.s3_signed_url, headers)
-            (error) -> throw error
+            (error) => @_onErrorBack(error)
           )
 
       _startSingleUpload: () ->
@@ -211,14 +219,13 @@ angular.module('xin_s3uploadFile', ['appSettings'])
               'Content-Type': contentType
             if @file.gzip
               headers["Content-Encoding"] = "gzip"
-            console.log(response)
             uploadToS3(callbacks, 'PUT', @file, response.s3_signed_url, headers)
           (error) => @_onErrorBack(error)
         )
 
+    # TODO : futur improvement ?
     # onSending = (file, formData) ->
-    #   console.log(file)
-    #   console.log(file.postData)
+    #   formData = new FormData()
     #   formData.append('key', file.postData.s3_id)
     #   formData.append('acl', 'private')
     #   formData.append('AWSAccessKeyId', file.postData.s3_aws_access_key_id)
@@ -226,28 +233,25 @@ angular.module('xin_s3uploadFile', ['appSettings'])
     #   formData.append('Signature', file.postData.s3_signature)
     #   formData.append('Content-Encoding', 'gzip')
     #   formData.append('Content-Type', file.type)
-
-        # formData = new FormData()
-        # # @sending(file, formData)
-        # xhr = new XMLHttpRequest()
-        # xhr.open(@method, @url, true)
-        # xhr.onload = ->
-        #   if xhr.status == 200
-        #     console.log("Success", xhr)
-        #     # callbacks.onSuccess?(xhr)
-        #   else
-        #     console.log("Error", xhr)
-        #     # callbacks.onError?('Upload error: ' + xhr.status)
-        # xhr.onerror = ->
-        #   console.log("Error")
-        #   # callbacks.onError?('XHR error.')
-        # # Some browser do not have the .upload property
-        # progressObj = xhr.upload ? xhr
-        # progressObj.onprogress = (e) ->
-        #   console.log("onprogress", e)
-        #   # if e.lengthComputable
-        #   #   callbacks.onProgress?(e.loaded, e.total)
-        #   # for key, value of headers
-        #   #   xhr.setRequestHeader(key, value)
-        # formData.append('file', file.data, file.name)
-        # xhr.send(formData)
+    # xhr = new XMLHttpRequest()
+    # xhr.open(@method, @url, true)
+    # xhr.onload = ->
+    #   if xhr.status == 200
+    #     console.log("Success", xhr)
+    #     # callbacks.onSuccess?(xhr)
+    #   else
+    #     console.log("Error", xhr)
+    #     # callbacks.onError?('Upload error: ' + xhr.status)
+    # xhr.onerror = ->
+    #   console.log("Error")
+    #   # callbacks.onError?('XHR error.')
+    # # Some browser do not have the .upload property
+    # progressObj = xhr.upload ? xhr
+    # progressObj.onprogress = (e) ->
+    #   console.log("onprogress", e)
+    #   # if e.lengthComputable
+    #   #   callbacks.onProgress?(e.loaded, e.total)
+    #   # for key, value of headers
+    #   #   xhr.setRequestHeader(key, value)
+    # formData.append('file', file.data, file.name)
+    # xhr.send(formData)

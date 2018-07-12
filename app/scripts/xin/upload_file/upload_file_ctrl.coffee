@@ -48,9 +48,9 @@ angular.module('xin_uploadFile', ['appSettings', 'xin_s3uploadFile', 'xin.fileUp
         split = file.fullPath.split("/")
         if split.length > 2
           $scope.uploader.warnings.push("Sous-dossier : #{file.fullPath}")
-        done("Erreur : sous-dossier")
-        $scope.$apply()
-        return
+          done("Erreur : sous-dossier")
+          $scope.$apply()
+          return
       # test regex
       if file.type not in ['image/png', 'image/png', 'image/jpeg']
         if not $scope.regex.test(file.name)
