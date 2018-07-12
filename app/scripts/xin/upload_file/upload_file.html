@@ -69,7 +69,7 @@
   </div>
 </div>
 
-<button class="btn btn-primary btn-xs"
+<!-- <button class="btn btn-primary btn-xs"
         type="button"
         ng-click="uploader.startAll()"
         ng-show="uploader.status == 'pause'">
@@ -86,7 +86,7 @@
         ng-click="uploader.cancelAll()"
         ng-show="uploader.itemsTotal">
   Tout annuler
-</button>
+</button> -->
 <button class="btn btn-primary btn-xs"
         type="button"
         ng-click="uploader.clearErrors()"
@@ -124,20 +124,10 @@
   </div>
 </div>
 
-<!-- Filters errors -->
-<div>
-  <!-- Items canceled -->
-  <div class="alert alert-danger"
-       ng-show="uploader.itemsCanceled.length">
-    <div ng-repeat="item in uploader.itemsCanceled">
-      Fichier {{ item.name }} annulé
-    </div>
-  </div>
-  <!-- Uploads failed -->
-  <div class="alert alert-danger"
-       ng-show="uploader.itemsFailedUpload.length">
-    <div ng-repeat="item in uploader.itemsFailedUpload">
-      Echec du téléchargement du fichier {{ item.file.name }}
-    </div>
+<!-- Items canceled -->
+<div class="alert alert-danger"
+      ng-show="uploader.itemsCanceled.length">
+  <div ng-repeat="item in uploader.itemsCanceled">
+    Fichier {{ item.name }} annulé
   </div>
 </div>

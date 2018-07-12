@@ -42,10 +42,6 @@ angular.module('uploadParticipationViews', ['ngRoute', 'xin_listResource',
     $scope.participation = null
     $scope.participationId = $routeParams.participationId
 
-    # summary
-    $scope.filesWarning = []
-    $scope.filesFailed = []
-
     # get participation
     Backend.one("participations", $routeParams.participationId).get().then(
       (participation) ->
@@ -61,9 +57,6 @@ angular.module('uploadParticipationViews', ['ngRoute', 'xin_listResource',
 
       (error) -> window.location = "#/404"
     )
-
-    # $scope.refresh = ->
-    #   $scope.$apply()
 
     $scope.computeDone = {}
     $scope.compute = ->
