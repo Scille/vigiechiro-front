@@ -116,7 +116,6 @@ angular.module('xin.fileUploader', ['xin_s3uploadFile', 'appSettings'])
               gzip: true
               transmittedSize: 0
             @processingFiles[file.fullPath || file.name] = file
-            @refreshScope()
             @_accept(file)
 
       _accept: (file) ->
@@ -177,18 +176,6 @@ angular.module('xin.fileUploader', ['xin_s3uploadFile', 'appSettings'])
         @_startTime = now
         @speed = @transmittedSize / diffTime
         @transmittedSize = 0
-
-
-      # _startUpload: (file) ->
-      #   file.start()
-      #   @itemsUploading.push(file)
-
-      # _onError: (item) ->
-      #   item = @_removeFileUploading(item)
-      #   if item? and item.length
-      #     @itemsFailedUpload.push(item[0])
-      #   @_checkReadyToCompress()
-      #   @_checkReadyToUp()
 
       # startAll: ->
       #   @status = 'progress'

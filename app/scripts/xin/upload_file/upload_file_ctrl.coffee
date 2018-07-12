@@ -91,16 +91,3 @@ angular.module('xin_uploadFile', ['appSettings', 'xin_s3uploadFile', 'xin.fileUp
     }
     $scope.$watch 'elem', (value) ->
       $scope.uploader = uploader = new Uploader($scope.elem[0].children[0], uploaderConfig)
-
-    # uploader.displayError = (error, type, limit = 0) ->
-    #   if type == 'back'
-    #     $scope.errors.back.push(error)
-    #   else if type == 'xhr'
-    #     $scope.errors.xhr.push(error)
-    #   $scope.$apply()
-
-    # uploader.onAddingWarningsComplete = ->
-    #   $scope.warnings = @warnings
-
-    # uploader.onCancelAllComplete = ->
-    #   $scope.warnings = []
