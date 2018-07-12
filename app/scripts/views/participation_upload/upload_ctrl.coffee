@@ -40,6 +40,7 @@ angular.module('uploadParticipationViews', ['ngRoute', 'xin_listResource',
                                                   session) ->
     participationResource = null
     $scope.participation = null
+    $scope.participationId = $routeParams.participationId
 
     # summary
     $scope.filesWarning = []
