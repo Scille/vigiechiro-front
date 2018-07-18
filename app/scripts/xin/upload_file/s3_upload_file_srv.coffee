@@ -191,6 +191,12 @@ angular.module('xin_s3uploadFile', ['appSettings'])
           titre: @file.name
           multipart: false
           lien_participation: @participationId
+        if payload.titre.endsWith('.ta.zip')
+          payload.mime = 'application/ta+zip'
+        else if payload.titre.endsWith('.tc.zip')
+          payload.mime = 'application/tc+zip'
+        else if payload.titre.endsWith('.wav.zip')
+          payload.mime = 'application/wav+zip'
         if payload.mime == ''
           if payload.titre.endsWith('.ta')
             payload.mime = 'application/ta'
