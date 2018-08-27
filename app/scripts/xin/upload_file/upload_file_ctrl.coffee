@@ -52,7 +52,7 @@ angular.module('xin_uploadFile', ['appSettings', 'xin_s3uploadFile', 'xin.fileUp
           $scope.$apply()
           return
       # test regex
-      if file.type not in ['image/png', 'image/png', 'image/jpeg']
+      if file.type not in ['image/png', 'image/png', 'image/jpeg', 'application/zip']
         if not $scope.regex.test(file.name)
           $scope.uploader.warnings.push("Nom de fichier invalide : #{file.name}")
           done("Erreur : mauvais nom de fichier #{file.name}")
