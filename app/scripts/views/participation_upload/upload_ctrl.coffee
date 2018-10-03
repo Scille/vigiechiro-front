@@ -9,9 +9,9 @@ makeRegExp = ($scope, type_site) ->
     'POINT_FIXE': /^Car.+-\d{4}-Pass\d{1,2}-([A-H][12]|Z[1-9][0-9]*)-.*_\d{8}_\d{6}_\d{3}\.(wav|ta|tac)(.zip)?$/
     'ROUTIER': /^Cir.+-\d{4}-Pass\d{1,2}-Tron\d{1,2}-Chiro_([01]_)?\d+_\d{3}\.(wav|ta|tac)(.zip)?$/
   exemples =
-    'CARRE': 'Cir270-2009-Pass1-Tron1-Chiro_0_00265_000.wav'
-    'POINT_FIXE': 'Car170517-2014-Pass1-C1-OB-1_20140702_224038_761.wav'
-    'ROUTIER': 'Cir270-2009-Pass1-Tron1-Chiro_0_00265_000.wav'
+    'CARRE': 'Cir270-2009-Pass1-Tron1-Chiro_0_00265_000.wav, batch-01.wav.zip'
+    'POINT_FIXE': 'Car170517-2014-Pass1-C1-OB-1_20140702_224038_761.wav, batch-01.wav.zip'
+    'ROUTIER': 'Cir270-2009-Pass1-Tron1-Chiro_0_00265_000.wav, batch-01.wav.zip'
   $scope.regexp = patt[type_site]
   $scope.fileFormatExemple = exemples[type_site]
 
