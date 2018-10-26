@@ -215,14 +215,8 @@ angular.module('xin_s3uploadFile', ['appSettings'])
           (response) =>
             # etag = response._etag
             @file.id = response._id
-            contentType = @file.type
-            if contentType == ''
-              if @file.name.endsWith('.ta')
-                contentType = 'application/ta'
-              else if @file.name.endsWith('.tac')
-                contentType = 'application/tac'
             headers =
-              'Content-Type': contentType
+              'Content-Type': payload.mime
             if @file.gzip
               headers["Content-Encoding"] = "gzip"
             uploadToS3(callbacks, 'PUT', @file, response.s3_signed_url, headers)
