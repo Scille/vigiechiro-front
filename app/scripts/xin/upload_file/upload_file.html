@@ -1,133 +1,114 @@
 <!-- drop zone -->
-<div class="drop row"
-     uploader="uploader">
-  <input type="file"
-         class="hidden"
-         uploader="uploader"
-         id="file-input"
-         multiple>
-  <center>
-    <label for="file-input">
-      Cliquez ou déposez vos fichiers ici
-      <div class="label label-warning">
-        Si rien ne passe lorsque vous sélectionnez les fichiers puis confirmez, utilisez le glisser/déposer.
-      </div>
-    </label>
-  </center>
-</div>
+<form class="simple-form">
+<input type="file" name="data" multiple class="btn btn-default">
+</input>
+</form>
 
-<!-- abstract -->
-<div class="well">
-  <div class="row">
-    <div class="col-md-7">Nb de fichiers restants: {{uploader.queuedFiles.length}}</div>
-    <div class="col-md-5">
-      {{uploader.speed/1024 | number: 1}} ko/s
-    </div>
-  </div>
-</div>
-
-<div ng-repeat="file in uploader.processingFiles"
+<div ng-repeat="upload in uploads"
      class="form-group">
-  <div class="row">
-    <div class="col-md-9">{{file.name}}</div>
-    <div class="col-md-3">
-      {{file.transmittedSize/1024/1024|number:2 }}/{{ file.data.size/1024/1024|number:2 }} Mo
-    </div>
-  </div>
-  <div class="row">
-    <div class="col-md-12 progress">
-      <div class="progress-bar progress-bar-striped active"
-           role="progressbar"
-           aria-valuenow="{{file.transmittedSize/file.data.size*100}}"
-           aria-valuemin="0"
-           aria-valuemax="100"
-           style="width: {{file.transmittedSize/file.data.size*100}}%;"
-           ng-show="file.transmittedSize/file.data.size*100 < 100">
-        {{ file.transmittedSize/file.data.size*100|number:1 }}%
-      </div>
-      <div class="progress-bar progress-bar-success"
-           role="progressbar"
-           aria-valuenow="100"
-           aria-valuemin="0"
-           aria-valuemax="100"
-           style="width: 100%;"
-           ng-show="file.transmittedSize/file.data.size*100 == 100">
+
+  <div ng-if="!upload.isFinished()">
+
+    <div class="row">
+      <div class="col-md-9">{{upload.name}}</div>
+      <div class="col-md-3">
+        {{upload.transmittedSize/1024/1024|number:2 }}/{{ upload.totalSize/1024/1024|number:2 }} Mo
       </div>
     </div>
-    <!-- <div class="col-md-3">
-      <button class="btn btn-warning btn-xs"
-              type="button"
-              ng-click="item.retry()">
-        Relancer
-      </button>
-      <button class="btn btn-danger btn-xs"
-              type="button"
-              ng-click="item.cancel()">
-        Annuler
-      </button>
-    </div> -->
+    <div class="row">
+      <div class="col-md-12 progress">
+        <div class="progress-bar progress-bar"
+             role="progressbar"
+             aria-valuenow="{{upload.transmittedSize}}"
+             aria-valuemin="0"
+             aria-valuemax="{{upload.totalSize}}"
+             style="width: {{upload.getTransmittedPercent()}}%;"
+             ng-if="upload.status == 's3_upload' || upload.status == 'finalize'"
+        >
+          {{ upload.getTransmittedPercent()|number:1 }}%
+        </div>
+
+        <div class="progress-bar progress-bar-striped active"
+             role="progressbar"
+             aria-valuenow="100"
+             aria-valuemin="0"
+             aria-valuemax="100"
+             style="width: 100%;"
+             ng-if="upload.status == 'bootstrap'"
+        >
+          {{ upload.getTransmittedPercent()|number:1 }}%
+        </div>
+
+        <div class="progress-bar progress-bar"
+             role="progressbar"
+             aria-valuenow="0"
+             aria-valuemin="0"
+             aria-valuemax="100"
+             style="width: 0%;"
+             ng-if="upload.status == 'stalled'"
+        >
+          {{ upload.getTransmittedPercent()|number:1 }}%
+        </div>
+
+      </div>
+    </div>
+
   </div>
 </div>
 
-<!-- <button class="btn btn-primary btn-xs"
-        type="button"
-        ng-click="uploader.startAll()"
-        ng-show="uploader.status == 'pause'">
-  Continuer
-</button>
-<button class="btn btn-warning btn-xs"
-        type="button"
-        ng-click="uploader.pauseAll()"
-        ng-show="uploader.status != 'pause' && (uploader.itemsWaiting.length || uploader.itemsReadyToCompress.length || uploader.itemsCompressing || uploader.itemsReadyToUp.length || uploader.itemsUploading.length)">
-  Pause
-</button>
-<button class="btn btn-danger btn-xs"
-        type="button"
-        ng-click="uploader.cancelAll()"
-        ng-show="uploader.itemsTotal">
-  Tout annuler
-</button> -->
-<button class="btn btn-primary btn-xs"
-        type="button"
-        ng-click="uploader.clearErrors()"
-        ng-show="uploader.warnings.length || uploader.errors.length">
-  Effacer les erreurs
-</button>
+<div ng-repeat="upload in uploads"
+     class="form-group">
 
-<div class="alert alert-warning"
-      ng-show="uploader.warnings.length">
-  <div>
-    <strong>{{uploader.warnings.length}}</strong>
+  <div ng-if="upload.status == 'error'">
+
+    <div class="alert alert-danger">
+
+      <div class="row">
+        <div class="col-md-9">{{upload.name}}</div>
+      </div>
+
+      <div class="row">
+        <div class="col-md-9">{{upload.error}}</div>
+      </div>
+
+    </div>
+
   </div>
-  <div ng-repeat="message in uploader.warnings">
-    {{message}}
+
+  <div ng-if="upload.status == 'already_uploaded'">
+
+    <div class="alert alert-info">
+
+      <div class="row">
+        <div class="col-md-9">{{upload.name}}</div>
+      </div>
+
+      <div class="row">
+        Fichier déjà uploadé
+      </div>
+
+    </div>
+
   </div>
+
 </div>
 
-<div class="alert alert-danger"
-      ng-show="uploader.errors.length">
-  <div>
-    <strong>{{uploader.errors.length}}</strong>
-  </div>
-  <div ng-repeat="message in uploader.errors">
-    {{message}}
-  </div>
-</div>
+<div ng-repeat="upload in uploads"
+     class="form-group">
 
-<div class="alert alert-success"
-      ng-show="uploader.successes.length">
-  <div>
-    <strong>{{uploader.successes.length}}</strong>
-  </div>
-  <div ng-repeat="message in uploader.successes">
-    {{message}}
-  </div>
-</div>
+  <div ng-if="upload.status == 'success'">
 
-<!-- Items canceled -->
-<div class="alert alert-danger"
-      ng-show="uploader.itemsCanceled.length">
-  <div ng-repeat="item in uploader.itemsCanceled">
-    Fichier {{ item.name }} annulé
+    <div class="alert alert-success">
+
+      <div class="row">
+        <div class="col-md-9">{{upload.name}}</div>
+      </div>
+
+      <div class="row">
+        Upload terminé
+      </div>
+
+    </div>
+
   </div>
 </div>

@@ -1,5 +1,47 @@
 'use strict'
 
+class Upload
+  constructor: (file) ->
+    this.name = file.name
+    this.file = file
+    this.status = 'stalled'
+    this.transmittedSize = 0
+    this.totalSize = file.size
+    this.id = null
+
+  isFinished: =>
+    return (
+      this.status == 'error' or
+      this.status == 'success' or
+      this.status == 'already_uploaded'
+    )
+
+  getTransmittedPercent: =>
+    this.transmittedSize * 100 / this.totalSize
+
+  progress: (transmitted, total) =>
+    this.transmittedSize = transmitted
+    this.totalSize = total
+
+  setBootstrap: =>
+    this.status = 'bootstrap'
+
+  setFinalize: () =>
+    this.status = 'finalize'
+
+  setS3Upload: () =>
+    this.status = 's3_upload'
+
+  setAlreadyUploaded: () =>
+    this.status = 'already_uploaded'
+
+  setError: (error) =>
+    this.status = 'error'
+    this.error = error
+
+  setSuccess: () =>
+    this.status = 'success'
+
 
 angular.module('xin_uploadFile', ['appSettings', 'xin_s3uploadFile', 'xin.fileUploader'])
   .directive 'uploadFileDirective', ->
@@ -13,87 +55,107 @@ angular.module('xin_uploadFile', ['appSettings', 'xin_s3uploadFile', 'xin.fileUp
       errorFiles: '=?'
       refresh: '=?'
     link: (scope, elem, attrs) ->
-      scope.elem = elem
-      # if attrs.directory?
-      #   scope.directory = true
-      #   input[0].setAttribute('directory', '')
-      #   input[0].setAttribute('webkitdirectory', '')
-      #   input[0].setAttribute('mozdirectory', '')
+      form_elem = elem.children()[0]
+      input_elem = form_elem.children[0]
+      input_elem.addEventListener 'change', ->
+        for file in input_elem.files
+          scope.newUpload(file)
 
+        form_elem.reset()
 
-  .controller 'UploadFileController', ($scope, Backend, S3FileUploader, Uploader, guid) ->
+  .controller 'UploadFileController', ($scope, Backend) ->
+    $scope.changeBeacon = 0
+    refreshView = ->
+      $scope.changeBeacon += 1
+      if!$scope.$$phase
+        try
+          $scope.$apply()
+        catch e
+          # Fuck you angular
+          console.log('fuck', e)
 
-    createGZipFile = (file) ->
-      return new Promise((resolve, reject) ->
-        arrayBuffer = null
-        fileReader = new FileReader()
-        fileReader.onload = (e) =>
-          arrayBuffer = e.target.result
-          gzipFile = pako.gzip(arrayBuffer)
-          blob = new Blob([gzipFile], {type: file.type})
-          blob.name = file.name
-          if blob.size == 0
-            resolve({file: file, gzip: false})
+    registerUpload = (file) ->
+      upload = new Upload(file)
+      # TODO: add semaphore here for concurrent upload
+      startUpload(upload)
+
+    startUpload = (upload) ->
+      upload.setBootstrap()
+      refreshView()
+
+      payload =
+        titre: upload.file.name
+        multipart: false
+        lien_participation: $scope.lienParticipation
+
+      Backend.all('fichiers').post(payload).then(
+        (response) ->
+          upload.id = response._id
+          s3Upload(upload, response.s3_signed_url, response.mime)
+
+        (error) ->
+          if error.status == 409
+            upload.setAlreadyUploaded()
           else
-            resolve({file: blob, gzip: true})
-        fileReader.readAsArrayBuffer(file)
+            console.log('Upload bootstrap error', error)
+            upload.setError("Erreur à l'initialisation de l'upload.")
+          refreshView()
       )
+      return upload
 
-    refreshScope = ->
-      $scope.$apply();
+    s3Upload = (upload, s3_signed_url, mime) ->
+      upload.setS3Upload()
+      refreshView()
 
-    onAccept = (file, done) ->
-      # test fullPath for subdirectory
-      if file.fullPath?
-        split = file.fullPath.split("/")
-        if split.length > 2
-          $scope.uploader.warnings.push("Sous-dossier : #{file.fullPath}")
-          done("Erreur : sous-dossier")
-          $scope.$apply()
-          return
-      # test regex
-      if (
-          file.name.endsWith('.ta') or
-          file.name.endsWith('.tc') or
-          file.name.endsWith('.tac') or
-          file.name.endsWith('.tcc') or
-          file.name.endsWith('.wav')
-        )
-        if not $scope.regex.test(file.name)
-          $scope.uploader.warnings.push("Nom de fichier invalide : #{file.name}")
-          done("Erreur : mauvais nom de fichier #{file.name}")
-          $scope.$apply()
-          return
-      # test empty file
-      if file.size == 0
-        $scope.uploader.warnings.push("#{file.name} : Fichier vide")
-        done("Erreur : fichier vide")
-        $scope.$apply()
+      xhr = new XMLHttpRequest()
+      if xhr.withCredentials?
+        xhr.withCredentials = true
+        xhr.open('PUT', s3_signed_url, true)
+      else
+        upload.setError('CORS non supporté sur ce navigateur')
+        refreshView()
         return
 
-      createGZipFile(file.data).then(
-        (result) ->
-          file.data = result.file
-          file.gzip = result.gzip
-          $scope.$apply()
-          done()
+      xhr.onload = ->
+        if xhr.status == 200
+          finalizeUpload(upload)
+        else
+          console.log('Upload S3 error', xhr)
+          upload.setError("Erreur lors de l'upload vers S3: #{xhr.status}")
+          refreshView()
+
+      xhr.onerror = ->
+        console.log('Upload S3 unknown error', xhr)
+        upload.setError("Erreur lors de l'upload vers S3.")
+        refreshView()
+
+      xhr.upload.onprogress = (e) ->
+        console.log('progress', e)
+
+        if e.lengthComputable
+          upload.progress(e.loaded, e.total)
+        refreshView()
+
+      xhr.setRequestHeader('Content-Type', mime)
+
+      xhr.send(upload.file)
+
+    finalizeUpload = (upload) ->
+      upload.setFinalize()
+      refreshView()
+      Backend.one('fichiers', upload.id).post().then(
+        (response) ->
+          upload.setSuccess()
+          refreshView()
+
         (error) ->
-          $scope.uploader.errors.push(error)
-          console.error(error)
-          $scope.$apply()
-          done(error)
+          console.log('Upload finalize error', error)
+          upload.setError("Erreur à la finilisation de l'upload.")
+          refreshView()
       )
 
-    onComplete = (file) ->
-      console.log('onComplete')
-
-    uploaderConfig = {
-      participationId: $scope.lienParticipation
-      parallelUploads: 5,
-      refreshScope: refreshScope,
-      accept: onAccept,
-      # sending: onSending,
-      complete: onComplete
-    }
-    $scope.$watch 'elem', (value) ->
-      $scope.uploader = uploader = new Uploader($scope.elem[0].children[0], uploaderConfig)
+    $scope.uploads = []
+    $scope.newUpload = (file) =>
+      console.log('New upload', file.name)
+      upload = registerUpload(file)
+      $scope.uploads.push(upload)
