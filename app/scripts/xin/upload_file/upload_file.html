@@ -9,16 +9,20 @@
     </h4>
   </div>
 
-  <div class="row">
-    <div class="col-md-4">
-      <input type="file" name="data" multiple class="btn btn-default file-selector">
-      </input>
+  <form class="selectors-form">
+    <div class="row">
+      <div class="col-md-4">
+        <input type="file" name="data" multiple
+               class="btn btn-default file-selector">
+        </input>
+      </div>
+      <div class="col-md-4 col-md-offset-4">
+        <input type="file" webkitdirectory mozdirectory
+               class="btn btn-default folder-selector">
+        </input>
+      </div>
     </div>
-    <div class="col-md-4 col-md-offset-4">
-      <input type="file" webkitdirectory mozdirectory class="btn btn-default folder-selector">
-      </input>
-    </div>
-  </div>
+  </form>
 
 </div>
 

@@ -55,13 +55,15 @@ angular.module('xin_uploadFile', ['appSettings', 'xin_s3uploadFile', 'xin.fileUp
       errorFiles: '=?'
       refresh: '=?'
     link: (scope, elem, attrs) ->
+      form_elem = elem.find('.selectors-form')[0]
+
       # File form
       file_selector_elem = elem.find('.file-selector')[0]
       file_selector_elem.addEventListener 'change', ->
         for file in file_selector_elem.files
           scope.newUpload(file)
 
-        file_selector_elem.reset()
+        form_elem.reset()
 
       # Folder form
       folder_selector_elem = elem.find('.folder-selector')[0]
@@ -69,18 +71,9 @@ angular.module('xin_uploadFile', ['appSettings', 'xin_s3uploadFile', 'xin.fileUp
         for file in folder_selector_elem.files
           scope.newUpload(file)
 
-        folder_selector_elem.reset()
+        form_elem.reset()
 
-  .controller 'UploadFileController', ($scope, Backend) ->
-    $scope.changeBeacon = 0
-    refreshView = ->
-      $scope.changeBeacon += 1
-      if!$scope.$$phase
-        try
-          $scope.$apply()
-        catch e
-          # Fuck you angular
-          console.log('fuck', e)
+  .controller 'UploadFileController', ($scope, $http, Backend) ->
 
     registerUpload = (file) ->
       upload = new Upload(file)
@@ -89,7 +82,6 @@ angular.module('xin_uploadFile', ['appSettings', 'xin_s3uploadFile', 'xin.fileUp
 
     startUpload = (upload) ->
       upload.setBootstrap()
-      refreshView()
 
       payload =
         titre: upload.file.name
@@ -107,59 +99,39 @@ angular.module('xin_uploadFile', ['appSettings', 'xin_s3uploadFile', 'xin.fileUp
           else
             console.log('Upload bootstrap error', error)
             upload.setError("Erreur à l'initialisation de l'upload.")
-          refreshView()
       )
       return upload
 
     s3Upload = (upload, s3_signed_url, mime) ->
       upload.setS3Upload()
-      refreshView()
+      req =
+        method: 'PUT',
+        url: s3_signed_url,
+        withCredentials: true
+        uploadEventHandlers:
+          progress: (e) ->
+            if e.lengthComputable
+              upload.progress(e.loaded, e.total)
+        headers:
+          'Content-Type': mime
+        data: upload.file
 
-      xhr = new XMLHttpRequest()
-      if xhr.withCredentials?
-        xhr.withCredentials = true
-        xhr.open('PUT', s3_signed_url, true)
-      else
-        upload.setError('CORS non supporté sur ce navigateur')
-        refreshView()
-        return
-
-      xhr.onload = ->
-        if xhr.status == 200
-          finalizeUpload(upload)
-        else
-          console.log('Upload S3 error', xhr)
-          upload.setError("Erreur lors de l'upload vers S3: #{xhr.status}")
-          refreshView()
-
-      xhr.onerror = ->
-        console.log('Upload S3 unknown error', xhr)
+      $http(req)
+      .success (data) ->
+        finalizeUpload(upload)
+      .error (data, status) ->
+        console.log('Upload S3 unknown error', data, status)
         upload.setError("Erreur lors de l'upload vers S3.")
-        refreshView()
-
-      xhr.upload.onprogress = (e) ->
-        console.log('progress', e)
-
-        if e.lengthComputable
-          upload.progress(e.loaded, e.total)
-        refreshView()
-
-      xhr.setRequestHeader('Content-Type', mime)
-
-      xhr.send(upload.file)
 
     finalizeUpload = (upload) ->
       upload.setFinalize()
-      refreshView()
       Backend.one('fichiers', upload.id).post().then(
         (response) ->
           upload.setSuccess()
-          refreshView()
 
         (error) ->
           console.log('Upload finalize error', error)
           upload.setError("Erreur à la finilisation de l'upload.")
-          refreshView()
       )
 
     $scope.uploads = []
