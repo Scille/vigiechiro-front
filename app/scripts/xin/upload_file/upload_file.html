@@ -1,11 +1,31 @@
 <!-- drop zone -->
-<form class="simple-form">
-<input type="file" name="data" multiple class="btn btn-default">
-</input>
-</form>
+<div class="container-fluid">
+  <div class="row">
+    <h4 class="col-md-4">
+      Ajouter des fichiers
+    </h4>
+    <h4 class="col-md-4 col-md-offset-4">
+      Ajouter un répertoire
+    </h4>
+  </div>
 
-<div ng-repeat="upload in uploads"
-     class="form-group">
+  <div class="row">
+    <div class="col-md-4">
+      <input type="file" name="data" multiple class="btn btn-default file-selector">
+      </input>
+    </div>
+    <div class="col-md-4 col-md-offset-4">
+      <input type="file" webkitdirectory mozdirectory class="btn btn-default folder-selector">
+      </input>
+    </div>
+  </div>
+
+</div>
+
+<p></p>
+
+<div class="container-fluid">
+<div ng-repeat="upload in uploads">
 
   <div ng-if="!upload.isFinished()">
 
@@ -56,21 +76,22 @@
   </div>
 </div>
 
-<div ng-repeat="upload in uploads"
-     class="form-group">
+<div ng-repeat="upload in uploads | orderBy:'-'">
 
   <div ng-if="upload.status == 'error'">
 
     <div class="alert alert-danger">
+      <div class="container">
 
-      <div class="row">
-        <div class="col-md-9">{{upload.name}}</div>
+        <div class="row col-md-9">
+          {{upload.name}}
+        </div>
+
+        <div class="row col-md-3">
+          {{upload.error}}
+        </div>
+
       </div>
-
-      <div class="row">
-        <div class="col-md-9">{{upload.error}}</div>
-      </div>
-
     </div>
 
   </div>
@@ -78,37 +99,37 @@
   <div ng-if="upload.status == 'already_uploaded'">
 
     <div class="alert alert-info">
+      <div class="container">
 
-      <div class="row">
-        <div class="col-md-9">{{upload.name}}</div>
+        <div class="row col-md-9">
+          {{upload.name}}
+        </div>
+
+        <div class="row col-md-3">
+          Fichier déjà uploadé
+        </div>
+
       </div>
-
-      <div class="row">
-        Fichier déjà uploadé
-      </div>
-
     </div>
 
   </div>
-
-</div>
-
-<div ng-repeat="upload in uploads"
-     class="form-group">
 
   <div ng-if="upload.status == 'success'">
 
     <div class="alert alert-success">
+      <div class="container">
 
-      <div class="row">
-        <div class="col-md-9">{{upload.name}}</div>
+        <div class="row col-md-9">
+          {{upload.name}}
+        </div>
+
+        <div class="row col-md-3">
+          Upload terminé
+        </div>
+
       </div>
-
-      <div class="row">
-        Upload terminé
-      </div>
-
     </div>
 
   </div>
+</div>
 </div>

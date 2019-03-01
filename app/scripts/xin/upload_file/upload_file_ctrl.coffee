@@ -55,13 +55,21 @@ angular.module('xin_uploadFile', ['appSettings', 'xin_s3uploadFile', 'xin.fileUp
       errorFiles: '=?'
       refresh: '=?'
     link: (scope, elem, attrs) ->
-      form_elem = elem.children()[0]
-      input_elem = form_elem.children[0]
-      input_elem.addEventListener 'change', ->
-        for file in input_elem.files
+      # File form
+      file_selector_elem = elem.find('.file-selector')[0]
+      file_selector_elem.addEventListener 'change', ->
+        for file in file_selector_elem.files
           scope.newUpload(file)
 
-        form_elem.reset()
+        file_selector_elem.reset()
+
+      # Folder form
+      folder_selector_elem = elem.find('.folder-selector')[0]
+      folder_selector_elem.addEventListener 'change', ->
+        for file in folder_selector_elem.files
+          scope.newUpload(file)
+
+        folder_selector_elem.reset()
 
   .controller 'UploadFileController', ($scope, Backend) ->
     $scope.changeBeacon = 0
