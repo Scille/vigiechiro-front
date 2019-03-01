@@ -2,12 +2,12 @@
   "name": "vigiechiro-app",
   "version": "0.2.0",
   "dependencies": {
-    "angular": "1.5.2",
+    "angular": "1.5.11",
     "bootstrap": "3.3.2",
-    "angular-sanitize": "1.5.2",
-    "angular-animate": "1.5.2",
-    "angular-touch": "1.5.2",
-    "angular-route": "1.5.2",
+    "angular-sanitize": "1.5.11",
+    "angular-animate": "1.5.11",
+    "angular-touch": "1.5.11",
+    "angular-route": "1.5.11",
     "restangular": "1.5.2",
     "ng-flow": "2.6.1",
     "angular-utils-pagination": "0.7.0",
@@ -22,10 +22,10 @@
     "angulartics-google-analytics": "0.1.4"
   },
   "devDependencies": {
-    "angular-mocks": "1.5.2"
+    "angular-mocks": "1.5.11"
   },
   "appPath": "app",
   "resolutions": {
-    "angular": "1.5.2"
+    "angular": "1.5.11"
   }
 }
