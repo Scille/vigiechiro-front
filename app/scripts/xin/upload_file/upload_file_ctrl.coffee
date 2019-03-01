@@ -50,10 +50,6 @@ angular.module('xin_uploadFile', ['appSettings', 'xin_s3uploadFile', 'xin.fileUp
     controller: 'UploadFileController'
     scope:
       lienParticipation: '@'
-      regex: '=?'
-      warningFiles: '=?'
-      errorFiles: '=?'
-      refresh: '=?'
     link: (scope, elem, attrs) ->
       form_elem = elem.find('.selectors-form')[0]
 
