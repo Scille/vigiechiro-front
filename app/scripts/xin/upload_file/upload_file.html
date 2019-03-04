@@ -28,6 +28,13 @@
 
 <p></p>
 
+<div ng-if="upload_stats.total > 0" class="alert"
+     ng-class="{'alert-danger': upload_stats.errors > 0, 'alert-info': upload_stats.errors == 0}">
+     {{upload_stats.success}} fichiers transmis
+     ({{upload_stats.ignored}} ignorés,
+     {{upload_stats.errors}} erreurs)
+</div>
+
 <div class="container-fluid">
 <div ng-repeat="upload in uploads">
 
@@ -40,7 +47,7 @@
       </div>
     </div>
     <div class="row">
-      <div class="col-md-12 progress">
+      <div class="progress">
         <div class="progress-bar progress-bar"
              role="progressbar"
              aria-valuenow="{{upload.transmittedSize}}"

@@ -71,10 +71,39 @@ angular.module('xin_uploadFile', ['appSettings', 'xin_s3uploadFile', 'xin.fileUp
 
   .controller 'UploadFileController', ($scope, $http, Backend) ->
 
+    $scope.upload_stats =
+      success: 0
+      errors: 0
+      ignored: 0
+      total: 0
+
+    max_concurrent_uploads = 5
+    current_uploads_count = 0
+    waiting_uploads = []
+
     registerUpload = (file) ->
       upload = new Upload(file)
-      # TODO: add semaphore here for concurrent upload
-      startUpload(upload)
+      if current_uploads_count < max_concurrent_uploads
+        startUpload(upload)
+        current_uploads_count += 1
+      else
+        waiting_uploads.push(upload)
+      return upload
+
+    teardownUpload = (upload) ->
+      $scope.upload_stats.total += 1
+      if upload.status == 'success'
+        $scope.upload_stats.success += 1
+      else if upload.status == 'already_uploaded'
+        $scope.upload_stats.ignored += 1
+      else
+        $scope.upload_stats.errors += 1
+
+      current_uploads_count -= 1
+      upload = waiting_uploads.pop()
+      if upload
+        startUpload(upload)
+        current_uploads_count += 1
 
     startUpload = (upload) ->
       upload.setBootstrap()
@@ -92,11 +121,12 @@ angular.module('xin_uploadFile', ['appSettings', 'xin_s3uploadFile', 'xin.fileUp
         (error) ->
           if error.status == 409
             upload.setAlreadyUploaded()
+            teardownUpload(upload)
           else
             console.log('Upload bootstrap error', error)
             upload.setError("Erreur à l'initialisation de l'upload.")
+            teardownUpload(upload)
       )
-      return upload
 
     s3Upload = (upload, s3_signed_url, mime) ->
       upload.setS3Upload()
@@ -118,16 +148,19 @@ angular.module('xin_uploadFile', ['appSettings', 'xin_s3uploadFile', 'xin.fileUp
       .error (data, status) ->
         console.log('Upload S3 unknown error', data, status)
         upload.setError("Erreur lors de l'upload vers S3.")
+        teardownUpload(upload)
 
     finalizeUpload = (upload) ->
       upload.setFinalize()
       Backend.one('fichiers', upload.id).post().then(
         (response) ->
           upload.setSuccess()
+          teardownUpload(upload)
 
         (error) ->
           console.log('Upload finalize error', error)
-          upload.setError("Erreur à la finilisation de l'upload.")
+          upload.setError("Erreur à la finalisation de l'upload.")
+          teardownUpload(upload)
       )
 
     $scope.uploads = []
