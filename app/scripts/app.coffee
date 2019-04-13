@@ -77,13 +77,13 @@ angular
       session.getUserPromise().then(
         (user) ->
           $scope.user = user
-          if not user.charte_acceptee
-            $('#charteModal').modal({'keyboard': false, 'backdrop': false})
-            $scope.acceptCharte = ->
-              Backend.one('moi').patch({'charte_acceptee': true}).then(
-                -> $('#charteModal').modal('hide')
-                (error) -> $scope.charteModalSaveError = true
-              )
+          # if not user.charte_acceptee
+          #   $('#charteModal').modal({'keyboard': false, 'backdrop': false})
+          #   $scope.acceptCharte = ->
+          #     Backend.one('moi').patch({'charte_acceptee': true}).then(
+          #       -> $('#charteModal').modal('hide')
+          #       (error) -> $scope.charteModalSaveError = true
+          #     )
 
           # Disable the spinner waiting for angular
           angular.element('.waiting-for-angular').hide()
