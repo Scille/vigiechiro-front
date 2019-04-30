@@ -80,10 +80,23 @@ angular.module('xin_uploadFile', ['appSettings', 'xin_s3uploadFile', 'xin.fileUp
     max_concurrent_uploads = 5
     current_uploads_count = 0
     waiting_uploads = []
+    already_uploaded_file_names = []
+
+    Backend.all('participations').one($scope.lienParticipation, 'pieces_jointes').get().then(
+      (response) ->
+        for file in response._items
+          already_uploaded_file_names.push(file.titre)
+
+      (error) ->
+        console.log('Error fectching participation info', error)
+    )
 
     registerUpload = (file) ->
       upload = new Upload(file)
-      if current_uploads_count < max_concurrent_uploads
+      if upload.file.name in already_uploaded_file_names
+        upload.setAlreadyUploaded()
+        teardownUpload(upload)
+      else if current_uploads_count < max_concurrent_uploads
         startUpload(upload)
         current_uploads_count += 1
       else
@@ -93,6 +106,7 @@ angular.module('xin_uploadFile', ['appSettings', 'xin_s3uploadFile', 'xin.fileUp
     teardownUpload = (upload) ->
       $scope.upload_stats.total += 1
       if upload.status == 'success'
+        already_uploaded_file_names.push(upload.file.name)
         $scope.upload_stats.success += 1
       else if upload.status == 'already_uploaded'
         $scope.upload_stats.ignored += 1
