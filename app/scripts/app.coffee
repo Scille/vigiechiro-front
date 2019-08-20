@@ -77,7 +77,7 @@ angular
       session.getUserPromise().then(
         (user) ->
           $scope.user = user
-          if user.charte_acceptee === undefined
+          if user.charte_acceptee == undefined or user.charte_acceptee == null
             $('#charteModal').modal({'keyboard': false, 'backdrop': false})
             $scope.updateCharte = (charte_acceptee) ->
               Backend.one('moi').patch({'charte_acceptee': charte_acceptee}).then(
