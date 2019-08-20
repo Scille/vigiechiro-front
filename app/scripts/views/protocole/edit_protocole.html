@@ -33,6 +33,13 @@
           <option value="ROUTIER">Routier</option>
           <option value="POINT_FIXE">Point fixe</option>
         </select>
+        <div class="checkbox">
+          <label>
+            <input type="checkbox" ng-model="protocole.autojoin" ng-value="true"
+                   ng-checked="protocole.autojoin">
+            Inscription&validation automatique de l'utilisateur à l'acceptation de la charte
+          </label>
+        </div>
       </div>
       <span ng-show="submitted && !protocole.type_site"
             class="help-block">

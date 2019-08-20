@@ -12,6 +12,7 @@ make_payload = ($scope) ->
   payload = make_payload_macro($scope)
   payload.type_site = $scope.protocole.type_site
   payload.taxon = $scope.protocole.taxon._id
+  payload.autojoin = $scope.protocole.autojoin
   return payload
 
 
