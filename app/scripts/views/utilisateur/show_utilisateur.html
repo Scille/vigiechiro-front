@@ -104,14 +104,6 @@
       </label>
     </div>
 
-    <div class="checkbox">
-      <label>
-        <input type="checkbox" ng-model="utilisateur.charte_acceptee" ng-value="true"
-               ng-checked="utilisateur.charte_acceptee" ng-disabled="readOnly">
-        Charte d'utilisation acceptée
-      </label>
-    </div>
-
     <div class="form-group">
         <input class="save-user btn btn-primary" type="submit" value="Sauvegarder" ng-hide="userForm.$pristine">
     </div>
@@ -119,4 +111,18 @@
       Echec de l'enregistrement de l'utilisateur.
     </div>
   </form>
+
+  <div class="page-header">
+    <h3>Charte d'utilisation</h3>
+  </div>
+
+  <div class="alert alert-danger" ng-if="utilisateur.charte_acceptee !== true">
+    Vous n'avez pas encore accepté la charte d'utilisation
+  </div>
+  <div class="alert alert-success" ng-if="utilisateur.charte_acceptee === true">
+    Vous avez accepté la charte d'utilisation
+  </div>
+
+  <button type="button" class="btn btn-primary" ng-click="displayCharte()">Voir la charte</button>
+
 </div>

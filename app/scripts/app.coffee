@@ -74,18 +74,18 @@ angular
       $scope.user = {}
       session.getIsAdminPromise().then (isAdmin) ->
         $scope.isAdmin = isAdmin
+      $scope.updateCharte = (charte_acceptee) ->
+        Backend.one('moi').patch({'charte_acceptee': charte_acceptee}).then(
+          -> $window.location.reload()
+          (error) ->
+            $scope.charteModalSaveError = true
+            $scope.charteModalSaveErrorReason = error
+        )
       session.getUserPromise().then(
         (user) ->
           $scope.user = user
           if user.charte_acceptee == undefined or user.charte_acceptee == null
-            $('#charteModal').modal({'keyboard': false, 'backdrop': false})
-            $scope.updateCharte = (charte_acceptee) ->
-              Backend.one('moi').patch({'charte_acceptee': charte_acceptee}).then(
-                -> $('#charteModal').modal('hide')
-                (error) ->
-                  $scope.charteModalSaveError = true
-                  $scope.charteModalSaveErrorReason = error
-              )
+            $('#charteModal').modal()
 
           # Disable the spinner waiting for angular
           angular.element('.waiting-for-angular').hide()

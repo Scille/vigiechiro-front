@@ -49,6 +49,7 @@ angular.module('utilisateurViews', ['ngRoute', 'xin_listResource', 'xin_tools',
     $scope.utilisateur = {}
     $scope.readOnly = false
     $scope.isAdmin = false
+    $scope.displayCharte = -> $('#charteModal').modal()
     userResource = undefined
     origin_role = undefined
     userBackend = undefined

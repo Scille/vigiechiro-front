@@ -20,7 +20,7 @@
     <div class="modal fade" id="charteModal" tabindex="-1" role="dialog" aria-labelledby="charteModalLabel">
       <div class="modal-dialog" role="document">
         <div class="modal-content">
-          <div class="modal-header">
+          <div class="modal-header" ng-if="user.charte_acceptee !== true">
             <h4 class="modal-title" id="charteModalLabel">Veuillez accepter la charte Vigiechiro avant de continuer</h4>
           </div>
           <div class="modal-body">
@@ -28,7 +28,7 @@
              Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nunc dapibus vel justo a ultrices. Ut tortor libero, pretium a hendrerit eget, fringilla sed magna. Cras urna nisi, laoreet ut ipsum quis, ullamcorper bibendum eros. Nullam nec risus lacus. Curabitur lacinia eget odio ut faucibus. Cras tristique justo eu elementum suscipit. Nam vehicula tempus nulla in sodales. Vivamus hendrerit semper velit, id pharetra elit lacinia et. Vestibulum feugiat gravida risus, a volutpat diam auctor et. Aenean hendrerit pulvinar lectus. Vestibulum ornare, orci at ullamcorper venenatis, velit erat aliquet turpis, at vehicula sapien nulla nec ante. Nulla nec egestas purus. 
 
           </div>
-          <div class="modal-footer">
+          <div class="modal-footer" ng-if="user.charte_acceptee !== true">
             <div class="alert alert-danger" ng-show="charteModalSaveError" style="text-align: left">
               Echec de l'enregistrement de l'utilisateur.
               {{charteModalSaveErrorReason}}
