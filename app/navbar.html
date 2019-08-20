@@ -31,8 +31,10 @@
           <div class="modal-footer">
             <div class="alert alert-danger" ng-show="charteModalSaveError" style="text-align: left">
               Echec de l'enregistrement de l'utilisateur.
+              {{charteModalSaveErrorReason}}
             </div>
-            <button type="button" class="btn btn-primary" ng-click="acceptCharte()">Accepter la charte</button>
+            <button type="button" class="btn btn-primary" ng-click="updateCharte(true)">Accepter</button>
+            <button type="button" class="btn btn-danger" ng-click="updateCharte(false)">Refuser</button>
           </div>
         </div>
       </div>
