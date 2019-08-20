@@ -116,13 +116,24 @@
     <h3>Charte d'utilisation</h3>
   </div>
 
-  <div class="alert alert-danger" ng-if="utilisateur.charte_acceptee !== true">
-    Vous n'avez pas encore accepté la charte d'utilisation
-  </div>
-  <div class="alert alert-success" ng-if="utilisateur.charte_acceptee === true">
-    Vous avez accepté la charte d'utilisation
+  <div ng-if="isSelf">
+    <div class="alert alert-danger" ng-if="utilisateur.charte_acceptee !== true">
+      Vous n'avez pas encore accepté la charte d'utilisation
+    </div>
+    <div class="alert alert-success" ng-if="utilisateur.charte_acceptee === true">
+      Vous avez accepté la charte d'utilisation
+    </div>
+
+    <button type="button" class="btn btn-primary" ng-click="displayCharte()">Voir la charte</button>
   </div>
 
-  <button type="button" class="btn btn-primary" ng-click="displayCharte()">Voir la charte</button>
+  <div ng-if="!isSelf">
+    <div class="alert alert-danger" ng-if="utilisateur.charte_acceptee !== true">
+      Cet utilisateur n'a pas encore accepté la charte d'utilisation
+    </div>
+    <div class="alert alert-success" ng-if="utilisateur.charte_acceptee === true">
+      Cet utilisateur a accepté la charte d'utilisation
+    </div>
+  </div>
 
 </div>

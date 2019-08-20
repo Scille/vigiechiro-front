@@ -48,6 +48,7 @@ angular.module('utilisateurViews', ['ngRoute', 'xin_listResource', 'xin_tools',
     $scope.submitted = false
     $scope.utilisateur = {}
     $scope.readOnly = false
+    $scope.isSelf = false
     $scope.isAdmin = false
     $scope.displayCharte = -> $('#charteModal').modal()
     userResource = undefined
@@ -66,9 +67,9 @@ angular.module('utilisateurViews', ['ngRoute', 'xin_listResource', 'xin_tools',
         $scope.utilisateur = utilisateur.plain()
         origin_role = $scope.utilisateur.role
         session.getUserPromise().then (user) ->
+          $scope.isSelf = user._id == utilisateur._id
           $scope.isAdmin = user.role == 'Administrateur'
-          $scope.readOnly = (not $scope.isAdmin and
-                             user._id != utilisateur._id)
+          $scope.readOnly = (not $scope.isAdmin and not $scope.isSelf)
       (error) -> window.location = '#/404'
     )
 
