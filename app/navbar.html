@@ -25,10 +25,10 @@
           </div>
           <div class="modal-body">
 
-<h2>
+<h3>
   Charte d’utilisation des données transférées dans le cadre
   du programme de sciences participatives Vigie-Chiro
-</h2>
+</h3>
 
 <p>
   Vigie-chiro est un programme de sciences participatives sur les Chiroptères de France métropolitaine, animé par le Muséum national d’Histoire naturelle (UMR 7204 - Centre d’Ecologie et des Sciences de la Conservation), lancé en 2006. Les données sont issues de trois protocoles complémentaires : le circuit routier, le circuit pédestre et le poste fixe. L’échantillonnage repose sur l’enregistrement des ultrasons des chauves-souris. Ce programme concerne les espèces facilement détectables par la technique acoustique. Les analyses portent généralement sur les espèces communes (notamment Pipistrelles, Noctules, Sérotines) pour des questions de nombre de contacts. 
@@ -42,16 +42,11 @@
 
 <p>
   Cette charte définit les engagements entre
-<div ng-if="user.nom && user.prenom">
-  {{ user.prenom }} {{ user.nom }}
-</div>
-<div ng-if="! (user.nom && user.prenom)">
-   {{ user.pseudo }}
-</div>
-<div ng-if="user.organisation">
-( {{ user.organisation }} )
-</div>
- :
+  <b>
+  <k ng-if="user.nom && user.prenom">{{ user.prenom }} {{ user.nom }}</k>
+  <k ng-if="! (user.nom && user.prenom)">{{ user.pseudo }}</k>
+  <k ng-if="user.organisation">( {{ user.organisation }} )</k>
+  </b>
 </p>
 
 <p>
@@ -59,10 +54,10 @@
 </p>
 
 <p>
-  l’UMR 7204 CESCO (Centre d’Ecologie et des Sciences de la Conservation), responsable du programme Vigie-Chiro.
+  l’<b>UMR 7204 CESCO</b> (Centre d’Ecologie et des Sciences de la Conservation), responsable du programme Vigie-Chiro.
 </p>
 
-<h3>Portée</h3>
+<h4>Portée</h4>
 
 <p>
   Cet engagement n’a pas de date limite de validité.
@@ -70,7 +65,7 @@
 </p>
 
 
-<h3>Diffusion et utilisation des données</h3>
+<h4>Diffusion et utilisation des données</h4>
 
 <p>
   Cet engagement implique que les données, avec toutes leurs précisions (hors données personnelles : email, coordonnées), transmises via le portail Vigie-chiro, peuvent être utilisées par :
@@ -124,7 +119,7 @@
 </ul>
 
 
-<h3>Engagements de Vigie-chiro :</h3>
+<h4>Engagements de Vigie-chiro :</h4>
 
 Vigie-chiro s’engage :
 <ul>
