@@ -134,6 +134,7 @@
     <div class="alert alert-success" ng-if="utilisateur.charte_acceptee === true">
       Cet utilisateur a accepté la charte d'utilisation
     </div>
+   <button type="button" class="btn btn-primary" ng-if="utilisateur.charte_acceptee === true" ng-click="resetCharteAccept()">Annuler l'acceptation</button>
   </div>
 
 </div>

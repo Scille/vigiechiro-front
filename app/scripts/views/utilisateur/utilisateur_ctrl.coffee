@@ -73,6 +73,12 @@ angular.module('utilisateurViews', ['ngRoute', 'xin_listResource', 'xin_tools',
       (error) -> window.location = '#/404'
     )
 
+    $scope.resetCharteAccept = ->
+      userBackend.one('reset_charte').post().then(
+           -> $route.reload()
+           (error) -> $scope.saveError = true
+         )
+
     $scope.saveUser = ->
       $scope.submitted = true
       if (not $scope.userForm.$valid or
