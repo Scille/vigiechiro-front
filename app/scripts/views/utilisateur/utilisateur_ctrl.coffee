@@ -92,7 +92,7 @@ angular.module('utilisateurViews', ['ngRoute', 'xin_listResource', 'xin_tools',
         if key.charAt(0) != '$' and value.$dirty
           payload[key] = $scope.utilisateur[key]
       # Special handling for radio buttons
-      for field in ['professionnel', 'donnees_publiques', 'charte_acceptee']
+      for field in ['professionnel', 'donnees_publiques']
         payload[field] = $scope.utilisateur[field]
       # Special handling for select
       if $scope.utilisateur.role != origin_role

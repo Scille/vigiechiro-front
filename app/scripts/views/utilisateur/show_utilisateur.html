@@ -117,11 +117,14 @@
   </div>
 
   <div ng-if="isSelf">
-    <div class="alert alert-danger" ng-if="utilisateur.charte_acceptee !== true">
+    <div class="alert alert-warning" ng-if="utilisateur.charte_acceptee === undefined">
       Vous n'avez pas encore accepté la charte d'utilisation
     </div>
     <div class="alert alert-success" ng-if="utilisateur.charte_acceptee === true">
       Vous avez accepté la charte d'utilisation
+    </div>
+    <div class="alert alert-danger" ng-if="utilisateur.charte_acceptee === false">
+      Vous avez refusé la charte d'utilisation
     </div>
 
     <button type="button" class="btn btn-primary" ng-click="displayCharte()">
@@ -130,16 +133,19 @@
   </div>
 
   <div ng-if="!isSelf">
-    <div class="alert alert-danger" ng-if="utilisateur.charte_acceptee !== true">
+    <div class="alert alert-warning" ng-if="utilisateur.charte_acceptee === undefined">
       Cet utilisateur n'a pas encore accepté la charte d'utilisation
     </div>
     <div class="alert alert-success" ng-if="utilisateur.charte_acceptee === true">
       Cet utilisateur a accepté la charte d'utilisation
     </div>
+    <div class="alert alert-danger" ng-if="utilisateur.charte_acceptee === false">
+      Cet utilisateur a refusé la charte d'utilisation
+    </div>
   </div>
 
   <div ng-if="isAdmin">
-    <button type="button" class="btn btn-primary" ng-if="utilisateur.charte_acceptee === true" ng-click="resetCharteAccept()">
+    <button type="button" class="btn btn-primary" ng-if="utilisateur.charte_acceptee !== undefined" ng-click="resetCharteAccept()">
       Annuler l'acceptation
     </button>
   </div>
