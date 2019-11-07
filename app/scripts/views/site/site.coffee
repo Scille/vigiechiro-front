@@ -4,6 +4,15 @@ breadcrumbsGetSiteDefer = undefined
 
 map = null
 
+extractSiteSaveError = (error) ->
+  msg = error.data?._errors
+  if !msg
+    return null
+  else if msg == "protocole registration not yet validated"
+    return "Votre inscription au protocole n'a pas encore été validée."
+  else
+    return msg
+
 initEnv = ($scope, $modal, session) ->
   $scope.saveDone = {}
   $scope.resetFormAllowed = false
@@ -372,7 +381,10 @@ angular.module('siteViews', ['ngRoute',
                 if $scope.site.verrouille
                   lock(site)
                 saveLocalities(site, callback_factory(site))
-              (error) -> throw error
+              (error) ->
+                $scope.mapError =
+                  message: extractSiteSaveError(error)
+                $scope.saveDone.end?()
             )
       # If tracé
       else if $scope.protocole.type_site == 'ROUTIER'
@@ -399,8 +411,9 @@ angular.module('siteViews', ['ngRoute',
         (site) ->
           saveLocalities(site, callback_factory(site))
         (error) ->
+          $scope.mapError =
+            message: extractSiteSaveError(error)
           $scope.saveDone.end?()
-          throw error
       )
 
 
@@ -472,6 +485,6 @@ angular.module('siteViews', ['ngRoute',
           saveLocalities(site, callbacks)
         (error) ->
           $scope.mapError =
-            message: error
+            message: extractSiteSaveError(error)
           $scope.saveDone.end?()
       )

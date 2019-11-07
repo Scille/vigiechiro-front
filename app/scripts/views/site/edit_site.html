@@ -123,9 +123,6 @@
     </span>
   </div>
 
-  <p class="bg-danger" ng-show="mapError">
-    {{ mapError.message }}
-  </p>
   <div class="alert alert-warning" ng-show="mapWarnings.length">
     <p ng-repeat="warning in mapWarnings">
       {{ warning.message }}
@@ -144,6 +141,13 @@
               ng-model="site.commentaire" ng-disabled="readOnly"
               placeholder="Commentaire">
     </textarea>
+  </div>
+
+  <div class="alert alert-danger" ng-show="mapError">
+    Le site n'a pu être sauvegardé.
+    <div ng-if="mapError.message">
+      {{ mapError.message }}
+    </div>
   </div>
 
   <sc-button class="btn btn-primary save-user"
