@@ -74,6 +74,9 @@ angular
       $scope.user = {}
       session.getIsAdminPromise().then (isAdmin) ->
         $scope.isAdmin = isAdmin
+      $scope.wantToRefuseCharte = false
+      $scope.setWantToRefuseCharte = (val) ->
+        $scope.wantToRefuseCharte = val
       $scope.updateCharte = (charte_acceptee) ->
         Backend.one('moi').patch({'charte_acceptee': charte_acceptee}).then(
           -> $window.location.reload()

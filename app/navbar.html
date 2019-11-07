@@ -148,12 +148,34 @@ Vigie-chiro s’engage :
 
           </div>
           <div class="modal-footer" ng-if="user.charte_acceptee !== true">
-            <div class="alert alert-danger" ng-show="charteModalSaveError" style="text-align: left">
-              Echec de l'enregistrement de l'utilisateur.
-              {{charteModalSaveErrorReason}}
+
+            <div ng-if="!wantToRefuseCharte">
+              <div class="alert alert-danger" ng-show="charteModalSaveError" style="text-align: left">
+                Echec de l'enregistrement de l'utilisateur.
+                {{charteModalSaveErrorReason}}
+              </div>
+              <button type="button" class="btn btn-primary" ng-click="updateCharte(true)">
+                Accepter
+              </button>
+              <button type="button" class="btn btn-danger" ng-click="setWantToRefuseCharte(true)">
+                Refuser
+              </button>
             </div>
-            <button type="button" class="btn btn-primary" ng-click="updateCharte(true)">Accepter</button>
-            <button type="button" class="btn btn-danger" ng-click="updateCharte(false)">Refuser</button>
+
+            <div class="alert alert-danger" role="alert" ng-if="wantToRefuseCharte">
+              En refusant la charte, votre inscription aux protocoles Vigie-chiro est conditionnée à une validation par un administrateur.
+              Dans ce cas, merci d'expliciter vos raisons de votre refus par mail auprès
+              de <a href="mailto: yves.bas@mnhn.fr">yves.bas@mnhn.fr</a>
+              ou <a href="mailto: julie.marmet@mnhn.fr">julie.marmet@mnhn.fr</a>.
+
+              <button type="button" class="btn btn-danger" ng-click="updateCharte(false)">
+                Confirmer le refus
+              </button>
+              <button type="button" class="btn btn-primary" ng-click="setWantToRefuseCharte(false)">
+                Annuler
+              </button>
+            </div>
+
           </div>
         </div>
       </div>
