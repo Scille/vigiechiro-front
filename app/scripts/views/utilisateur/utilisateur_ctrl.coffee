@@ -74,11 +74,17 @@ angular.module('utilisateurViews', ['ngRoute', 'xin_listResource', 'xin_tools',
     )
 
     $scope.resetCharteAccept = ->
-      session.getUserPromise().then (user) ->
-        Backend.one('utilisateurs', user._id).one('reset_charte').post().then(
-          -> $route.reload()
-          (error) -> $scope.saveError = true
-        )
+      if $routeParams.userId == 'moi'
+        session.getUserPromise().then (user) ->
+          Backend.one('utilisateurs', user._id).one('reset_charte').post().then(
+            -> $route.reload()
+            (error) -> $scope.saveError = true
+          )
+      else
+          Backend.one('utilisateurs', $routeParams.userId).one('reset_charte').post().then(
+            -> $route.reload()
+            (error) -> $scope.saveError = true
+          )
 
     $scope.saveUser = ->
       $scope.submitted = true
