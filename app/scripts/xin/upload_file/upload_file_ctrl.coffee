@@ -60,6 +60,7 @@ angular.module('xin_uploadFile', ['appSettings', 'xin_s3uploadFile', 'xin.fileUp
           scope.newUpload(file)
 
         form_elem.reset()
+        scope.$apply()
 
       # Folder form
       folder_selector_elem = elem.find('.folder-selector')[0]
@@ -68,6 +69,7 @@ angular.module('xin_uploadFile', ['appSettings', 'xin_s3uploadFile', 'xin.fileUp
           scope.newUpload(file)
 
         form_elem.reset()
+        scope.$apply()
 
   .controller 'UploadFileController', ($scope, $http, Backend) ->
 
