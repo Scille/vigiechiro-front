@@ -85,7 +85,8 @@ angular.module('xin_uploadFile', ['appSettings', 'xin_s3uploadFile', 'xin.fileUp
     Backend.all('participations').one($scope.lienParticipation, 'pieces_jointes').get().then(
       (response) ->
         for file in response._items
-          already_uploaded_file_names.push(file.titre)
+          if file.disponible
+            already_uploaded_file_names.push(file.titre)
 
       (error) ->
         console.log('Error fectching participation info', error)
