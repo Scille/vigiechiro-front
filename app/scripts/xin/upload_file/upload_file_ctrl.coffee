@@ -94,13 +94,14 @@ angular.module('xin_uploadFile', ['appSettings', 'xin_s3uploadFile', 'xin.fileUp
 
     registerUpload = (file) ->
       upload = new Upload(file)
+      current_uploads_count += 1
       if upload.file.name in already_uploaded_file_names
         upload.setAlreadyUploaded()
         teardownUpload(upload)
-      else if current_uploads_count < max_concurrent_uploads
+      else if current_uploads_count < max_concurrent_uploads + 1
         startUpload(upload)
-        current_uploads_count += 1
       else
+        current_uploads_count -= 1
         waiting_uploads.push(upload)
       return upload
 
