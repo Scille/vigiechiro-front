@@ -42,10 +42,15 @@ angular
           session.getUserPromise().then (user) ->
             defer.resolve(user.pseudo)
           return defer.promise
+      .when '/policy',
+        templateUrl: 'policy.html'
+        no_login: true
       .when '/403',
         templateUrl: '403.html'
+        no_login: true
       .when '/404',
         templateUrl: '404.html'
+        no_login: true
       .otherwise
         redirectTo: '/404'
 
