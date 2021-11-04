@@ -166,6 +166,22 @@
         </div>
       </div>
 
+      <!-- Processing extra -->
+      <div>
+        <a class="btn btn-primary" data-toggle="collapse"
+           data-target="#display-processing-extra-files-collapse"
+           aria-expanded="false" aria-controls="display-processing-extra-files-collapse"
+           ng-click="displayProcessingExtraFiles()">
+          Afficher les autres fichiers de traitement
+        </a>
+        <div class="container collapse" id="display-processing-extra-files-collapse">
+          <list-resource-directive resource-backend="processingExtraBackend"
+                                   lookup="processing_extra_lookup">
+            <access-file-directive file="resource"></access-file-directive>
+          </list-resource-directive>
+        </div>
+      </div>
+
     </div>
 
     <div class="panel panel-default panel-body">

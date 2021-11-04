@@ -233,6 +233,12 @@ angular.module('participationViews', ['ngRoute', 'textAngular', 'xin_listResourc
       if not $scope.tc_lookup?
         $scope.tc_lookup =
           tc: true
+    $scope.displayProcessingExtraFiles = ->
+      if not $scope.processingExtraBackend?
+        $scope.processingExtraBackend = Backend.all('participations/'+$scope.participation._id+'/pieces_jointes')
+      if not $scope.processing_extra_lookup?
+        $scope.processing_extra_lookup =
+          processing_extra: true
 
 
 
