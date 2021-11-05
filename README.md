@@ -19,7 +19,7 @@ Pour installer Nodejs et npm : [https://nodejs.org/en/download/package-manager/]
 
 Installation de bower et grunt
 ```
-npm install -g grunt-cli@^1.4.2 bower@^1.8.12 protractor@^7.0.0
+npm install -g grunt-cli@1.3.2 bower@^1.8.12 protractor@^7.0.0
 ```
 
 Tests end-to-end
