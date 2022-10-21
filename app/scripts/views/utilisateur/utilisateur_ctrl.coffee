@@ -53,6 +53,8 @@ angular.module('utilisateurViews', ['ngRoute', 'xin_listResource', 'xin_tools',
     $scope.displayCharte = -> $('#charteModal').modal()
     userResource = undefined
     origin_role = undefined
+    origin_professionnel = undefined
+    origin_donnees_publiques = undefined
     userBackend = undefined
     if $routeParams.userId == 'moi'
       userBackend = Backend.one('moi')
@@ -66,6 +68,8 @@ angular.module('utilisateurViews', ['ngRoute', 'xin_listResource', 'xin_tools',
         userResource = utilisateur
         $scope.utilisateur = utilisateur.plain()
         origin_role = $scope.utilisateur.role
+        origin_professionnel = $scope.utilisateur.professionnel
+        origin_donnees_publiques = $scope.utilisateur.donnees_publiques
         session.getUserPromise().then (user) ->
           $scope.isSelf = user._id == utilisateur._id
           $scope.isAdmin = user.role == 'Administrateur'
@@ -97,12 +101,13 @@ angular.module('utilisateurViews', ['ngRoute', 'xin_listResource', 'xin_tools',
       for key, value of $scope.userForm
         if key.charAt(0) != '$' and value.$dirty
           payload[key] = $scope.utilisateur[key]
-      # Special handling for radio buttons
-      for field in ['professionnel', 'donnees_publiques']
-        payload[field] = $scope.utilisateur[field]
-      # Special handling for select
+      # Special handling for select & checkbox
       if $scope.utilisateur.role != origin_role
         payload.role = $scope.utilisateur.role
+      if $scope.utilisateur.professionnel != origin_professionnel
+        payload.professionnel = $scope.utilisateur.professionnel
+      if $scope.utilisateur.donnees_publiques != origin_donnees_publiques
+        payload.donnees_publiques = $scope.utilisateur.donnees_publiques
       userBackend.patch(payload).then(
         -> $route.reload()
         (error) -> $scope.saveError = true

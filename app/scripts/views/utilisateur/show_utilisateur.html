@@ -79,8 +79,7 @@
     <div class="checkbox">
      <div class="col-sm-1"></div>
       <label>
-        <input type="checkbox" ng-model="utilisateur.professionnel" ng-value="true"
-               ng-checked="utilisateur.professionnel" ng-disabled="readOnly">
+        <input type="checkbox" ng-model="utilisateur.professionnel" ng-disabled="readOnly">
         Je participe à titre professionnel
       </label>
     </div>
@@ -98,8 +97,7 @@
 
     <div class="checkbox" ng-if="isAdmin">
       <label>
-        <input type="checkbox" ng-model="utilisateur.donnees_publiques" ng-value="true"
-               ng-checked="utilisateur.donnees_publiques" ng-disabled="readOnly">
+        <input type="checkbox" ng-model="utilisateur.donnees_publiques" ng-disabled="readOnly">
         Observations publiées sous license publique
       </label>
     </div>
