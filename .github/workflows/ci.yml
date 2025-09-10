@@ -7,39 +7,42 @@ on:
     branches: [ "master" ]
 
 env:
-  node-version: 4.5.0
+  node-version: 22
 
 jobs:
 
-  tests:
-    runs-on: ubuntu-latest
+  # Dependencies are too old, Protractor is long deprecated (CI is unable to install it...),
+  # tests don't run anymore :/
 
-    steps:
-    - uses: actions/checkout@v3
+  # tests:
+  #   runs-on: ubuntu-latest
 
-    - uses: actions/setup-node@v3
-      with:
-        node-version: ${{ env.node-version }}
+  #   steps:
+  #   - uses: actions/checkout@v3
 
-    - name: Build
-      run: |
-        set -eux
-        npm install -g grunt-cli@1.3.2 bower@^1.8.12 protractor@^7.0.0
-        npm install
-        bower install
+  #   - uses: actions/setup-node@v3
+  #     with:
+  #       node-version: ${{ env.node-version }}
 
-    - name: Tests
-      run: |
-        set -eux
-        # Tests are disabled, used to be:
-        # grunt test-e2e
-        # grunt test
-      env:
-        DEV_FAKE_AUTH: true
+  #   - name: Build
+  #     run: |
+  #       set -eux
+  #       # npm install -g grunt-cli@1.3.2 bower@^1.8.12 protractor@^7.0.0
+  #       npm install -g grunt-cli@1.3.2 bower@^1.8.12
+  #       npm install
+  #       bower install
+
+  #   - name: Tests
+  #     run: |
+  #       set -eux
+  #       grunt test-e2e
+  #       grunt test
+  #     env:
+  #       DEV_FAKE_AUTH: true
 
   deploy:
     runs-on: ubuntu-latest
-    needs: tests
+    # needs: tests
 
     if: ${{ github.ref == 'refs/heads/prod' || github.ref == 'refs/heads/master' }}
 
@@ -49,7 +52,7 @@ jobs:
     steps:
     - uses: actions/checkout@v3
 
-    - uses: actions/setup-node@v3
+    - uses: actions/setup-node@v5
       with:
         node-version: ${{ env.node-version }}
 
